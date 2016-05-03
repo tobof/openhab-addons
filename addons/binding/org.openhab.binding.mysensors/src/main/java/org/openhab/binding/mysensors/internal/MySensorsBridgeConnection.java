@@ -1,10 +1,3 @@
-/**
- * Copyright (c) 2014-2015 openHAB UG (haftungsbeschraenkt) and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- */
 package org.openhab.binding.mysensors.internal;
 
 import java.util.ArrayList;
@@ -34,13 +27,9 @@ public abstract class MySensorsBridgeConnection {
     private Object holdingThread = null;
     private boolean iVersionResponse = false;
 
-    private boolean skipStartupCheck = false;
-
-    public MySensorsBridgeConnection(boolean skipStartupCheck) {
+    public MySensorsBridgeConnection() {
         outboundMessageQueue = new LinkedBlockingQueue<MySensorsMessage>();
         updateListeners = new ArrayList<>();
-
-        this.skipStartupCheck = skipStartupCheck;
     }
 
     /**
@@ -70,19 +59,14 @@ public abstract class MySensorsBridgeConnection {
 
         holdingThread = this;
 
-        if (!skipStartupCheck) {
-            synchronized (holdingThread) {
-                try {
-                    if (!iVersionResponse) {
-                        this.wait(5 * 1000); // wait 2s the reply for the I_VERSION message
-                    }
-                } catch (Exception e) {
-                    logger.error("Exception on waiting for I_VERSION message", e);
+        synchronized (holdingThread) {
+            try {
+                if (!iVersionResponse) {
+                    this.wait(2 * 1000); // wait 2s the reply for the I_VERSION message
                 }
+            } catch (Exception e) {
+                logger.error("Exception on waiting for I_VERSION message", e);
             }
-        } else {
-            logger.warn("Skipping I_VERSION connection test, not recommended...");
-            iVersionResponse = true;
         }
 
         if (!iVersionResponse) {

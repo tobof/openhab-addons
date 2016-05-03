@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014-2016 by the respective copyright holders.
+ * Copyright (c) 2014-2015 openHAB UG (haftungsbeschraenkt) and others.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -149,11 +149,12 @@ public class ZWaveDiscoveryService extends AbstractDiscoveryService {
         thingDiscovered(discoveryResult);
     }
 
-    public void deviceAdded(ZWaveNode node) {
+    public ThingUID deviceAdded(ZWaveNode node) {
         // Don't add the controller as a thing
         if (controllerHandler.getOwnNodeId() == node.getNodeId()) {
-            return;
+            return null;
         }
+
         logger.debug("NODE {}: Device discovery completed", node.getNodeId());
 
         // if (node.getManufacturer() == Integer.MAX_VALUE || node.getDeviceId() == Integer.MAX_VALUE
@@ -169,7 +170,7 @@ public class ZWaveDiscoveryService extends AbstractDiscoveryService {
             if (product == null) {
                 continue;
             }
-            logger.debug("Checking {}", product.getThingTypeUID());
+            // logger.debug("Checking {}", product.getThingTypeUID());
             if (product.match(node) == true) {
                 foundProduct = product;
                 break;
@@ -226,7 +227,7 @@ public class ZWaveDiscoveryService extends AbstractDiscoveryService {
 
         thingDiscovered(discoveryResult);
 
-        return;
+        return thingUID;
     }
 
     public void deviceRemoved(ZWaveNode node) {

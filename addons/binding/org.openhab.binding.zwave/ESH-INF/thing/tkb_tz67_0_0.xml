@@ -28,7 +28,6 @@
       <property name="manufacturerRef">0202:0611</property>
     </properties>
 
-    <!-- CONFIGURATION DESCRIPTIONS -->
     <config-description>
 
       <!-- PARAMETER DEFINITIONS -->

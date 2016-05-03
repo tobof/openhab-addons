@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014-2016 by the respective copyright holders.
+ * Copyright (c) 2014-2015 openHAB UG (haftungsbeschraenkt) and others.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
  * Base class for devices provided by the MAX! protocol.
  *
  * @author Andreas Heil (info@aheil.de)
- * @author Marcel Verpaalen - OH2 update + enhancements
+ * @author Marcel Verpaalen - OH2 update
  * @since 1.4.0
  */
 public abstract class Device {
@@ -62,48 +62,28 @@ public abstract class Device {
         return deviceName;
     }
 
-    public void setName(String name) {
-        if (config != null) {
-            config.setName(name);
-        }
-    }
-
-    public static Device create(String rfAddress, List<DeviceConfiguration> configurations) {
+    private static Device create(String rfAddress, List<DeviceConfiguration> configurations) {
         Device returnValue = null;
         for (DeviceConfiguration c : configurations) {
             if (c.getRFAddress().toUpperCase().equals(rfAddress.toUpperCase())) {
-                return create(c);
+                switch (c.getDeviceType()) {
+                    case HeatingThermostatPlus:
+                    case HeatingThermostat:
+                        HeatingThermostat thermostat = new HeatingThermostat(c);
+                        thermostat.setType(c.getDeviceType());
+                        return thermostat;
+                    case EcoSwitch:
+                        return new EcoSwitch(c);
+                    case ShutterContact:
+                        return new ShutterContact(c);
+                    case WallMountedThermostat:
+                        return new WallMountedThermostat(c);
+                    default:
+                        return new UnsupportedDevice(c);
+                }
             }
         }
         return returnValue;
-    }
-
-    /**
-     * Creates a new device
-     *
-     * @param DeviceConfiguration
-     * @return Device
-     */
-    public static Device create(DeviceConfiguration c) {
-        {
-            switch (c.getDeviceType()) {
-                case HeatingThermostatPlus:
-                case HeatingThermostat:
-                    HeatingThermostat thermostat = new HeatingThermostat(c);
-                    thermostat.setType(c.getDeviceType());
-                    return thermostat;
-                case EcoSwitch:
-                    return new EcoSwitch(c);
-                case ShutterContact:
-                    return new ShutterContact(c);
-                case WallMountedThermostat:
-                    return new WallMountedThermostat(c);
-                case Cube:
-                    return new Cube(c);
-                default:
-                    return new UnsupportedDevice(c);
-            }
-        }
     }
 
     public static Device create(byte[] raw, List<DeviceConfiguration> configurations) {
@@ -371,11 +351,6 @@ public abstract class Device {
 
     public boolean isLinkStatusError() {
         return linkStatusError;
-    }
-
-    @Override
-    public String toString() {
-        return this.getType().toString() + " (" + rfAddress + ") '" + this.getName() + "'";
     }
 
 }

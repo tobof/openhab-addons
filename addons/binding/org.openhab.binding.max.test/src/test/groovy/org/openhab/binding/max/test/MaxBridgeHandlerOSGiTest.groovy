@@ -13,7 +13,8 @@ import static org.junit.matchers.JUnitMatchers.*
 
 import org.eclipse.smarthome.config.core.Configuration
 import org.eclipse.smarthome.core.thing.Bridge
-import org.eclipse.smarthome.core.thing.ThingRegistry
+import org.eclipse.smarthome.core.thing.ManagedThingProvider
+import org.eclipse.smarthome.core.thing.ThingProvider
 import org.eclipse.smarthome.core.thing.ThingTypeUID
 import org.eclipse.smarthome.core.thing.ThingUID
 import org.eclipse.smarthome.core.thing.binding.ThingHandler
@@ -34,14 +35,14 @@ class MaxBridgeHandlerOSGiTest extends OSGiTest {
 
     final ThingTypeUID BRIDGE_THING_TYPE_UID = new ThingTypeUID("max", "bridge")
 
-    ThingRegistry thingRegistry
+    ManagedThingProvider managedThingProvider
     VolatileStorageService volatileStorageService = new VolatileStorageService()
 
     @Before
     void setUp() {
         registerService(volatileStorageService)
-        thingRegistry = getService(ThingRegistry, ThingRegistry)
-        assertThat thingRegistry, is(notNullValue())
+        managedThingProvider = getService(ThingProvider, ManagedThingProvider)
+        assertThat managedThingProvider, is(notNullValue())
     }
 
     @Test
@@ -51,33 +52,34 @@ class MaxBridgeHandlerOSGiTest extends OSGiTest {
         assertThat maxBridgeHandler, is(nullValue())
 
         Configuration configuration = new Configuration().with {
-            put(MaxBinding.PROPERTY_SERIAL_NUMBER, "KEQ0565026")
-            put(MaxBinding.PROPERTY_IP_ADDRESS, "192.168.3.100")
+            put(MaxBinding.SERIAL_NUMBER, "KEQ0565026")
+            put(MaxBinding.IP_ADDRESS, "192.168.3.100")
             it
         }
 
 
         ThingUID cubeUid = new ThingUID(BRIDGE_THING_TYPE_UID, "testCube");
 
-        Bridge maxBridge = thingRegistry.createThingOfType(
+
+        Bridge maxBridge = managedThingProvider.createThing(
                 BRIDGE_THING_TYPE_UID,
                 cubeUid,
-                null,
                 null, configuration)
 
         assertThat maxBridge, is(notNullValue())
-        thingRegistry.add(maxBridge)
 
         // wait for MaxCubeBridgeHandler to be registered
         waitForAssert({
-            assertThat getService(ThingHandler, MaxCubeBridgeHandler), is(notNullValue())
+            maxBridgeHandler = getService(ThingHandler, MaxCubeBridgeHandler)
+            assertThat maxBridgeHandler, is(notNullValue())
         },  10000)
 
-        thingRegistry.forceRemove(cubeUid)
+        managedThingProvider.remove(maxBridge.getUID())
 
         // wait for MaxCubeBridgeHandler to be unregistered
         waitForAssert({
-            assertThat getService(ThingHandler, MaxCubeBridgeHandler), is(nullValue())
+            maxBridgeHandler = getService(ThingHandler, MaxCubeBridgeHandler)
+            assertThat maxBridgeHandler, is(nullValue())
         }, 10000)
     }
 
