@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014-2016 by the respective copyright holders.
+ * Copyright (c) 2014-2015 openHAB UG (haftungsbeschraenkt) and others.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -8,7 +8,6 @@
  */
 package org.openhab.binding.zwave.internal.protocol.commandclass;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,11 +15,11 @@ import org.openhab.binding.zwave.internal.protocol.SerialMessage;
 import org.openhab.binding.zwave.internal.protocol.SerialMessage.SerialMessageClass;
 import org.openhab.binding.zwave.internal.protocol.SerialMessage.SerialMessagePriority;
 import org.openhab.binding.zwave.internal.protocol.SerialMessage.SerialMessageType;
+import org.openhab.binding.zwave.internal.protocol.ZWaveSerialMessageException;
 import org.openhab.binding.zwave.internal.protocol.ZWaveConfigurationParameter;
 import org.openhab.binding.zwave.internal.protocol.ZWaveController;
 import org.openhab.binding.zwave.internal.protocol.ZWaveEndpoint;
 import org.openhab.binding.zwave.internal.protocol.ZWaveNode;
-import org.openhab.binding.zwave.internal.protocol.ZWaveSerialMessageException;
 import org.openhab.binding.zwave.internal.protocol.event.ZWaveCommandClassValueEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -103,8 +102,7 @@ public class ZWaveConfigurationCommandClass extends ZWaveCommandClass {
      *            the endpoint or instance number this message is meant for.
      * @throws ZWaveSerialMessageException
      */
-    private void processConfigurationReport(SerialMessage serialMessage, int offset)
-            throws ZWaveSerialMessageException {
+    private void processConfigurationReport(SerialMessage serialMessage, int offset) throws ZWaveSerialMessageException {
         // Extract the parameter index and value
         int parameter = serialMessage.getMessagePayloadByte(offset + 1);
         int size = serialMessage.getMessagePayloadByte(offset + 2);
@@ -206,16 +204,7 @@ public class ZWaveConfigurationCommandClass extends ZWaveCommandClass {
      * @return the stored parameter value;
      */
     public ZWaveConfigurationParameter getParameter(Integer index) {
-        return configParameters.get(index);
-    }
-
-    /**
-     * Gets all parameters
-     *
-     * @return
-     */
-    public Map<Integer, ZWaveConfigurationParameter> getParameters() {
-        return Collections.unmodifiableMap(configParameters);
+        return this.configParameters.get(index);
     }
 
     /**

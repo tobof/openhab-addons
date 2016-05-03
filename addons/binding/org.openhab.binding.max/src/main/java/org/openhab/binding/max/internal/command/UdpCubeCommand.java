@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014-2016 by the respective copyright holders.
+ * Copyright (c) 2014-2015 openHAB UG (haftungsbeschraenkt) and others.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -29,7 +29,6 @@ import com.google.common.base.Strings;
  * Cube LAN gateway.
  *
  * @author Marcel Verpaalen - Initial contribution
- * @since 2.0
  *
  */
 public class UdpCubeCommand {
@@ -71,7 +70,7 @@ public class UdpCubeCommand {
      */
     public synchronized boolean send() {
         String commandString;
-        if (serialNumber == null || serialNumber.isEmpty()) {
+        if (serialNumber.isEmpty() || serialNumber == null) {
             serialNumber = "**********";
         }
         if (commandType.equals(udpCommandType.RESET)) {
