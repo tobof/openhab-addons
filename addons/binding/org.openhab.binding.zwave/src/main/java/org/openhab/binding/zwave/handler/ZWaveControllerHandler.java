@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014-2015 openHAB UG (haftungsbeschraenkt) and others.
+ * Copyright (c) 2014-2016 by the respective copyright holders.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -10,6 +10,7 @@ package org.openhab.binding.zwave.handler;
 
 import static org.openhab.binding.zwave.ZWaveBindingConstants.*;
 
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -21,7 +22,6 @@ import org.eclipse.smarthome.config.core.validation.ConfigValidationException;
 import org.eclipse.smarthome.config.discovery.DiscoveryService;
 import org.eclipse.smarthome.core.thing.Bridge;
 import org.eclipse.smarthome.core.thing.ChannelUID;
-import org.eclipse.smarthome.core.thing.Thing;
 import org.eclipse.smarthome.core.thing.ThingStatus;
 import org.eclipse.smarthome.core.thing.UID;
 import org.eclipse.smarthome.core.thing.binding.BaseBridgeHandler;
@@ -32,6 +32,7 @@ import org.openhab.binding.zwave.internal.ZWaveNetworkMonitor;
 import org.openhab.binding.zwave.internal.protocol.SerialMessage;
 import org.openhab.binding.zwave.internal.protocol.ZWaveController;
 import org.openhab.binding.zwave.internal.protocol.ZWaveEventListener;
+import org.openhab.binding.zwave.internal.protocol.ZWaveIoHandler;
 import org.openhab.binding.zwave.internal.protocol.ZWaveNode;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveSecurityCommandClass;
 import org.openhab.binding.zwave.internal.protocol.event.ZWaveEvent;
@@ -48,7 +49,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Chris Jackson - Initial contribution
  */
-public abstract class ZWaveControllerHandler extends BaseBridgeHandler implements ZWaveEventListener {
+public abstract class ZWaveControllerHandler extends BaseBridgeHandler implements ZWaveEventListener, ZWaveIoHandler {
 
     private Logger logger = LoggerFactory.getLogger(ZWaveControllerHandler.class);
 
@@ -90,12 +91,33 @@ public abstract class ZWaveControllerHandler extends BaseBridgeHandler implement
         param = getConfig().get(CONFIGURATION_NETWORKKEY);
         if (param instanceof String && param != null) {
             networkKey = (String) param;
-        } else {
-            // TODO: Create random network key
-            networkKey = "";
         }
 
-        super.initialize();
+        if (networkKey.length() == 0) {
+            // Create random network key
+            networkKey = "";
+            for (int cnt = 0; cnt < 16; cnt++) {
+                int value = (int) Math.floor((Math.random() * 255));
+                if (cnt != 0) {
+                    networkKey += " ";
+                }
+                networkKey += String.format("%02X", value);
+            }
+            // Persist the value
+            Configuration configuration = editConfiguration();
+            configuration.put(ZWaveBindingConstants.CONFIGURATION_NETWORKKEY, networkKey);
+            try {
+                // If the thing is defined statically, then this will fail and we will never start!
+                updateConfiguration(configuration);
+            } catch (IllegalStateException e) {
+                // Eat it for now...
+            }
+        }
+
+        // We must set the state
+        updateStatus(ThingStatus.OFFLINE);
+
+        // super.initialize();
     }
 
     /**
@@ -191,11 +213,14 @@ public abstract class ZWaveControllerHandler extends BaseBridgeHandler implement
                     continue;
                 }
 
-                if (cfg[1].equals("softreset") && "GO".equals(value)) {
+                if (cfg[1].equals("softreset") && value instanceof BigDecimal
+                        && value.equals(ZWaveBindingConstants.ACTION_CHECK_VALUE)) {
                     controller.requestSoftReset();
-                } else if (cfg[1].equals("hardreset") && "GO".equals(value)) {
+                } else if (cfg[1].equals("hardreset") && value instanceof BigDecimal
+                        && value.equals(ZWaveBindingConstants.ACTION_CHECK_VALUE)) {
                     controller.requestHardReset();
-                } else if (cfg[1].equals("exclude") && "GO".equals(value)) {
+                } else if (cfg[1].equals("exclude") && value instanceof BigDecimal
+                        && value.equals(ZWaveBindingConstants.ACTION_CHECK_VALUE)) {
                     controller.requestRemoveNodesStart();
                 }
 
@@ -204,7 +229,6 @@ public abstract class ZWaveControllerHandler extends BaseBridgeHandler implement
             if ("security".equals(cfg[0])) {
                 if (cfg[1].equals("networkkey")) {
                     // Format the key here so it's presented nicely and consistently to the user!
-
                     if (value != null) {
                         String hexString = (String) value;
                         hexString = hexString.replace("0x", "");
@@ -273,12 +297,15 @@ public abstract class ZWaveControllerHandler extends BaseBridgeHandler implement
     @Override
     public void ZWaveIncomingEvent(ZWaveEvent event) {
         if (event instanceof ZWaveNetworkStateEvent) {
+            logger.debug("Controller: Incoming Network State Event {}",
+                    ((ZWaveNetworkStateEvent) event).getNetworkState());
             if (((ZWaveNetworkStateEvent) event).getNetworkState() == true) {
                 updateStatus(ThingStatus.ONLINE);
-                Bridge bridge = this.getThing();
-                for (Thing child : bridge.getThings()) {
-                    ((ZWaveThingHandler) child.getHandler()).bridgeHandlerInitialized(this, bridge);
-                }
+                // TODO: Shouldn't the framework do this for us? Maybe it does here as there's a state change?
+                // Bridge bridge = this.getThing();
+                // for (Thing child : bridge.getThings()) {
+                // ((ZWaveThingHandler) child.getHandler()).bridgeHandlerInitialized(this, bridge);
+                // }
             } else {
                 updateStatus(ThingStatus.OFFLINE);
             }
@@ -319,8 +346,7 @@ public abstract class ZWaveControllerHandler extends BaseBridgeHandler implement
         controller.incomingPacket(serialMessage);
     }
 
-    public abstract void sendPacket(SerialMessage serialMessage);
-
+    @Override
     public void deviceDiscovered(int nodeId) {
         if (discoveryService == null) {
             return;
@@ -397,6 +423,13 @@ public abstract class ZWaveControllerHandler extends BaseBridgeHandler implement
             return;
         }
         controller.requestRemoveFailedNode(nodeId);
+    }
+
+    public void checkNodeFailed(int nodeId) {
+        if (controller == null) {
+            return;
+        }
+        controller.requestIsFailedNode(nodeId);
     }
 
     public void replaceFailedNode(int nodeId) {
