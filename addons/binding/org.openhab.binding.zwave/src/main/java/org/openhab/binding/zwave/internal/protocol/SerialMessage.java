@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014-2016 by the respective copyright holders.
+ * Copyright (c) 2014-2015 openHAB UG (haftungsbeschraenkt) and others.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -58,7 +58,7 @@ public class SerialMessage {
     private int callbackId = 0;
 
     private boolean transactionCanceled = false;
-    protected boolean ackPending = false;
+    private boolean ackPending = false;
 
     /**
      * Indicates whether the serial message is valid.
@@ -174,12 +174,6 @@ public class SerialMessage {
         return result.toString();
     }
 
-    /**
-     * Converts a byte to a hexadecimal string representation
-     *
-     * @param bb the byte to convert
-     * @return string the string representation
-     */
     public static String b2hex(byte b) {
         return String.format("%02X ", b);
     }
@@ -205,10 +199,9 @@ public class SerialMessage {
      */
     @Override
     public String toString() {
-        return String.format(
-                "Message: class=%s[0x%02X], type=%s[0x%02X], priority=%s, dest=%d, callback=%d, payload=%s",
+        return String.format("Message: class=%s[0x%02X], type=%s[0x%02X], priority=%s, dest=%d, payload=%s",
                 new Object[] { messageClass, messageClass.key, messageType, messageType.ordinal(), priority,
-                        messageNode, getCallbackId(), SerialMessage.bb2hex(this.getMessagePayload()) });
+                        messageNode, SerialMessage.bb2hex(this.getMessagePayload()) });
     };
 
     /**
@@ -337,7 +330,7 @@ public class SerialMessage {
      * @throws ZWaveSerialMessageException
      */
     public int getMessagePayloadByte(int index) throws ZWaveSerialMessageException {
-        if (index >= messagePayload.length) {
+        if (messagePayload.length < index) {
             throw new ZWaveSerialMessageException(
                     "Attempt to read message payload out of bounds: " + this.toString() + " (" + index + ")");
         }
@@ -480,6 +473,7 @@ public class SerialMessage {
     /**
      * Serial message type enumeration. Indicates whether the message is a request or a response.
      *
+     * @author Jan-Willem Spuij
      */
     public enum SerialMessageType {
         Request, // 0x00
@@ -502,6 +496,8 @@ public class SerialMessage {
      * the lowest so they don't cause any impact on the system.
      * </ul>
      *
+     * @author Chris Jackson
+     * @author Jan-Willem Spuij
      */
     public enum SerialMessagePriority {
         Immediate,
@@ -515,6 +511,7 @@ public class SerialMessage {
     /**
      * Serial message class enumeration. Enumerates the different messages that can be exchanged with the controller.
      *
+     * @author Jan-Willem Spuij
      */
     public enum SerialMessageClass {
         SerialApiGetInitData(0x02, "SerialApiGetInitData"), // Request initial information about devices in network

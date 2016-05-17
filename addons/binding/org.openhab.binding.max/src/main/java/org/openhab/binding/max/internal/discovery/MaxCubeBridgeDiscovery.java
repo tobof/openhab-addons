@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014-2016 by the respective copyright holders.
+ * Copyright (c) 2014-2015 openHAB UG (haftungsbeschraenkt) and others.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -43,14 +43,13 @@ import org.slf4j.LoggerFactory;
 public class MaxCubeBridgeDiscovery extends AbstractDiscoveryService {
 
     static final String MAXCUBE_DISCOVER_STRING = "eQ3Max*\0**********I";
-    private final static int SEARCH_TIME = 15;
 
     private final static Logger logger = LoggerFactory.getLogger(MaxCubeBridgeDiscovery.class);
 
     static boolean discoveryRunning = false;
 
     /** The refresh interval for discovery of MAX! Cubes */
-    private final static long SEARCH_INTERVAL = 600;
+    private long refreshInterval = 600;
     private ScheduledFuture<?> cubeDiscoveryJob;
     private Runnable cubeDiscoveryRunnable = new Runnable() {
         @Override
@@ -60,7 +59,7 @@ public class MaxCubeBridgeDiscovery extends AbstractDiscoveryService {
     };
 
     public MaxCubeBridgeDiscovery() {
-        super(SEARCH_TIME);
+        super(MaxBinding.SUPPORTED_BRIDGE_THING_TYPES_UIDS, 15, true);
     }
 
     @Override
@@ -71,7 +70,7 @@ public class MaxCubeBridgeDiscovery extends AbstractDiscoveryService {
     @Override
     public void startScan() {
         logger.debug("Start MAX! Cube discovery");
-        discoverCube();
+        scheduler.scheduleAtFixedRate(cubeDiscoveryRunnable, 0, refreshInterval, TimeUnit.SECONDS);
     }
 
     /*
@@ -97,7 +96,7 @@ public class MaxCubeBridgeDiscovery extends AbstractDiscoveryService {
     protected void startBackgroundDiscovery() {
         logger.debug("Start MAX! Cube background discovery");
         if (cubeDiscoveryJob == null || cubeDiscoveryJob.isCancelled()) {
-            cubeDiscoveryJob = scheduler.scheduleWithFixedDelay(cubeDiscoveryRunnable, 0, SEARCH_INTERVAL,
+            cubeDiscoveryJob = scheduler.scheduleAtFixedRate(cubeDiscoveryRunnable, 0, refreshInterval,
                     TimeUnit.SECONDS);
         }
     }
@@ -186,7 +185,6 @@ public class MaxCubeBridgeDiscovery extends AbstractDiscoveryService {
             ThingUID uid = new ThingUID(MaxBinding.CUBEBRIDGE_THING_TYPE, cubeSerialNumber);
             if (uid != null) {
                 DiscoveryResult result = DiscoveryResultBuilder.create(uid).withProperties(properties)
-                        .withRepresentationProperty(MaxBinding.PROPERTY_SERIAL_NUMBER)
                         .withLabel("MAX! Cube LAN Gateway").build();
                 thingDiscovered(result);
             }

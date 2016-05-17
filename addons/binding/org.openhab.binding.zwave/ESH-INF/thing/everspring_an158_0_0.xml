@@ -46,7 +46,6 @@
       <property name="defaultAssociations">1</property>
     </properties>
 
-    <!-- CONFIGURATION DESCRIPTIONS -->
     <config-description>
 
       <!-- PARAMETER DEFINITIONS -->
@@ -90,7 +89,7 @@
         <label>1: Reports</label>
       </parameter>
 
-      <parameter name="group_2" type="text" groupName="association" multiple="true">
+      <parameter name="group_2" type="text" groupName="association"  multiple="true">
         <label>2: Control</label>
         <multipleLimit>4</multipleLimit>
       </parameter>

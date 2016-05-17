@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014-2016 by the respective copyright holders.
+ * Copyright (c) 2014-2015 openHAB UG (haftungsbeschraenkt) and others.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -8,21 +8,19 @@
  */
 package org.openhab.binding.zwave.internal.protocol.commandclass;
 
-import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
-import java.nio.charset.CharsetEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 
 import org.openhab.binding.zwave.internal.protocol.SerialMessage;
 import org.openhab.binding.zwave.internal.protocol.SerialMessage.SerialMessageClass;
 import org.openhab.binding.zwave.internal.protocol.SerialMessage.SerialMessagePriority;
 import org.openhab.binding.zwave.internal.protocol.SerialMessage.SerialMessageType;
+import org.openhab.binding.zwave.internal.protocol.ZWaveSerialMessageException;
 import org.openhab.binding.zwave.internal.protocol.ZWaveController;
 import org.openhab.binding.zwave.internal.protocol.ZWaveEndpoint;
 import org.openhab.binding.zwave.internal.protocol.ZWaveNode;
-import org.openhab.binding.zwave.internal.protocol.ZWaveSerialMessageException;
 import org.openhab.binding.zwave.internal.protocol.event.ZWaveCommandClassValueEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,11 +44,6 @@ import com.thoughtworks.xstream.annotations.XStreamOmitField;
 
 @XStreamAlias("nodeNamingCommandClass")
 public class ZWaveNodeNamingCommandClass extends ZWaveCommandClass implements ZWaveCommandClassDynamicState {
-
-    public enum Type {
-        NODENAME_NAME,
-        NODENAME_LOCATION
-    }
 
     @XStreamOmitField
     private static final Logger logger = LoggerFactory.getLogger(ZWaveNodeNamingCommandClass.class);
@@ -112,7 +105,7 @@ public class ZWaveNodeNamingCommandClass extends ZWaveCommandClass implements ZW
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @throws ZWaveSerialMessageException
      */
     @Override
@@ -127,6 +120,7 @@ public class ZWaveNodeNamingCommandClass extends ZWaveCommandClass implements ZW
                 processNameReport(serialMessage, offset, endpoint);
                 initialiseName = true;
                 break;
+
             case LOCATION_REPORT:
                 logger.trace("NODE {}: Process Location Report", this.getNode().getNodeId());
                 processLocationReport(serialMessage, offset, endpoint);
@@ -189,54 +183,32 @@ public class ZWaveNodeNamingCommandClass extends ZWaveCommandClass implements ZW
             numBytes = MAX_STRING_LENGTH;
         }
 
-        if (charPresentation != ENCODING_ASCII) {
-            logger.debug("NODE {}: Switching to using ASCII encoding", getNode().getNodeId());
-            charPresentation = ENCODING_ASCII;
-        }
-
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        // Check for null terminations - ignore anything after the first null
+        // Check for non-printable characters - ignore anything after the first one!
         for (int c = 0; c < numBytes; c++) {
-            if (serialMessage.getMessagePayloadByte(c + offset + 2) > 32
-                    && serialMessage.getMessagePayloadByte(c + offset + 2) < 127) {
-                baos.write((byte) (serialMessage.getMessagePayloadByte(c + offset + 2)));
+            if (serialMessage.getMessagePayloadByte(c + offset + 2) == 0) {
+                numBytes = c;
+                logger.debug("NODE {} : Node name string truncated to {} characters", this.getNode().getNodeId(),
+                        numBytes);
+                break;
             }
         }
-        try {
-            return new String(baos.toByteArray(), "ASCII");
-        } catch (UnsupportedEncodingException e) {
-            return null;
-        }
 
-        /*
-         * byte[] strBuffer = Arrays.copyOfRange(serialMessage.getMessagePayload(), offset + 2, offset + 2 + numBytes);
-         *
-         * String response = null;
-         * try {
-         * switch (charPresentation) {
-         * case ENCODING_ASCII:
-         * // Using standard ASCII codes. (values 128-255 are ignored)
-         * break;
-         * case ENCODING_EXTENDED_ASCII:
-         * // Using standard and OEM Extended ASCII
-         * response = new String(strBuffer, "ASCII");
-         * break;
-         *
-         * case ENCODING_UTF16:
-         * // Unicode UTF-16
-         * String sTemp = new String(strBuffer, "UTF-16");
-         * response = new String(sTemp.getBytes("UTF-8"), "UTF-8");
-         * break;
-         * }
-         * } catch (UnsupportedEncodingException uee) {
-         * System.out.println("Exception: " + uee);
-         * }
-         * if (response == null) {
-         * return null;
-         * }
-         *
-         * return response.replaceAll("\\p{C}", "?");
-         */
+        byte[] strBuffer = Arrays.copyOfRange(serialMessage.getMessagePayload(), offset + 2, offset + 2 + numBytes);
+
+        try {
+            switch (charPresentation) {
+                case ENCODING_ASCII:
+                case ENCODING_EXTENDED_ASCII:
+                    return new String(strBuffer, "ASCII");
+
+                case ENCODING_UTF16:
+                    String sTemp = new String(strBuffer, "UTF-16");
+                    return new String(sTemp.getBytes("UTF-8"), "UTF-8");
+            }
+        } catch (UnsupportedEncodingException uee) {
+            System.out.println("Exception: " + uee);
+        }
+        return null;
     }
 
     /**
@@ -257,7 +229,7 @@ public class ZWaveNodeNamingCommandClass extends ZWaveCommandClass implements ZW
         this.name = name;
         logger.debug("NODE {}: Node name: {}", this.getNode().getNodeId(), name);
         ZWaveCommandClassValueEvent zEvent = new ZWaveCommandClassValueEvent(this.getNode().getNodeId(), endpoint,
-                this.getCommandClass(), name, Type.NODENAME_NAME);
+                this.getCommandClass(), name);
         this.getController().notifyEventListeners(zEvent);
     }
 
@@ -279,7 +251,7 @@ public class ZWaveNodeNamingCommandClass extends ZWaveCommandClass implements ZW
         this.location = location;
         logger.debug("NODE {}: Node location: {}", this.getNode().getNodeId(), location);
         ZWaveCommandClassValueEvent zEvent = new ZWaveCommandClassValueEvent(this.getNode().getNodeId(), endpoint,
-                this.getCommandClass(), location, Type.NODENAME_LOCATION);
+                this.getCommandClass(), location);
         this.getController().notifyEventListeners(zEvent);
     }
 
@@ -324,15 +296,12 @@ public class ZWaveNodeNamingCommandClass extends ZWaveCommandClass implements ZW
                 str);
 
         byte[] nameBuffer = null;
-        byte encoding = ENCODING_ASCII;
-
-        // First we want to see if this can be encoded in ASCII
-        CharsetEncoder asciiEncoder = StandardCharsets.US_ASCII.newEncoder();
-        if (asciiEncoder.canEncode(str) == true) {
-            nameBuffer = str.getBytes(StandardCharsets.US_ASCII);
-        } else {
-            nameBuffer = str.getBytes(StandardCharsets.UTF_16);
-            encoding = ENCODING_UTF16;
+        try {
+            nameBuffer = str.getBytes("UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return null;
         }
 
         int len = nameBuffer.length;
@@ -343,7 +312,7 @@ public class ZWaveNodeNamingCommandClass extends ZWaveCommandClass implements ZW
         SerialMessage result = new SerialMessage(this.getNode().getNodeId(), SerialMessageClass.SendData,
                 SerialMessageType.Request, SerialMessageClass.SendData, SerialMessagePriority.Set);
         byte[] newPayload = { (byte) this.getNode().getNodeId(), (byte) ((byte) len + 3),
-                (byte) getCommandClass().getKey(), (byte) command, encoding };
+                (byte) getCommandClass().getKey(), (byte) command, (byte) ENCODING_UTF16 };
 
         byte[] msg = new byte[newPayload.length + len];
         System.arraycopy(newPayload, 0, msg, 0, newPayload.length);
