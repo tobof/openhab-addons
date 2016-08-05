@@ -45,7 +45,7 @@ public abstract class MySensorsWriter implements MySensorsUpdateListener, Runnab
     public void run() {
 
         while (!stopWriting) {
-            if (!mysCon.pauseWriter) {
+            if (!mysCon.isWriterPaused()) {
                 try {
                     MySensorsMessage msg = mysCon.pollMySensorsOutboundQueue();
 
@@ -69,9 +69,7 @@ public abstract class MySensorsWriter implements MySensorsUpdateListener, Runnab
                                         msg.setMsg(msg.getOldMsg());
                                         msg.setAck(0);
                                         MySensorsStatusUpdateEvent event = new MySensorsStatusUpdateEvent(msg);
-                                        for (MySensorsUpdateListener mySensorsEventListener : mysCon.updateListeners) {
-                                            mySensorsEventListener.statusUpdateReceived(event);
-                                        }
+                                        mysCon.broadCastEvent(event);
                                     } else if (!msg.getRevert()) {
                                         logger.debug("Not reverted due to configuration!");
                                     }
@@ -111,21 +109,25 @@ public abstract class MySensorsWriter implements MySensorsUpdateListener, Runnab
 
         if (future != null) {
             future.cancel(true);
+            future = null;
         }
 
         if (executor != null) {
             executor.shutdown();
             executor.shutdownNow();
+            executor = null;
         }
 
         try {
             if (outs != null) {
                 outs.flush();
                 outs.close();
+                outs = null;
             }
 
             if (outStream != null) {
                 outStream.close();
+                outStream = null;
             }
         } catch (IOException e) {
             logger.error("Cannot close writer stream");
@@ -135,7 +137,6 @@ public abstract class MySensorsWriter implements MySensorsUpdateListener, Runnab
 
     @Override
     public void statusUpdateReceived(MySensorsStatusUpdateEvent event) {
-        // TODO Auto-generated method stub
 
     }
 

@@ -37,7 +37,7 @@ public class MySensorsIpConnection extends MySensorsBridgeConnection {
 
     @Override
     public boolean connect() {
-        logger.debug("Connecting to bridge ...");
+        logger.debug("Connecting to IP bridge ...");
 
         try {
             sock = new Socket(ipAddress, tcpPort);
@@ -58,6 +58,7 @@ public class MySensorsIpConnection extends MySensorsBridgeConnection {
 
     @Override
     public void disconnect() {
+        logger.debug("Disconnecting from IP bridge ...");
 
         if (mysConWriter != null) {
             mysConWriter.stopWriting();

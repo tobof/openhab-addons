@@ -55,7 +55,8 @@ public class MySensorsReader implements MySensorsUpdateListener, Runnable {
 
                 // We lost connection
                 if (line == null) {
-                    broadCastDisconnect();
+                    logger.warn("Connection to Gateway lost!");
+                    mysCon.broadCastDisconnect();
                     break;
                 }
 
@@ -63,9 +64,7 @@ public class MySensorsReader implements MySensorsUpdateListener, Runnable {
                 MySensorsMessage msg = MySensorsMessageParser.parse(line);
                 if (msg != null) {
                     MySensorsStatusUpdateEvent event = new MySensorsStatusUpdateEvent(msg);
-                    for (MySensorsUpdateListener mySensorsEventListener : mysCon.updateListeners) {
-                        mySensorsEventListener.statusUpdateReceived(event);
-                    }
+                    mysCon.broadCastEvent(event);
                 }
             } catch (Exception e) {
                 logger.error("({}) on reading from serial port, message: {}", e, getClass(), e.getMessage());
@@ -73,15 +72,6 @@ public class MySensorsReader implements MySensorsUpdateListener, Runnable {
 
         }
 
-    }
-
-    private void broadCastDisconnect() {
-        logger.warn("Connection to Gateway lost!");
-        stopReader();
-
-        for (MySensorsUpdateListener mySensorsEventListener : mysCon.updateListeners) {
-            mySensorsEventListener.disconnectEvent();
-        }
     }
 
     public void stopReader() {
@@ -92,20 +82,24 @@ public class MySensorsReader implements MySensorsUpdateListener, Runnable {
 
         if (future != null) {
             future.cancel(true);
+            future = null;
         }
 
         if (executor != null) {
             executor.shutdown();
             executor.shutdownNow();
+            executor = null;
         }
 
         try {
             if (reads != null) {
                 reads.close();
+                reads = null;
             }
 
             if (inStream != null) {
                 inStream.close();
+                inStream = null;
             }
         } catch (IOException e) {
             logger.error("Cannot close reader stream");
@@ -115,13 +109,12 @@ public class MySensorsReader implements MySensorsUpdateListener, Runnable {
 
     @Override
     public void statusUpdateReceived(MySensorsStatusUpdateEvent event) {
-        // TODO Auto-generated method stub
 
     }
 
     @Override
     public void disconnectEvent() {
-        stopReader();
+
     }
 
 }

@@ -15,6 +15,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import org.openhab.binding.mysensors.MySensorsBindingConstants;
+import org.openhab.binding.mysensors.handler.MySensorsStatusUpdateEvent;
 import org.openhab.binding.mysensors.handler.MySensorsUpdateListener;
 import org.openhab.binding.mysensors.protocol.MySensorsReader;
 import org.openhab.binding.mysensors.protocol.MySensorsWriter;
@@ -25,8 +26,8 @@ public abstract class MySensorsBridgeConnection {
 
     private Logger logger = LoggerFactory.getLogger(MySensorsBridgeConnection.class);
 
-    public List<MySensorsUpdateListener> updateListeners;
-    public boolean pauseWriter = false;
+    private List<MySensorsUpdateListener> updateListeners;
+    private boolean pauseWriter = false;
 
     private BlockingQueue<MySensorsMessage> outboundMessageQueue = null;
 
@@ -100,7 +101,9 @@ public abstract class MySensorsBridgeConnection {
      */
     public void addUpdateListener(MySensorsUpdateListener listener) {
         synchronized (updateListeners) {
-            updateListeners.add(listener);
+            if (!updateListeners.contains(listener)) {
+                updateListeners.add(listener);
+            }
         }
     }
 
@@ -110,6 +113,10 @@ public abstract class MySensorsBridgeConnection {
                 updateListeners.remove(listener);
             }
         }
+    }
+
+    public List<MySensorsUpdateListener> getUpdateListeners() {
+        return updateListeners;
     }
 
     public MySensorsMessage pollMySensorsOutboundQueue() throws InterruptedException {
@@ -154,11 +161,33 @@ public abstract class MySensorsBridgeConnection {
     }
 
     public void iVersionMessageReceived(String msg) {
-        iVersionResponse = true;
-        synchronized (waitingObj) {
-            waitingObj.notifyAll();
-            waitingObj = null;
+        if (waitingObj != null) {
+            logger.debug("Good,Gateway is up and running! (Ver:{})", msg);
+            synchronized (waitingObj) {
+                iVersionResponse = true;
+                waitingObj.notifyAll();
+                waitingObj = null;
+            }
         }
-        logger.debug("Good,Gateway is up and running! (Ver:{})", msg);
+    }
+
+    public boolean isWriterPaused() {
+        return pauseWriter;
+    }
+
+    public void broadCastDisconnect() {
+        synchronized (updateListeners) {
+            for (MySensorsUpdateListener mySensorsEventListener : updateListeners) {
+                mySensorsEventListener.disconnectEvent();
+            }
+        }
+    }
+
+    public void broadCastEvent(MySensorsStatusUpdateEvent event) {
+        synchronized (updateListeners) {
+            for (MySensorsUpdateListener mySensorsEventListener : updateListeners) {
+                mySensorsEventListener.statusUpdateReceived(event);
+            }
+        }
     }
 }

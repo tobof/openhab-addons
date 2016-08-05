@@ -22,10 +22,12 @@ import org.eclipse.smarthome.core.thing.Thing;
 import org.eclipse.smarthome.core.thing.ThingStatus;
 import org.eclipse.smarthome.core.thing.binding.BaseBridgeHandler;
 import org.eclipse.smarthome.core.types.Command;
+import org.openhab.binding.mysensors.MySensorsBindingUtility;
 import org.openhab.binding.mysensors.config.MySensorsBridgeConfiguration;
 import org.openhab.binding.mysensors.discovery.MySensorsDiscoveryService;
 import org.openhab.binding.mysensors.internal.MySensorsBridgeConnection;
 import org.openhab.binding.mysensors.internal.MySensorsMessage;
+import org.openhab.binding.mysensors.internal.MySensorsNetworkSanityChecker;
 import org.openhab.binding.mysensors.protocol.ip.MySensorsIpConnection;
 import org.openhab.binding.mysensors.protocol.serial.MySensorsSerialConnection;
 import org.slf4j.Logger;
@@ -66,7 +68,7 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
      */
     @Override
     public void initialize() {
-        logger.debug("Initialization of the MySensors Bridge");
+        logger.debug("Initialization of the MySensors bridge");
 
         MySensorsBridgeConfiguration configuration = getConfigAs(MySensorsBridgeConfiguration.class);
 
@@ -90,12 +92,19 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
         mysCon.addUpdateListener(this);
 
         if (mysCon.connect()) {
+            logger.info("Successfully connected to MySensors Bridge.");
+
             updateStatus(ThingStatus.ONLINE);
 
             // Start discovery service
             MySensorsDiscoveryService discoveryService = new MySensorsDiscoveryService(this);
             discoveryService.activate();
+
+            // Start network sanity check
+            MySensorsNetworkSanityChecker netSanityChecker = new MySensorsNetworkSanityChecker(mysCon, configuration);
+            netSanityChecker.start();
         } else {
+            disconnect();
             mysCon.removeUpdateListener(this);
             updateStatus(ThingStatus.OFFLINE);
         }
@@ -109,9 +118,7 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
      */
     @Override
     public void dispose() {
-        if (mysCon != null) {
-            mysCon.disconnect();
-        }
+        disconnect();
     }
 
     /*
@@ -157,38 +164,18 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
         }
 
         // Have we get a I_VERSION message?
-        if (msg.getNodeId() == 0) {
-            if (msg.getChildId() == 0 || msg.getChildId() == 255) {
-                if (msg.getMsgType() == MYSENSORS_MSG_TYPE_INTERNAL) {
-                    if (msg.getAck() == 0) {
-                        if (msg.getSubType() == MYSENSORS_SUBTYPE_I_VERSION) {
-                            handleIncomingVersionMessage(msg.msg);
-                        }
-                    }
-                }
-            }
+        if (MySensorsBindingUtility.isIVersionMessage(msg)) {
+            handleIncomingVersionMessage(msg.msg);
         }
 
         // Have we get a I_CONFIG message?
-        if (msg.getChildId() == 0 || msg.getChildId() == 255) {
-            if (msg.getMsgType() == MYSENSORS_MSG_TYPE_INTERNAL) {
-                if (msg.getAck() == 0) {
-                    if (msg.getSubType() == MYSENSORS_SUBTYPE_I_CONFIG) {
-                        answerIConfigMessage(msg);
-                    }
-                }
-            }
+        if (MySensorsBindingUtility.isIConfigMessage(msg)) {
+            answerIConfigMessage(msg);
         }
 
         // Have we get a I_TIME message?
-        if (msg.getChildId() == 0 || msg.getChildId() == 255) {
-            if (msg.getMsgType() == MYSENSORS_MSG_TYPE_INTERNAL) {
-                if (msg.getAck() == 0) {
-                    if (msg.getSubType() == MYSENSORS_SUBTYPE_I_TIME) {
-                        answerITimeMessage(msg);
-                    }
-                }
-            }
+        if (MySensorsBindingUtility.isITimeMessage(msg)) {
+            answerITimeMessage(msg);
         }
     }
 
@@ -288,6 +275,15 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
 
     @Override
     public void disconnectEvent() {
+        disconnect();
         updateStatus(ThingStatus.OFFLINE);
+    }
+
+    private void disconnect() {
+        if (mysCon != null) {
+            logger.info("Disconnecting from MySensors bridge.");
+            mysCon.disconnect();
+            mysCon = null;
+        }
     }
 }

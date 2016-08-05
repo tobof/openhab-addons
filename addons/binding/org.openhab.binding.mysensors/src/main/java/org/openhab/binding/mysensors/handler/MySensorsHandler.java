@@ -319,7 +319,7 @@ public class MySensorsHandler extends BaseThingHandler implements MySensorsUpdat
             logger.warn("Bridge connection not estblished yet - can't subscribe for node: {} child: {}", nodeId,
                     childId);
         } else {
-            logger.debug("Bridge connection estblished - subscribing update for node: {} child: {}", nodeId, childId);
+            logger.info("Bridge connection established - subscribing update for node: {} child: {}", nodeId, childId);
             bridgeHandler.getBridgeConnection().addUpdateListener(this);
         }
     }

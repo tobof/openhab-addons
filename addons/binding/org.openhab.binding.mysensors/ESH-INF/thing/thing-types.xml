@@ -41,6 +41,12 @@
 				<description>Metric answer with imperial instead of metric</description>
 				<default>false</default>
 			</parameter>
+			<parameter name="enableNetworkSanCheck" type="boolean" required="false">
+                <context>enablenetworksancheck</context>
+                <label>Disable network sanity check</label>
+                <description>Network sanity check periodically unsure that gateway is up and running</description>
+                <default>false</default>
+            </parameter>
 		</config-description>
 
 	</bridge-type>
@@ -82,6 +88,12 @@
 				<description>Metric answer with imperial instead of metric</description>
 				<default>false</default>
 			</parameter>
+			<parameter name="enableNetworkSanCheck" type="boolean" required="false">
+                <context>enablenetworksancheck</context>
+                <label>Disable network sanity check</label>
+                <description>Network sanity check periodically unsure that gateway is up and running</description>
+                <default>false</default>
+            </parameter>
 		</config-description>
 
 	</bridge-type>

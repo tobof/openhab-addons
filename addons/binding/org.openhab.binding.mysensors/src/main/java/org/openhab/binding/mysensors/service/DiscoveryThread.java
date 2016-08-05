@@ -37,7 +37,6 @@ public class DiscoveryThread implements MySensorsUpdateListener {
 
     @Override
     public void disconnectEvent() {
-        // TODO Auto-generated method stub
 
     }
 }
