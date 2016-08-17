@@ -37,20 +37,24 @@ public class MySensorsIpConnection extends MySensorsBridgeConnection {
 
     @Override
     public boolean connect() {
-        logger.debug("Connecting to IP bridge ...");
+        logger.debug("Connecting to IP bridge [{}:{}]", ipAddress, tcpPort);
 
-        try {
-            sock = new Socket(ipAddress, tcpPort);
-            mysConReader = new MySensorIpReader(sock.getInputStream(), this);
-            mysConWriter = new MySensorsIpWriter(sock, this, sendDelay);
+        if (ipAddress == null || ipAddress.isEmpty()) {
+            logger.error("IP must be not null/empty");
+        } else {
+            try {
+                sock = new Socket(ipAddress, tcpPort);
+                mysConReader = new MySensorIpReader(sock.getInputStream(), this);
+                mysConWriter = new MySensorsIpWriter(sock, this, sendDelay);
 
-            connected = startReaderWriterThread(mysConReader, mysConWriter);
-        } catch (UnknownHostException e) {
-            logger.error("Error while trying to connect to: " + ipAddress + ":" + tcpPort);
-            e.printStackTrace();
-        } catch (IOException e) {
-            logger.error("Error while trying to connect InputStreamReader");
-            e.printStackTrace();
+                connected = startReaderWriterThread(mysConReader, mysConWriter);
+            } catch (UnknownHostException e) {
+                logger.error("Error while trying to connect to: " + ipAddress + ":" + tcpPort);
+                e.printStackTrace();
+            } catch (IOException e) {
+                logger.error("Error while trying to connect InputStreamReader");
+                e.printStackTrace();
+            }
         }
 
         return connected;
@@ -62,16 +66,19 @@ public class MySensorsIpConnection extends MySensorsBridgeConnection {
 
         if (mysConWriter != null) {
             mysConWriter.stopWriting();
+            mysConWriter = null;
         }
 
         if (mysConReader != null) {
             mysConReader.stopReader();
+            mysConReader = null;
         }
 
         // Shut down socket
         try {
             if (sock != null && sock.isConnected()) {
                 sock.close();
+                sock = null;
             }
         } catch (IOException e) {
             logger.error("cannot disconnect from socket, message: {}", e.getMessage());

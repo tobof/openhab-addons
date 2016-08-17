@@ -56,4 +56,22 @@ public class MySensorsBindingUtility {
 
         return ret;
     }
+
+    public static boolean isIdRequestMessage(MySensorsMessage msg) {
+        boolean ret = false;
+
+        if (msg.getNodeId() == 255) {
+            if (msg.getChildId() == 255) {
+                if (msg.getMsgType() == MYSENSORS_SUBTYPE_I_ID_REQUEST) {
+                    if (msg.getAck() == 0) {
+                        if (msg.getSubType() == MYSENSORS_MSG_TYPE_INTERNAL) {
+                            ret = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        return ret;
+    }
 }

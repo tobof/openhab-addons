@@ -104,8 +104,8 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
             MySensorsNetworkSanityChecker netSanityChecker = new MySensorsNetworkSanityChecker(mysCon, configuration);
             netSanityChecker.start();
         } else {
-            disconnect();
             mysCon.removeUpdateListener(this);
+            disconnect();
             updateStatus(ThingStatus.OFFLINE);
         }
 
@@ -151,16 +151,8 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
         }
 
         // Are we getting a Request ID Message?
-        if (msg.getNodeId() == 255) {
-            if (msg.getChildId() == 255) {
-                if (msg.getMsgType() == MYSENSORS_MSG_TYPE_INTERNAL) {
-                    if (msg.getAck() == 0) {
-                        if (msg.getSubType() == 3) {
-                            answerIDRequest();
-                        }
-                    }
-                }
-            }
+        if (MySensorsBindingUtility.isIdRequestMessage(msg)) {
+            answerIDRequest();
         }
 
         // Have we get a I_VERSION message?
