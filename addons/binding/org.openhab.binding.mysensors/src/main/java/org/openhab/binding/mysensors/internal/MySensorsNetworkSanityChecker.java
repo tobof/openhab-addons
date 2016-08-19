@@ -15,6 +15,7 @@ import java.util.concurrent.TimeUnit;
 import org.openhab.binding.mysensors.MySensorsBindingConstants;
 import org.openhab.binding.mysensors.MySensorsBindingUtility;
 import org.openhab.binding.mysensors.config.MySensorsBridgeConfiguration;
+import org.openhab.binding.mysensors.handler.MySensorsBridgeHandler;
 import org.openhab.binding.mysensors.handler.MySensorsStatusUpdateEvent;
 import org.openhab.binding.mysensors.handler.MySensorsUpdateListener;
 import org.slf4j.Logger;
@@ -33,6 +34,7 @@ public class MySensorsNetworkSanityChecker implements MySensorsUpdateListener, R
     private static final int SHEDULE_MINUTES_DELAY = 1; // only for test will be: 3
     private static final int MAX_ATTEMPTS_BEFORE_DISCONNECT = 1; // only for test will be: 3
 
+    private MySensorsBridgeHandler myBridgeHandler = null;
     private MySensorsBridgeConnection myBridgeConnection = null;
     private MySensorsBridgeConfiguration myConfiguration = null;
 
@@ -42,13 +44,14 @@ public class MySensorsNetworkSanityChecker implements MySensorsUpdateListener, R
     private Integer iVersionMessageMissing = 0;
     private boolean iVersionMessageArrived = false;
 
-    public MySensorsNetworkSanityChecker(MySensorsBridgeConnection myBridgeConnection,
+    public MySensorsNetworkSanityChecker(MySensorsBridgeHandler myBridgeHandler,
             MySensorsBridgeConfiguration myConfiguration) {
 
         if (myBridgeConnection == null || myConfiguration == null) {
             throw new IllegalArgumentException();
         }
-        this.myBridgeConnection = myBridgeConnection;
+        this.myBridgeHandler = myBridgeHandler;
+        this.myBridgeConnection = myBridgeHandler.getBridgeConnection();
         this.myConfiguration = myConfiguration;
     }
 
@@ -134,6 +137,5 @@ public class MySensorsNetworkSanityChecker implements MySensorsUpdateListener, R
 
     @Override
     public void disconnectEvent() {
-        stop();
     }
 }

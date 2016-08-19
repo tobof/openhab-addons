@@ -45,7 +45,7 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
 
     private Logger logger = LoggerFactory.getLogger(MySensorsBridgeHandler.class);
 
-    public Collection<Thing> connectedThings = Lists.newArrayList();
+    private Collection<Thing> connectedThings = Lists.newArrayList();
 
     // List of Ids that OpenHAB has given, in response to an id request from a sensor node
     private List<Number> givenIds = new ArrayList<Number>();
@@ -56,6 +56,9 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
     private String iConfig = null;
 
     private boolean skipStartupCheck = false;
+
+    // Network sanity checker thread
+    private MySensorsNetworkSanityChecker netSanityChecker = null;
 
     public MySensorsBridgeHandler(Bridge bridge) {
         super(bridge);
@@ -100,9 +103,17 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
             MySensorsDiscoveryService discoveryService = new MySensorsDiscoveryService(this);
             discoveryService.activate();
 
-            // Start network sanity check
-            MySensorsNetworkSanityChecker netSanityChecker = new MySensorsNetworkSanityChecker(mysCon, configuration);
-            netSanityChecker.start();
+            if (configuration.enableNetworkSanCheck) {
+                logger.info("Network Sanity Checker thread started");
+
+                // Start network sanity check
+                netSanityChecker = new MySensorsNetworkSanityChecker(this, configuration);
+                netSanityChecker.start();
+
+            } else {
+                logger.warn("Network Sanity Checker thread disabled from bridge configuration");
+            }
+
         } else {
             mysCon.removeUpdateListener(this);
             disconnect();
@@ -118,6 +129,12 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
      */
     @Override
     public void dispose() {
+
+        if (netSanityChecker != null) {
+            netSanityChecker.stop();
+            netSanityChecker = null;
+        }
+
         disconnect();
     }
 
