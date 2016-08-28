@@ -74,7 +74,7 @@ public class MySensorsHandler extends BaseThingHandler implements MySensorsUpdat
 
     @Override
     public void handleRemoval() {
-        getBridgeHandler().getBridgeConnection().removeUpdateListener(this);
+        getBridgeHandler().getBridgeConnector().removeUpdateListener(this);
         super.handleRemoval();
     }
 
@@ -204,7 +204,7 @@ public class MySensorsHandler extends BaseThingHandler implements MySensorsUpdat
         newMsg.setOldMsg(oldPayload);
         oldMsgContent.put(subType, msgPayload);
 
-        getBridgeHandler().getBridgeConnection().addMySensorsOutboundMessage(newMsg);
+        getBridgeHandler().getBridgeConnector().addMySensorsOutboundMessage(newMsg);
     }
 
     /*
@@ -291,11 +291,16 @@ public class MySensorsHandler extends BaseThingHandler implements MySensorsUpdat
                         oldVal = "";
                     }
                     msg.setMsg(oldVal);
-                    getBridgeHandler().getBridgeConnection().addMySensorsOutboundMessage(msg);
+                    getBridgeHandler().getBridgeConnector().addMySensorsOutboundMessage(msg);
                 }
             }
 
         }
+    }
+
+    @Override
+    public void disconnectEvent() {
+
     }
 
     /**
@@ -315,12 +320,12 @@ public class MySensorsHandler extends BaseThingHandler implements MySensorsUpdat
     @Override
     public void bridgeHandlerInitialized(ThingHandler thingHandler, Bridge bridge) {
         MySensorsBridgeHandler bridgeHandler = (MySensorsBridgeHandler) thingHandler;
-        if (bridgeHandler.getBridgeConnection() == null) {
+        if (bridgeHandler.getBridgeConnector() == null) {
             logger.warn("Bridge connection not estblished yet - can't subscribe for node: {} child: {}", nodeId,
                     childId);
         } else {
             logger.info("Bridge connection established - subscribing update for node: {} child: {}", nodeId, childId);
-            bridgeHandler.getBridgeConnection().addUpdateListener(this);
+            bridgeHandler.getBridgeConnector().addUpdateListener(this);
         }
     }
 
@@ -332,10 +337,5 @@ public class MySensorsHandler extends BaseThingHandler implements MySensorsUpdat
             updateState(CHANNEL_LAST_UPDATE, dt);
             logger.debug("Setting last update for node {} to {}", nodeId, dt.toString());
         }
-    }
-
-    @Override
-    public void disconnectEvent() {
-
     }
 }

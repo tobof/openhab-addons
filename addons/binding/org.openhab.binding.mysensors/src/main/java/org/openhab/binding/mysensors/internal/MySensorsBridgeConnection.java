@@ -26,10 +26,12 @@ public abstract class MySensorsBridgeConnection {
 
     private Logger logger = LoggerFactory.getLogger(MySensorsBridgeConnection.class);
 
-    private List<MySensorsUpdateListener> updateListeners;
     private boolean pauseWriter = false;
 
     private BlockingQueue<MySensorsMessage> outboundMessageQueue = null;
+
+    // Update listener
+    private List<MySensorsUpdateListener> updateListeners = null;
 
     protected boolean connected = false;
 
@@ -96,29 +98,6 @@ public abstract class MySensorsBridgeConnection {
         return iVersionResponse;
     }
 
-    /**
-     * @param listener An Object, that wants to listen on status updates
-     */
-    public void addUpdateListener(MySensorsUpdateListener listener) {
-        synchronized (updateListeners) {
-            if (!updateListeners.contains(listener)) {
-                updateListeners.add(listener);
-            }
-        }
-    }
-
-    public void removeUpdateListener(MySensorsUpdateListener listener) {
-        synchronized (updateListeners) {
-            if (updateListeners.contains(listener)) {
-                updateListeners.remove(listener);
-            }
-        }
-    }
-
-    public List<MySensorsUpdateListener> getUpdateListeners() {
-        return updateListeners;
-    }
-
     public MySensorsMessage pollMySensorsOutboundQueue() throws InterruptedException {
         return outboundMessageQueue.poll(1, TimeUnit.DAYS);
     }
@@ -160,19 +139,27 @@ public abstract class MySensorsBridgeConnection {
         pauseWriter = false;
     }
 
-    public void iVersionMessageReceived(String msg) {
-        if (waitingObj != null) {
-            logger.debug("Good,Gateway is up and running! (Ver:{})", msg);
-            synchronized (waitingObj) {
-                iVersionResponse = true;
-                waitingObj.notifyAll();
-                waitingObj = null;
+    /**
+     * @param listener An Object, that wants to listen on status updates
+     */
+    public void addUpdateListener(MySensorsUpdateListener listener) {
+        synchronized (updateListeners) {
+            if (!updateListeners.contains(listener)) {
+                updateListeners.add(listener);
             }
         }
     }
 
-    public boolean isWriterPaused() {
-        return pauseWriter;
+    public void removeUpdateListener(MySensorsUpdateListener listener) {
+        synchronized (updateListeners) {
+            if (updateListeners.contains(listener)) {
+                updateListeners.remove(listener);
+            }
+        }
+    }
+
+    public List<MySensorsUpdateListener> getUpdateListeners() {
+        return updateListeners;
     }
 
     public void broadCastDisconnect() {
@@ -189,5 +176,24 @@ public abstract class MySensorsBridgeConnection {
                 mySensorsEventListener.statusUpdateReceived(event);
             }
         }
+    }
+
+    public void iVersionMessageReceived(String msg) {
+        if (waitingObj != null) {
+            logger.debug("Good,Gateway is up and running! (Ver:{})", msg);
+            synchronized (waitingObj) {
+                iVersionResponse = true;
+                waitingObj.notifyAll();
+                waitingObj = null;
+            }
+        }
+    }
+
+    public boolean isWriterPaused() {
+        return pauseWriter;
+    }
+
+    public boolean isConnected() {
+        return connected;
     }
 }

@@ -7,13 +7,14 @@
  */
 package org.openhab.binding.mysensors.handler;
 
-import static org.openhab.binding.mysensors.MySensorsBindingConstants.*;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.smarthome.config.core.Configuration;
 import org.eclipse.smarthome.core.thing.Bridge;
@@ -22,18 +23,10 @@ import org.eclipse.smarthome.core.thing.Thing;
 import org.eclipse.smarthome.core.thing.ThingStatus;
 import org.eclipse.smarthome.core.thing.binding.BaseBridgeHandler;
 import org.eclipse.smarthome.core.types.Command;
-import org.openhab.binding.mysensors.MySensorsBindingUtility;
 import org.openhab.binding.mysensors.config.MySensorsBridgeConfiguration;
-import org.openhab.binding.mysensors.discovery.MySensorsDiscoveryService;
-import org.openhab.binding.mysensors.internal.MySensorsBridgeConnection;
-import org.openhab.binding.mysensors.internal.MySensorsMessage;
-import org.openhab.binding.mysensors.internal.MySensorsNetworkSanityChecker;
-import org.openhab.binding.mysensors.protocol.ip.MySensorsIpConnection;
-import org.openhab.binding.mysensors.protocol.serial.MySensorsSerialConnection;
+import org.openhab.binding.mysensors.internal.MySensorsNetworkConnector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.collect.Lists;
 
 /**
  * @author Tim Oberföll
@@ -41,24 +34,19 @@ import com.google.common.collect.Lists;
  *         MySensorsBridgeHandler is used to initialize a new bridge (in MySensors: Gateway)
  *         The sensors are connected via the gateway/bridge to the controller
  */
-public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySensorsUpdateListener {
+public class MySensorsBridgeHandler extends BaseBridgeHandler {
 
     private Logger logger = LoggerFactory.getLogger(MySensorsBridgeHandler.class);
-
-    private Collection<Thing> connectedThings = Lists.newArrayList();
 
     // List of Ids that OpenHAB has given, in response to an id request from a sensor node
     private List<Number> givenIds = new ArrayList<Number>();
 
-    private MySensorsBridgeConnection mysCon = null;
+    // Network connector to bridge
+    private MySensorsNetworkConnector mysConnector = null;
+    private Future<?> connectorFuture = null;
 
-    // Is (I)mperial or (M)etric?
-    private String iConfig = null;
-
-    private boolean skipStartupCheck = false;
-
-    // Network sanity checker thread
-    private MySensorsNetworkSanityChecker netSanityChecker = null;
+    // Configuration from thing file
+    private MySensorsBridgeConfiguration myConfiguration = null;
 
     public MySensorsBridgeHandler(Bridge bridge) {
         super(bridge);
@@ -73,53 +61,14 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
     public void initialize() {
         logger.debug("Initialization of the MySensors bridge");
 
-        MySensorsBridgeConfiguration configuration = getConfigAs(MySensorsBridgeConfiguration.class);
+        myConfiguration = getConfigAs(MySensorsBridgeConfiguration.class);
 
-        boolean imperial = configuration.imperial;
-        iConfig = imperial ? "I" : "M";
+        logger.debug("Set skip check on startup to: {}", myConfiguration.skipStartupCheck);
 
-        logger.debug("Using {} measure unit", (imperial ? "Imperial" : "Metric"));
+        mysConnector = new MySensorsNetworkConnector(this);
+        connectorFuture = getScheduler().scheduleWithFixedDelay(mysConnector, 0, 10, TimeUnit.SECONDS);
 
-        skipStartupCheck = configuration.skipStartupCheck;
-
-        logger.debug("Set skip check on startup to: {}", skipStartupCheck);
-
-        if (getThing().getThingTypeUID().equals(THING_TYPE_BRIDGE_SER)) {
-            mysCon = new MySensorsSerialConnection(configuration.serialPort, configuration.baudRate,
-                    configuration.sendDelay, skipStartupCheck);
-        } else if (getThing().getThingTypeUID().equals(THING_TYPE_BRIDGE_ETH)) {
-            mysCon = new MySensorsIpConnection(configuration.ipAddress, configuration.tcpPort, configuration.sendDelay,
-                    skipStartupCheck);
-        }
-
-        mysCon.addUpdateListener(this);
-
-        if (mysCon.connect()) {
-            logger.info("Successfully connected to MySensors Bridge.");
-
-            updateStatus(ThingStatus.ONLINE);
-
-            // Start discovery service
-            MySensorsDiscoveryService discoveryService = new MySensorsDiscoveryService(this);
-            discoveryService.activate();
-
-            if (configuration.enableNetworkSanCheck) {
-                logger.info("Network Sanity Checker thread started");
-
-                // Start network sanity check
-                netSanityChecker = new MySensorsNetworkSanityChecker(this, configuration);
-                netSanityChecker.start();
-
-            } else {
-                logger.warn("Network Sanity Checker thread disabled from bridge configuration");
-            }
-
-        } else {
-            mysCon.removeUpdateListener(this);
-            disconnect();
-            updateStatus(ThingStatus.OFFLINE);
-        }
-
+        notifyDisconnect();
     }
 
     /*
@@ -129,13 +78,8 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
      */
     @Override
     public void dispose() {
-
-        if (netSanityChecker != null) {
-            netSanityChecker.stop();
-            netSanityChecker = null;
-        }
-
         disconnect();
+        notifyDisconnect();
     }
 
     /*
@@ -150,94 +94,11 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
         // TODO Auto-generated method stub
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * org.openhab.binding.mysensors.handler.MySensorsUpdateListener#statusUpdateReceived(org.openhab.binding.mysensors.
-     * handler.MySensorsStatusUpdateEvent)
-     */
-    @Override
-    public void statusUpdateReceived(MySensorsStatusUpdateEvent event) {
-        MySensorsMessage msg = event.getData();
-        // logger.debug("updateRecieved: " + msg.getDebugInfo());
-        // Do we get an ACK?
-        if (msg.getAck() == 1) {
-            logger.debug(String.format("ACK received! Node: %d, Child: %d", msg.nodeId, msg.childId));
-            mysCon.removeMySensorsOutboundMessage(msg);
-        }
-
-        // Are we getting a Request ID Message?
-        if (MySensorsBindingUtility.isIdRequestMessage(msg)) {
-            answerIDRequest();
-        }
-
-        // Have we get a I_VERSION message?
-        if (MySensorsBindingUtility.isIVersionMessage(msg)) {
-            handleIncomingVersionMessage(msg.msg);
-        }
-
-        // Have we get a I_CONFIG message?
-        if (MySensorsBindingUtility.isIConfigMessage(msg)) {
-            answerIConfigMessage(msg);
-        }
-
-        // Have we get a I_TIME message?
-        if (MySensorsBindingUtility.isITimeMessage(msg)) {
-            answerITimeMessage(msg);
-        }
+    public List<Number> getGivedIds() {
+        return givenIds;
     }
 
-    /**
-     * Answer to I_TIME message for gateway time request from sensor
-     *
-     * @param msg, the incoming I_TIME message from sensor
-     */
-    private void answerITimeMessage(MySensorsMessage msg) {
-        logger.info("I_TIME request received from {}, answering...", msg.nodeId);
-
-        String time = Long.toString(System.currentTimeMillis() / 1000);
-        MySensorsMessage newMsg = new MySensorsMessage(msg.nodeId, msg.childId, MYSENSORS_MSG_TYPE_INTERNAL, 0, false,
-                MYSENSORS_SUBTYPE_I_TIME, time);
-        mysCon.addMySensorsOutboundMessage(newMsg);
-
-    }
-
-    /**
-     * Answer to I_CONFIG message for imperial/metric request from sensor
-     *
-     * @param msg, the incoming I_CONFIG message from sensor
-     */
-    private void answerIConfigMessage(MySensorsMessage msg) {
-        logger.debug("I_CONFIG request received from {}, answering...", msg.nodeId);
-
-        MySensorsMessage newMsg = new MySensorsMessage(msg.nodeId, msg.childId, MYSENSORS_MSG_TYPE_INTERNAL, 0, false,
-                MYSENSORS_SUBTYPE_I_CONFIG, iConfig);
-        mysCon.addMySensorsOutboundMessage(newMsg);
-
-    }
-
-    /**
-     * If an ID -Request from a sensor is received the controller will send an id to the sensor
-     */
-    private void answerIDRequest() {
-        logger.debug("ID Request received");
-
-        int newId = getFreeId();
-        givenIds.add(newId);
-        MySensorsMessage newMsg = new MySensorsMessage(255, 255, 3, 0, false, 4, newId + "");
-        mysCon.addMySensorsOutboundMessage(newMsg);
-        logger.info("New Node in the MySensors network has requested an ID. ID is: {}", newId);
-    }
-
-    /**
-     * Wake up main thread that is waiting for confirmation of link up
-     */
-    private void handleIncomingVersionMessage(String message) {
-        mysCon.iVersionMessageReceived(message);
-    }
-
-    private int getFreeId() {
+    public int getFreeId() {
         int id = 1;
 
         List<Number> takenIds = new ArrayList<Number>();
@@ -278,21 +139,36 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
         return id;
     }
 
-    public MySensorsBridgeConnection getBridgeConnection() {
-        return mysCon;
+    public MySensorsNetworkConnector getBridgeConnector() {
+        return mysConnector;
     }
 
-    @Override
-    public void disconnectEvent() {
-        disconnect();
+    public MySensorsBridgeConfiguration getBridgeConfiguration() {
+        return myConfiguration;
+    }
+
+    public ScheduledExecutorService getScheduler() {
+        return scheduler;
+    }
+
+    public void notifyConnect() {
+        updateStatus(ThingStatus.ONLINE);
+    }
+
+    public void notifyDisconnect() {
         updateStatus(ThingStatus.OFFLINE);
     }
 
     private void disconnect() {
-        if (mysCon != null) {
-            logger.info("Disconnecting from MySensors bridge.");
-            mysCon.disconnect();
-            mysCon = null;
+
+        if (connectorFuture != null) {
+            connectorFuture.cancel(true);
+            connectorFuture = null;
+        }
+
+        if (mysConnector != null) {
+            mysConnector.disconnect();
+            mysConnector = null;
         }
     }
 }
