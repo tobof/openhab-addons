@@ -43,7 +43,7 @@ public abstract class MySensorsWriter implements MySensorsUpdateListener, Runnab
 
     @Override
     public void run() {
-
+        Thread.currentThread().setName(MySensorsWriter.class.getName());
         while (!stopWriting) {
             if (!mysCon.isWriterPaused()) {
                 try {
@@ -89,8 +89,8 @@ public abstract class MySensorsWriter implements MySensorsUpdateListener, Runnab
                         logger.warn("Message returned from queue is null");
                     }
 
-                } catch (InterruptedException e) {
-                    logger.warn("Writer thread interrupted");
+                } catch (Exception e) {
+                    logger.error("({}) on writing from serial port, message: {}", e, getClass(), e.getMessage());
                 }
             }
         }
@@ -137,11 +137,6 @@ public abstract class MySensorsWriter implements MySensorsUpdateListener, Runnab
 
     @Override
     public void statusUpdateReceived(MySensorsStatusUpdateEvent event) {
-
-    }
-
-    @Override
-    public void disconnectEvent() {
 
     }
 }

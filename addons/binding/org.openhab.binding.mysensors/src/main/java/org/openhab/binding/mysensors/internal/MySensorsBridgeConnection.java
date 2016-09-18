@@ -30,36 +30,52 @@ public abstract class MySensorsBridgeConnection {
 
     private BlockingQueue<MySensorsMessage> outboundMessageQueue = null;
 
-    // Update listener
-    private List<MySensorsUpdateListener> updateListeners = null;
+    private boolean connected = false;
 
-    protected boolean connected = false;
+    private boolean requestDisconnection = false;
 
     private MySensorsBridgeConnection waitingObj = null;
     private boolean iVersionResponse = false;
 
     private boolean skipStartupCheck = false;
 
+    protected MySensorsWriter mysConWriter = null;
+    protected MySensorsReader mysConReader = null;
+
+    // Update listener
+    private List<MySensorsUpdateListener> updateListeners = null;
+
     public MySensorsBridgeConnection(boolean skipStartupCheck) {
         outboundMessageQueue = new LinkedBlockingQueue<MySensorsMessage>();
-        updateListeners = new ArrayList<>();
-
         this.skipStartupCheck = skipStartupCheck;
+        updateListeners = new ArrayList<>();
     }
 
     /**
-     * startup connection with bridge
+     * Startup connection with bridge
      *
      * @return
      */
-    public abstract boolean connect();
+    public boolean connect() {
+        connected = _connect();
+        return connected;
+    }
+
+    public abstract boolean _connect();
 
     /**
-     * shutodown method that allows the correct disconnection with the used bridge
+     * Shutdown method that allows the correct disconnection with the used bridge
      *
      * @return
      */
-    public abstract void disconnect();
+    public void disconnect() {
+        removeAllUpdateListener();
+        clearOutboundMessagesQueue();
+        _disconnect();
+        connected = false;
+    }
+
+    public abstract void _disconnect();
 
     /**
      * Start thread managing the incoming/outgoing messages. It also have the task to test the connection to gateway by
@@ -102,17 +118,63 @@ public abstract class MySensorsBridgeConnection {
         return outboundMessageQueue.poll(1, TimeUnit.DAYS);
     }
 
+    private void clearOutboundMessagesQueue() {
+        synchronized (outboundMessageQueue) {
+            outboundMessageQueue.clear();
+        }
+    }
+
     public void addMySensorsOutboundMessage(MySensorsMessage msg) {
         addMySensorsOutboundMessage(msg, 1);
     }
 
     public void addMySensorsOutboundMessage(MySensorsMessage msg, int copy) {
-        try {
-            for (int i = 0; i < copy; i++) {
-                outboundMessageQueue.put(msg);
+        synchronized (outboundMessageQueue) {
+            try {
+                for (int i = 0; i < copy; i++) {
+                    outboundMessageQueue.put(msg);
+                }
+            } catch (InterruptedException e) {
+                logger.error("Interrupted message while ruuning");
             }
-        } catch (InterruptedException e) {
-            logger.error("Interrupted message while ruuning");
+        }
+
+    }
+
+    /**
+     * @param listener An Object, that wants to listen on status updates
+     */
+    public void addUpdateListener(MySensorsUpdateListener listener) {
+        synchronized (updateListeners) {
+            if (!updateListeners.contains(listener)) {
+                updateListeners.add(listener);
+            }
+        }
+    }
+
+    public void removeUpdateListener(MySensorsUpdateListener listener) {
+        synchronized (updateListeners) {
+            if (updateListeners.contains(listener)) {
+                updateListeners.remove(listener);
+            }
+        }
+    }
+
+    private void removeAllUpdateListener() {
+        synchronized (updateListeners) {
+            updateListeners.clear();
+        }
+    }
+
+    public List<MySensorsUpdateListener> getUpdateListeners() {
+        return updateListeners;
+    }
+
+    public void broadCastEvent(MySensorsStatusUpdateEvent event) {
+        synchronized (updateListeners) {
+            for (MySensorsUpdateListener mySensorsEventListener : updateListeners) {
+                mySensorsEventListener.statusUpdateReceived(event);
+            }
         }
     }
 
@@ -139,45 +201,6 @@ public abstract class MySensorsBridgeConnection {
         pauseWriter = false;
     }
 
-    /**
-     * @param listener An Object, that wants to listen on status updates
-     */
-    public void addUpdateListener(MySensorsUpdateListener listener) {
-        synchronized (updateListeners) {
-            if (!updateListeners.contains(listener)) {
-                updateListeners.add(listener);
-            }
-        }
-    }
-
-    public void removeUpdateListener(MySensorsUpdateListener listener) {
-        synchronized (updateListeners) {
-            if (updateListeners.contains(listener)) {
-                updateListeners.remove(listener);
-            }
-        }
-    }
-
-    public List<MySensorsUpdateListener> getUpdateListeners() {
-        return updateListeners;
-    }
-
-    public void broadCastDisconnect() {
-        synchronized (updateListeners) {
-            for (MySensorsUpdateListener mySensorsEventListener : updateListeners) {
-                mySensorsEventListener.disconnectEvent();
-            }
-        }
-    }
-
-    public void broadCastEvent(MySensorsStatusUpdateEvent event) {
-        synchronized (updateListeners) {
-            for (MySensorsUpdateListener mySensorsEventListener : updateListeners) {
-                mySensorsEventListener.statusUpdateReceived(event);
-            }
-        }
-    }
-
     public void iVersionMessageReceived(String msg) {
         if (waitingObj != null) {
             logger.debug("Good,Gateway is up and running! (Ver:{})", msg);
@@ -195,5 +218,14 @@ public abstract class MySensorsBridgeConnection {
 
     public boolean isConnected() {
         return connected;
+    }
+
+    public boolean requestingDisconnection() {
+        return requestDisconnection;
+    }
+
+    public void requestDisconnection(boolean flag) {
+        logger.debug("Request disconnection flag setted to: " + flag);
+        requestDisconnection = flag;
     }
 }

@@ -15,5 +15,14 @@
 
   <name>MySensors Binding</name>
   <packaging>eclipse-plugin</packaging>
+  
+  <dependencies>
+    <dependency>
+	    <groupId>com.neuronrobotics</groupId>
+	    <artifactId>nrjavaserial</artifactId>
+	    <version>3.11.0</version>
+	    <type>bundle</type>
+	</dependency>
+  </dependencies>
 
 </project>

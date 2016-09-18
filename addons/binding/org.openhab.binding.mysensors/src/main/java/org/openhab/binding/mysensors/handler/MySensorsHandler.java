@@ -74,12 +74,15 @@ public class MySensorsHandler extends BaseThingHandler implements MySensorsUpdat
 
     @Override
     public void handleRemoval() {
+        logger.trace("handleRemoval for thing: " + nodeId);
+        updateStatus(ThingStatus.OFFLINE);
         getBridgeHandler().getBridgeConnector().removeUpdateListener(this);
         super.handleRemoval();
     }
 
     @Override
     public void bridgeHandlerDisposed(ThingHandler thingHandler, Bridge bridge) {
+        logger.trace("handleRemoval for thing: " + nodeId);
         updateStatus(ThingStatus.OFFLINE);
         super.bridgeHandlerDisposed(thingHandler, bridge);
     }
@@ -298,11 +301,6 @@ public class MySensorsHandler extends BaseThingHandler implements MySensorsUpdat
         }
     }
 
-    @Override
-    public void disconnectEvent() {
-
-    }
-
     /**
      * Returns the BridgeHandler of the bridge/gateway to the MySensors network
      *
@@ -320,7 +318,7 @@ public class MySensorsHandler extends BaseThingHandler implements MySensorsUpdat
     @Override
     public void bridgeHandlerInitialized(ThingHandler thingHandler, Bridge bridge) {
         MySensorsBridgeHandler bridgeHandler = (MySensorsBridgeHandler) thingHandler;
-        if (bridgeHandler.getBridgeConnector() == null) {
+        if (bridgeHandler.getBridgeConnector() == null || !bridgeHandler.getBridgeConnector().checkConnection()) {
             logger.warn("Bridge connection not estblished yet - can't subscribe for node: {} child: {}", nodeId,
                     childId);
         } else {

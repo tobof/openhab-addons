@@ -32,12 +32,8 @@ public class MySensorsSerialConnection extends MySensorsBridgeConnection {
     private String serialPort = "";
     private int baudRate = 115200;
     private int sendDelay = 0;
-    private boolean skipStartupCheck = false;
 
     private NRSerialPort serialConnection = null;
-
-    private MySensorsSerialWriter mysConWriter = null;
-    private MySensorsSerialReader mysConReader = null;
 
     public MySensorsSerialConnection(String serialPort, int baudRate, int sendDelay, boolean skipStartupCheck) {
         super(skipStartupCheck);
@@ -45,15 +41,16 @@ public class MySensorsSerialConnection extends MySensorsBridgeConnection {
         this.serialPort = serialPort;
         this.baudRate = baudRate;
         this.sendDelay = sendDelay;
-        this.skipStartupCheck = skipStartupCheck;
-
     }
 
     @Override
-    public boolean connect() {
+    public boolean _connect() {
         logger.debug("Connecting to {} [baudRate:{}]", serialPort, baudRate);
 
+        boolean ret = false;
+
         updateSerialProperties(serialPort);
+
         serialConnection = new NRSerialPort(serialPort, baudRate);
         if (serialConnection.connect()) {
             logger.debug("Successfully connected to serial port.");
@@ -69,28 +66,31 @@ public class MySensorsSerialConnection extends MySensorsBridgeConnection {
             mysConReader = new MySensorsSerialReader(serialConnection.getInputStream(), this);
             mysConWriter = new MySensorsSerialWriter(serialConnection.getOutputStream(), this, sendDelay);
 
-            connected = startReaderWriterThread(mysConReader, mysConWriter);
+            ret = startReaderWriterThread(mysConReader, mysConWriter);
         } else {
             logger.error("Can't connect to serial port. Wrong port?");
         }
 
-        return connected;
+        return ret;
     }
 
     @Override
-    public void disconnect() {
+    public void _disconnect() {
         logger.debug("Shutting down serial connection!");
 
         if (mysConWriter != null) {
             mysConWriter.stopWriting();
+            mysConWriter = null;
         }
 
         if (mysConReader != null) {
             mysConReader.stopReader();
+            mysConReader = null;
         }
 
         if (serialConnection != null && serialConnection.isConnected()) {
             serialConnection.disconnect();
+            serialConnection = null;
         }
 
     }

@@ -25,9 +25,6 @@ public class MySensorsIpConnection extends MySensorsBridgeConnection {
 
     private Socket sock = null;
 
-    private MySensorsIpWriter mysConWriter = null;
-    private MySensorIpReader mysConReader = null;
-
     public MySensorsIpConnection(String ipAddress, int tcpPort, int sendDelay, boolean skipStartupCheck) {
         super(skipStartupCheck);
         this.ipAddress = ipAddress;
@@ -36,8 +33,10 @@ public class MySensorsIpConnection extends MySensorsBridgeConnection {
     }
 
     @Override
-    public boolean connect() {
+    public boolean _connect() {
         logger.debug("Connecting to IP bridge [{}:{}]", ipAddress, tcpPort);
+
+        boolean ret = false;
 
         if (ipAddress == null || ipAddress.isEmpty()) {
             logger.error("IP must be not null/empty");
@@ -47,7 +46,7 @@ public class MySensorsIpConnection extends MySensorsBridgeConnection {
                 mysConReader = new MySensorIpReader(sock.getInputStream(), this);
                 mysConWriter = new MySensorsIpWriter(sock, this, sendDelay);
 
-                connected = startReaderWriterThread(mysConReader, mysConWriter);
+                ret = startReaderWriterThread(mysConReader, mysConWriter);
             } catch (UnknownHostException e) {
                 logger.error("Error while trying to connect to: " + ipAddress + ":" + tcpPort);
                 e.printStackTrace();
@@ -57,11 +56,11 @@ public class MySensorsIpConnection extends MySensorsBridgeConnection {
             }
         }
 
-        return connected;
+        return ret;
     }
 
     @Override
-    public void disconnect() {
+    public void _disconnect() {
         logger.debug("Disconnecting from IP bridge ...");
 
         if (mysConWriter != null) {

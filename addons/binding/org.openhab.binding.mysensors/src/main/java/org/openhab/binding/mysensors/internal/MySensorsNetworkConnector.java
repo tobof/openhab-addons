@@ -2,10 +2,6 @@ package org.openhab.binding.mysensors.internal;
 
 import static org.openhab.binding.mysensors.MySensorsBindingConstants.*;
 
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-
-import org.openhab.binding.mysensors.MySensorsBindingConstants;
 import org.openhab.binding.mysensors.MySensorsBindingUtility;
 import org.openhab.binding.mysensors.discovery.MySensorsDiscoveryService;
 import org.openhab.binding.mysensors.handler.MySensorsBridgeHandler;
@@ -33,12 +29,21 @@ public class MySensorsNetworkConnector implements Runnable, MySensorsUpdateListe
     // Connection retry done
     private int numOfRetry = 0;
 
+    // Connector will check for connection status every CONNECTOR_INTERVAL_CHECK seconds
+    public static final int CONNECTOR_INTERVAL_CHECK = 10;
+
     public MySensorsNetworkConnector(MySensorsBridgeHandler bridgeHandler) {
         this.bridgeHandler = bridgeHandler;
     }
 
     @Override
     public void run() {
+        Thread.currentThread().setName(MySensorsNetworkConnector.class.getName());
+
+        if (checkConnection() && myCon.requestingDisconnection()) {
+            logger.info("Connection request disconnection...");
+            stop();
+        }
 
         if (myCon == null) {
             if (bridgeHandler.getThing().getThingTypeUID().equals(THING_TYPE_BRIDGE_SER)) {
@@ -54,7 +59,8 @@ public class MySensorsNetworkConnector implements Runnable, MySensorsUpdateListe
             }
         }
 
-        if (!myCon.isConnected()) {
+        if (!checkConnection()) {
+
             if (myCon.connect()) {
                 logger.info("Successfully connected to MySensors Bridge.");
 
@@ -67,10 +73,9 @@ public class MySensorsNetworkConnector implements Runnable, MySensorsUpdateListe
                 discoveryService.activate();
 
                 if (bridgeHandler.getBridgeConfiguration().enableNetworkSanCheck) {
-                    logger.info("Network Sanity Checker thread started");
 
                     // Start network sanity check
-                    netSanityChecker = new MySensorsNetworkSanityChecker();
+                    netSanityChecker = new MySensorsNetworkSanityChecker(bridgeHandler);
                     netSanityChecker.start();
 
                 } else {
@@ -78,7 +83,8 @@ public class MySensorsNetworkConnector implements Runnable, MySensorsUpdateListe
                 }
 
             } else {
-                logger.error("Failed connecting to bridge...next retry in {} seconds (Retry No.:{})", 10, numOfRetry);
+                logger.error("Failed connecting to bridge...next retry in {} seconds (Retry No.:{})",
+                        CONNECTOR_INTERVAL_CHECK, numOfRetry);
                 numOfRetry++;
                 // removeUpdateListener(bridgeHandler);
             }
@@ -86,6 +92,7 @@ public class MySensorsNetworkConnector implements Runnable, MySensorsUpdateListe
         } else {
             logger.debug("Bridge is connected, connection skipped");
         }
+
     }
 
     public void addMySensorsOutboundMessage(MySensorsMessage msg, int copy) {
@@ -94,10 +101,6 @@ public class MySensorsNetworkConnector implements Runnable, MySensorsUpdateListe
 
     public void addMySensorsOutboundMessage(MySensorsMessage msg) {
         myCon.addMySensorsOutboundMessage(msg);
-    }
-
-    public MySensorsMessage pollMySensorsOutboundQueue() throws InterruptedException {
-        return myCon.pollMySensorsOutboundQueue();
     }
 
     public void removeMySensorsOutboundMessage(MySensorsMessage msg) {
@@ -116,8 +119,16 @@ public class MySensorsNetworkConnector implements Runnable, MySensorsUpdateListe
         return myCon.isWriterPaused();
     }
 
-    public boolean isConnected() {
-        return myCon.isConnected();
+    public boolean checkConnection() {
+        return myCon != null && myCon.isConnected();
+    }
+
+    public boolean requestingDisconnection() {
+        return myCon.requestingDisconnection();
+    }
+
+    public void requestDisconnection(boolean flag) {
+        myCon.requestDisconnection(flag);
     }
 
     /*
@@ -158,12 +169,7 @@ public class MySensorsNetworkConnector implements Runnable, MySensorsUpdateListe
         }
     }
 
-    @Override
-    public void disconnectEvent() {
-
-    }
-
-    public void disconnect() {
+    public void stop() {
 
         if (netSanityChecker != null) {
             netSanityChecker.stop();
@@ -226,95 +232,6 @@ public class MySensorsNetworkConnector implements Runnable, MySensorsUpdateListe
      */
     private void handleIncomingVersionMessage(String message) {
         myCon.iVersionMessageReceived(message);
-    }
-
-    private class MySensorsNetworkSanityChecker implements MySensorsUpdateListener, Runnable {
-
-        private Logger logger = LoggerFactory.getLogger(getClass());
-
-        private static final int SHEDULE_MINUTES_DELAY = 1; // only for test will be: 3
-        private static final int MAX_ATTEMPTS_BEFORE_DISCONNECT = 1; // only for test will be: 3
-
-        private ScheduledFuture<?> future = null;
-
-        private Integer iVersionMessageMissing = 0;
-        private boolean iVersionMessageArrived = false;
-
-        public void start() {
-
-            if (bridgeHandler.getBridgeConfiguration().enableNetworkSanCheck) {
-                logger.info("Network Sanity Checker thread started");
-
-                iVersionMessageArrived = false;
-                iVersionMessageMissing = 0;
-
-                future = bridgeHandler.getScheduler().scheduleWithFixedDelay(MySensorsNetworkSanityChecker.this,
-                        SHEDULE_MINUTES_DELAY, SHEDULE_MINUTES_DELAY, TimeUnit.MINUTES);
-
-            } else {
-                logger.warn("Network Sanity Checker thread disabled from bridge configuration");
-            }
-
-        }
-
-        public void stop() {
-            logger.info("Network Sanity Checker thread stopped");
-
-            if (future != null) {
-                future.cancel(true);
-                future = null;
-            }
-
-        }
-
-        @Override
-        public void run() {
-            try {
-                addUpdateListener(this);
-
-                addMySensorsOutboundMessage(MySensorsBindingConstants.I_VERSION_MESSAGE);
-
-                Thread.sleep(3000);
-
-                synchronized (iVersionMessageMissing) {
-                    if (!iVersionMessageArrived) {
-                        logger.warn(
-                                "I_VERSION message response is not arrived. Remained attempts before disconnection {}",
-                                MAX_ATTEMPTS_BEFORE_DISCONNECT - iVersionMessageMissing);
-
-                        if ((MAX_ATTEMPTS_BEFORE_DISCONNECT - iVersionMessageMissing) <= 0) {
-                            logger.error("Retry period expired, gateway is down. Disconneting bridge...");
-
-                        } else {
-                            iVersionMessageMissing++;
-                        }
-                    } else {
-                        logger.debug("Network sanity check: PASSED");
-                        iVersionMessageMissing = 0;
-                    }
-
-                    iVersionMessageArrived = false;
-                }
-
-            } catch (InterruptedException e) {
-                logger.error("interrupted exception in network sanity thread checker");
-            } finally {
-                removeUpdateListener(this);
-            }
-        }
-
-        @Override
-        public void statusUpdateReceived(MySensorsStatusUpdateEvent event) {
-            synchronized (iVersionMessageMissing) {
-                if (!iVersionMessageArrived) {
-                    iVersionMessageArrived = MySensorsBindingUtility.isIVersionMessage(event.getData());
-                }
-            }
-        }
-
-        @Override
-        public void disconnectEvent() {
-        }
     }
 
 }

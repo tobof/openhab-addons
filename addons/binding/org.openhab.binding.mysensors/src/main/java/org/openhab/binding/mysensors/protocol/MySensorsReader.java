@@ -41,6 +41,7 @@ public class MySensorsReader implements MySensorsUpdateListener, Runnable {
 
     @Override
     public void run() {
+        Thread.currentThread().setName(MySensorsReader.class.getName());
         String line = null;
 
         while (!stopReader) {
@@ -56,7 +57,7 @@ public class MySensorsReader implements MySensorsUpdateListener, Runnable {
                 // We lost connection
                 if (line == null) {
                     logger.warn("Connection to Gateway lost!");
-                    mysCon.broadCastDisconnect();
+                    mysCon.requestDisconnection(true);
                     break;
                 }
 
@@ -109,11 +110,6 @@ public class MySensorsReader implements MySensorsUpdateListener, Runnable {
 
     @Override
     public void statusUpdateReceived(MySensorsStatusUpdateEvent event) {
-
-    }
-
-    @Override
-    public void disconnectEvent() {
 
     }
 

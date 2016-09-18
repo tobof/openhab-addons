@@ -12,6 +12,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -48,8 +49,11 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler {
     // Configuration from thing file
     private MySensorsBridgeConfiguration myConfiguration = null;
 
+    private ScheduledExecutorService connectorScheduler = null;
+
     public MySensorsBridgeHandler(Bridge bridge) {
         super(bridge);
+        connectorScheduler = Executors.newSingleThreadScheduledExecutor();
     }
 
     /*
@@ -66,7 +70,8 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler {
         logger.debug("Set skip check on startup to: {}", myConfiguration.skipStartupCheck);
 
         mysConnector = new MySensorsNetworkConnector(this);
-        connectorFuture = getScheduler().scheduleWithFixedDelay(mysConnector, 0, 10, TimeUnit.SECONDS);
+        connectorFuture = connectorScheduler.scheduleWithFixedDelay(mysConnector, 0,
+                MySensorsNetworkConnector.CONNECTOR_INTERVAL_CHECK, TimeUnit.SECONDS);
 
         notifyDisconnect();
     }
@@ -79,7 +84,6 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler {
     @Override
     public void dispose() {
         disconnect();
-        notifyDisconnect();
     }
 
     /*
@@ -147,10 +151,6 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler {
         return myConfiguration;
     }
 
-    public ScheduledExecutorService getScheduler() {
-        return scheduler;
-    }
-
     public void notifyConnect() {
         updateStatus(ThingStatus.ONLINE);
     }
@@ -161,14 +161,20 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler {
 
     private void disconnect() {
 
+        if (mysConnector != null) {
+            mysConnector.stop();
+            mysConnector = null;
+        }
+
         if (connectorFuture != null) {
             connectorFuture.cancel(true);
             connectorFuture = null;
         }
 
-        if (mysConnector != null) {
-            mysConnector.disconnect();
-            mysConnector = null;
+        if (connectorScheduler != null) {
+            connectorScheduler.shutdown();
+            connectorScheduler.shutdownNow();
+            connectorScheduler = null;
         }
     }
 }
