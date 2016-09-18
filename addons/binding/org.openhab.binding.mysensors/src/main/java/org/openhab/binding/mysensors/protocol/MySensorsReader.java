@@ -65,7 +65,7 @@ public class MySensorsReader implements MySensorsUpdateListener, Runnable {
                 MySensorsMessage msg = MySensorsMessageParser.parse(line);
                 if (msg != null) {
                     MySensorsStatusUpdateEvent event = new MySensorsStatusUpdateEvent(msg);
-                    mysCon.broadCastEvent(event);
+                    mysCon.getConnector().broadCastEvent(event);
                 }
             } catch (Exception e) {
                 logger.error("({}) on reading from serial port, message: {}", e, getClass(), e.getMessage());

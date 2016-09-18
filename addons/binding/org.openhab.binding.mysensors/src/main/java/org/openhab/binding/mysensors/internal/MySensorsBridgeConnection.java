@@ -7,14 +7,21 @@
  */
 package org.openhab.binding.mysensors.internal;
 
+import static org.openhab.binding.mysensors.MySensorsBindingConstants.*;
+
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.smarthome.config.core.Configuration;
+import org.eclipse.smarthome.core.thing.Thing;
 import org.openhab.binding.mysensors.MySensorsBindingConstants;
+import org.openhab.binding.mysensors.MySensorsBindingUtility;
 import org.openhab.binding.mysensors.handler.MySensorsStatusUpdateEvent;
 import org.openhab.binding.mysensors.handler.MySensorsUpdateListener;
 import org.openhab.binding.mysensors.protocol.MySensorsReader;
@@ -22,7 +29,7 @@ import org.openhab.binding.mysensors.protocol.MySensorsWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class MySensorsBridgeConnection {
+public abstract class MySensorsBridgeConnection implements MySensorsUpdateListener {
 
     private Logger logger = LoggerFactory.getLogger(MySensorsBridgeConnection.class);
 
@@ -42,13 +49,12 @@ public abstract class MySensorsBridgeConnection {
     protected MySensorsWriter mysConWriter = null;
     protected MySensorsReader mysConReader = null;
 
-    // Update listener
-    private List<MySensorsUpdateListener> updateListeners = null;
+    private MySensorsNetworkConnector connector = null;
 
-    public MySensorsBridgeConnection(boolean skipStartupCheck) {
-        outboundMessageQueue = new LinkedBlockingQueue<MySensorsMessage>();
+    public MySensorsBridgeConnection(MySensorsNetworkConnector connector, boolean skipStartupCheck) {
+        this.connector = connector;
+        this.outboundMessageQueue = new LinkedBlockingQueue<MySensorsMessage>();
         this.skipStartupCheck = skipStartupCheck;
-        updateListeners = new ArrayList<>();
     }
 
     /**
@@ -58,6 +64,9 @@ public abstract class MySensorsBridgeConnection {
      */
     public boolean connect() {
         connected = _connect();
+        if (connected) {
+            connector.addUpdateListener(this);
+        }
         return connected;
     }
 
@@ -69,8 +78,8 @@ public abstract class MySensorsBridgeConnection {
      * @return
      */
     public void disconnect() {
-        removeAllUpdateListener();
         clearOutboundMessagesQueue();
+        connector.removeUpdateListener(this);
         _disconnect();
         connected = false;
     }
@@ -114,16 +123,6 @@ public abstract class MySensorsBridgeConnection {
         return iVersionResponse;
     }
 
-    public MySensorsMessage pollMySensorsOutboundQueue() throws InterruptedException {
-        return outboundMessageQueue.poll(1, TimeUnit.DAYS);
-    }
-
-    private void clearOutboundMessagesQueue() {
-        synchronized (outboundMessageQueue) {
-            outboundMessageQueue.clear();
-        }
-    }
-
     public void addMySensorsOutboundMessage(MySensorsMessage msg) {
         addMySensorsOutboundMessage(msg, 1);
     }
@@ -141,41 +140,18 @@ public abstract class MySensorsBridgeConnection {
 
     }
 
-    /**
-     * @param listener An Object, that wants to listen on status updates
-     */
-    public void addUpdateListener(MySensorsUpdateListener listener) {
-        synchronized (updateListeners) {
-            if (!updateListeners.contains(listener)) {
-                updateListeners.add(listener);
-            }
+    public MySensorsMessage pollMySensorsOutboundQueue() throws InterruptedException {
+        return outboundMessageQueue.poll(1, TimeUnit.DAYS);
+    }
+
+    public void clearOutboundMessagesQueue() {
+        synchronized (outboundMessageQueue) {
+            outboundMessageQueue.clear();
         }
     }
 
-    public void removeUpdateListener(MySensorsUpdateListener listener) {
-        synchronized (updateListeners) {
-            if (updateListeners.contains(listener)) {
-                updateListeners.remove(listener);
-            }
-        }
-    }
-
-    private void removeAllUpdateListener() {
-        synchronized (updateListeners) {
-            updateListeners.clear();
-        }
-    }
-
-    public List<MySensorsUpdateListener> getUpdateListeners() {
-        return updateListeners;
-    }
-
-    public void broadCastEvent(MySensorsStatusUpdateEvent event) {
-        synchronized (updateListeners) {
-            for (MySensorsUpdateListener mySensorsEventListener : updateListeners) {
-                mySensorsEventListener.statusUpdateReceived(event);
-            }
-        }
+    public MySensorsNetworkConnector getConnector() {
+        return connector;
     }
 
     public void removeMySensorsOutboundMessage(MySensorsMessage msg) {
@@ -228,4 +204,129 @@ public abstract class MySensorsBridgeConnection {
         logger.debug("Request disconnection flag setted to: " + flag);
         requestDisconnection = flag;
     }
+
+    @Override
+    public void statusUpdateReceived(MySensorsStatusUpdateEvent event) {
+        MySensorsMessage msg = event.getData();
+        // logger.debug("updateRecieved: " + msg.getDebugInfo());
+        // Do we get an ACK?
+        if (msg.getAck() == 1) {
+            logger.debug(String.format("ACK received! Node: %d, Child: %d", msg.nodeId, msg.childId));
+            removeMySensorsOutboundMessage(msg);
+        }
+
+        // Are we getting a Request ID Message?
+        if (MySensorsBindingUtility.isIdRequestMessage(msg)) {
+            answerIDRequest();
+        }
+
+        // Have we get a I_VERSION message?
+        if (MySensorsBindingUtility.isIVersionMessage(msg)) {
+            handleIncomingVersionMessage(msg.msg);
+        }
+
+        // Have we get a I_CONFIG message?
+        if (MySensorsBindingUtility.isIConfigMessage(msg)) {
+            answerIConfigMessage(msg);
+        }
+
+        // Have we get a I_TIME message?
+        if (MySensorsBindingUtility.isITimeMessage(msg)) {
+            answerITimeMessage(msg);
+        }
+
+    }
+
+    /**
+     * Answer to I_TIME message for gateway time request from sensor
+     *
+     * @param msg, the incoming I_TIME message from sensor
+     */
+    private void answerITimeMessage(MySensorsMessage msg) {
+        logger.info("I_TIME request received from {}, answering...", msg.nodeId);
+
+        String time = Long.toString(System.currentTimeMillis() / 1000);
+        MySensorsMessage newMsg = new MySensorsMessage(msg.nodeId, msg.childId, MYSENSORS_MSG_TYPE_INTERNAL, 0, false,
+                MYSENSORS_SUBTYPE_I_TIME, time);
+        addMySensorsOutboundMessage(newMsg);
+
+    }
+
+    /**
+     * Answer to I_CONFIG message for imperial/metric request from sensor
+     *
+     * @param msg, the incoming I_CONFIG message from sensor
+     */
+    private void answerIConfigMessage(MySensorsMessage msg) {
+        boolean imperial = connector.getBridgeHandler().getBridgeConfiguration().imperial;
+        String iConfig = imperial ? "I" : "M";
+
+        logger.debug("I_CONFIG request received from {}, answering: {}", iConfig);
+
+        MySensorsMessage newMsg = new MySensorsMessage(msg.nodeId, msg.childId, MYSENSORS_MSG_TYPE_INTERNAL, 0, false,
+                MYSENSORS_SUBTYPE_I_CONFIG, iConfig);
+        addMySensorsOutboundMessage(newMsg);
+
+    }
+
+    /**
+     * If an ID -Request from a sensor is received the controller will send an id to the sensor
+     */
+    private void answerIDRequest() {
+        logger.debug("ID Request received");
+
+        int newId = reserveId();
+        MySensorsMessage newMsg = new MySensorsMessage(255, 255, 3, 0, false, 4, newId + "");
+        addMySensorsOutboundMessage(newMsg);
+        logger.info("New Node in the MySensors network has requested an ID. ID is: {}", newId);
+    }
+
+    /**
+     * Wake up main thread that is waiting for confirmation of link up
+     */
+    private void handleIncomingVersionMessage(String message) {
+        iVersionMessageReceived(message);
+    }
+
+    private int reserveId() {
+        int id = 1;
+
+        List<Number> takenIds = new ArrayList<Number>();
+
+        // Which ids are taken in Thing list of OpenHAB
+        Collection<Thing> thingList = connector.getBridgeHandler().getThingRegistry().getAll();
+        Iterator<Thing> iterator = thingList.iterator();
+
+        while (iterator.hasNext()) {
+            Thing thing = iterator.next();
+            Configuration conf = thing.getConfiguration();
+            if (conf != null) {
+                Object nodeIdobj = conf.get("nodeId");
+                if (nodeIdobj != null) {
+                    int nodeId = Integer.parseInt(nodeIdobj.toString());
+                    takenIds.add(nodeId);
+                }
+            }
+        }
+
+        // Which ids are already given by the binding, but not yet in the thing list?
+        // Iterator<Number> iteratorGiven = givenIds.iterator();
+        // while (iteratorGiven.hasNext()) {
+        // takenIds.add(iteratorGiven.next());
+        // }
+
+        // generate new id
+        boolean foundId = false;
+        while (!foundId) {
+            Random rand = new Random(System.currentTimeMillis());
+            int newId = rand.nextInt((254 - 1) + 1) + 1;
+            if (!takenIds.contains(newId)) {
+                id = newId;
+                foundId = true;
+            }
+        }
+
+        return id;
+    }
+
 }

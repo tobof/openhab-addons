@@ -12,6 +12,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 import org.openhab.binding.mysensors.internal.MySensorsBridgeConnection;
+import org.openhab.binding.mysensors.internal.MySensorsNetworkConnector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,8 +26,9 @@ public class MySensorsIpConnection extends MySensorsBridgeConnection {
 
     private Socket sock = null;
 
-    public MySensorsIpConnection(String ipAddress, int tcpPort, int sendDelay, boolean skipStartupCheck) {
-        super(skipStartupCheck);
+    public MySensorsIpConnection(MySensorsNetworkConnector connector, String ipAddress, int tcpPort, int sendDelay,
+            boolean skipStartupCheck) {
+        super(connector, skipStartupCheck);
         this.ipAddress = ipAddress;
         this.tcpPort = tcpPort;
         this.sendDelay = sendDelay;

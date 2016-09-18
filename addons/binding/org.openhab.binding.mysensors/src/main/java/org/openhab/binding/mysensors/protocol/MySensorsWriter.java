@@ -69,7 +69,7 @@ public abstract class MySensorsWriter implements MySensorsUpdateListener, Runnab
                                         msg.setMsg(msg.getOldMsg());
                                         msg.setAck(0);
                                         MySensorsStatusUpdateEvent event = new MySensorsStatusUpdateEvent(msg);
-                                        mysCon.broadCastEvent(event);
+                                        mysCon.getConnector().broadCastEvent(event);
                                     } else if (!msg.getRevert()) {
                                         logger.debug("Not reverted due to configuration!");
                                     }

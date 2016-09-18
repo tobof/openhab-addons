@@ -7,20 +7,14 @@
  */
 package org.openhab.binding.mysensors.handler;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.smarthome.config.core.Configuration;
 import org.eclipse.smarthome.core.thing.Bridge;
 import org.eclipse.smarthome.core.thing.ChannelUID;
-import org.eclipse.smarthome.core.thing.Thing;
+import org.eclipse.smarthome.core.thing.ThingRegistry;
 import org.eclipse.smarthome.core.thing.ThingStatus;
 import org.eclipse.smarthome.core.thing.binding.BaseBridgeHandler;
 import org.eclipse.smarthome.core.types.Command;
@@ -38,9 +32,6 @@ import org.slf4j.LoggerFactory;
 public class MySensorsBridgeHandler extends BaseBridgeHandler {
 
     private Logger logger = LoggerFactory.getLogger(MySensorsBridgeHandler.class);
-
-    // List of Ids that OpenHAB has given, in response to an id request from a sensor node
-    private List<Number> givenIds = new ArrayList<Number>();
 
     // Network connector to bridge
     private MySensorsNetworkConnector mysConnector = null;
@@ -83,7 +74,9 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler {
      */
     @Override
     public void dispose() {
+        logger.debug("Disposing of the MySensors bridge");
         disconnect();
+        notifyDisconnect();
     }
 
     /*
@@ -98,49 +91,8 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler {
         // TODO Auto-generated method stub
     }
 
-    public List<Number> getGivedIds() {
-        return givenIds;
-    }
-
-    public int getFreeId() {
-        int id = 1;
-
-        List<Number> takenIds = new ArrayList<Number>();
-
-        // Which ids are taken in Thing list of OpenHAB
-        Collection<Thing> thingList = thingRegistry.getAll();
-        Iterator<Thing> iterator = thingList.iterator();
-
-        while (iterator.hasNext()) {
-            Thing thing = iterator.next();
-            Configuration conf = thing.getConfiguration();
-            if (conf != null) {
-                Object nodeIdobj = conf.get("nodeId");
-                if (nodeIdobj != null) {
-                    int nodeId = Integer.parseInt(nodeIdobj.toString());
-                    takenIds.add(nodeId);
-                }
-            }
-        }
-
-        // Which ids are already given by the binding, but not yet in the thing list?
-        Iterator<Number> iteratorGiven = givenIds.iterator();
-        while (iteratorGiven.hasNext()) {
-            takenIds.add(iteratorGiven.next());
-        }
-
-        // generate new id
-        boolean foundId = false;
-        while (!foundId) {
-            Random rand = new Random(System.currentTimeMillis());
-            int newId = rand.nextInt((254 - 1) + 1) + 1;
-            if (!takenIds.contains(newId)) {
-                id = newId;
-                foundId = true;
-            }
-        }
-
-        return id;
+    public ThingRegistry getThingRegistry() {
+        return thingRegistry;
     }
 
     public MySensorsNetworkConnector getBridgeConnector() {
