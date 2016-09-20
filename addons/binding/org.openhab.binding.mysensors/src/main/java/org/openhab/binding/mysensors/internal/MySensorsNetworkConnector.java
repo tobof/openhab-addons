@@ -4,6 +4,7 @@ import static org.openhab.binding.mysensors.MySensorsBindingConstants.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
 
 import org.openhab.binding.mysensors.discovery.MySensorsDiscoveryService;
 import org.openhab.binding.mysensors.handler.MySensorsBridgeHandler;
@@ -41,6 +42,9 @@ public class MySensorsNetworkConnector implements Runnable {
 
     // Update listener
     private List<MySensorsUpdateListener> updateListeners = null;
+
+    // Outbound queue
+    private BlockingQueue<MySensorsMessage> outboundMessageQueue = null;
 
     public MySensorsNetworkConnector(MySensorsBridgeHandler bridgeHandler) {
         this.bridgeHandler = bridgeHandler;

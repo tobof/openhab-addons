@@ -67,6 +67,12 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler {
         notifyDisconnect();
     }
 
+    @Override
+    public void preDispose() {
+        super.preDispose();
+        notifyDisconnect();
+    }
+
     /*
      * (non-Javadoc)
      *
@@ -76,7 +82,6 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler {
     public void dispose() {
         logger.debug("Disposing of the MySensors bridge");
         disconnect();
-        notifyDisconnect();
     }
 
     /*
