@@ -30,6 +30,7 @@ import org.eclipse.smarthome.core.types.Command;
 import org.eclipse.smarthome.core.types.RefreshType;
 import org.openhab.binding.mysensors.config.MySensorsSensorConfiguration;
 import org.openhab.binding.mysensors.internal.MySensorsMessage;
+import org.openhab.binding.mysensors.internal.MySensorsMessageParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -111,7 +112,16 @@ public class MySensorsHandler extends BaseThingHandler implements MySensorsUpdat
         if (requestAck) {
             int_requestack = 1;
         }
-        if (channelUID.getId().equals(CHANNEL_STATUS)) {
+
+        // just forward the message in case it is received via this channel. This is special!
+        if (channelUID.getId().equals(CHANNEL_MYSENSORS_MESSAGE)) {
+            if (command instanceof StringType) {
+                StringType stringTypeMessage = (StringType) command;
+                MySensorsMessage msg = MySensorsMessageParser.parse(stringTypeMessage.toString());
+                getBridgeHandler().getBridgeConnection().addMySensorsOutboundMessage(msg);
+                return;
+            }
+        } else if (channelUID.getId().equals(CHANNEL_STATUS)) {
 
             subType = MYSENSORS_SUBTYPE_V_STATUS;
 
@@ -232,8 +242,12 @@ public class MySensorsHandler extends BaseThingHandler implements MySensorsUpdat
     public void statusUpdateReceived(MySensorsStatusUpdateEvent event) {
         MySensorsMessage msg = event.getData();
 
-        // or is this an update message?
-        if (nodeId == msg.getNodeId()) { // is this message for me?
+        // Am I the all knowing node that receives all messages?
+        if (nodeId == 999 && childId == 999) {
+            updateState(CHANNEL_MYSENSORS_MESSAGE,
+                    new StringType(MySensorsMessageParser.generateAPIString(msg).replaceAll("(\\r|\\n)", "")));
+
+        } else if (nodeId == msg.getNodeId()) { // is this message for me?
 
             updateLastUpdate();
 
