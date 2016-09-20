@@ -148,12 +148,8 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
      * @return true, if connection established correctly
      */
     private boolean connect() {
+        addUpdateListener(this);
         connected = _connect();
-
-        if (connected) {
-            addUpdateListener(this);
-        }
-
         return connected;
     }
 
