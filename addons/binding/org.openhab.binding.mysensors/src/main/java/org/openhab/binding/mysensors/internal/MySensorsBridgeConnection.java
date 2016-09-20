@@ -171,6 +171,7 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
         removeUpdateListener(this);
         _disconnect();
         connected = false;
+        requestDisconnection = false;
     }
 
     protected abstract void _disconnect();
