@@ -15,13 +15,18 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.smarthome.config.core.Configuration;
 import org.eclipse.smarthome.core.thing.Thing;
 import org.openhab.binding.mysensors.MySensorsBindingConstants;
 import org.openhab.binding.mysensors.MySensorsBindingUtility;
+import org.openhab.binding.mysensors.discovery.MySensorsDiscoveryService;
+import org.openhab.binding.mysensors.handler.MySensorsBridgeHandler;
 import org.openhab.binding.mysensors.handler.MySensorsStatusUpdateEvent;
 import org.openhab.binding.mysensors.handler.MySensorsUpdateListener;
 import org.openhab.binding.mysensors.protocol.MySensorsReader;
@@ -29,62 +34,169 @@ import org.openhab.binding.mysensors.protocol.MySensorsWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class MySensorsBridgeConnection implements MySensorsUpdateListener {
+public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUpdateListener {
 
-    private Logger logger = LoggerFactory.getLogger(MySensorsBridgeConnection.class);
+    private Logger logger = LoggerFactory.getLogger(getClass());
 
+    // Connector will check for connection status every CONNECTOR_INTERVAL_CHECK seconds
+    public static final int CONNECTOR_INTERVAL_CHECK = 10;
+
+    // ??
     private boolean pauseWriter = false;
 
+    // Blocking queue wait for message
     private BlockingQueue<MySensorsMessage> outboundMessageQueue = null;
 
+    // Flag setted to true while connection is up
     private boolean connected = false;
 
+    // Flag to be set (through available method below)
     private boolean requestDisconnection = false;
 
     private MySensorsBridgeConnection waitingObj = null;
+
+    // I_VERSION response flag
     private boolean iVersionResponse = false;
 
+    // Check connection on startup flag
     private boolean skipStartupCheck = false;
 
+    // Reader and writer thread
     protected MySensorsWriter mysConWriter = null;
     protected MySensorsReader mysConReader = null;
 
-    private MySensorsNetworkConnector connector = null;
+    // Bridge handler dependency
+    private MySensorsBridgeHandler bridgeHandler = null;
 
-    public MySensorsBridgeConnection(MySensorsNetworkConnector connector, boolean skipStartupCheck) {
-        this.connector = connector;
+    // Sanity checker
+    private MySensorsNetworkSanityChecker netSanityChecker = null;
+
+    // Connection retry done
+    private int numOfRetry = 0;
+
+    // Update listener
+    private List<MySensorsUpdateListener> updateListeners = null;
+
+    // Connection status watchdog
+    private ScheduledExecutorService watchdogExecutor = null;
+    private Future<?> futureWatchdog = null;
+
+    public MySensorsBridgeConnection(MySensorsBridgeHandler bridgeHandler) {
         this.outboundMessageQueue = new LinkedBlockingQueue<MySensorsMessage>();
-        this.skipStartupCheck = skipStartupCheck;
+        this.bridgeHandler = bridgeHandler;
+        this.updateListeners = new ArrayList<>();
+        this.watchdogExecutor = Executors.newSingleThreadScheduledExecutor();
+    }
+
+    public void initialize() {
+        logger.debug("Set skip check on startup to: {}", bridgeHandler.getBridgeConfiguration().skipStartupCheck);
+        skipStartupCheck = bridgeHandler.getBridgeConfiguration().skipStartupCheck;
+
+        // Launch connection watchdog
+        logger.debug("Enabling connection watchdog");
+        futureWatchdog = watchdogExecutor.scheduleWithFixedDelay(this, 0, CONNECTOR_INTERVAL_CHECK, TimeUnit.SECONDS);
+
+        // Launch network sanity checker (if requested)
+        if (bridgeHandler.getBridgeConfiguration().enableNetworkSanCheck) {
+            logger.info("Network Sanity Checker thread started");
+            netSanityChecker = new MySensorsNetworkSanityChecker(this);
+        } else {
+            logger.warn("Network Sanity Checker thread disabled from bridge configuration");
+        }
+    }
+
+    @Override
+    public void run() {
+        Thread.currentThread().setName(MySensorsBridgeConnection.class.getName());
+
+        if (requestingDisconnection()) {
+            logger.info("Connection request disconnection...");
+            requestDisconnection(false);
+            disconnect();
+        }
+
+        if (!connected) {
+            if (connect()) {
+                logger.info("Successfully connected to MySensors Bridge.");
+
+                numOfRetry = 0;
+
+                bridgeHandler.notifyConnect();
+
+                // Start discovery service
+                MySensorsDiscoveryService discoveryService = new MySensorsDiscoveryService(bridgeHandler);
+                discoveryService.activate();
+
+                if (bridgeHandler.getBridgeConfiguration().enableNetworkSanCheck) {
+
+                    // Start network sanity check
+                    netSanityChecker = new MySensorsNetworkSanityChecker(this);
+                    netSanityChecker.start();
+
+                } else {
+                    logger.warn("Network Sanity Checker thread disabled from bridge configuration");
+                }
+
+            } else {
+                logger.error("Failed connecting to bridge...next retry in {} seconds (Retry No.:{})",
+                        CONNECTOR_INTERVAL_CHECK, numOfRetry);
+                numOfRetry++;
+            }
+
+        } else {
+            logger.debug("Bridge is connected, connection skipped");
+        }
+
     }
 
     /**
      * Startup connection with bridge
      *
-     * @return
+     * @return true, if connection established correctly
      */
-    public boolean connect() {
+    private boolean connect() {
         connected = _connect();
         if (connected) {
-            connector.addUpdateListener(this);
+            addUpdateListener(this);
         }
         return connected;
     }
 
-    public abstract boolean _connect();
+    protected abstract boolean _connect();
 
     /**
      * Shutdown method that allows the correct disconnection with the used bridge
-     *
-     * @return
      */
-    public void disconnect() {
-        clearOutboundMessagesQueue();
-        connector.removeUpdateListener(this);
+    private void disconnect() {
+        removeUpdateListener(this);
         _disconnect();
         connected = false;
     }
 
-    public abstract void _disconnect();
+    protected abstract void _disconnect();
+
+    public void destroy() {
+        logger.debug("Destroying connection");
+
+        if (connected) {
+            disconnect();
+        }
+
+        if (netSanityChecker != null) {
+            netSanityChecker.stop();
+            netSanityChecker = null;
+        }
+
+        if (futureWatchdog != null) {
+            futureWatchdog.cancel(true);
+            futureWatchdog = null;
+        }
+
+        if (watchdogExecutor != null) {
+            watchdogExecutor.shutdown();
+            watchdogExecutor.shutdownNow();
+        }
+    }
 
     /**
      * Start thread managing the incoming/outgoing messages. It also have the task to test the connection to gateway by
@@ -117,7 +229,8 @@ public abstract class MySensorsBridgeConnection implements MySensorsUpdateListen
         }
 
         if (!iVersionResponse) {
-            logger.error("Cannot start reading/writing thread, probably sync message (I_VERSION) not received");
+            logger.error(
+                    "Cannot start reading/writing thread, probably sync message (I_VERSION) not received. Try disabling skipStartupCheck");
         }
 
         return iVersionResponse;
@@ -150,8 +263,38 @@ public abstract class MySensorsBridgeConnection implements MySensorsUpdateListen
         }
     }
 
-    public MySensorsNetworkConnector getConnector() {
-        return connector;
+    /**
+     * @param listener An Object, that wants to listen on status updates
+     */
+    public void addUpdateListener(MySensorsUpdateListener listener) {
+        synchronized (updateListeners) {
+            if (!updateListeners.contains(listener)) {
+                logger.trace("Adding listener: " + listener);
+                updateListeners.add(listener);
+            }
+        }
+    }
+
+    public void removeUpdateListener(MySensorsUpdateListener listener) {
+        synchronized (updateListeners) {
+            if (updateListeners.contains(listener)) {
+                logger.trace("Removing listener: " + listener);
+                updateListeners.remove(listener);
+            }
+        }
+    }
+
+    public List<MySensorsUpdateListener> getUpdateListeners() {
+        return updateListeners;
+    }
+
+    public void broadCastEvent(MySensorsStatusUpdateEvent event) {
+        synchronized (updateListeners) {
+            for (MySensorsUpdateListener mySensorsEventListener : updateListeners) {
+                logger.trace("Broadcasting event to: " + mySensorsEventListener);
+                mySensorsEventListener.statusUpdateReceived(event);
+            }
+        }
     }
 
     public void removeMySensorsOutboundMessage(MySensorsMessage msg) {
@@ -258,10 +401,10 @@ public abstract class MySensorsBridgeConnection implements MySensorsUpdateListen
      * @param msg, the incoming I_CONFIG message from sensor
      */
     private void answerIConfigMessage(MySensorsMessage msg) {
-        boolean imperial = connector.getBridgeHandler().getBridgeConfiguration().imperial;
+        boolean imperial = bridgeHandler.getBridgeConfiguration().imperial;
         String iConfig = imperial ? "I" : "M";
 
-        logger.debug("I_CONFIG request received from {}, answering: {}", iConfig);
+        logger.debug("I_CONFIG request received from {}, answering: (is imperial?){}", iConfig, imperial);
 
         MySensorsMessage newMsg = new MySensorsMessage(msg.nodeId, msg.childId, MYSENSORS_MSG_TYPE_INTERNAL, 0, false,
                 MYSENSORS_SUBTYPE_I_CONFIG, iConfig);
@@ -294,7 +437,7 @@ public abstract class MySensorsBridgeConnection implements MySensorsUpdateListen
         List<Number> takenIds = new ArrayList<Number>();
 
         // Which ids are taken in Thing list of OpenHAB
-        Collection<Thing> thingList = connector.getBridgeHandler().getThingRegistry().getAll();
+        Collection<Thing> thingList = bridgeHandler.getThingRegistry().getAll();
         Iterator<Thing> iterator = thingList.iterator();
 
         while (iterator.hasNext()) {

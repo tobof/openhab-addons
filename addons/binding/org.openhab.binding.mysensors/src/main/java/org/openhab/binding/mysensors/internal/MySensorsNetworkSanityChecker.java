@@ -1,3 +1,10 @@
+/**
+ * Copyright (c) 2014-2016 openHAB UG (haftungsbeschraenkt) and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ */
 package org.openhab.binding.mysensors.internal;
 
 import java.util.concurrent.Executors;
@@ -7,7 +14,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.openhab.binding.mysensors.MySensorsBindingConstants;
 import org.openhab.binding.mysensors.MySensorsBindingUtility;
-import org.openhab.binding.mysensors.handler.MySensorsBridgeHandler;
 import org.openhab.binding.mysensors.handler.MySensorsStatusUpdateEvent;
 import org.openhab.binding.mysensors.handler.MySensorsUpdateListener;
 import org.slf4j.Logger;
@@ -20,39 +26,25 @@ public class MySensorsNetworkSanityChecker implements MySensorsUpdateListener, R
     private static final int SHEDULE_MINUTES_DELAY = 1; // only for test will be: 3
     private static final int MAX_ATTEMPTS_BEFORE_DISCONNECT = 1; // only for test will be: 3
 
-    private MySensorsBridgeHandler bridgeHandler = null;
+    private MySensorsBridgeConnection bridgeConnection = null;
 
+    private ScheduledExecutorService scheduler = null;
     private ScheduledFuture<?> future = null;
 
     private Integer iVersionMessageMissing = 0;
     private boolean iVersionMessageArrived = false;
 
-    private ScheduledExecutorService scheduler = null;
-
-    public MySensorsNetworkSanityChecker(MySensorsBridgeHandler bridgeHandler) {
-        this.bridgeHandler = bridgeHandler;
+    public MySensorsNetworkSanityChecker(MySensorsBridgeConnection bridgeConnection) {
+        this.bridgeConnection = bridgeConnection;
     }
 
     public void start() {
 
-        if (scheduler == null) {
-            scheduler = Executors.newSingleThreadScheduledExecutor();
-        } else {
-            logger.warn("Scheduler is not null");
-        }
+        iVersionMessageArrived = false;
+        iVersionMessageMissing = 0;
 
-        if (bridgeHandler.getBridgeConfiguration().enableNetworkSanCheck) {
-            logger.info("Network Sanity Checker thread started");
-
-            iVersionMessageArrived = false;
-            iVersionMessageMissing = 0;
-
-            future = scheduler.scheduleWithFixedDelay(MySensorsNetworkSanityChecker.this, SHEDULE_MINUTES_DELAY,
-                    SHEDULE_MINUTES_DELAY, TimeUnit.MINUTES);
-
-        } else {
-            logger.warn("Network Sanity Checker thread disabled from bridge configuration");
-        }
+        scheduler = Executors.newSingleThreadScheduledExecutor();
+        future = scheduler.scheduleWithFixedDelay(this, SHEDULE_MINUTES_DELAY, SHEDULE_MINUTES_DELAY, TimeUnit.MINUTES);
 
     }
 
@@ -77,9 +69,9 @@ public class MySensorsNetworkSanityChecker implements MySensorsUpdateListener, R
         Thread.currentThread().setName(MySensorsNetworkSanityChecker.class.getName());
 
         try {
-            bridgeHandler.getBridgeConnector().addUpdateListener(this);
+            bridgeConnection.addUpdateListener(this);
 
-            bridgeHandler.getBridgeConnector().addMySensorsOutboundMessage(MySensorsBindingConstants.I_VERSION_MESSAGE);
+            bridgeConnection.addMySensorsOutboundMessage(MySensorsBindingConstants.I_VERSION_MESSAGE);
 
             Thread.sleep(3000);
 
@@ -91,7 +83,7 @@ public class MySensorsNetworkSanityChecker implements MySensorsUpdateListener, R
                     if ((MAX_ATTEMPTS_BEFORE_DISCONNECT - iVersionMessageMissing) <= 0) {
                         logger.error("Retry period expired, gateway is down. Disconneting bridge...");
 
-                        bridgeHandler.getBridgeConnector().requestDisconnection(true);
+                        bridgeConnection.requestDisconnection(true);
 
                     } else {
                         iVersionMessageMissing++;
@@ -107,7 +99,7 @@ public class MySensorsNetworkSanityChecker implements MySensorsUpdateListener, R
         } catch (InterruptedException e) {
             logger.error("interrupted exception in network sanity thread checker");
         } finally {
-            bridgeHandler.getBridgeConnector().removeUpdateListener(this);
+            bridgeConnection.removeUpdateListener(this);
         }
     }
 

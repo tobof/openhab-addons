@@ -76,7 +76,7 @@ public class MySensorsHandler extends BaseThingHandler implements MySensorsUpdat
     public void handleRemoval() {
         logger.trace("handleRemoval for thing: " + nodeId);
         updateStatus(ThingStatus.OFFLINE);
-        getBridgeHandler().getBridgeConnector().removeUpdateListener(this);
+        getBridgeHandler().getBridgeConnection().removeUpdateListener(this);
         super.handleRemoval();
     }
 
@@ -207,7 +207,7 @@ public class MySensorsHandler extends BaseThingHandler implements MySensorsUpdat
         newMsg.setOldMsg(oldPayload);
         oldMsgContent.put(subType, msgPayload);
 
-        getBridgeHandler().getBridgeConnector().addMySensorsOutboundMessage(newMsg);
+        getBridgeHandler().getBridgeConnection().addMySensorsOutboundMessage(newMsg);
     }
 
     /*
@@ -294,7 +294,7 @@ public class MySensorsHandler extends BaseThingHandler implements MySensorsUpdat
                         oldVal = "";
                     }
                     msg.setMsg(oldVal);
-                    getBridgeHandler().getBridgeConnector().addMySensorsOutboundMessage(msg);
+                    getBridgeHandler().getBridgeConnection().addMySensorsOutboundMessage(msg);
                 }
             }
 
@@ -318,12 +318,20 @@ public class MySensorsHandler extends BaseThingHandler implements MySensorsUpdat
     @Override
     public void bridgeHandlerInitialized(ThingHandler thingHandler, Bridge bridge) {
         MySensorsBridgeHandler bridgeHandler = (MySensorsBridgeHandler) thingHandler;
-        if (bridgeHandler.getBridgeConnector() == null) {
-            logger.warn("Bridge connection not estblished yet - can't subscribe for node: {} child: {}", nodeId,
-                    childId);
-        } else {
-            logger.info("Bridge connection established - subscribing update for node: {} child: {}", nodeId, childId);
-            bridgeHandler.getBridgeConnector().addUpdateListener(this);
+        synchronized (this) {
+            try {
+                while (bridgeHandler.getBridgeConnection() == null) {
+                    logger.warn("Bridge connection not estblished yet - can't subscribe for node: {} child: {}", nodeId,
+                            childId);
+                    wait(2000);
+                }
+
+                logger.info("Bridge connection established - subscribing update for node: {} child: {}", nodeId,
+                        childId);
+                bridgeHandler.getBridgeConnection().addUpdateListener(this);
+            } catch (InterruptedException e) {
+                logger.warn("Interrupted while waiting for connection to become available");
+            }
         }
     }
 

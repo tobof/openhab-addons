@@ -13,8 +13,8 @@ import java.util.Enumeration;
 
 import org.apache.commons.lang.StringUtils;
 import org.openhab.binding.mysensors.MySensorsBindingConstants;
+import org.openhab.binding.mysensors.handler.MySensorsBridgeHandler;
 import org.openhab.binding.mysensors.internal.MySensorsBridgeConnection;
-import org.openhab.binding.mysensors.internal.MySensorsNetworkConnector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,9 +36,9 @@ public class MySensorsSerialConnection extends MySensorsBridgeConnection {
 
     private NRSerialPort serialConnection = null;
 
-    public MySensorsSerialConnection(MySensorsNetworkConnector connector, String serialPort, int baudRate,
-            int sendDelay, boolean skipStartupCheck) {
-        super(connector, skipStartupCheck);
+    public MySensorsSerialConnection(MySensorsBridgeHandler bridgeHandler, String serialPort, int baudRate,
+            int sendDelay) {
+        super(bridgeHandler);
 
         this.serialPort = serialPort;
         this.baudRate = baudRate;

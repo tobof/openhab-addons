@@ -10,13 +10,13 @@ package org.openhab.binding.mysensors.service;
 import org.openhab.binding.mysensors.discovery.MySensorsDiscoveryService;
 import org.openhab.binding.mysensors.handler.MySensorsStatusUpdateEvent;
 import org.openhab.binding.mysensors.handler.MySensorsUpdateListener;
-import org.openhab.binding.mysensors.internal.MySensorsNetworkConnector;
+import org.openhab.binding.mysensors.internal.MySensorsBridgeConnection;
 
 public class DiscoveryThread implements MySensorsUpdateListener {
-    private MySensorsNetworkConnector mysCon;
+    private MySensorsBridgeConnection mysCon;
     private MySensorsDiscoveryService mysDiscoServ;
 
-    public DiscoveryThread(MySensorsNetworkConnector mysCon, MySensorsDiscoveryService mysDiscoServ) {
+    public DiscoveryThread(MySensorsBridgeConnection mysCon, MySensorsDiscoveryService mysDiscoServ) {
         this.mysCon = mysCon;
         this.mysDiscoServ = mysDiscoServ;
     }

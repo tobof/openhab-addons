@@ -7,10 +7,7 @@
  */
 package org.openhab.binding.mysensors.handler;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import static org.openhab.binding.mysensors.MySensorsBindingConstants.*;
 
 import org.eclipse.smarthome.core.thing.Bridge;
 import org.eclipse.smarthome.core.thing.ChannelUID;
@@ -19,7 +16,9 @@ import org.eclipse.smarthome.core.thing.ThingStatus;
 import org.eclipse.smarthome.core.thing.binding.BaseBridgeHandler;
 import org.eclipse.smarthome.core.types.Command;
 import org.openhab.binding.mysensors.config.MySensorsBridgeConfiguration;
-import org.openhab.binding.mysensors.internal.MySensorsNetworkConnector;
+import org.openhab.binding.mysensors.internal.MySensorsBridgeConnection;
+import org.openhab.binding.mysensors.protocol.ip.MySensorsIpConnection;
+import org.openhab.binding.mysensors.protocol.serial.MySensorsSerialConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,18 +32,14 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler {
 
     private Logger logger = LoggerFactory.getLogger(MySensorsBridgeHandler.class);
 
-    // Network connector to bridge
-    private MySensorsNetworkConnector mysConnector = null;
-    private Future<?> connectorFuture = null;
+    // Bridge connection
+    private MySensorsBridgeConnection myCon = null;
 
     // Configuration from thing file
     private MySensorsBridgeConfiguration myConfiguration = null;
 
-    private ScheduledExecutorService connectorScheduler = null;
-
     public MySensorsBridgeHandler(Bridge bridge) {
         super(bridge);
-        connectorScheduler = Executors.newSingleThreadScheduledExecutor();
     }
 
     /*
@@ -56,15 +51,23 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler {
     public void initialize() {
         logger.debug("Initialization of the MySensors bridge");
 
+        notifyDisconnect();
+
         myConfiguration = getConfigAs(MySensorsBridgeConfiguration.class);
 
-        logger.debug("Set skip check on startup to: {}", myConfiguration.skipStartupCheck);
+        if (getThing().getThingTypeUID().equals(THING_TYPE_BRIDGE_SER)) {
+            myCon = new MySensorsSerialConnection(this, myConfiguration.serialPort, myConfiguration.baudRate,
+                    myConfiguration.sendDelay);
+        } else if (getThing().getThingTypeUID().equals(THING_TYPE_BRIDGE_ETH)) {
+            myCon = new MySensorsIpConnection(this, myConfiguration.ipAddress, myConfiguration.tcpPort,
+                    myConfiguration.sendDelay);
+        } else {
+            logger.error("Not recognized bridge: {}", getThing().getThingTypeUID());
+        }
 
-        mysConnector = new MySensorsNetworkConnector(this);
-        connectorFuture = connectorScheduler.scheduleWithFixedDelay(mysConnector, 0,
-                MySensorsNetworkConnector.CONNECTOR_INTERVAL_CHECK, TimeUnit.SECONDS);
-
-        notifyDisconnect();
+        if (myCon != null) {
+            myCon.initialize();
+        }
     }
 
     @Override
@@ -81,7 +84,7 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler {
     @Override
     public void dispose() {
         logger.debug("Disposing of the MySensors bridge");
-        disconnect();
+        myCon.destroy();
     }
 
     /*
@@ -93,19 +96,19 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler {
      */
     @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
-        // TODO Auto-generated method stub
+
     }
 
     public ThingRegistry getThingRegistry() {
         return thingRegistry;
     }
 
-    public MySensorsNetworkConnector getBridgeConnector() {
-        return mysConnector;
-    }
-
     public MySensorsBridgeConfiguration getBridgeConfiguration() {
         return myConfiguration;
+    }
+
+    public MySensorsBridgeConnection getBridgeConnection() {
+        return myCon;
     }
 
     public void notifyConnect() {
@@ -114,24 +117,5 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler {
 
     public void notifyDisconnect() {
         updateStatus(ThingStatus.OFFLINE);
-    }
-
-    private void disconnect() {
-
-        if (mysConnector != null) {
-            mysConnector.stop();
-            mysConnector = null;
-        }
-
-        if (connectorFuture != null) {
-            connectorFuture.cancel(true);
-            connectorFuture = null;
-        }
-
-        if (connectorScheduler != null) {
-            connectorScheduler.shutdown();
-            connectorScheduler.shutdownNow();
-            connectorScheduler = null;
-        }
     }
 }
