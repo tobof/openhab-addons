@@ -38,10 +38,15 @@ public class MySensorsNetworkSanityChecker implements MySensorsUpdateListener, R
         this.bridgeConnection = bridgeConnection;
     }
 
-    public void start() {
+    public void reset() {
+        synchronized (iVersionMessageMissing) {
+            iVersionMessageArrived = false;
+            iVersionMessageMissing = 0;
+        }
+    }
 
-        iVersionMessageArrived = false;
-        iVersionMessageMissing = 0;
+    public void start() {
+        reset();
 
         scheduler = Executors.newSingleThreadScheduledExecutor();
         future = scheduler.scheduleWithFixedDelay(this, SHEDULE_MINUTES_DELAY, SHEDULE_MINUTES_DELAY, TimeUnit.MINUTES);

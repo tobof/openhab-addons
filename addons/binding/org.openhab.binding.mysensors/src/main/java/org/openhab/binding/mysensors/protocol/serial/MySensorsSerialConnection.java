@@ -7,6 +7,7 @@
  */
 package org.openhab.binding.mysensors.protocol.serial;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -52,6 +53,7 @@ public class MySensorsSerialConnection extends MySensorsBridgeConnection {
         boolean ret = false;
 
         updateSerialProperties(serialPort);
+        deleteLockFile(serialPort);
 
         serialConnection = new NRSerialPort(serialPort, baudRate);
         if (serialConnection.connect()) {
@@ -90,20 +92,49 @@ public class MySensorsSerialConnection extends MySensorsBridgeConnection {
             mysConReader = null;
         }
 
-        if (serialConnection != null && serialConnection.isConnected()) {
+        if (serialConnection != null) {
             serialConnection.disconnect();
             serialConnection = null;
         }
 
     }
 
-    private void updateSerialProperties(String devName) {
+    /**
+     * This method delete lock file (if present).
+     * RXTX library not removes them after call NRSerialPort.disconnect().
+     * If lock file was not removed, new connection fail to startup
+     *
+     * @param devName is the device used as COM/UART port
+     */
+    private void deleteLockFile(String devName) {
+        try {
+            String[] namePart = devName.split("/");
+            File lockFile = new File("/var/lock/LCK.." + namePart[namePart.length - 1]);
+            if (lockFile.exists()) {
+                logger.warn("Lock file found ({}), this is not good...try removing it", lockFile.toString());
+                lockFile.delete();
 
-        /*
-         * By default, RXTX searches only devices /dev/ttyS* and
-         * /dev/ttyUSB*, and will therefore not find devices that
-         * have been symlinked. Adding them however is tricky, see below.
-         */
+                if (lockFile.exists()) {
+                    logger.error("Warn! Lock file cannot be deleted, probably connection will fail");
+                } else {
+                    logger.info("Ok, lock file removed...");
+                }
+            } else {
+                logger.debug("Lock file doesn't not exists");
+            }
+        } catch (Exception e) {
+            logger.error("Serial lock file not removed, cause: {} ({})", e.getClass(), e.getMessage());
+        }
+    }
+
+    /**
+     * By default, RXTX searches only devices /dev/ttyS* and
+     * /dev/ttyUSB*, and will therefore not find devices that
+     * have been symlinked. Adding them however is tricky, see below.
+     *
+     * @param devName is the device used as COM/UART port
+     */
+    private void updateSerialProperties(String devName) {
 
         //
         // first go through the port identifiers to find any that are not in
@@ -118,7 +149,7 @@ public class MySensorsSerialConnection extends MySensorsBridgeConnection {
                 allPorts.add(id.getName());
             }
         }
-        logger.trace("ports found from identifiers: {}", StringUtils.join(allPorts, ":"));
+        logger.trace("Ports found from identifiers: {}", StringUtils.join(allPorts, ":"));
         //
         // now add our port so it's in the list
         //
@@ -139,7 +170,7 @@ public class MySensorsSerialConnection extends MySensorsBridgeConnection {
             }
         }
         String finalPorts = StringUtils.join(allPorts, ":");
-        logger.trace("final port list: {}", finalPorts);
+        logger.debug("Final port list: {}", finalPorts);
 
         //
         // Finally overwrite the "gnu.io.rxtx.SerialPorts" System property.

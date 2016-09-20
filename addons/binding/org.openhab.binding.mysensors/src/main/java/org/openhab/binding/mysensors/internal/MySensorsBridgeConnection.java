@@ -95,14 +95,6 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
         // Launch connection watchdog
         logger.debug("Enabling connection watchdog");
         futureWatchdog = watchdogExecutor.scheduleWithFixedDelay(this, 0, CONNECTOR_INTERVAL_CHECK, TimeUnit.SECONDS);
-
-        // Launch network sanity checker (if requested)
-        if (bridgeHandler.getBridgeConfiguration().enableNetworkSanCheck) {
-            logger.info("Network Sanity Checker thread started");
-            netSanityChecker = new MySensorsNetworkSanityChecker(this);
-        } else {
-            logger.warn("Network Sanity Checker thread disabled from bridge configuration");
-        }
     }
 
     @Override
@@ -141,6 +133,7 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
                 logger.error("Failed connecting to bridge...next retry in {} seconds (Retry No.:{})",
                         CONNECTOR_INTERVAL_CHECK, numOfRetry);
                 numOfRetry++;
+                disconnect();
             }
 
         } else {
@@ -156,9 +149,11 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
      */
     private boolean connect() {
         connected = _connect();
+
         if (connected) {
             addUpdateListener(this);
         }
+
         return connected;
     }
 
@@ -168,6 +163,12 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
      * Shutdown method that allows the correct disconnection with the used bridge
      */
     private void disconnect() {
+
+        if (netSanityChecker != null) {
+            netSanityChecker.stop();
+            netSanityChecker = null;
+        }
+
         removeUpdateListener(this);
         _disconnect();
         connected = false;
@@ -181,11 +182,6 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
 
         if (connected) {
             disconnect();
-        }
-
-        if (netSanityChecker != null) {
-            netSanityChecker.stop();
-            netSanityChecker = null;
         }
 
         if (futureWatchdog != null) {
