@@ -17,6 +17,7 @@ import org.eclipse.smarthome.core.thing.binding.BaseBridgeHandler;
 import org.eclipse.smarthome.core.types.Command;
 import org.openhab.binding.mysensors.config.MySensorsBridgeConfiguration;
 import org.openhab.binding.mysensors.internal.MySensorsBridgeConnection;
+import org.openhab.binding.mysensors.internal.cache.MySensorsCacheFactory;
 import org.openhab.binding.mysensors.protocol.ip.MySensorsIpConnection;
 import org.openhab.binding.mysensors.protocol.serial.MySensorsSerialConnection;
 import org.slf4j.Logger;
@@ -37,6 +38,9 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler {
 
     // Configuration from thing file
     private MySensorsBridgeConfiguration myConfiguration = null;
+
+    // Cache file
+    private MySensorsCacheFactory bindingCacheFile = null;
 
     public MySensorsBridgeHandler(Bridge bridge) {
         super(bridge);

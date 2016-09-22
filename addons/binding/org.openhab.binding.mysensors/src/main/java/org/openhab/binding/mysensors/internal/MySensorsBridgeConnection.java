@@ -13,13 +13,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.eclipse.smarthome.config.core.Configuration;
 import org.eclipse.smarthome.core.thing.Thing;
@@ -29,6 +30,7 @@ import org.openhab.binding.mysensors.discovery.MySensorsDiscoveryService;
 import org.openhab.binding.mysensors.handler.MySensorsBridgeHandler;
 import org.openhab.binding.mysensors.handler.MySensorsStatusUpdateEvent;
 import org.openhab.binding.mysensors.handler.MySensorsUpdateListener;
+import org.openhab.binding.mysensors.internal.cache.MySensorsCacheFactory;
 import org.openhab.binding.mysensors.protocol.MySensorsReader;
 import org.openhab.binding.mysensors.protocol.MySensorsWriter;
 import org.slf4j.Logger;
@@ -425,9 +427,19 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
     }
 
     private int reserveId() {
-        int id = 1;
+        int id = -1;
+        MySensorsCacheFactory cacheFactory = MySensorsCacheFactory.getCacheFactory();
 
+        List<Integer> givenIds = IntStream
+                .of(cacheFactory.readCache(MySensorsCacheFactory.GIVEN_IDS_CACHE_FILE, new int[] { 1 }, int[].class))
+                .boxed().collect(Collectors.toList());
         List<Number> takenIds = new ArrayList<Number>();
+
+        // Which ids are already given by the binding, but not yet in the thing list?
+        Iterator<Integer> iteratorGiven = givenIds.iterator();
+        while (iteratorGiven.hasNext()) {
+            takenIds.add(iteratorGiven.next());
+        }
 
         // Which ids are taken in Thing list of OpenHAB
         Collection<Thing> thingList = bridgeHandler.getThingRegistry().getAll();
@@ -445,20 +457,18 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
             }
         }
 
-        // Which ids are already given by the binding, but not yet in the thing list?
-        // Iterator<Number> iteratorGiven = givenIds.iterator();
-        // while (iteratorGiven.hasNext()) {
-        // takenIds.add(iteratorGiven.next());
-        // }
-
         // generate new id
         boolean foundId = false;
-        while (!foundId) {
-            Random rand = new Random(System.currentTimeMillis());
-            int newId = rand.nextInt((254 - 1) + 1) + 1;
+        Integer newId = takenIds.get(0).intValue();
+        while (!foundId && newId < 255) {
             if (!takenIds.contains(newId)) {
-                id = newId;
+                id = newId.intValue();
+                givenIds.add(id);
                 foundId = true;
+                cacheFactory.writeCache(MySensorsCacheFactory.GIVEN_IDS_CACHE_FILE, givenIds.toArray(new Integer[] {}),
+                        Integer[].class);
+            } else {
+                newId++;
             }
         }
 
