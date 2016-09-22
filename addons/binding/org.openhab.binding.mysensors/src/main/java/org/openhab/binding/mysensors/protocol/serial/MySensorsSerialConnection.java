@@ -93,7 +93,11 @@ public class MySensorsSerialConnection extends MySensorsBridgeConnection {
         }
 
         if (serialConnection != null) {
-            serialConnection.disconnect();
+            try {
+                serialConnection.disconnect();
+            } catch (Exception e) {
+                logger.error("Windows fail on closing stream...");
+            }
             serialConnection = null;
         }
 

@@ -431,7 +431,7 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
         MySensorsCacheFactory cacheFactory = MySensorsCacheFactory.getCacheFactory();
 
         List<Integer> givenIds = IntStream
-                .of(cacheFactory.readCache(MySensorsCacheFactory.GIVEN_IDS_CACHE_FILE, new int[] { 1 }, int[].class))
+                .of(cacheFactory.readCache(MySensorsCacheFactory.GIVEN_IDS_CACHE_FILE, new int[] {}, int[].class))
                 .boxed().collect(Collectors.toList());
         List<Number> takenIds = new ArrayList<Number>();
 
@@ -459,7 +459,7 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
 
         // generate new id
         boolean foundId = false;
-        Integer newId = takenIds.get(0).intValue();
+        Integer newId = 1;
         while (!foundId && newId < 255) {
             if (!takenIds.contains(newId)) {
                 id = newId.intValue();
