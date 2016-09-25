@@ -3,7 +3,7 @@ package org.openhab.binding.mysensors.test;
 import java.util.Arrays;
 
 import org.junit.Test;
-import org.openhab.binding.mysensors.internal.cache.MySensorsCacheFactory;
+import org.openhab.binding.mysensors.internal.factory.MySensorsCacheFactory;
 
 public class CacheTest {
 

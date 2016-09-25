@@ -5,13 +5,13 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package org.openhab.binding.mysensors.protocol.ip;
+package org.openhab.binding.mysensors.internal.protocol.ip;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-import org.openhab.binding.mysensors.protocol.MySensorsWriter;
+import org.openhab.binding.mysensors.internal.protocol.MySensorsWriter;
 
 public class MySensorsIpWriter extends MySensorsWriter {
 

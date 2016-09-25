@@ -5,7 +5,7 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package org.openhab.binding.mysensors.internal;
+package org.openhab.binding.mysensors.internal.protocol;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -13,9 +13,11 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.openhab.binding.mysensors.MySensorsBindingConstants;
-import org.openhab.binding.mysensors.MySensorsBindingUtility;
-import org.openhab.binding.mysensors.handler.MySensorsStatusUpdateEvent;
-import org.openhab.binding.mysensors.handler.MySensorsUpdateListener;
+import org.openhab.binding.mysensors.internal.MySensorsUtility;
+import org.openhab.binding.mysensors.internal.event.MySensorsEventType;
+import org.openhab.binding.mysensors.internal.event.MySensorsStatusUpdateEvent;
+import org.openhab.binding.mysensors.internal.event.MySensorsUpdateListener;
+import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,7 +76,7 @@ public class MySensorsNetworkSanityChecker implements MySensorsUpdateListener, R
         Thread.currentThread().setName(MySensorsNetworkSanityChecker.class.getName());
 
         try {
-            bridgeConnection.addUpdateListener(this);
+            bridgeConnection.addEventListener(this);
 
             bridgeConnection.addMySensorsOutboundMessage(MySensorsBindingConstants.I_VERSION_MESSAGE);
 
@@ -104,15 +106,17 @@ public class MySensorsNetworkSanityChecker implements MySensorsUpdateListener, R
         } catch (InterruptedException e) {
             logger.error("interrupted exception in network sanity thread checker");
         } finally {
-            bridgeConnection.removeUpdateListener(this);
+            bridgeConnection.removeEventListener(this);
         }
     }
 
     @Override
     public void statusUpdateReceived(MySensorsStatusUpdateEvent event) {
-        synchronized (iVersionMessageMissing) {
-            if (!iVersionMessageArrived) {
-                iVersionMessageArrived = MySensorsBindingUtility.isIVersionMessage(event.getData());
+        if (event.getEventType() == MySensorsEventType.INCOMING_MESSAGE) {
+            synchronized (iVersionMessageMissing) {
+                if (!iVersionMessageArrived) {
+                    iVersionMessageArrived = MySensorsUtility.isIVersionMessage((MySensorsMessage) event.getData());
+                }
             }
         }
     }

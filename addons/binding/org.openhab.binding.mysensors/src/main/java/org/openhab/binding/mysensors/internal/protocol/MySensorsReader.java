@@ -5,7 +5,7 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package org.openhab.binding.mysensors.protocol;
+package org.openhab.binding.mysensors.internal.protocol;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -14,11 +14,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import org.openhab.binding.mysensors.handler.MySensorsStatusUpdateEvent;
-import org.openhab.binding.mysensors.handler.MySensorsUpdateListener;
-import org.openhab.binding.mysensors.internal.MySensorsBridgeConnection;
-import org.openhab.binding.mysensors.internal.MySensorsMessage;
-import org.openhab.binding.mysensors.internal.MySensorsMessageParser;
+import org.openhab.binding.mysensors.internal.event.MySensorsStatusUpdateEvent;
+import org.openhab.binding.mysensors.internal.event.MySensorsUpdateListener;
+import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
+import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

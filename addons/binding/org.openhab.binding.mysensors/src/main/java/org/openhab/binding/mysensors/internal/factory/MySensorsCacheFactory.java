@@ -1,4 +1,4 @@
-package org.openhab.binding.mysensors.internal.cache;
+package org.openhab.binding.mysensors.internal.factory;
 
 import java.io.File;
 import java.io.FileReader;

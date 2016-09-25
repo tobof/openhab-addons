@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.smarthome.core.thing.ThingTypeUID;
-import org.openhab.binding.mysensors.internal.MySensorsMessage;
+import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;

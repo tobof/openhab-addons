@@ -5,12 +5,13 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package org.openhab.binding.mysensors.service;
+package org.openhab.binding.mysensors.discovery;
 
-import org.openhab.binding.mysensors.discovery.MySensorsDiscoveryService;
-import org.openhab.binding.mysensors.handler.MySensorsStatusUpdateEvent;
-import org.openhab.binding.mysensors.handler.MySensorsUpdateListener;
-import org.openhab.binding.mysensors.internal.MySensorsBridgeConnection;
+import org.openhab.binding.mysensors.internal.event.MySensorsEventType;
+import org.openhab.binding.mysensors.internal.event.MySensorsStatusUpdateEvent;
+import org.openhab.binding.mysensors.internal.event.MySensorsUpdateListener;
+import org.openhab.binding.mysensors.internal.protocol.MySensorsBridgeConnection;
+import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
 
 public class DiscoveryThread implements MySensorsUpdateListener {
     private MySensorsBridgeConnection mysCon;
@@ -22,16 +23,18 @@ public class DiscoveryThread implements MySensorsUpdateListener {
     }
 
     public void start() {
-        mysCon.addUpdateListener(this);
+        mysCon.addEventListener(this);
     }
 
     public void stop() {
-        mysCon.removeUpdateListener(this);
+        mysCon.removeEventListener(this);
     }
 
     @Override
     public void statusUpdateReceived(MySensorsStatusUpdateEvent event) {
-        mysDiscoServ.newDevicePresented(event.getData());
+        if (event.getEventType() == MySensorsEventType.INCOMING_MESSAGE) {
+            mysDiscoServ.newDevicePresented((MySensorsMessage) event.getData());
+        }
 
     }
 }

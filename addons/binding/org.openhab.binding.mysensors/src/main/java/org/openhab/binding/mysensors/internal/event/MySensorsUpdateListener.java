@@ -5,7 +5,7 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package org.openhab.binding.mysensors.handler;
+package org.openhab.binding.mysensors.internal.event;
 
 import java.util.EventListener;
 

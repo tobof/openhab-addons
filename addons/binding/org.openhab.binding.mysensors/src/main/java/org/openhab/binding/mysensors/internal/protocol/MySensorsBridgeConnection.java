@@ -5,12 +5,11 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package org.openhab.binding.mysensors.internal;
+package org.openhab.binding.mysensors.internal.protocol;
 
 import static org.openhab.binding.mysensors.MySensorsBindingConstants.*;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
@@ -19,20 +18,14 @@ import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
-import org.eclipse.smarthome.config.core.Configuration;
-import org.eclipse.smarthome.core.thing.Thing;
 import org.openhab.binding.mysensors.MySensorsBindingConstants;
-import org.openhab.binding.mysensors.MySensorsBindingUtility;
 import org.openhab.binding.mysensors.discovery.MySensorsDiscoveryService;
-import org.openhab.binding.mysensors.handler.MySensorsBridgeHandler;
-import org.openhab.binding.mysensors.handler.MySensorsStatusUpdateEvent;
-import org.openhab.binding.mysensors.handler.MySensorsUpdateListener;
-import org.openhab.binding.mysensors.internal.cache.MySensorsCacheFactory;
-import org.openhab.binding.mysensors.protocol.MySensorsReader;
-import org.openhab.binding.mysensors.protocol.MySensorsWriter;
+import org.openhab.binding.mysensors.internal.MySensorsUtility;
+import org.openhab.binding.mysensors.internal.event.MySensorsStatusUpdateEvent;
+import org.openhab.binding.mysensors.internal.event.MySensorsUpdateListener;
+import org.openhab.binding.mysensors.internal.handler.MySensorsBridgeHandler;
+import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,6 +81,7 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
         this.bridgeHandler = bridgeHandler;
         this.updateListeners = new ArrayList<>();
         this.watchdogExecutor = Executors.newSingleThreadScheduledExecutor();
+        this.iVersionResponse = false;
     }
 
     public void initialize() {
@@ -114,8 +108,6 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
                 logger.info("Successfully connected to MySensors Bridge.");
 
                 numOfRetry = 0;
-
-                bridgeHandler.notifyConnect();
 
                 // Start discovery service
                 MySensorsDiscoveryService discoveryService = new MySensorsDiscoveryService(bridgeHandler);
@@ -150,7 +142,6 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
      * @return true, if connection established correctly
      */
     private boolean connect() {
-        addUpdateListener(this);
         connected = _connect();
         return connected;
     }
@@ -167,7 +158,6 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
             netSanityChecker = null;
         }
 
-        removeUpdateListener(this);
         _disconnect();
         connected = false;
         requestDisconnection = false;
@@ -205,6 +195,7 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
         writer.startWriter();
 
         if (!skipStartupCheck) {
+            addEventListener(this);
             try {
                 int i = 0;
                 synchronized (this) {
@@ -217,6 +208,8 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
                 }
             } catch (Exception e) {
                 logger.error("Exception on waiting for I_VERSION message", e);
+            } finally {
+                removeEventListener(this);
             }
         } else {
             logger.warn("Skipping I_VERSION connection test, not recommended...");
@@ -261,7 +254,7 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
     /**
      * @param listener An Object, that wants to listen on status updates
      */
-    public void addUpdateListener(MySensorsUpdateListener listener) {
+    public void addEventListener(MySensorsUpdateListener listener) {
         synchronized (updateListeners) {
             if (!updateListeners.contains(listener)) {
                 logger.trace("Adding listener: " + listener);
@@ -270,7 +263,7 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
         }
     }
 
-    public void removeUpdateListener(MySensorsUpdateListener listener) {
+    public void removeEventListener(MySensorsUpdateListener listener) {
         synchronized (updateListeners) {
             if (updateListeners.contains(listener)) {
                 logger.trace("Removing listener: " + listener);
@@ -279,7 +272,7 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
         }
     }
 
-    public List<MySensorsUpdateListener> getUpdateListeners() {
+    public List<MySensorsUpdateListener> getEventListeners() {
         return updateListeners;
     }
 
@@ -315,17 +308,6 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
         pauseWriter = false;
     }
 
-    public void iVersionMessageReceived(String msg) {
-        if (waitingObj != null) {
-            logger.debug("Good,Gateway is up and running! (Ver:{})", msg);
-            synchronized (waitingObj) {
-                iVersionResponse = true;
-                waitingObj.notifyAll();
-                waitingObj = null;
-            }
-        }
-    }
-
     public boolean isWriterPaused() {
         return pauseWriter;
     }
@@ -343,36 +325,56 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
         requestDisconnection = flag;
     }
 
-    @Override
-    public void statusUpdateReceived(MySensorsStatusUpdateEvent event) {
-        MySensorsMessage msg = event.getData();
-        // logger.debug("updateRecieved: " + msg.getDebugInfo());
+    /**
+     * Wake up main thread that is waiting for confirmation of link up
+     */
+    private void handleIncomingVersionMessage(String message) {
+        iVersionMessageReceived(message);
+    }
+
+    private void iVersionMessageReceived(String msg) {
+        if (waitingObj != null) {
+            logger.debug("Good,Gateway is up and running! (Ver:{})", msg);
+            synchronized (waitingObj) {
+                iVersionResponse = true;
+                waitingObj.notifyAll();
+                waitingObj = null;
+            }
+        }
+    }
+
+    private void handleIncomingMessageEvent(MySensorsMessage msg) {
         // Do we get an ACK?
         if (msg.getAck() == 1) {
             logger.debug(String.format("ACK received! Node: %d, Child: %d", msg.nodeId, msg.childId));
             removeMySensorsOutboundMessage(msg);
         }
 
-        // Are we getting a Request ID Message?
-        if (MySensorsBindingUtility.isIdRequestMessage(msg)) {
-            answerIDRequest();
-        }
-
-        // Have we get a I_VERSION message?
-        if (MySensorsBindingUtility.isIVersionMessage(msg)) {
-            handleIncomingVersionMessage(msg.msg);
-        }
-
         // Have we get a I_CONFIG message?
-        if (MySensorsBindingUtility.isIConfigMessage(msg)) {
+        if (MySensorsUtility.isIConfigMessage(msg)) {
             answerIConfigMessage(msg);
         }
 
         // Have we get a I_TIME message?
-        if (MySensorsBindingUtility.isITimeMessage(msg)) {
+        if (MySensorsUtility.isITimeMessage(msg)) {
             answerITimeMessage(msg);
         }
 
+        // Have we get a I_VERSION message?
+        if (MySensorsUtility.isIVersionMessage(msg)) {
+            handleIncomingVersionMessage(msg.msg);
+        }
+    }
+
+    @Override
+    public void statusUpdateReceived(MySensorsStatusUpdateEvent event) {
+        switch (event.getEventType()) {
+            case INCOMING_MESSAGE:
+                handleIncomingMessageEvent((MySensorsMessage) event.getData());
+                break;
+            default:
+                break;
+        }
     }
 
     /**
@@ -405,74 +407,6 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
                 MYSENSORS_SUBTYPE_I_CONFIG, iConfig);
         addMySensorsOutboundMessage(newMsg);
 
-    }
-
-    /**
-     * If an ID -Request from a sensor is received the controller will send an id to the sensor
-     */
-    private void answerIDRequest() {
-        logger.debug("ID Request received");
-
-        int newId = reserveId();
-        MySensorsMessage newMsg = new MySensorsMessage(255, 255, 3, 0, false, 4, newId + "");
-        addMySensorsOutboundMessage(newMsg);
-        logger.info("New Node in the MySensors network has requested an ID. ID is: {}", newId);
-    }
-
-    /**
-     * Wake up main thread that is waiting for confirmation of link up
-     */
-    private void handleIncomingVersionMessage(String message) {
-        iVersionMessageReceived(message);
-    }
-
-    private int reserveId() {
-        int id = -1;
-        MySensorsCacheFactory cacheFactory = MySensorsCacheFactory.getCacheFactory();
-
-        List<Integer> givenIds = IntStream
-                .of(cacheFactory.readCache(MySensorsCacheFactory.GIVEN_IDS_CACHE_FILE, new int[] {}, int[].class))
-                .boxed().collect(Collectors.toList());
-        List<Number> takenIds = new ArrayList<Number>();
-
-        // Which ids are already given by the binding, but not yet in the thing list?
-        Iterator<Integer> iteratorGiven = givenIds.iterator();
-        while (iteratorGiven.hasNext()) {
-            takenIds.add(iteratorGiven.next());
-        }
-
-        // Which ids are taken in Thing list of OpenHAB
-        Collection<Thing> thingList = bridgeHandler.getThingRegistry().getAll();
-        Iterator<Thing> iterator = thingList.iterator();
-
-        while (iterator.hasNext()) {
-            Thing thing = iterator.next();
-            Configuration conf = thing.getConfiguration();
-            if (conf != null) {
-                Object nodeIdobj = conf.get("nodeId");
-                if (nodeIdobj != null) {
-                    int nodeId = Integer.parseInt(nodeIdobj.toString());
-                    takenIds.add(nodeId);
-                }
-            }
-        }
-
-        // generate new id
-        boolean foundId = false;
-        Integer newId = 1;
-        while (!foundId && newId < 255) {
-            if (!takenIds.contains(newId)) {
-                id = newId.intValue();
-                givenIds.add(id);
-                foundId = true;
-                cacheFactory.writeCache(MySensorsCacheFactory.GIVEN_IDS_CACHE_FILE, givenIds.toArray(new Integer[] {}),
-                        Integer[].class);
-            } else {
-                newId++;
-            }
-        }
-
-        return id;
     }
 
 }

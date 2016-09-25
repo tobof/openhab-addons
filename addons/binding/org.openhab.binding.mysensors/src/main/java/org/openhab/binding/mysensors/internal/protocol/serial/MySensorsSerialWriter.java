@@ -5,12 +5,12 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package org.openhab.binding.mysensors.protocol.serial;
+package org.openhab.binding.mysensors.internal.protocol.serial;
 
 import java.io.OutputStream;
 import java.io.PrintWriter;
 
-import org.openhab.binding.mysensors.protocol.MySensorsWriter;
+import org.openhab.binding.mysensors.internal.protocol.MySensorsWriter;
 
 public class MySensorsSerialWriter extends MySensorsWriter {
 

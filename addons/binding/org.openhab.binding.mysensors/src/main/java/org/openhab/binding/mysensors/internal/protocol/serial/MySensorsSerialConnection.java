@@ -5,7 +5,7 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package org.openhab.binding.mysensors.protocol.serial;
+package org.openhab.binding.mysensors.internal.protocol.serial;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -14,8 +14,8 @@ import java.util.Enumeration;
 
 import org.apache.commons.lang.StringUtils;
 import org.openhab.binding.mysensors.MySensorsBindingConstants;
-import org.openhab.binding.mysensors.handler.MySensorsBridgeHandler;
-import org.openhab.binding.mysensors.internal.MySensorsBridgeConnection;
+import org.openhab.binding.mysensors.internal.handler.MySensorsBridgeHandler;
+import org.openhab.binding.mysensors.internal.protocol.MySensorsBridgeConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -96,7 +96,6 @@ public class MySensorsSerialConnection extends MySensorsBridgeConnection {
             try {
                 serialConnection.disconnect();
             } catch (Exception e) {
-                logger.error("Windows fail on closing stream...");
             }
             serialConnection = null;
         }

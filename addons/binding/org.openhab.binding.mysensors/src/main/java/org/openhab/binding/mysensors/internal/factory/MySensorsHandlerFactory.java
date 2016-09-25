@@ -5,7 +5,7 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package org.openhab.binding.mysensors.internal;
+package org.openhab.binding.mysensors.internal.factory;
 
 import static org.openhab.binding.mysensors.MySensorsBindingConstants.*;
 
@@ -22,9 +22,11 @@ import org.eclipse.smarthome.core.thing.ThingUID;
 import org.eclipse.smarthome.core.thing.binding.BaseThingHandlerFactory;
 import org.eclipse.smarthome.core.thing.binding.ThingHandler;
 import org.openhab.binding.mysensors.discovery.MySensorsDiscoveryService;
-import org.openhab.binding.mysensors.handler.MySensorsBridgeHandler;
-import org.openhab.binding.mysensors.handler.MySensorsHandler;
+import org.openhab.binding.mysensors.internal.handler.MySensorsBridgeHandler;
+import org.openhab.binding.mysensors.internal.handler.MySensorsThingHandler;
 import org.osgi.framework.ServiceRegistration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The {@link MySensorsHandlerFactory} is responsible for creating things and thing
@@ -33,6 +35,8 @@ import org.osgi.framework.ServiceRegistration;
  * @author Tim Oberföll
  */
 public class MySensorsHandlerFactory extends BaseThingHandlerFactory {
+
+    private Logger logger = LoggerFactory.getLogger(getClass());
 
     private Map<ThingUID, ServiceRegistration<?>> discoveryServiceRegs = new HashMap<>();
 
@@ -54,7 +58,7 @@ public class MySensorsHandlerFactory extends BaseThingHandlerFactory {
         ThingTypeUID thingTypeUID = thing.getThingTypeUID();
 
         if (SUPPORTED_THING_TYPES_UIDS.contains(thingTypeUID)) {
-            return new MySensorsHandler(thing);
+            return new MySensorsThingHandler(thing);
         }
 
         if (thingTypeUID.equals(THING_TYPE_BRIDGE_SER) || thingTypeUID.equals(THING_TYPE_BRIDGE_ETH)) {
@@ -62,6 +66,8 @@ public class MySensorsHandlerFactory extends BaseThingHandlerFactory {
             registerDeviceDiscoveryService(handler);
             return handler;
         }
+
+        logger.error("Thing {} cannot be configured, is this thing supported by the binding?", thingTypeUID);
 
         return null;
     }
@@ -85,7 +91,14 @@ public class MySensorsHandlerFactory extends BaseThingHandlerFactory {
     }
 
     @Override
+    public void removeThing(ThingUID thingUID) {
+        logger.trace("Removing thing: {}", thingUID);
+        super.removeThing(thingUID);
+    }
+
+    @Override
     protected void removeHandler(ThingHandler thingHandler) {
+        logger.trace("Removing handler: {}", thingHandler);
         if (thingHandler instanceof MySensorsBridgeHandler) {
             ServiceRegistration<?> serviceReg = this.discoveryServiceRegs.get(thingHandler.getThing().getUID());
             if (serviceReg != null) {

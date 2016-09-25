@@ -1,10 +1,10 @@
-package org.openhab.binding.mysensors;
+package org.openhab.binding.mysensors.internal;
 
 import static org.openhab.binding.mysensors.MySensorsBindingConstants.*;
 
-import org.openhab.binding.mysensors.internal.MySensorsMessage;
+import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
 
-public class MySensorsBindingUtility {
+public class MySensorsUtility {
     public static boolean isIConfigMessage(MySensorsMessage msg) {
         boolean ret = false;
 
@@ -70,6 +70,16 @@ public class MySensorsBindingUtility {
                     }
                 }
             }
+        }
+
+        return ret;
+    }
+
+    public static boolean isPresentationMessage(MySensorsMessage msg) {
+        boolean ret = false;
+
+        if (msg.getMsgType() == MYSENSORS_MSG_TYPE_PRESENTATION) {
+            ret = true;
         }
 
         return ret;

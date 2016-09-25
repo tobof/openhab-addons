@@ -5,13 +5,13 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package org.openhab.binding.mysensors.protocol.ip;
+package org.openhab.binding.mysensors.internal.protocol.ip;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import org.openhab.binding.mysensors.protocol.MySensorsReader;
+import org.openhab.binding.mysensors.internal.protocol.MySensorsReader;
 
 public class MySensorIpReader extends MySensorsReader {
     public MySensorIpReader(InputStream inStream, MySensorsIpConnection mysCon) {

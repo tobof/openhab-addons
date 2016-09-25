@@ -5,7 +5,7 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package org.openhab.binding.mysensors.handler;
+package org.openhab.binding.mysensors.internal.handler;
 
 import static org.openhab.binding.mysensors.MySensorsBindingConstants.*;
 
@@ -29,20 +29,22 @@ import org.eclipse.smarthome.core.thing.binding.ThingHandler;
 import org.eclipse.smarthome.core.types.Command;
 import org.eclipse.smarthome.core.types.RefreshType;
 import org.openhab.binding.mysensors.config.MySensorsSensorConfiguration;
-import org.openhab.binding.mysensors.internal.MySensorsMessage;
-import org.openhab.binding.mysensors.internal.MySensorsMessageParser;
+import org.openhab.binding.mysensors.internal.event.MySensorsStatusUpdateEvent;
+import org.openhab.binding.mysensors.internal.event.MySensorsUpdateListener;
+import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
+import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The {@link MySensorsHandler} is responsible for handling commands, which are
+ * The {@link MySensorsThingHandler} is responsible for handling commands, which are
  * sent to one of the channels.
  *
  * @author Tim Oberföll
  */
-public class MySensorsHandler extends BaseThingHandler implements MySensorsUpdateListener {
+public class MySensorsThingHandler extends BaseThingHandler implements MySensorsUpdateListener {
 
-    private Logger logger = LoggerFactory.getLogger(MySensorsHandler.class);
+    private Logger logger = LoggerFactory.getLogger(MySensorsThingHandler.class);
 
     private MySensorsSensorConfiguration configuration = null;
 
@@ -55,7 +57,7 @@ public class MySensorsHandler extends BaseThingHandler implements MySensorsUpdat
 
     private Map<Integer, String> oldMsgContent = new HashMap<Integer, String>();
 
-    public MySensorsHandler(Thing thing) {
+    public MySensorsThingHandler(Thing thing) {
         super(thing);
     }
 
@@ -77,7 +79,7 @@ public class MySensorsHandler extends BaseThingHandler implements MySensorsUpdat
     public void handleRemoval() {
         logger.trace("handleRemoval for thing: " + nodeId);
         updateStatus(ThingStatus.OFFLINE);
-        getBridgeHandler().getBridgeConnection().removeUpdateListener(this);
+        getBridgeHandler().getBridgeConnection().removeEventListener(this);
         super.handleRemoval();
     }
 
@@ -240,8 +242,43 @@ public class MySensorsHandler extends BaseThingHandler implements MySensorsUpdat
      */
     @Override
     public void statusUpdateReceived(MySensorsStatusUpdateEvent event) {
-        MySensorsMessage msg = event.getData();
+        switch (event.getEventType()) {
+            case INCOMING_MESSAGE:
+                handleIncomingMessageEvent((MySensorsMessage) event.getData());
+                break;
+            default:
+                break;
+        }
+    }
 
+    /**
+     * Returns the BridgeHandler of the bridge/gateway to the MySensors network
+     *
+     * @return BridgeHandler of the bridge/gateway to the MySensors network
+     */
+    public synchronized MySensorsBridgeHandler getBridgeHandler() {
+        MySensorsBridgeHandler myBridgeHandler = null;
+
+        Bridge bridge = getBridge();
+        myBridgeHandler = (MySensorsBridgeHandler) bridge.getHandler();
+
+        return myBridgeHandler;
+    }
+
+    @Override
+    public void bridgeHandlerInitialized(ThingHandler thingHandler, Bridge bridge) {
+        MySensorsBridgeHandler bridgeHandler = (MySensorsBridgeHandler) thingHandler;
+        if (bridgeHandler.getBridgeConnection() == null) {
+            logger.warn("Bridge connection not estblished yet - can't subscribe for node: {} child: {}", nodeId,
+                    childId);
+        } else {
+            logger.info("Bridge connection established - subscribing update for node: {} child: {}", nodeId, childId);
+            bridgeHandler.getBridgeConnection().addEventListener(this);
+        }
+
+    }
+
+    private void handleIncomingMessageEvent(MySensorsMessage msg) {
         // Am I the all knowing node that receives all messages?
         if (nodeId == 999 && childId == 999) {
             updateState(CHANNEL_MYSENSORS_MESSAGE,
@@ -312,40 +349,6 @@ public class MySensorsHandler extends BaseThingHandler implements MySensorsUpdat
                 }
             }
 
-        }
-    }
-
-    /**
-     * Returns the BridgeHandler of the bridge/gateway to the MySensors network
-     *
-     * @return BridgeHandler of the bridge/gateway to the MySensors network
-     */
-    public synchronized MySensorsBridgeHandler getBridgeHandler() {
-        MySensorsBridgeHandler myBridgeHandler = null;
-
-        Bridge bridge = getBridge();
-        myBridgeHandler = (MySensorsBridgeHandler) bridge.getHandler();
-
-        return myBridgeHandler;
-    }
-
-    @Override
-    public void bridgeHandlerInitialized(ThingHandler thingHandler, Bridge bridge) {
-        MySensorsBridgeHandler bridgeHandler = (MySensorsBridgeHandler) thingHandler;
-        synchronized (this) {
-            try {
-                while (bridgeHandler.getBridgeConnection() == null) {
-                    logger.warn("Bridge connection not estblished yet - can't subscribe for node: {} child: {}", nodeId,
-                            childId);
-                    wait(2000);
-                }
-
-                logger.info("Bridge connection established - subscribing update for node: {} child: {}", nodeId,
-                        childId);
-                bridgeHandler.getBridgeConnection().addUpdateListener(this);
-            } catch (InterruptedException e) {
-                logger.warn("Interrupted while waiting for connection to become available");
-            }
         }
     }
 
