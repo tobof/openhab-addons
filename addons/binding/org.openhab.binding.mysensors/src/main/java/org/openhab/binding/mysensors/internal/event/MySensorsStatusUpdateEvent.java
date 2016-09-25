@@ -20,7 +20,8 @@ public class MySensorsStatusUpdateEvent {
 
     private MySensorsEventType eventType;
 
-    public MySensorsStatusUpdateEvent(Object data) {
+    public MySensorsStatusUpdateEvent(MySensorsEventType eventType, Object data) {
+        this.eventType = eventType;
         this.data = data;
     }
 

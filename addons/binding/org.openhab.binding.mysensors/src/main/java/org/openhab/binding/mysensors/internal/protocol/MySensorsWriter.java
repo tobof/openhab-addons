@@ -15,6 +15,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import org.openhab.binding.mysensors.MySensorsBindingConstants;
+import org.openhab.binding.mysensors.internal.event.MySensorsEventType;
 import org.openhab.binding.mysensors.internal.event.MySensorsStatusUpdateEvent;
 import org.openhab.binding.mysensors.internal.event.MySensorsUpdateListener;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
@@ -67,7 +68,8 @@ public abstract class MySensorsWriter implements MySensorsUpdateListener, Runnab
                                         logger.debug("Reverting status!");
                                         msg.setMsg(msg.getOldMsg());
                                         msg.setAck(0);
-                                        MySensorsStatusUpdateEvent event = new MySensorsStatusUpdateEvent(msg);
+                                        MySensorsStatusUpdateEvent event = new MySensorsStatusUpdateEvent(
+                                                MySensorsEventType.INCOMING_MESSAGE, msg);
                                         mysCon.broadCastEvent(event);
                                     } else if (!msg.getRevert()) {
                                         logger.debug("Not reverted due to configuration!");

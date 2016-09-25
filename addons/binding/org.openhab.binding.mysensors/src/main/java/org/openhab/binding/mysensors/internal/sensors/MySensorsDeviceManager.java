@@ -1,9 +1,11 @@
 package org.openhab.binding.mysensors.internal.sensors;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 
 import org.openhab.binding.mysensors.internal.MySensorsUtility;
+import org.openhab.binding.mysensors.internal.event.MySensorsEventType;
 import org.openhab.binding.mysensors.internal.event.MySensorsStatusUpdateEvent;
 import org.openhab.binding.mysensors.internal.event.MySensorsUpdateListener;
 import org.openhab.binding.mysensors.internal.exception.NoMoreIdsException;
@@ -24,6 +26,23 @@ public class MySensorsDeviceManager implements MySensorsUpdateListener {
         this.nodeMap = new HashMap<Integer, MySensorsNode>();
     }
 
+    public MySensorsDeviceManager(MySensorsBridgeConnection myCon, HashMap<Integer, MySensorsNode> nodeMap) {
+        this.myCon = myCon;
+        this.nodeMap = nodeMap;
+    }
+
+    public MySensorsDeviceManager(MySensorsBridgeConnection myCon, List<MySensorsNode> nodeList) {
+        this.myCon = myCon;
+        this.nodeMap = new HashMap<Integer, MySensorsNode>();
+
+        if (nodeList != null) {
+            for (MySensorsNode n : nodeList) {
+                nodeMap.put(n.getNodeId(), n);
+            }
+        }
+
+    }
+
     public MySensorsNode getNode(int nodeId) {
         return nodeMap.get(nodeId);
     }
@@ -31,6 +50,17 @@ public class MySensorsDeviceManager implements MySensorsUpdateListener {
     public void addNode(MySensorsNode node) {
         synchronized (nodeMap) {
             nodeMap.put(node.getNodeId(), node);
+        }
+    }
+
+    public void addChild(int nodeId, MySensorsChild<?> child) {
+        synchronized (nodeMap) {
+            MySensorsNode node = nodeMap.get(nodeId);
+            if (node != null) {
+                node.addChild(child);
+            } else {
+                logger.warn("Node {} not found in map", nodeId);
+            }
         }
     }
 
@@ -81,18 +111,27 @@ public class MySensorsDeviceManager implements MySensorsUpdateListener {
             return;
         }
 
-        // Are we getting a Presentation Message
-        if (MySensorsUtility.isPresentationMessage(msg)) {
-            newChildPresented(msg);
+        // Register node if not present
+        if (nodeMap.containsKey(msg.getNodeId())) {
+            checkNodeFound(msg);
             return;
         }
     }
 
-    private void newChildPresented(MySensorsMessage msg) {
-        if (nodeMap.containsKey(msg.nodeId)) {
+    private void checkNodeFound(MySensorsMessage msg) {
+        MySensorsNode node = null;
+        synchronized (nodeMap) {
+            if (!nodeMap.containsKey(msg.nodeId)) {
+                logger.debug("Node {} found!");
 
-        } else {
+                node = new MySensorsNode(msg.nodeId);
+                addNode(node);
+            }
+        }
 
+        if (node != null) {
+            MySensorsStatusUpdateEvent evt = new MySensorsStatusUpdateEvent(MySensorsEventType.INCOMING_MESSAGE, node);
+            myCon.broadCastEvent(evt);
         }
     }
 

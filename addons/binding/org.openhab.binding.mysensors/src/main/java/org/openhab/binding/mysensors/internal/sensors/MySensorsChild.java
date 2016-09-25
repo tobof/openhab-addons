@@ -9,12 +9,7 @@ package org.openhab.binding.mysensors.internal.sensors;
 
 import java.util.Date;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class MySensorsChild<T> {
-
-    private Logger logger = LoggerFactory.getLogger(getClass());
 
     private Integer childId = 0;
     private T childValue = null;

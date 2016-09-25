@@ -14,6 +14,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import org.openhab.binding.mysensors.internal.event.MySensorsEventType;
 import org.openhab.binding.mysensors.internal.event.MySensorsStatusUpdateEvent;
 import org.openhab.binding.mysensors.internal.event.MySensorsUpdateListener;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
@@ -63,7 +64,8 @@ public class MySensorsReader implements MySensorsUpdateListener, Runnable {
                 logger.debug(line);
                 MySensorsMessage msg = MySensorsMessageParser.parse(line);
                 if (msg != null) {
-                    MySensorsStatusUpdateEvent event = new MySensorsStatusUpdateEvent(msg);
+                    MySensorsStatusUpdateEvent event = new MySensorsStatusUpdateEvent(
+                            MySensorsEventType.INCOMING_MESSAGE, msg);
                     mysCon.broadCastEvent(event);
                 }
             } catch (Exception e) {
