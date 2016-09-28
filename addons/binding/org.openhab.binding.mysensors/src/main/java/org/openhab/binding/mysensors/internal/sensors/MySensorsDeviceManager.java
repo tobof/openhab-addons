@@ -2,6 +2,7 @@ package org.openhab.binding.mysensors.internal.sensors;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.openhab.binding.mysensors.internal.MySensorsUtility;
@@ -19,15 +20,18 @@ public class MySensorsDeviceManager implements MySensorsUpdateListener {
 
     private MySensorsBridgeConnection myCon = null;
 
-    private HashMap<Integer, MySensorsNode> nodeMap = null;
+    private Map<Integer, MySensorsNode> nodeMap = null;
 
     public MySensorsDeviceManager(MySensorsBridgeConnection myCon) {
         this.myCon = myCon;
         this.nodeMap = new HashMap<Integer, MySensorsNode>();
     }
 
-    public MySensorsDeviceManager(MySensorsBridgeConnection myCon, HashMap<Integer, MySensorsNode> nodeMap) {
+    public MySensorsDeviceManager(MySensorsBridgeConnection myCon, Map<Integer, MySensorsNode> nodeMap) {
         this.myCon = myCon;
+        if (nodeMap == null) {
+            throw new NullPointerException("Cannot create MySensorsDeviceManager null node map passed");
+        }
         this.nodeMap = nodeMap;
     }
 
@@ -35,9 +39,15 @@ public class MySensorsDeviceManager implements MySensorsUpdateListener {
         this.myCon = myCon;
         this.nodeMap = new HashMap<Integer, MySensorsNode>();
 
+        if (nodeList == null) {
+            throw new NullPointerException("Cannot create MySensorsDeviceManager null node list passed");
+        }
+
         if (nodeList != null) {
             for (MySensorsNode n : nodeList) {
-                nodeMap.put(n.getNodeId(), n);
+                if (n != null) {
+                    nodeMap.put(n.getNodeId(), n);
+                }
             }
         }
 
@@ -79,6 +89,7 @@ public class MySensorsDeviceManager implements MySensorsUpdateListener {
             while (newId < 255) {
                 if (!takenIds.contains(newId)) {
                     nodeMap.put(newId, null);
+                    break;
                 } else {
                     newId++;
                 }
@@ -112,18 +123,21 @@ public class MySensorsDeviceManager implements MySensorsUpdateListener {
         }
 
         // Register node if not present
-        // checkNodeFound(msg);
-        // checkChildFound(msg);
+        checkNodeFound(msg);
+        checkChildFound(msg);
     }
 
     private void checkNodeFound(MySensorsMessage msg) {
         MySensorsNode node = null;
         synchronized (nodeMap) {
-            if (!nodeMap.containsKey(msg.nodeId)) {
-                logger.debug("Node {} found!", msg.getNodeId());
+            if (msg.nodeId != 0 && msg.nodeId != 255) {
+                if (nodeMap.containsKey(msg.nodeId) && (nodeMap.get(msg.nodeId) == null)
+                        || (!nodeMap.containsKey(msg.nodeId))) {
+                    logger.debug("Node {} found!", msg.getNodeId());
 
-                node = new MySensorsNode(msg.nodeId);
-                addNode(node);
+                    node = new MySensorsNode(msg.nodeId);
+                    addNode(node);
+                }
             }
         }
 
@@ -135,14 +149,12 @@ public class MySensorsDeviceManager implements MySensorsUpdateListener {
     }
 
     private void checkChildFound(MySensorsMessage msg) {
-        MySensorsNode node = null;
         synchronized (nodeMap) {
-            node = nodeMap.get(msg.nodeId);
-            if (node != null) {
+            if (msg.childId != 255 && nodeMap.containsKey(msg.childId)) {
                 logger.debug("Child {} for node: {} found!", msg.getChildId(), msg.getNodeId());
 
-                MySensorsChild<?> child = new MySensorsChild<Void>(msg.nodeId, null);
-                addChild(msg.nodeId, child);
+                MySensorsChild<?> child = new MySensorsChild<Void>(msg.childId, null);
+                addChild(msg.childId, child);
             }
         }
     }
@@ -164,7 +176,7 @@ public class MySensorsDeviceManager implements MySensorsUpdateListener {
      * If an ID -Request from a sensor is received the controller will send an id to the sensor
      */
     private void answerIDRequest() {
-        logger.debug("ID Request received");
+        logger.info("ID Request received");
 
         int newId = 0;
         try {
