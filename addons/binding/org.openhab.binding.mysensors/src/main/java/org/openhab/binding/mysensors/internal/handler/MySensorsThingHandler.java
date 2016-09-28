@@ -25,8 +25,8 @@ import org.eclipse.smarthome.core.thing.ChannelUID;
 import org.eclipse.smarthome.core.thing.Thing;
 import org.eclipse.smarthome.core.thing.ThingStatus;
 import org.eclipse.smarthome.core.thing.ThingStatusDetail;
+import org.eclipse.smarthome.core.thing.ThingStatusInfo;
 import org.eclipse.smarthome.core.thing.binding.BaseThingHandler;
-import org.eclipse.smarthome.core.thing.binding.ThingHandler;
 import org.eclipse.smarthome.core.types.Command;
 import org.eclipse.smarthome.core.types.RefreshType;
 import org.openhab.binding.mysensors.config.MySensorsSensorConfiguration;
@@ -74,28 +74,19 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
     }
 
     @Override
-    public void preDispose() {
-        getBridgeHandler().getBridgeConnection().removeEventListener(this);
-        super.preDispose();
-    }
+    public void bridgeStatusChanged(ThingStatusInfo bridgeStatusInfo) {
+        logger.debug("MySensors Bridge Status updated to {} for device: {}", bridgeStatusInfo.getStatus().toString(),
+                getThing().getUID().toString());
+        if (bridgeStatusInfo.getStatus().equals(ThingStatus.ONLINE)
+                || bridgeStatusInfo.getStatus().equals(ThingStatus.OFFLINE)) {
+            if (!getBridgeHandler().getBridgeConnection().isEventListenerRegisterd(this)) {
+                logger.debug("Event listener for node {}-{} not registered yet, registering...", nodeId, childId);
+                getBridgeHandler().getBridgeConnection().addEventListener(this);
 
-    @Override
-    public void bridgeHandlerInitialized(ThingHandler thingHandler, Bridge bridge) {
-        MySensorsBridgeHandler bridgeHandler = (MySensorsBridgeHandler) thingHandler;
-        if (bridgeHandler.getBridgeConnection() == null) {
-            logger.warn("Bridge connection not estblished yet - can't subscribe for node: {} child: {}", nodeId,
-                    childId);
-        } else {
-            logger.info("Bridge connection established - subscribing update for node: {} child: {}", nodeId, childId);
-            bridgeHandler.getBridgeConnection().addEventListener(this);
+                // only at startup the node has the same status of the bridge
+                updateStatus(bridgeStatusInfo.getStatus());
+            }
         }
-
-    }
-
-    @Override
-    public void bridgeHandlerDisposed(ThingHandler thingHandler, Bridge bridge) {
-        logger.trace("bridgeHandlerDisposed for thing: " + nodeId);
-        super.bridgeHandlerDisposed(thingHandler, bridge);
     }
 
     /*

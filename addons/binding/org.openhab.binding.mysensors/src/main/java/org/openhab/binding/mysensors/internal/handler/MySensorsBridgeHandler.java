@@ -73,7 +73,6 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
         }
 
         if (myCon != null) {
-            updateStatus(ThingStatus.OFFLINE);
             myCon.initialize();
             myCon.addEventListener(this);
         }

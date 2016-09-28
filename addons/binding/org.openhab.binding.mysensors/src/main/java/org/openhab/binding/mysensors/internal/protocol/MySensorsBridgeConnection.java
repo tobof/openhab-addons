@@ -255,6 +255,15 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
         }
     }
 
+    public boolean isEventListenerRegisterd(MySensorsUpdateListener listener) {
+        boolean ret = false;
+        synchronized (updateListeners) {
+            ret = updateListeners.contains(listener);
+        }
+
+        return ret;
+    }
+
     /**
      * @param listener An Object, that wants to listen on status updates
      */
