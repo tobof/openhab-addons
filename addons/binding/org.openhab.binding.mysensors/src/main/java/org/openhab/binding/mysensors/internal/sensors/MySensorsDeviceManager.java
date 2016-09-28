@@ -82,7 +82,7 @@ public class MySensorsDeviceManager implements MySensorsUpdateListener {
     public Integer reserveId() throws NoMoreIdsException {
         int newId = 1;
 
-        clearNullOnMap();
+        // clearNullOnMap();
 
         Set<Integer> takenIds = getGivenIds();
 
@@ -151,11 +151,11 @@ public class MySensorsDeviceManager implements MySensorsUpdateListener {
 
     private void checkChildFound(MySensorsMessage msg) {
         synchronized (nodeMap) {
-            if (msg.childId != 255 && nodeMap.containsKey(msg.childId)) {
-                logger.debug("Child {} for node: {} found!", msg.getChildId(), msg.getNodeId());
+            if (msg.childId != 255 && !nodeMap.containsKey(msg.childId)) {
+                logger.debug("New child {} for node {} found!", msg.getChildId(), msg.getNodeId());
 
                 MySensorsChild<?> child = new MySensorsChild<Void>(msg.childId, null);
-                addChild(msg.childId, child);
+                addChild(msg.nodeId, child);
             }
         }
     }

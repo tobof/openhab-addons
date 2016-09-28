@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -106,6 +107,9 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
             myCon.removeEventListener(this);
             myCon.destroy();
         }
+
+        saveCacheFile();
+
         super.dispose();
     }
 
@@ -212,10 +216,53 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
             }
         }
 
-        givenIds.add(newNode.getNodeId());
+        if (newNode != null) {
+            givenIds.add(newNode.getNodeId());
+        }
 
         cacheFactory.writeCache(MySensorsCacheFactory.GIVEN_IDS_CACHE_FILE, givenIds.toArray(new Integer[] {}),
                 Integer[].class);
+
+    }
+
+    private void saveCacheFile() {
+
+        if (myDevManager != null) {
+
+            MySensorsCacheFactory cacheFactory = MySensorsCacheFactory.getCacheFactory();
+
+            List<Integer> givenIds = IntStream
+                    .of(cacheFactory.readCache(MySensorsCacheFactory.GIVEN_IDS_CACHE_FILE, new int[] {}, int[].class))
+                    .boxed().collect(Collectors.toList());
+
+            // Add ids taken by Thing list of OpenHAB
+            Collection<Thing> thingList = thingRegistry.getAll();
+            Iterator<Thing> iterator = thingList.iterator();
+
+            while (iterator.hasNext()) {
+                Thing thing = iterator.next();
+                Configuration conf = thing.getConfiguration();
+                if (conf != null) {
+                    Object nodeIdobj = conf.get("nodeId");
+                    if (nodeIdobj != null) {
+                        int nodeId = Integer.parseInt(nodeIdobj.toString());
+                        if (!givenIds.contains(nodeId)) {
+                            givenIds.add(nodeId);
+                        }
+                    }
+                }
+            }
+
+            Set<Integer> onDeviceManager = getDeviceManager().getGivenIds();
+            for (Integer i : onDeviceManager) {
+                if (i != null && !givenIds.contains(i)) {
+                    givenIds.add(i);
+                }
+            }
+
+            cacheFactory.writeCache(MySensorsCacheFactory.GIVEN_IDS_CACHE_FILE, givenIds.toArray(new Integer[] {}),
+                    Integer[].class);
+        }
 
     }
 }
