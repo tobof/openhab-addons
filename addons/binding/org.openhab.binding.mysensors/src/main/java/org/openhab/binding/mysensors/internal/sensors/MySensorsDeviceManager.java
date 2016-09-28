@@ -1,6 +1,7 @@
 package org.openhab.binding.mysensors.internal.sensors;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -164,7 +165,9 @@ public class MySensorsDeviceManager implements MySensorsUpdateListener {
      */
     private void clearNullOnMap() {
         synchronized (nodeMap) {
-            for (Integer i : getGivenIds()) {
+            Iterator<Integer> iterator = getGivenIds().iterator();
+            while (iterator.hasNext()) {
+                Integer i = iterator.next();
                 if (getNode(i) == null) {
                     nodeMap.remove(i);
                 }
