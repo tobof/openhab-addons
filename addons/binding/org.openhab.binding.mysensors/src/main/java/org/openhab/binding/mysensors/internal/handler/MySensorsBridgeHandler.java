@@ -9,22 +9,14 @@ package org.openhab.binding.mysensors.internal.handler;
 
 import static org.openhab.binding.mysensors.MySensorsBindingConstants.*;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
-import org.eclipse.smarthome.config.core.Configuration;
 import org.eclipse.smarthome.core.thing.Bridge;
 import org.eclipse.smarthome.core.thing.ChannelUID;
-import org.eclipse.smarthome.core.thing.Thing;
-import org.eclipse.smarthome.core.thing.ThingRegistry;
 import org.eclipse.smarthome.core.thing.ThingStatus;
 import org.eclipse.smarthome.core.thing.binding.BaseBridgeHandler;
 import org.eclipse.smarthome.core.types.Command;
 import org.openhab.binding.mysensors.config.MySensorsBridgeConfiguration;
+import org.openhab.binding.mysensors.internal.event.MySensorsStatusUpdateEvent;
+import org.openhab.binding.mysensors.internal.event.MySensorsUpdateListener;
 import org.openhab.binding.mysensors.internal.factory.MySensorsCacheFactory;
 import org.openhab.binding.mysensors.internal.protocol.MySensorsBridgeConnection;
 import org.openhab.binding.mysensors.internal.protocol.ip.MySensorsIpConnection;
@@ -39,7 +31,7 @@ import org.slf4j.LoggerFactory;
  *         MySensorsBridgeHandler is used to initialize a new bridge (in MySensors: Gateway)
  *         The sensors are connected via the gateway/bridge to the controller
  */
-public class MySensorsBridgeHandler extends BaseBridgeHandler {
+public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySensorsUpdateListener {
 
     private Logger logger = LoggerFactory.getLogger(MySensorsBridgeHandler.class);
 
@@ -68,8 +60,6 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler {
     public void initialize() {
         logger.debug("Initialization of the MySensors bridge");
 
-        updateStatus(ThingStatus.OFFLINE);
-
         myConfiguration = getConfigAs(MySensorsBridgeConfiguration.class);
 
         if (getThing().getThingTypeUID().equals(THING_TYPE_BRIDGE_SER)) {
@@ -83,16 +73,14 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler {
         }
 
         if (myCon != null) {
+            updateStatus(ThingStatus.OFFLINE);
             myCon.initialize();
+            myCon.addEventListener(this);
         }
 
         myDevManager = new MySensorsDeviceManager(myCon);
-    }
 
-    @Override
-    public void preDispose() {
-        super.preDispose();
-        updateStatus(ThingStatus.OFFLINE);
+        logger.debug("Initialization of the MySensors bridge DONE!");
     }
 
     /*
@@ -103,7 +91,11 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler {
     @Override
     public void dispose() {
         logger.debug("Disposing of the MySensors bridge");
-        myCon.destroy();
+        if (myCon != null) {
+            myCon.removeEventListener(this);
+            myCon.destroy();
+        }
+        super.dispose();
     }
 
     /*
@@ -118,10 +110,6 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler {
 
     }
 
-    public ThingRegistry getThingRegistry() {
-        return thingRegistry;
-    }
-
     public MySensorsBridgeConfiguration getBridgeConfiguration() {
         return myConfiguration;
     }
@@ -134,52 +122,58 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler {
         return myDevManager;
     }
 
-    private int reserveId() {
-        int id = -1;
-        MySensorsCacheFactory cacheFactory = MySensorsCacheFactory.getCacheFactory();
-
-        List<Integer> givenIds = IntStream
-                .of(cacheFactory.readCache(MySensorsCacheFactory.GIVEN_IDS_CACHE_FILE, new int[] {}, int[].class))
-                .boxed().collect(Collectors.toList());
-        List<Number> takenIds = new ArrayList<Number>();
-
-        // Which ids are already given by the binding, but not yet in the thing list?
-        Iterator<Integer> iteratorGiven = givenIds.iterator();
-        while (iteratorGiven.hasNext()) {
-            takenIds.add(iteratorGiven.next());
-        }
-
-        // Which ids are taken in Thing list of OpenHAB
-        Collection<Thing> thingList = thingRegistry.getAll();
-        Iterator<Thing> iterator = thingList.iterator();
-
-        while (iterator.hasNext()) {
-            Thing thing = iterator.next();
-            Configuration conf = thing.getConfiguration();
-            if (conf != null) {
-                Object nodeIdobj = conf.get("nodeId");
-                if (nodeIdobj != null) {
-                    int nodeId = Integer.parseInt(nodeIdobj.toString());
-                    takenIds.add(nodeId);
+    @Override
+    public void statusUpdateReceived(MySensorsStatusUpdateEvent event) {
+        switch (event.getEventType()) {
+            case NEW_NODE_DISCOVERED:
+                updateCacheFile();
+                break;
+            case BRIDGE_STATUS_UPDATE:
+                if (((MySensorsBridgeConnection) event.getData()).isConnected()) {
+                    updateStatus(ThingStatus.ONLINE);
+                } else {
+                    updateStatus(ThingStatus.OFFLINE);
                 }
-            }
+                break;
+            default:
+                break;
         }
 
-        // generate new id
-        boolean foundId = false;
-        Integer newId = 1;
-        while (!foundId && newId < 255) {
-            if (!takenIds.contains(newId)) {
-                id = newId.intValue();
-                givenIds.add(id);
-                foundId = true;
-                cacheFactory.writeCache(MySensorsCacheFactory.GIVEN_IDS_CACHE_FILE, givenIds.toArray(new Integer[] {}),
-                        Integer[].class);
-            } else {
-                newId++;
-            }
-        }
+    }
 
-        return id;
+    private void updateCacheFile() {
+        /*
+         * MySensorsCacheFactory cacheFactory = MySensorsCacheFactory.getCacheFactory();
+         *
+         * List<Integer> givenIds = IntStream
+         * .of(cacheFactory.readCache(MySensorsCacheFactory.GIVEN_IDS_CACHE_FILE, new int[] {}, int[].class))
+         * .boxed().collect(Collectors.toList());
+         * List<Number> takenIds = new ArrayList<Number>();
+         *
+         * // Which ids are already given by the binding, but not yet in the thing list?
+         * Iterator<Integer> iteratorGiven = givenIds.iterator();
+         * while (iteratorGiven.hasNext()) {
+         * takenIds.add(iteratorGiven.next());
+         * }
+         *
+         * // Which ids are taken in Thing list of OpenHAB
+         * Collection<Thing> thingList = thingRegistry.getAll();
+         * Iterator<Thing> iterator = thingList.iterator();
+         *
+         * while (iterator.hasNext()) {
+         * Thing thing = iterator.next();
+         * Configuration conf = thing.getConfiguration();
+         * if (conf != null) {
+         * Object nodeIdobj = conf.get("nodeId");
+         * if (nodeIdobj != null) {
+         * int nodeId = Integer.parseInt(nodeIdobj.toString());
+         * takenIds.add(nodeId);
+         * }
+         * }
+         * }
+         *
+         * cacheFactory.writeCache(MySensorsCacheFactory.GIVEN_IDS_CACHE_FILE, givenIds.toArray(new Integer[] {}),
+         * Integer[].class);
+         */
     }
 }

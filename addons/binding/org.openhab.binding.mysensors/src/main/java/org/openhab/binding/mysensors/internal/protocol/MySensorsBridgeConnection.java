@@ -22,6 +22,7 @@ import java.util.concurrent.TimeUnit;
 import org.openhab.binding.mysensors.MySensorsBindingConstants;
 import org.openhab.binding.mysensors.discovery.MySensorsDiscoveryService;
 import org.openhab.binding.mysensors.internal.MySensorsUtility;
+import org.openhab.binding.mysensors.internal.event.MySensorsEventType;
 import org.openhab.binding.mysensors.internal.event.MySensorsStatusUpdateEvent;
 import org.openhab.binding.mysensors.internal.event.MySensorsUpdateListener;
 import org.openhab.binding.mysensors.internal.handler.MySensorsBridgeHandler;
@@ -143,6 +144,7 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
      */
     private boolean connect() {
         connected = _connect();
+        broadCastEvent(new MySensorsStatusUpdateEvent(MySensorsEventType.BRIDGE_STATUS_UPDATE, this));
         return connected;
     }
 
@@ -161,6 +163,8 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
         _disconnect();
         connected = false;
         requestDisconnection = false;
+
+        broadCastEvent(new MySensorsStatusUpdateEvent(MySensorsEventType.BRIDGE_STATUS_UPDATE, this));
     }
 
     protected abstract void _disconnect();
@@ -218,7 +222,7 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
 
         if (!iVersionResponse) {
             logger.error(
-                    "Cannot start reading/writing thread, probably sync message (I_VERSION) not received. Try disabling skipStartupCheck");
+                    "Cannot start reading/writing thread, probably sync message (I_VERSION) not received. Try set skipStartupCheck to true");
         }
 
         return iVersionResponse;

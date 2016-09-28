@@ -112,17 +112,15 @@ public class MySensorsDeviceManager implements MySensorsUpdateListener {
         }
 
         // Register node if not present
-        if (nodeMap.containsKey(msg.getNodeId())) {
-            checkNodeFound(msg);
-            return;
-        }
+        // checkNodeFound(msg);
+        // checkChildFound(msg);
     }
 
     private void checkNodeFound(MySensorsMessage msg) {
         MySensorsNode node = null;
         synchronized (nodeMap) {
             if (!nodeMap.containsKey(msg.nodeId)) {
-                logger.debug("Node {} found!");
+                logger.debug("Node {} found!", msg.getNodeId());
 
                 node = new MySensorsNode(msg.nodeId);
                 addNode(node);
@@ -130,8 +128,22 @@ public class MySensorsDeviceManager implements MySensorsUpdateListener {
         }
 
         if (node != null) {
-            MySensorsStatusUpdateEvent evt = new MySensorsStatusUpdateEvent(MySensorsEventType.INCOMING_MESSAGE, node);
+            MySensorsStatusUpdateEvent evt = new MySensorsStatusUpdateEvent(MySensorsEventType.NEW_NODE_DISCOVERED,
+                    node);
             myCon.broadCastEvent(evt);
+        }
+    }
+
+    private void checkChildFound(MySensorsMessage msg) {
+        MySensorsNode node = null;
+        synchronized (nodeMap) {
+            node = nodeMap.get(msg.nodeId);
+            if (node != null) {
+                logger.debug("Child {} for node: {} found!", msg.getChildId(), msg.getNodeId());
+
+                MySensorsChild<?> child = new MySensorsChild<Void>(msg.nodeId, null);
+                addChild(msg.nodeId, child);
+            }
         }
     }
 
