@@ -13,7 +13,6 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.openhab.binding.mysensors.MySensorsBindingConstants;
-import org.openhab.binding.mysensors.internal.MySensorsUtility;
 import org.openhab.binding.mysensors.internal.event.MySensorsEventType;
 import org.openhab.binding.mysensors.internal.event.MySensorsStatusUpdateEvent;
 import org.openhab.binding.mysensors.internal.event.MySensorsUpdateListener;
@@ -115,7 +114,7 @@ public class MySensorsNetworkSanityChecker implements MySensorsUpdateListener, R
         if (event.getEventType() == MySensorsEventType.INCOMING_MESSAGE) {
             synchronized (iVersionMessageMissing) {
                 if (!iVersionMessageArrived) {
-                    iVersionMessageArrived = MySensorsUtility.isIVersionMessage((MySensorsMessage) event.getData());
+                    iVersionMessageArrived = ((MySensorsMessage) event.getData()).isIVersionMessage();
                 }
             }
         }

@@ -32,9 +32,9 @@ import org.eclipse.smarthome.core.types.RefreshType;
 import org.openhab.binding.mysensors.config.MySensorsSensorConfiguration;
 import org.openhab.binding.mysensors.internal.event.MySensorsStatusUpdateEvent;
 import org.openhab.binding.mysensors.internal.event.MySensorsUpdateListener;
-import org.openhab.binding.mysensors.internal.protocol.MySensorsBridgeConnection;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageParser;
+import org.openhab.binding.mysensors.internal.sensors.MySensorsNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,10 +82,10 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
             if (!getBridgeHandler().getBridgeConnection().isEventListenerRegisterd(this)) {
                 logger.debug("Event listener for node {}-{} not registered yet, registering...", nodeId, childId);
                 getBridgeHandler().getBridgeConnection().addEventListener(this);
-
-                // only at startup the node has the same status of the bridge
-                updateStatus(bridgeStatusInfo.getStatus());
             }
+
+            // the node has the same status of the bridge
+            updateStatus(bridgeStatusInfo.getStatus());
         }
     }
 
@@ -245,11 +245,11 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
             case INCOMING_MESSAGE:
                 handleIncomingMessageEvent((MySensorsMessage) event.getData());
                 break;
-            case BRIDGE_STATUS_UPDATE:
-                if (((MySensorsBridgeConnection) event.getData()).isConnected()) {
-                    updateStatus(ThingStatus.ONLINE);
-                } else {
-                    updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.BRIDGE_OFFLINE);
+            case NODE_STATUS_UPDATE:
+                // TODO Network Sanity Checker could put node to 'unreachable' causing, here, to set this thing to
+                // OFFLINE
+                if (!((MySensorsNode) event.getData()).isReachable()) {
+                    updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR);
                 }
                 break;
             default:

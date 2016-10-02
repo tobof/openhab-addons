@@ -10,12 +10,11 @@ package org.openhab.binding.mysensors.internal.handler;
 import static org.openhab.binding.mysensors.MySensorsBindingConstants.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import org.eclipse.smarthome.config.core.Configuration;
 import org.eclipse.smarthome.core.thing.Bridge;
@@ -160,9 +159,8 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
         MySensorsCacheFactory cacheFactory = MySensorsCacheFactory.getCacheFactory();
         List<MySensorsNode> nodes = new ArrayList<MySensorsNode>();
 
-        List<Integer> givenIds = IntStream
-                .of(cacheFactory.readCache(MySensorsCacheFactory.GIVEN_IDS_CACHE_FILE, new int[] {}, int[].class))
-                .boxed().collect(Collectors.toList());
+        List<Integer> givenIds = Arrays.asList(
+                cacheFactory.readCache(MySensorsCacheFactory.GIVEN_IDS_CACHE_FILE, new Integer[] {}, Integer[].class));
 
         // Add ids taken by Thing list of OpenHAB
         Collection<Thing> thingList = thingRegistry.getAll();
@@ -194,9 +192,8 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
 
         MySensorsCacheFactory cacheFactory = MySensorsCacheFactory.getCacheFactory();
 
-        List<Integer> givenIds = IntStream
-                .of(cacheFactory.readCache(MySensorsCacheFactory.GIVEN_IDS_CACHE_FILE, new int[] {}, int[].class))
-                .boxed().collect(Collectors.toList());
+        List<Integer> givenIds = Arrays.asList(
+                cacheFactory.readCache(MySensorsCacheFactory.GIVEN_IDS_CACHE_FILE, new Integer[] {}, Integer[].class));
 
         // Add ids taken by Thing list of OpenHAB
         Collection<Thing> thingList = thingRegistry.getAll();
@@ -231,9 +228,8 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
 
             MySensorsCacheFactory cacheFactory = MySensorsCacheFactory.getCacheFactory();
 
-            List<Integer> givenIds = IntStream
-                    .of(cacheFactory.readCache(MySensorsCacheFactory.GIVEN_IDS_CACHE_FILE, new int[] {}, int[].class))
-                    .boxed().collect(Collectors.toList());
+            List<Integer> givenIds = Arrays.asList(cacheFactory.readCache(MySensorsCacheFactory.GIVEN_IDS_CACHE_FILE,
+                    new Integer[] {}, Integer[].class));
 
             // Add ids taken by Thing list of OpenHAB
             Collection<Thing> thingList = thingRegistry.getAll();

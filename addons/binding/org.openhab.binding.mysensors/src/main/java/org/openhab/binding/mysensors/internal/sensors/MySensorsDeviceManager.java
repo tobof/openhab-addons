@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.openhab.binding.mysensors.internal.MySensorsUtility;
 import org.openhab.binding.mysensors.internal.event.MySensorsEventType;
 import org.openhab.binding.mysensors.internal.event.MySensorsStatusUpdateEvent;
 import org.openhab.binding.mysensors.internal.event.MySensorsUpdateListener;
@@ -118,14 +117,14 @@ public class MySensorsDeviceManager implements MySensorsUpdateListener {
 
     private void handleIncomingMessageEvent(MySensorsMessage msg) {
         // Are we getting a Request ID Message?
-        if (MySensorsUtility.isIdRequestMessage(msg)) {
+        if (msg.isIdRequestMessage()) {
             answerIDRequest();
             return;
         }
 
         // Register node if not present
         checkNodeFound(msg);
-        checkChildFound(msg);
+        // checkChildFound(msg); TODO
     }
 
     private void checkNodeFound(MySensorsMessage msg) {
@@ -149,6 +148,7 @@ public class MySensorsDeviceManager implements MySensorsUpdateListener {
         }
     }
 
+    @SuppressWarnings("unused")
     private void checkChildFound(MySensorsMessage msg) {
         synchronized (nodeMap) {
             if (msg.childId != 255 && !nodeMap.containsKey(msg.childId)) {
@@ -162,7 +162,9 @@ public class MySensorsDeviceManager implements MySensorsUpdateListener {
 
     /**
      * Removes null element from map, null element represent reserved, but not used, id for nodes.
+     * Null elements will disappear if the sensor accept the ID (so start transmitting information with that ID)
      */
+    @SuppressWarnings("unused")
     private void clearNullOnMap() {
         synchronized (nodeMap) {
             Iterator<Integer> iterator = getGivenIds().iterator();

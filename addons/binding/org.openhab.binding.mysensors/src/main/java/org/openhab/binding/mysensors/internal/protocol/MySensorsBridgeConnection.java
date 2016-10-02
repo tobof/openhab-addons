@@ -21,7 +21,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.openhab.binding.mysensors.MySensorsBindingConstants;
 import org.openhab.binding.mysensors.discovery.MySensorsDiscoveryService;
-import org.openhab.binding.mysensors.internal.MySensorsUtility;
 import org.openhab.binding.mysensors.internal.event.MySensorsEventType;
 import org.openhab.binding.mysensors.internal.event.MySensorsStatusUpdateEvent;
 import org.openhab.binding.mysensors.internal.event.MySensorsUpdateListener;
@@ -249,12 +248,6 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
         return outboundMessageQueue.poll(1, TimeUnit.DAYS);
     }
 
-    public void clearOutboundMessagesQueue() {
-        synchronized (outboundMessageQueue) {
-            outboundMessageQueue.clear();
-        }
-    }
-
     public boolean isEventListenerRegisterd(MySensorsUpdateListener listener) {
         boolean ret = false;
         synchronized (updateListeners) {
@@ -364,17 +357,17 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
         }
 
         // Have we get a I_CONFIG message?
-        if (MySensorsUtility.isIConfigMessage(msg)) {
+        if (msg.isIConfigMessage()) {
             answerIConfigMessage(msg);
         }
 
         // Have we get a I_TIME message?
-        if (MySensorsUtility.isITimeMessage(msg)) {
+        if (msg.isITimeMessage()) {
             answerITimeMessage(msg);
         }
 
         // Have we get a I_VERSION message?
-        if (MySensorsUtility.isIVersionMessage(msg)) {
+        if (msg.isIVersionMessage()) {
             handleIncomingVersionMessage(msg.msg);
         }
     }

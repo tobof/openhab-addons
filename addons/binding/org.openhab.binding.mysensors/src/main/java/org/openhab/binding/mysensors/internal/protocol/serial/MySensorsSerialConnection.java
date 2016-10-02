@@ -53,7 +53,7 @@ public class MySensorsSerialConnection extends MySensorsBridgeConnection {
         boolean ret = false;
 
         updateSerialProperties(serialPort);
-        deleteLockFile(serialPort);
+        // deleteLockFile(serialPort);
 
         serialConnection = new NRSerialPort(serialPort, baudRate);
         if (serialConnection.connect()) {
@@ -109,6 +109,7 @@ public class MySensorsSerialConnection extends MySensorsBridgeConnection {
      *
      * @param devName is the device used as COM/UART port
      */
+    @SuppressWarnings("unused")
     private void deleteLockFile(String devName) {
         try {
             String[] namePart = devName.split("/");

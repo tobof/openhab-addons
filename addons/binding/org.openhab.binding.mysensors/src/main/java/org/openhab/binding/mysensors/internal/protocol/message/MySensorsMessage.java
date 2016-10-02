@@ -7,6 +7,8 @@
  */
 package org.openhab.binding.mysensors.internal.protocol.message;
 
+import static org.openhab.binding.mysensors.MySensorsBindingConstants.*;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -129,6 +131,84 @@ public class MySensorsMessage {
 
     public void setOldMsg(String oldMsg) {
         this.oldMsg = oldMsg;
+    }
+
+    public boolean isIConfigMessage() {
+        boolean ret = false;
+
+        if (childId == 0 || childId == 255) {
+            if (msgType == MYSENSORS_MSG_TYPE_INTERNAL) {
+                if (ack == 0) {
+                    if (subType == MYSENSORS_SUBTYPE_I_CONFIG) {
+                        ret = true;
+                    }
+                }
+            }
+        }
+
+        return ret;
+    }
+
+    public boolean isIVersionMessage() {
+        boolean ret = false;
+
+        if (nodeId == 0) {
+            if (childId == 0 || childId == 255) {
+                if (msgType == MYSENSORS_MSG_TYPE_INTERNAL) {
+                    if (ack == 0) {
+                        if (subType == MYSENSORS_SUBTYPE_I_VERSION) {
+                            ret = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        return ret;
+    }
+
+    public boolean isITimeMessage() {
+        boolean ret = false;
+
+        if (childId == 0 || childId == 255) {
+            if (msgType == MYSENSORS_MSG_TYPE_INTERNAL) {
+                if (ack == 0) {
+                    if (subType == MYSENSORS_SUBTYPE_I_TIME) {
+                        ret = true;
+                    }
+                }
+            }
+        }
+
+        return ret;
+    }
+
+    public boolean isIdRequestMessage() {
+        boolean ret = false;
+
+        if (nodeId == 255) {
+            if (childId == 255) {
+                if (msgType == MYSENSORS_SUBTYPE_I_ID_REQUEST) {
+                    if (ack == 0) {
+                        if (subType == MYSENSORS_MSG_TYPE_INTERNAL) {
+                            ret = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        return ret;
+    }
+
+    public boolean isPresentationMessage() {
+        boolean ret = false;
+
+        if (msgType == MYSENSORS_MSG_TYPE_PRESENTATION) {
+            ret = true;
+        }
+
+        return ret;
     }
 
 }
