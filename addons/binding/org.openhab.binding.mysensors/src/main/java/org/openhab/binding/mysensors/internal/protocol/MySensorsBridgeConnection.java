@@ -162,6 +162,7 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
         _disconnect();
         connected = false;
         requestDisconnection = false;
+        iVersionResponse = false;
 
         broadCastEvent(new MySensorsStatusUpdateEvent(MySensorsEventType.BRIDGE_STATUS_UPDATE, this));
     }
