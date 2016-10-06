@@ -71,6 +71,7 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
         requestAck = configuration.requestAck;
         revertState = configuration.revertState;
         logger.debug("Configuration: node {}, chiledId: {}, revertState: {}", nodeId, childId, revertState);
+        updateStatus(ThingStatus.OFFLINE);
     }
 
     @Override
