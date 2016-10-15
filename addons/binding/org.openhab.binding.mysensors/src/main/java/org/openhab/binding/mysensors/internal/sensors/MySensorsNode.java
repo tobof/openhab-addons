@@ -34,6 +34,10 @@ public class MySensorsNode {
         chidldMap.put(child.getChildId(), child);
     }
 
+    public MySensorsChild<?> getChild(int childId) {
+        return chidldMap.get(childId);
+    }
+
     public boolean isReachable() {
         return reachable;
     }

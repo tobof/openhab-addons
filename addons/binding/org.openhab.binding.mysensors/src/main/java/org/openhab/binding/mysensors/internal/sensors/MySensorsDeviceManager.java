@@ -1,7 +1,6 @@
 package org.openhab.binding.mysensors.internal.sensors;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -81,14 +80,12 @@ public class MySensorsDeviceManager implements MySensorsUpdateListener {
     public Integer reserveId() throws NoMoreIdsException {
         int newId = 1;
 
-        // clearNullOnMap();
-
         Set<Integer> takenIds = getGivenIds();
 
         synchronized (takenIds) {
             while (newId < 255) {
                 if (!takenIds.contains(newId)) {
-                    nodeMap.put(newId, null);
+                    nodeMap.put(newId, new MySensorsNode(newId));
                     break;
                 } else {
                     newId++;
@@ -120,21 +117,19 @@ public class MySensorsDeviceManager implements MySensorsUpdateListener {
         if (msg.isIdRequestMessage()) {
             answerIDRequest();
             return;
+        } else {
+            // Register node (keep track of nearby devices, used to reseve right id for new devices)
+            checkNodeFound(msg);
         }
 
-        // Register node if not present
-        checkNodeFound(msg);
-        // checkChildFound(msg); TODO
     }
 
     private void checkNodeFound(MySensorsMessage msg) {
         MySensorsNode node = null;
         synchronized (nodeMap) {
             if (msg.nodeId != 0 && msg.nodeId != 255) {
-                if (nodeMap.containsKey(msg.nodeId) && (nodeMap.get(msg.nodeId) == null)
-                        || (!nodeMap.containsKey(msg.nodeId))) {
+                if (!nodeMap.containsKey(msg.nodeId)) {
                     logger.debug("Node {} found!", msg.getNodeId());
-
                     node = new MySensorsNode(msg.nodeId);
                     addNode(node);
                 }
@@ -145,35 +140,6 @@ public class MySensorsDeviceManager implements MySensorsUpdateListener {
             MySensorsStatusUpdateEvent evt = new MySensorsStatusUpdateEvent(MySensorsEventType.NEW_NODE_DISCOVERED,
                     node);
             myCon.broadCastEvent(evt);
-        }
-    }
-
-    @SuppressWarnings("unused")
-    private void checkChildFound(MySensorsMessage msg) {
-        synchronized (nodeMap) {
-            if (msg.childId != 255 && !nodeMap.containsKey(msg.childId)) {
-                logger.debug("New child {} for node {} found!", msg.getChildId(), msg.getNodeId());
-
-                MySensorsChild<?> child = new MySensorsChild<Void>(msg.childId, null);
-                addChild(msg.nodeId, child);
-            }
-        }
-    }
-
-    /**
-     * Removes null element from map, null element represent reserved, but not used, id for nodes.
-     * Null elements will disappear if the sensor accept the ID (so start transmitting information with that ID)
-     */
-    @SuppressWarnings("unused")
-    private void clearNullOnMap() {
-        synchronized (nodeMap) {
-            Iterator<Integer> iterator = getGivenIds().iterator();
-            while (iterator.hasNext()) {
-                Integer i = iterator.next();
-                if (getNode(i) == null) {
-                    nodeMap.remove(i);
-                }
-            }
         }
     }
 
