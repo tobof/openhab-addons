@@ -15,5 +15,6 @@
 
   <name>MySensors Binding</name>
   <packaging>eclipse-plugin</packaging>
+ 
 
 </project>

@@ -29,11 +29,13 @@ import org.eclipse.smarthome.core.thing.ThingStatusInfo;
 import org.eclipse.smarthome.core.thing.binding.BaseThingHandler;
 import org.eclipse.smarthome.core.types.Command;
 import org.eclipse.smarthome.core.types.RefreshType;
+import org.eclipse.smarthome.core.types.State;
 import org.openhab.binding.mysensors.config.MySensorsSensorConfiguration;
 import org.openhab.binding.mysensors.internal.event.MySensorsStatusUpdateEvent;
 import org.openhab.binding.mysensors.internal.event.MySensorsUpdateListener;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageParser;
+import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -253,6 +255,9 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
                     updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR);
                 }
                 break;
+            case CHILD_VALUE_UPDATED:
+                handleChildUpdateEvent(null);
+                break;
             default:
                 break;
         }
@@ -270,6 +275,11 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
         myBridgeHandler = (MySensorsBridgeHandler) bridge.getHandler();
 
         return myBridgeHandler;
+    }
+
+    private <T extends State> void handleChildUpdateEvent(MySensorsChild<T> child) {
+        T value = child.getChildValue();
+        updateState("", value);
     }
 
     private void handleIncomingMessageEvent(MySensorsMessage msg) {
@@ -347,12 +357,17 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
     }
 
     private void updateLastUpdate() {
-        // Don't always fire last update channel, do it only after a minute by
-        if (lastUpdate == null || (System.currentTimeMillis() > (lastUpdate.getCalendar().getTimeInMillis() + 60000))) {
-            DateTimeType dt = new DateTimeType();
-            lastUpdate = dt;
-            updateState(CHANNEL_LAST_UPDATE, dt);
-            logger.debug("Setting last update for node {} to {}", nodeId, dt.toString());
-        }
-    }
+    };
+
+    /*
+     * private void updateLastUpdate() {
+     * // Don't always fire last update channel, do it only after a minute by
+     * if (lastUpdate == null || (System.currentTimeMillis() > (lastUpdate.getCalendar().getTimeInMillis() + 60000))) {
+     * DateTimeType dt = new DateTimeType();
+     * lastUpdate = dt;
+     * updateState(CHANNEL_LAST_UPDATE, dt);
+     * logger.debug("Setting last update for node {} to {}", nodeId, dt.toString());
+     * }
+     * }
+     */
 }

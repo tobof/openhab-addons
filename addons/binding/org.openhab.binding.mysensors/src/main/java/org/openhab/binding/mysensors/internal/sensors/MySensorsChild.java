@@ -9,7 +9,9 @@ package org.openhab.binding.mysensors.internal.sensors;
 
 import java.util.Date;
 
-public class MySensorsChild<T> {
+import org.eclipse.smarthome.core.types.State;
+
+public class MySensorsChild<T extends State> {
 
     private Integer childId = 0;
     private T childValue = null;
