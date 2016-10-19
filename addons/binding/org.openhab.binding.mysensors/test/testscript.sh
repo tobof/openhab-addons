@@ -39,6 +39,9 @@ echo "172;0;1;0;1;87" > $serialPort
 # Set Temperature status
 echo "172;1;1;0;0;27" > $serialPort
 
+# Set V_TEXT
+echo "123;123;1;0;47;ipsumlorum" > $serialPort
+
 
 #### Represent door
 #echo "172;4;0;0;0;1.4.1" > $serialPort

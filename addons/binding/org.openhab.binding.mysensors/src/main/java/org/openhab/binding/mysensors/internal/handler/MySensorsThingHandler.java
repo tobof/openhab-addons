@@ -205,6 +205,9 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
         } else if (channelUID.getId().equals(CHANNEL_VOLUME)) {
             subType = MYSENSORS_SUBTYPE_V_VOLUME;
             msgPayload = command.toString();
+        } else if (channelUID.getId().equals(CHANNEL_TEXT)) {
+            subType = MYSENSORS_SUBTYPE_V_TEXT;
+            msgPayload = command.toString();
         } else {
             msgPayload = "";
         }
@@ -230,7 +233,7 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
      */
     @Override
     public void handleUpdate(ChannelUID channelUID, org.eclipse.smarthome.core.types.State newState) {
-        logger.debug("handleUpdate called");
+        // logger.debug("handleUpdate called");
     }
 
     /*
@@ -323,6 +326,8 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
                         } else if (channel.equals(CHANNEL_HVAC_FLOW_MODE)) {
                             updateState(channel, new StringType(msg.getMsg()));
                         } else if (channel.equals(CHANNEL_HVAC_SPEED)) {
+                            updateState(channel, new StringType(msg.getMsg()));
+                        } else if (channel.equals(CHANNEL_TEXT)) {
                             updateState(channel, new StringType(msg.getMsg()));
                         } else {
                             updateState(channel, new DecimalType(msg.getMsg()));
