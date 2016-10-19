@@ -208,6 +208,13 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
         } else if (channelUID.getId().equals(CHANNEL_TEXT)) {
             subType = MYSENSORS_SUBTYPE_V_TEXT;
             msgPayload = command.toString();
+        } else if (channelUID.getId().equals(CHANNEL_IR_SEND)) {
+            subType = MYSENSORS_SUBTYPE_V_IR_SEND;
+            msgPayload = command.toString();
+        } else if (channelUID.getId().equals(CHANNEL_IR_RECEIVE)) {
+            subType = MYSENSORS_SUBTYPE_V_IR_RECEIVE;
+            msgPayload = command.toString();
+
         } else {
             msgPayload = "";
         }
@@ -328,6 +335,10 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
                         } else if (channel.equals(CHANNEL_HVAC_SPEED)) {
                             updateState(channel, new StringType(msg.getMsg()));
                         } else if (channel.equals(CHANNEL_TEXT)) {
+                            updateState(channel, new StringType(msg.getMsg()));
+                        } else if (channel.equals(CHANNEL_IR_SEND)) {
+                            updateState(channel, new StringType(msg.getMsg()));
+                        } else if (channel.equals(CHANNEL_IR_RECEIVE)) {
                             updateState(channel, new StringType(msg.getMsg()));
                         } else {
                             updateState(channel, new DecimalType(msg.getMsg()));

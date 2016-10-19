@@ -42,6 +42,11 @@ echo "172;1;1;0;0;27" > $serialPort
 # Set V_TEXT
 echo "123;123;1;0;47;ipsumlorum" > $serialPort
 
+# Set V_IR_RECEIVE
+echo "111;111;1;0;33;FADEXXFE" > $serialPort
+
+# Set V_IR_SEND
+echo "111;112;1;0;32;ABCDEFGHIJKL" > $serialPort
 
 #### Represent door
 #echo "172;4;0;0;0;1.4.1" > $serialPort
