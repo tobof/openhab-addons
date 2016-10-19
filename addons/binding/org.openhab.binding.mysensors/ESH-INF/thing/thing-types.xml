@@ -939,6 +939,102 @@
             </parameter>
         </config-description>
     </thing-type>
+    
+    <thing-type id="text">
+        <supported-bridge-type-refs>
+            <bridge-type-ref id="bridge-ser" />
+            <bridge-type-ref id="bridge-eth" />
+        </supported-bridge-type-refs>
+
+        <label>Text</label>
+        <description>V_TEXT</description>
+
+        <channels>
+            <channel id="text" typeId="text-channel" />
+            <channel id="lastupdate" typeId="lastupdate-channel"/>
+        </channels>
+
+        <config-description>
+            <parameter name="nodeId" type="text" required="true">
+                <context>NodeId</context>
+                <label>NodeId</label>
+                <description>The ID of the node in the MySensors network
+                </description>
+                <default>999</default>
+            </parameter>
+            <parameter name="childId" type="text" required="true">
+                <context>ChildId</context>
+                <label>ChildId</label>
+                <description>The ID of the child of a node in the MySensors network
+                </description>
+                <default>999</default>
+            </parameter>
+        </config-description>
+    </thing-type>
+    
+    <thing-type id="irSend">
+        <supported-bridge-type-refs>
+            <bridge-type-ref id="bridge-ser" />
+            <bridge-type-ref id="bridge-eth" />
+        </supported-bridge-type-refs>
+
+        <label>IR Send</label>
+        <description>Send IR codes</description>
+
+        <channels>
+            <channel id="irSend" typeId="irSend-channel" />
+            <channel id="lastupdate" typeId="lastupdate-channel"/>
+        </channels>
+
+        <config-description>
+            <parameter name="nodeId" type="text" required="true">
+                <context>NodeId</context>
+                <label>NodeId</label>
+                <description>The ID of the node in the MySensors network
+                </description>
+                <default>999</default>
+            </parameter>
+            <parameter name="childId" type="text" required="true">
+                <context>ChildId</context>
+                <label>ChildId</label>
+                <description>The ID of the child of a node in the MySensors network
+                </description>
+                <default>999</default>
+            </parameter>
+        </config-description>
+    </thing-type>
+    
+    <thing-type id="irReceive">
+        <supported-bridge-type-refs>
+            <bridge-type-ref id="bridge-ser" />
+            <bridge-type-ref id="bridge-eth" />
+        </supported-bridge-type-refs>
+
+        <label>IR Receive</label>
+        <description>Receive IR codes</description>
+
+        <channels>
+            <channel id="irReceive" typeId="irReceive-channel" />
+            <channel id="lastupdate" typeId="lastupdate-channel"/>
+        </channels>
+
+        <config-description>
+            <parameter name="nodeId" type="text" required="true">
+                <context>NodeId</context>
+                <label>NodeId</label>
+                <description>The ID of the node in the MySensors network
+                </description>
+                <default>999</default>
+            </parameter>
+            <parameter name="childId" type="text" required="true">
+                <context>ChildId</context>
+                <label>ChildId</label>
+                <description>The ID of the child of a node in the MySensors network
+                </description>
+                <default>999</default>
+            </parameter>
+        </config-description>
+    </thing-type>
 
 
 	<!-- CHANNELS -->
@@ -1202,5 +1298,23 @@
         <label>MySensors Message</label>
         <description>MySensors Message Channel</description>
         <state readOnly="false"></state>
+    </channel-type>
+    <channel-type id="text-channel">
+        <item-type>String</item-type>
+        <label>Text</label>
+        <description>MySensors Text Channel</description>
+        <category>Variable</category>
+    </channel-type>
+    <channel-type id="irSend-channel">
+        <item-type>String</item-type>
+        <label>Text</label>
+        <description>MySensors IR Send Channel</description>
+        <category>Variable</category>
+    </channel-type>
+    <channel-type id="irReceive-channel">
+        <item-type>String</item-type>
+        <label>Text</label>
+        <description>MySensors IR Receive Channel</description>
+        <category>Variable</category>
     </channel-type>
 </thing:thing-descriptions>
