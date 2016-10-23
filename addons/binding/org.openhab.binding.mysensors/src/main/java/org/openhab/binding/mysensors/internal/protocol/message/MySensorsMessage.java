@@ -202,13 +202,15 @@ public class MySensorsMessage {
     }
 
     public boolean isPresentationMessage() {
-        boolean ret = false;
+        return msgType == MYSENSORS_MSG_TYPE_PRESENTATION;
+    }
 
-        if (msgType == MYSENSORS_MSG_TYPE_PRESENTATION) {
-            ret = true;
-        }
+    public boolean isSetReqMessage() {
+        return msgType == MYSENSORS_MSG_TYPE_REQ || msgType == MYSENSORS_MSG_TYPE_SET;
+    }
 
-        return ret;
+    public boolean isInternalMessage() {
+        return msgType == MYSENSORS_MSG_TYPE_INTERNAL;
     }
 
 }

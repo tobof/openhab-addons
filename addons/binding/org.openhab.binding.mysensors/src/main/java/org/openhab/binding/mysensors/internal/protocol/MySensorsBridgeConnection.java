@@ -26,6 +26,10 @@ import org.openhab.binding.mysensors.internal.event.MySensorsStatusUpdateEvent;
 import org.openhab.binding.mysensors.internal.event.MySensorsUpdateListener;
 import org.openhab.binding.mysensors.internal.handler.MySensorsBridgeHandler;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
+import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
+import org.openhab.binding.mysensors.internal.sensors.MySensorsDeviceManager;
+import org.openhab.binding.mysensors.internal.sensors.MySensorsNode;
+import org.openhab.binding.mysensors.internal.sensors.MySensorsVariable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -287,7 +291,11 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
         synchronized (updateListeners) {
             for (MySensorsUpdateListener mySensorsEventListener : updateListeners) {
                 logger.trace("Broadcasting event to: " + mySensorsEventListener);
-                mySensorsEventListener.statusUpdateReceived(event);
+                try {
+                    mySensorsEventListener.statusUpdateReceived(event);
+                } catch (Throwable e) {
+                    logger.error("Event broadcasting throw an exception", e);
+                }
             }
         }
     }
@@ -350,7 +358,7 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
         }
     }
 
-    private void handleIncomingMessageEvent(MySensorsMessage msg) {
+    private void handleSpecialMessageEvent(MySensorsMessage msg) {
         // Do we get an ACK?
         if (msg.getAck() == 1) {
             logger.debug(String.format("ACK received! Node: %d, Child: %d", msg.nodeId, msg.childId));
@@ -373,11 +381,39 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
         }
     }
 
+    private void handleIncomingMessage(MySensorsMessage msg) throws Throwable {
+        if (MySensorsNode.isValidNodeId(msg.nodeId) && MySensorsChild.isValidChildId(msg.childId)
+                && msg.isSetReqMessage()) {
+            MySensorsDeviceManager deviceManager = MySensorsDeviceManager.getDeviceManager();
+            MySensorsNode node = deviceManager.getNode(msg.nodeId);
+            if (node != null) {
+                MySensorsChild child = node.getChild(msg.childId);
+                if (child != null) {
+                    MySensorsVariable variable = child.getVariable(msg.subType);
+                    if (variable != null) {
+                        variable.setValue(msg.msg);
+                    } else {
+                        logger.warn("Variable {}({}) not present", msg.subType, CHANNEL_MAP.get(msg.subType));
+                    }
+                } else {
+                    logger.debug("Child {} not present into node {}", msg.nodeId, msg.childId);
+                }
+            } else {
+                // This node was not present previously, send new node discovered event
+                node = new MySensorsNode(msg.nodeId);
+                deviceManager.addNode(node);
+                broadCastEvent(new MySensorsStatusUpdateEvent(MySensorsEventType.NEW_NODE_DISCOVERED, node));
+            }
+        }
+
+    }
+
     @Override
-    public void statusUpdateReceived(MySensorsStatusUpdateEvent event) {
+    public void statusUpdateReceived(MySensorsStatusUpdateEvent event) throws Throwable {
         switch (event.getEventType()) {
             case INCOMING_MESSAGE:
-                handleIncomingMessageEvent((MySensorsMessage) event.getData());
+                handleSpecialMessageEvent((MySensorsMessage) event.getData());
+                handleIncomingMessage((MySensorsMessage) event.getData());
                 break;
             default:
                 break;

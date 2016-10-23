@@ -12,8 +12,17 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.smarthome.core.library.types.DecimalType;
+import org.eclipse.smarthome.core.library.types.OnOffType;
+import org.eclipse.smarthome.core.library.types.OpenClosedType;
+import org.eclipse.smarthome.core.library.types.PercentType;
+import org.eclipse.smarthome.core.library.types.StringType;
+import org.eclipse.smarthome.core.library.types.UpDownType;
 import org.eclipse.smarthome.core.thing.ThingTypeUID;
+import org.eclipse.smarthome.core.types.Type;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
+import org.openhab.binding.mysensors.internal.sensors.type.MySensorsDecimalType;
+import org.openhab.binding.mysensors.internal.sensors.type.MySensorsType;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
@@ -272,7 +281,7 @@ public class MySensorsBindingConstants {
     // I version message for startup check
     public static final MySensorsMessage I_VERSION_MESSAGE = new MySensorsMessage(0, 0, 3, 0, false, 2, "");
 
-    public final static Map<Number, String> CHANNEL_MAP = new HashMap<Number, String>() {
+    public final static Map<Integer, String> CHANNEL_MAP = new HashMap<Integer, String>() {
         /**
          *
          */
@@ -337,7 +346,73 @@ public class MySensorsBindingConstants {
         }
     };
 
-    public final static Map<Number, String> CHANNEL_MAP_INTERNAL = new HashMap<Number, String>() {
+    public final static Map<String, Class<? extends MySensorsType>> TYPE_MAP = new HashMap<String, Class<? extends MySensorsType>>() {
+
+        /**
+         *
+         */
+        private static final long serialVersionUID = 6273187523631143905L;
+
+        {
+            put(CHANNEL_TEMP, MySensorsDecimalType.class);
+            put(CHANNEL_HUM, MySensorsDecimalType.class);
+            put(CHANNEL_STATUS, OnOffType.class);
+            put(CHANNEL_VOLT, MySensorsDecimalType.class);
+            put(CHANNEL_WATT, MySensorsDecimalType.class);
+            put(CHANNEL_KWH, MySensorsDecimalType.class);
+            put(CHANNEL_PRESSURE, MySensorsDecimalType.class);
+            put(CHANNEL_BARO, StringType.class);
+            put(CHANNEL_TRIPPED, OpenClosedType.class);
+            put(CHANNEL_ARMED, OpenClosedType.class);
+            put(CHANNEL_DIMMER, PercentType.class);
+            put(CHANNEL_COVER, UpDownType.class);
+            put(CHANNEL_COVER, UpDownType.class);
+            put(CHANNEL_COVER, UpDownType.class);
+            put(CHANNEL_WIND, MySensorsDecimalType.class);
+            put(CHANNEL_GUST, MySensorsDecimalType.class);
+            put(CHANNEL_RAIN, MySensorsDecimalType.class);
+            put(CHANNEL_RAINRATE, MySensorsDecimalType.class);
+            put(CHANNEL_UV, MySensorsDecimalType.class);
+            put(CHANNEL_WEIGHT, MySensorsDecimalType.class);
+            put(CHANNEL_IMPEDANCE, MySensorsDecimalType.class);
+            put(CHANNEL_DISTANCE, MySensorsDecimalType.class);
+            put(CHANNEL_LIGHT_LEVEL, MySensorsDecimalType.class);
+            put(CHANNEL_CURRENT, MySensorsDecimalType.class);
+            put(CHANNEL_HVAC_FLOW_STATE, StringType.class);
+            put(CHANNEL_HVAC_SPEED, StringType.class);
+            put(CHANNEL_HVAC_SETPOINT_COOL, MySensorsDecimalType.class);
+            put(CHANNEL_HVAC_SETPOINT_HEAT, MySensorsDecimalType.class);
+            put(CHANNEL_HVAC_FLOW_MODE, StringType.class);
+            put(CHANNEL_VAR1, MySensorsDecimalType.class);
+            put(CHANNEL_VAR2, MySensorsDecimalType.class);
+            put(CHANNEL_VAR3, MySensorsDecimalType.class);
+            put(CHANNEL_VAR4, MySensorsDecimalType.class);
+            put(CHANNEL_VAR5, MySensorsDecimalType.class);
+            put(CHANNEL_FLOW, MySensorsDecimalType.class);
+            put(CHANNEL_VOLUME, MySensorsDecimalType.class);
+            put(CHANNEL_LOCK_STATUS, MySensorsDecimalType.class);
+            put(CHANNEL_LEVEL, MySensorsDecimalType.class);
+            put(CHANNEL_RGB, MySensorsDecimalType.class);
+            put(CHANNEL_RGBW, MySensorsDecimalType.class);
+            put(CHANNEL_ID, MySensorsDecimalType.class);
+            put(CHANNEL_UNIT_PREFIX, MySensorsDecimalType.class);
+            put(CHANNEL_TEXT, StringType.class);
+            put(CHANNEL_CUSTOM, MySensorsDecimalType.class);
+            put(CHANNEL_POSITION, MySensorsDecimalType.class);
+            put(CHANNEL_IR_RECORD, MySensorsDecimalType.class);
+            put(CHANNEL_PH, MySensorsDecimalType.class);
+            put(CHANNEL_ORP, MySensorsDecimalType.class);
+            put(CHANNEL_EC, MySensorsDecimalType.class);
+            put(CHANNEL_VAR, MySensorsDecimalType.class);
+            put(CHANNEL_VA, MySensorsDecimalType.class);
+            put(CHANNEL_POWER_FACTOR, MySensorsDecimalType.class);
+            put(CHANNEL_TEXT, StringType.class);
+            put(CHANNEL_IR_SEND, StringType.class);
+            put(CHANNEL_IR_RECEIVE, StringType.class);
+        }
+    };
+
+    public final static Map<Integer, String> CHANNEL_MAP_INTERNAL = new HashMap<Integer, String>() {
         /**
          *
          */
@@ -346,6 +421,19 @@ public class MySensorsBindingConstants {
         {
             put(MYSENSORS_SUBTYPE_I_VERSION, CHANNEL_VERSION);
             put(MYSENSORS_SUBTYPE_I_BATTERY_LEVEL, CHANNEL_BATTERY);
+        }
+    };
+
+    public final static Map<String, Class<? extends Type>> TYPE_MAP_INTERNAL = new HashMap<String, Class<? extends Type>>() {
+
+        /**
+         *
+         */
+        private static final long serialVersionUID = -4363396832873428778L;
+
+        {
+            put(CHANNEL_VERSION, StringType.class);
+            put(CHANNEL_BATTERY, DecimalType.class);
         }
     };
 

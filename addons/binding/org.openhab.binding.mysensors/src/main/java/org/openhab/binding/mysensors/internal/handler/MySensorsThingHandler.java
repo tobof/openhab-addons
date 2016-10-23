@@ -13,9 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.smarthome.core.library.types.DateTimeType;
-import org.eclipse.smarthome.core.library.types.DecimalType;
 import org.eclipse.smarthome.core.library.types.OnOffType;
-import org.eclipse.smarthome.core.library.types.OpenClosedType;
 import org.eclipse.smarthome.core.library.types.PercentType;
 import org.eclipse.smarthome.core.library.types.StopMoveType;
 import org.eclipse.smarthome.core.library.types.StringType;
@@ -29,14 +27,13 @@ import org.eclipse.smarthome.core.thing.ThingStatusInfo;
 import org.eclipse.smarthome.core.thing.binding.BaseThingHandler;
 import org.eclipse.smarthome.core.types.Command;
 import org.eclipse.smarthome.core.types.RefreshType;
-import org.eclipse.smarthome.core.types.State;
 import org.openhab.binding.mysensors.config.MySensorsSensorConfiguration;
 import org.openhab.binding.mysensors.internal.event.MySensorsStatusUpdateEvent;
 import org.openhab.binding.mysensors.internal.event.MySensorsUpdateListener;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageParser;
-import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsNode;
+import org.openhab.binding.mysensors.internal.sensors.MySensorsVariable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -103,7 +100,7 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
     public void handleCommand(ChannelUID channelUID, Command command) {
 
         /*
-         * We don't handle refresh commands yet
+         * TODO We don't handle refresh commands yet
          *
          */
         if (command == RefreshType.REFRESH) {
@@ -112,10 +109,7 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
 
         String msgPayload = "";
         int subType = 0;
-        int int_requestack = 0;
-        if (requestAck) {
-            int_requestack = 1;
-        }
+        int int_requestack = requestAck ? 1 : 0;
 
         // just forward the message in case it is received via this channel. This is special!
         if (channelUID.getId().equals(CHANNEL_MYSENSORS_MESSAGE)) {
@@ -266,7 +260,7 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
                 }
                 break;
             case CHILD_VALUE_UPDATED:
-                handleChildUpdateEvent(null);
+                handleChildUpdateEvent((MySensorsVariable) event.getData());
                 break;
             default:
                 break;
@@ -287,9 +281,8 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
         return myBridgeHandler;
     }
 
-    private <T extends State> void handleChildUpdateEvent(MySensorsChild<T> child) {
-        T value = child.getChildValue();
-        updateState("", value);
+    private void handleChildUpdateEvent(MySensorsVariable var) {
+        updateState(CHANNEL_MAP.get(var.getVariableNum()), var.getValue());
     }
 
     private void handleIncomingMessageEvent(MySensorsMessage msg) {
@@ -298,92 +291,6 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
             updateState(CHANNEL_MYSENSORS_MESSAGE,
                     new StringType(MySensorsMessageParser.generateAPIString(msg).replaceAll("(\\r|\\n)", "")));
 
-        } else if (nodeId == msg.getNodeId()) { // is this message for me?
-
-            updateLastUpdate();
-
-            if (msg.getMsgType() == MYSENSORS_MSG_TYPE_INTERNAL) { // INTERNAL MESSAGE?
-                if (CHANNEL_MAP_INTERNAL.containsKey(msg.getSubType())) {
-                    String channel = CHANNEL_MAP_INTERNAL.get(msg.getSubType());
-                    if (channel.equals(CHANNEL_VERSION)) {
-                        updateState(channel, new StringType(msg.getMsg()));
-                    } else if (channel.equals(CHANNEL_BATTERY)) {
-                        updateState(channel, new DecimalType(msg.getMsg()));
-                    }
-                }
-            } else if (msg.getMsgType() == MYSENSORS_MSG_TYPE_SET) {
-
-                if (childId == msg.getChildId()) { // which child should be updated?
-                    if (CHANNEL_MAP.containsKey(msg.getSubType())) {
-                        String channel = CHANNEL_MAP.get(msg.getSubType());
-                        if (channel.equals(CHANNEL_BARO)) {
-                            updateState(channel, new StringType(msg.getMsg()));
-                        } else if (channel.equals(CHANNEL_STATUS)) {
-                            if (msg.getMsg().equals("1")) {
-                                updateState(channel, OnOffType.ON);
-                            } else if (msg.getMsg().equals("0")) {
-                                updateState(channel, OnOffType.OFF);
-                            }
-                        } else if (channel.equals(CHANNEL_ARMED) || channel.equals(CHANNEL_TRIPPED)) {
-                            if (msg.getMsg().equals("1")) {
-                                updateState(channel, OpenClosedType.OPEN);
-                            } else {
-                                updateState(channel, OpenClosedType.CLOSED);
-                            }
-                        } else if (channel.equals(CHANNEL_DIMMER)) {
-                            updateState(channel, new PercentType(msg.getMsg()));
-                        } else if (channel.equals(CHANNEL_COVER)) {
-                            if (msg.getMsg().equals(MYSENSORS_SUBTYPE_V_UP)) {
-                                updateState(channel, UpDownType.UP);
-                            } else if (msg.getMsg().equals(MYSENSORS_SUBTYPE_V_DOWN)) {
-                                updateState(channel, UpDownType.DOWN);
-                            }
-                        } else if (channel.equals(CHANNEL_HVAC_FLOW_STATE)) {
-                            updateState(channel, new StringType(msg.getMsg()));
-                        } else if (channel.equals(CHANNEL_HVAC_FLOW_MODE)) {
-                            updateState(channel, new StringType(msg.getMsg()));
-                        } else if (channel.equals(CHANNEL_HVAC_SPEED)) {
-                            updateState(channel, new StringType(msg.getMsg()));
-                        } else if (channel.equals(CHANNEL_TEXT)) {
-                            updateState(channel, new StringType(msg.getMsg()));
-                        } else if (channel.equals(CHANNEL_IR_SEND)) {
-                            updateState(channel, new StringType(msg.getMsg()));
-                        } else if (channel.equals(CHANNEL_IR_RECEIVE)) {
-                            updateState(channel, new StringType(msg.getMsg()));
-                        } else {
-                            updateState(channel, new DecimalType(msg.getMsg()));
-                        }
-                        oldMsgContent.put(msg.getSubType(), msg.getMsg());
-                    }
-                }
-            } else if (msg.getMsgType() == MYSENSORS_MSG_TYPE_REQ) {
-                if (childId == msg.getChildId()) {
-                    logger.debug("Request received!");
-                    msg.setMsgType(MYSENSORS_MSG_TYPE_SET);
-                    String oldVal = oldMsgContent.get(msg.getSubType());
-                    if (oldVal == null) {
-                        oldVal = "";
-                    }
-                    msg.setMsg(oldVal);
-                    getBridgeHandler().getBridgeConnection().addMySensorsOutboundMessage(msg);
-                }
-            }
-
         }
     }
-
-    private void updateLastUpdate() {
-    };
-
-    /*
-     * private void updateLastUpdate() {
-     * // Don't always fire last update channel, do it only after a minute by
-     * if (lastUpdate == null || (System.currentTimeMillis() > (lastUpdate.getCalendar().getTimeInMillis() + 60000))) {
-     * DateTimeType dt = new DateTimeType();
-     * lastUpdate = dt;
-     * updateState(CHANNEL_LAST_UPDATE, dt);
-     * logger.debug("Setting last update for node {} to {}", nodeId, dt.toString());
-     * }
-     * }
-     */
 }

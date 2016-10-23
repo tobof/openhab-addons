@@ -8,37 +8,51 @@
 package org.openhab.binding.mysensors.internal.sensors;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.eclipse.smarthome.core.types.State;
-
-public class MySensorsChild<T extends State> {
+public class MySensorsChild {
 
     private Integer childId = 0;
-    private T childValue = null;
+    private Map<Integer, MySensorsVariable> variableMap = null;
 
     private Date childLastUpdate = null;
 
-    public MySensorsChild(int childId, T initialValue) {
+    public MySensorsChild(int childId) {
         this.childId = childId;
-        this.childValue = initialValue;
+        variableMap = new HashMap<Integer, MySensorsVariable>();
+
+    }
+
+    public MySensorsChild(int childId, Map<Integer, MySensorsVariable> variableMap) throws NullPointerException {
+        this.childId = childId;
+
+        if (variableMap == null) {
+            throw new NullPointerException("Passed varialble map in costructor is null");
+        }
+
+        this.variableMap = variableMap;
+    }
+
+    public MySensorsVariable getVariable(int variableNum) {
+        return variableMap.get(variableNum);
     }
 
     public int getChildId() {
         return childId;
     }
 
-    public void setChildValue(T newValue) {
-        childLastUpdate = new Date();
-        childValue = newValue;
+    public Date getLastUpdate() {
+        return childLastUpdate;
     }
 
-    public T getChildValue() {
-        return childValue;
+    public static boolean isValidChildId(int id) {
+        return (id > 0 && id < 255);
     }
 
     @Override
     public String toString() {
-        return "MySensorsChild [childId=" + childId + ", nodeValue=" + childValue + "]";
+        return "MySensorsChild [childId=" + childId + ", nodeValue=" + variableMap + "]";
     }
 
 }

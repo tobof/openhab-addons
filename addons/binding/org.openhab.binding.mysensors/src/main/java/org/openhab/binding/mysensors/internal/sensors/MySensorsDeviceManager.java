@@ -1,7 +1,5 @@
 package org.openhab.binding.mysensors.internal.sensors;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -9,7 +7,6 @@ import org.openhab.binding.mysensors.internal.event.MySensorsEventType;
 import org.openhab.binding.mysensors.internal.event.MySensorsStatusUpdateEvent;
 import org.openhab.binding.mysensors.internal.event.MySensorsUpdateListener;
 import org.openhab.binding.mysensors.internal.exception.NoMoreIdsException;
-import org.openhab.binding.mysensors.internal.protocol.MySensorsBridgeConnection;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,39 +14,19 @@ import org.slf4j.LoggerFactory;
 public class MySensorsDeviceManager implements MySensorsUpdateListener {
     private Logger logger = LoggerFactory.getLogger(getClass());
 
-    private MySensorsBridgeConnection myCon = null;
-
     private Map<Integer, MySensorsNode> nodeMap = null;
 
-    public MySensorsDeviceManager(MySensorsBridgeConnection myCon) {
-        this.myCon = myCon;
-        this.nodeMap = new HashMap<Integer, MySensorsNode>();
+    private static MySensorsDeviceManager singleton = null;
+
+    private MySensorsDeviceManager() {
     }
 
-    public MySensorsDeviceManager(MySensorsBridgeConnection myCon, Map<Integer, MySensorsNode> nodeMap) {
-        this.myCon = myCon;
-        if (nodeMap == null) {
-            throw new NullPointerException("Cannot create MySensorsDeviceManager null node map passed");
-        }
-        this.nodeMap = nodeMap;
-    }
-
-    public MySensorsDeviceManager(MySensorsBridgeConnection myCon, List<MySensorsNode> nodeList) {
-        this.myCon = myCon;
-        this.nodeMap = new HashMap<Integer, MySensorsNode>();
-
-        if (nodeList == null) {
-            throw new NullPointerException("Cannot create MySensorsDeviceManager null node list passed");
+    public synchronized static MySensorsDeviceManager getDeviceManager() {
+        if (singleton == null) {
+            singleton = new MySensorsDeviceManager();
         }
 
-        if (nodeList != null) {
-            for (MySensorsNode n : nodeList) {
-                if (n != null) {
-                    nodeMap.put(n.getNodeId(), n);
-                }
-            }
-        }
-
+        return singleton;
     }
 
     public MySensorsNode getNode(int nodeId) {
@@ -58,11 +35,12 @@ public class MySensorsDeviceManager implements MySensorsUpdateListener {
 
     public void addNode(MySensorsNode node) {
         synchronized (nodeMap) {
+
             nodeMap.put(node.getNodeId(), node);
         }
     }
 
-    public void addChild(int nodeId, MySensorsChild<?> child) {
+    public void addChild(int nodeId, MySensorsChild child) {
         synchronized (nodeMap) {
             MySensorsNode node = nodeMap.get(nodeId);
             if (node != null) {
@@ -117,22 +95,19 @@ public class MySensorsDeviceManager implements MySensorsUpdateListener {
         if (msg.isIdRequestMessage()) {
             answerIDRequest();
             return;
-        } else {
-            // Register node (keep track of nearby devices, used to reseve right id for new devices)
-            checkNodeFound(msg);
         }
 
+        // Register node if not present
+        checkNodeFound(msg);
     }
 
     private void checkNodeFound(MySensorsMessage msg) {
         MySensorsNode node = null;
         synchronized (nodeMap) {
-            if (msg.nodeId != 0 && msg.nodeId != 255) {
-                if (!nodeMap.containsKey(msg.nodeId)) {
-                    logger.debug("Node {} found!", msg.getNodeId());
-                    node = new MySensorsNode(msg.nodeId);
-                    addNode(node);
-                }
+            if (MySensorsNode.isValidNodeId(msg.getNodeId()) && !nodeMap.containsKey(msg.nodeId)) {
+                logger.debug("Node {} found!", msg.getNodeId());
+                node = new MySensorsNode(msg.nodeId);
+                addNode(node);
             }
         }
 

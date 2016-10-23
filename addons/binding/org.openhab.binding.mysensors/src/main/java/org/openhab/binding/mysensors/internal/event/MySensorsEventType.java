@@ -9,8 +9,9 @@ package org.openhab.binding.mysensors.internal.event;
 
 public enum MySensorsEventType {
     INCOMING_MESSAGE,
+    NODE_ID_RESERVATION,
     NEW_NODE_DISCOVERED,
     NODE_STATUS_UPDATE,
-    BRIDGE_STATUS_UPDATE,
-    CHILD_VALUE_UPDATED
+    CHILD_VALUE_UPDATED,
+    BRIDGE_STATUS_UPDATE
 }

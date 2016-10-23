@@ -55,9 +55,6 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
     // Configuration from thing file
     private MySensorsBridgeConfiguration myConfiguration = null;
 
-    // Cache file
-    private MySensorsCacheFactory bindingCacheFile = null;
-
     public MySensorsBridgeHandler(Bridge bridge) {
         super(bridge);
     }
@@ -88,7 +85,6 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
             myCon.addEventListener(this);
         }
 
-        myDevManager = new MySensorsDeviceManager(myCon, loadCacheFile());
         myCon.addEventListener(myDevManager);
 
         logger.debug("Initialization of the MySensors bridge DONE!");

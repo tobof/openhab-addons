@@ -24,6 +24,7 @@ import org.eclipse.smarthome.core.thing.binding.ThingHandler;
 import org.openhab.binding.mysensors.discovery.MySensorsDiscoveryService;
 import org.openhab.binding.mysensors.internal.handler.MySensorsBridgeHandler;
 import org.openhab.binding.mysensors.internal.handler.MySensorsThingHandler;
+import org.openhab.binding.mysensors.internal.sensors.MySensorsDeviceManager;
 import org.osgi.framework.ServiceRegistration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +39,15 @@ public class MySensorsHandlerFactory extends BaseThingHandlerFactory {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
+    // Discovery services
     private Map<ThingUID, ServiceRegistration<?>> discoveryServiceRegs = new HashMap<>();
+
+    // Device manager
+    private MySensorsDeviceManager devManager = null;
+
+    public MySensorsHandlerFactory() {
+        devManager = MySensorsDeviceManager.getDeviceManager();
+    }
 
     @Override
     public boolean supportsThingType(ThingTypeUID thingTypeUID) {
@@ -54,7 +63,7 @@ public class MySensorsHandlerFactory extends BaseThingHandlerFactory {
      */
     @Override
     protected ThingHandler createHandler(Thing thing) {
-
+        logger.trace("Creating handler for thing: {}", thing.getUID());
         ThingTypeUID thingTypeUID = thing.getThingTypeUID();
 
         if (SUPPORTED_THING_TYPES_UIDS.contains(thingTypeUID)) {
@@ -81,6 +90,7 @@ public class MySensorsHandlerFactory extends BaseThingHandlerFactory {
      */
     @Override
     protected Thing createThing(ThingTypeUID thingTypeUID, Configuration configuration, ThingUID thingUID) {
+        logger.trace("Create thing: {}", thingUID);
         return super.createThing(thingTypeUID, configuration, thingUID);
     }
 
