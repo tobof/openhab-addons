@@ -36,6 +36,9 @@ echo "172;255;3;0;12;1.0" > $serialPort
 # Set Humidty status
 echo "172;0;1;0;1;87" > $serialPort
 
+# Set Humidty status
+echo "173;0;1;0;1;44" > $serialPort
+
 # Set Temperature status
 echo "172;1;1;0;0;27" > $serialPort
 
