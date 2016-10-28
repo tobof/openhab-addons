@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.Type;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,15 +46,15 @@ public class MySensorsCacheFactory {
         }
     }
 
-    public <T> T readCache(String cacheName, T defaulT, Class<T> clasz) {
+    public <T> T readCache(String cacheName, T defaulT, Type clasz) {
         return jsonFromFile(cacheName, defaulT, clasz);
     }
 
-    public <T> void writeCache(String cacheName, T obj, Class<T> clasz) {
+    public <T> void writeCache(String cacheName, T obj, Type clasz) {
         jsonToFile(cacheName, obj, clasz);
     }
 
-    private synchronized <T> T jsonFromFile(String fileName, T def, Class<T> clasz) {
+    private synchronized <T> T jsonFromFile(String fileName, T def, Type clasz) {
 
         T ret = def;
 
@@ -83,7 +84,7 @@ public class MySensorsCacheFactory {
         return ret;
     }
 
-    private synchronized <T> void jsonToFile(String fileName, T obj, Class<T> clasz) {
+    private synchronized <T> void jsonToFile(String fileName, T obj, Type clasz) {
         JsonWriter jsonWriter = null;
         try {
             File f = new File(CACHE_BASE_PATH + "/" + GIVEN_IDS_CACHE_FILE + CACHE_FILE_SUFFIX);
