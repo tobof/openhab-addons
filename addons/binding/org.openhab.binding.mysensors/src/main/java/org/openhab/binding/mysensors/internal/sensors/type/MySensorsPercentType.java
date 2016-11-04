@@ -1,17 +1,17 @@
 package org.openhab.binding.mysensors.internal.sensors.type;
 
 import org.eclipse.smarthome.core.library.types.DecimalType;
+import org.eclipse.smarthome.core.library.types.PercentType;
 import org.eclipse.smarthome.core.types.State;
 
-public class MySensorsDecimalType extends DecimalType implements MySensorsType {
-
+public class MySensorsPercentType extends DecimalType implements MySensorsType {
     /**
      *
      */
-    private static final long serialVersionUID = 7773038279703304405L;
+    private static final long serialVersionUID = -9040518556535682773L;
 
     @Override
     public State fromString(String s) {
-        return new DecimalType(s);
+        return new PercentType(s);
     }
 }

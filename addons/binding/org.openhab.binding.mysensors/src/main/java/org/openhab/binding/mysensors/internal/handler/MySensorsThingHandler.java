@@ -8,16 +8,13 @@
 package org.openhab.binding.mysensors.internal.handler;
 
 import static org.openhab.binding.mysensors.MySensorsBindingConstants.*;
+import static org.openhab.binding.mysensors.internal.MySensorsUtility.invertMap;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.smarthome.core.library.types.DateTimeType;
-import org.eclipse.smarthome.core.library.types.OnOffType;
-import org.eclipse.smarthome.core.library.types.PercentType;
-import org.eclipse.smarthome.core.library.types.StopMoveType;
 import org.eclipse.smarthome.core.library.types.StringType;
-import org.eclipse.smarthome.core.library.types.UpDownType;
 import org.eclipse.smarthome.core.thing.Bridge;
 import org.eclipse.smarthome.core.thing.ChannelUID;
 import org.eclipse.smarthome.core.thing.Thing;
@@ -32,6 +29,7 @@ import org.openhab.binding.mysensors.internal.event.MySensorsStatusUpdateEvent;
 import org.openhab.binding.mysensors.internal.event.MySensorsUpdateListener;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageParser;
+import org.openhab.binding.mysensors.internal.sensors.MySensorsDeviceManager;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsNode;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsVariable;
 import org.slf4j.Logger;
@@ -119,113 +117,31 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
                 getBridgeHandler().getBridgeConnection().addMySensorsOutboundMessage(msg);
                 return;
             }
-        } else if (channelUID.getId().equals(CHANNEL_STATUS)) {
-
-            subType = MYSENSORS_SUBTYPE_V_STATUS;
-
-            if (command instanceof OnOffType) {
-                if ((OnOffType) command == OnOffType.ON) {
-                    msgPayload = "1";
-                } else if ((OnOffType) command == OnOffType.OFF) {
-                    msgPayload = "0";
-                }
-            }
-
-        } else if (channelUID.getId().equals(CHANNEL_DIMMER)) {
-            if (command instanceof PercentType) {
-                msgPayload = ((PercentType) command).toString();
-                subType = MYSENSORS_SUBTYPE_V_PERCENTAGE;
-            } else {
-                if (command instanceof OnOffType) {
-                    if ((OnOffType) command == OnOffType.ON) {
-                        msgPayload = "1";
-                    } else if ((OnOffType) command == OnOffType.OFF) {
-                        msgPayload = "0";
-                    }
-                }
-                subType = MYSENSORS_SUBTYPE_V_STATUS;
-            }
-        } else if (channelUID.getId().equals(CHANNEL_COVER)) {
-            if (command instanceof PercentType) {
-                msgPayload = ((PercentType) command).toString();
-                subType = MYSENSORS_SUBTYPE_V_PERCENTAGE;
-            } else {
-                if (command instanceof UpDownType) {
-                    if ((UpDownType) command == UpDownType.UP) {
-                        subType = MYSENSORS_SUBTYPE_V_UP;
-                    } else if ((UpDownType) command == UpDownType.DOWN) {
-                        subType = MYSENSORS_SUBTYPE_V_DOWN;
-                    }
-                } else if (command instanceof StopMoveType) {
-                    if ((StopMoveType) command == StopMoveType.STOP) {
-                        subType = MYSENSORS_SUBTYPE_V_STOP;
-                    }
-                }
-
-                msgPayload = "1";
-
-            }
-        } else if (channelUID.getId().equals(CHANNEL_HVAC_SETPOINT_HEAT)) {
-            subType = MYSENSORS_SUBTYPE_V_HVAC_SETPOINT_HEAT;
-            msgPayload = command.toString();
-        } else if (channelUID.getId().equals(CHANNEL_HVAC_SETPOINT_COOL)) {// Unverified
-            subType = MYSENSORS_SUBTYPE_V_HVAC_SETPOINT_COOL;
-            msgPayload = command.toString();
-        } else if (channelUID.getId().equals(CHANNEL_HVAC_FLOW_STATE)) {// Unverified
-            subType = MYSENSORS_SUBTYPE_V_HVAC_FLOW_STATE;
-            msgPayload = command.toString();
-        } else if (channelUID.getId().equals(CHANNEL_HVAC_FLOW_MODE)) {
-            subType = MYSENSORS_SUBTYPE_V_HVAC_FLOW_MODE;
-            msgPayload = command.toString();
-        } else if (channelUID.getId().equals(CHANNEL_HVAC_SPEED)) {// Unverified
-            subType = MYSENSORS_SUBTYPE_V_HVAC_SPEED;
-            msgPayload = command.toString();
-        } else if (channelUID.getId().equals(CHANNEL_VAR1)) {// Unverified
-            subType = MYSENSORS_SUBTYPE_V_VAR1;
-            msgPayload = command.toString();
-        } else if (channelUID.getId().equals(CHANNEL_VAR2)) {// Unverified
-            subType = MYSENSORS_SUBTYPE_V_VAR2;
-            msgPayload = command.toString();
-        } else if (channelUID.getId().equals(CHANNEL_VAR3)) {
-            subType = MYSENSORS_SUBTYPE_V_VAR3;
-            msgPayload = command.toString();
-        } else if (channelUID.getId().equals(CHANNEL_VAR4)) {
-            subType = MYSENSORS_SUBTYPE_V_VAR4;
-            msgPayload = command.toString();
-        } else if (channelUID.getId().equals(CHANNEL_VAR5)) {
-            subType = MYSENSORS_SUBTYPE_V_VAR5;
-            msgPayload = command.toString();
-        } else if (channelUID.getId().equals(CHANNEL_FLOW)) {
-            subType = MYSENSORS_SUBTYPE_V_FLOW;
-            msgPayload = command.toString();
-        } else if (channelUID.getId().equals(CHANNEL_VOLUME)) {
-            subType = MYSENSORS_SUBTYPE_V_VOLUME;
-            msgPayload = command.toString();
-        } else if (channelUID.getId().equals(CHANNEL_TEXT)) {
-            subType = MYSENSORS_SUBTYPE_V_TEXT;
-            msgPayload = command.toString();
-        } else if (channelUID.getId().equals(CHANNEL_IR_SEND)) {
-            subType = MYSENSORS_SUBTYPE_V_IR_SEND;
-            msgPayload = command.toString();
-        } else if (channelUID.getId().equals(CHANNEL_IR_RECEIVE)) {
-            subType = MYSENSORS_SUBTYPE_V_IR_RECEIVE;
-            msgPayload = command.toString();
-
         } else {
-            msgPayload = "";
+            MySensorsVariable var = MySensorsDeviceManager.getDeviceManager().getVariable(nodeId, childId,
+                    invertMap(CHANNEL_MAP).get(channelUID.getId()));
+            if (var != null) {
+
+                // Update value into the MS device
+                var.setValue(command);
+
+                // Create the real message to send
+                MySensorsMessage newMsg = new MySensorsMessage(nodeId, childId, MYSENSORS_MSG_TYPE_SET, int_requestack,
+                        revertState, subType, var.getValue().toString());
+
+                String oldPayload = oldMsgContent.get(subType);
+                if (oldPayload == null) {
+                    oldPayload = "";
+                }
+                newMsg.setOldMsg(oldPayload);
+                oldMsgContent.put(subType, msgPayload);
+
+                getBridgeHandler().getBridgeConnection().addMySensorsOutboundMessage(newMsg);
+
+            } else {
+                logger.warn("Variable not found, cannot handle command for thing {}", thing.getUID());
+            }
         }
-
-        MySensorsMessage newMsg = new MySensorsMessage(nodeId, childId, MYSENSORS_MSG_TYPE_SET, int_requestack,
-                revertState, subType, msgPayload);
-
-        String oldPayload = oldMsgContent.get(subType);
-        if (oldPayload == null) {
-            oldPayload = "";
-        }
-        newMsg.setOldMsg(oldPayload);
-        oldMsgContent.put(subType, msgPayload);
-
-        getBridgeHandler().getBridgeConnection().addMySensorsOutboundMessage(newMsg);
     }
 
     /*
@@ -259,7 +175,7 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
                     updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR);
                 }
                 break;
-            case CHILD_VALUE_UPDATED:
+            case CHILD_VALUE_CHANGED:
                 handleChildUpdateEvent((MySensorsVariable) event.getData());
                 break;
             default:

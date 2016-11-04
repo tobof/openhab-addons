@@ -11,20 +11,22 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.openhab.binding.mysensors.internal.Pair;
+
 public class MySensorsChild {
 
     private Integer childId = 0;
-    private Map<Integer, MySensorsVariable> variableMap = null;
+    private Map<Pair<Integer>, MySensorsVariable> variableMap = null;
 
     private Date childLastUpdate = null;
 
     public MySensorsChild(int childId) {
         this.childId = childId;
-        variableMap = new HashMap<Integer, MySensorsVariable>();
+        variableMap = new HashMap<Pair<Integer>, MySensorsVariable>();
 
     }
 
-    public MySensorsChild(int childId, Map<Integer, MySensorsVariable> variableMap) throws NullPointerException {
+    public MySensorsChild(int childId, Map<Pair<Integer>, MySensorsVariable> variableMap) throws NullPointerException {
         this.childId = childId;
 
         if (variableMap == null) {
@@ -34,8 +36,10 @@ public class MySensorsChild {
         this.variableMap = variableMap;
     }
 
-    public MySensorsVariable getVariable(int variableNum) {
-        return variableMap.get(variableNum);
+    public MySensorsVariable getVariable(int messageType, int variableNum) {
+        synchronized (variableMap) {
+            return variableMap.get(new Pair<Integer>(messageType, variableNum));
+        }
     }
 
     public int getChildId() {
@@ -43,7 +47,9 @@ public class MySensorsChild {
     }
 
     public Date getLastUpdate() {
-        return childLastUpdate;
+        synchronized (childLastUpdate) {
+            return childLastUpdate;
+        }
     }
 
     public static boolean isValidChildId(int id) {

@@ -38,7 +38,9 @@ public class MySensorsNode {
     }
 
     public void addChild(MySensorsChild child) {
-        chidldMap.put(child.getChildId(), child);
+        synchronized (chidldMap) {
+            chidldMap.put(child.getChildId(), child);
+        }
     }
 
     public MySensorsChild getChild(int childId) {

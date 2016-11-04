@@ -11,18 +11,28 @@ import org.eclipse.smarthome.core.thing.Channel;
 import org.eclipse.smarthome.core.thing.Thing;
 import org.eclipse.smarthome.core.thing.type.ChannelTypeUID;
 import org.openhab.binding.mysensors.config.MySensorsSensorConfiguration;
+import org.openhab.binding.mysensors.internal.Pair;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsNode;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsVariable;
 import org.openhab.binding.mysensors.internal.sensors.type.MySensorsType;
 
-public class MySensorsFactory {
-    public static MySensorsNode buildNodeFromThing(Thing t) throws Throwable {
+public class MySensorsSensorsFactory {
+    public static MySensorsNode buildNodeFromThing(Thing t, MySensorsNode node) throws Throwable {
         MySensorsNode ret = null;
         MySensorsSensorConfiguration conf = t.getConfiguration().as(MySensorsSensorConfiguration.class);
-        MySensorsChild child = buildChildsFromThing(Integer.parseInt(conf.childId), t);
+        MySensorsChild child = null;
 
-        ret = new MySensorsNode(Integer.parseInt(conf.nodeId));
+        if (node == null) {
+            ret = new MySensorsNode(Integer.parseInt(conf.nodeId));
+        } else {
+            ret = node;
+        }
+
+        child = buildChildsFromThing(Integer.parseInt(conf.childId), t);
+        if (child == null) {
+            throw new IllegalStateException("Null child built");
+        }
 
         ret.addChild(child);
 
@@ -32,36 +42,35 @@ public class MySensorsFactory {
     public static MySensorsChild buildChildsFromThing(int childId, Thing t) throws Throwable {
         MySensorsChild ret = null;
 
-        Map<Integer, MySensorsVariable> map = buildVariablesFromThing(t, TYPE_MAP, invertMap(CHANNEL_MAP));
+        Map<Pair<Integer>, MySensorsVariable> map = buildVariablesFromThing(t);
 
         ret = new MySensorsChild(childId, map);
 
         return ret;
     }
 
-    public static Map<Integer, MySensorsVariable> buildVariablesFromThing(Thing t,
-            Map<String, Class<? extends MySensorsType>> typeMap, Map<String, Integer> reverseChannelMap)
-            throws Throwable {
+    public static Map<Pair<Integer>, MySensorsVariable> buildVariablesFromThing(Thing t) throws Throwable {
 
-        Map<Integer, MySensorsVariable> ret = new HashMap<Integer, MySensorsVariable>();
+        Map<Pair<Integer>, MySensorsVariable> ret = new HashMap<Pair<Integer>, MySensorsVariable>();
         List<Channel> channels = t.getChannels();
 
         for (Channel c : channels) {
             ChannelTypeUID channel = c.getChannelTypeUID();
-            Integer variableNum = reverseChannelMap.get(channel);
-            Class<? extends MySensorsType> cls = typeMap.get(channel);
+            Pair<Integer> variableNum = invertMap(CHANNEL_MAP).get(channel);
+            Class<? extends MySensorsType> cls = TYPE_MAP.get(channel);
             MySensorsVariable var = getVariable(variableNum, cls.newInstance());
+
+            if (variableNum == null || var == null) {
+                throw new IllegalStateException("Variable number and/or type building error");
+            }
+
             ret.put(variableNum, var);
         }
 
         return ret;
     }
 
-    private static MySensorsVariable getVariable(int variableNum, MySensorsType type) throws Throwable {
-        return new MySensorsVariable(variableNum, type);
-    }
-
-    public static void mergeNode(MySensorsNode node) {
-        // TODO
+    private static MySensorsVariable getVariable(Pair<Integer> varTypeAndNumber, MySensorsType type) throws Throwable {
+        return new MySensorsVariable(varTypeAndNumber, type);
     }
 }

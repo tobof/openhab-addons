@@ -12,17 +12,16 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.smarthome.core.library.types.DecimalType;
-import org.eclipse.smarthome.core.library.types.OnOffType;
-import org.eclipse.smarthome.core.library.types.OpenClosedType;
-import org.eclipse.smarthome.core.library.types.PercentType;
-import org.eclipse.smarthome.core.library.types.StringType;
-import org.eclipse.smarthome.core.library.types.UpDownType;
 import org.eclipse.smarthome.core.thing.ThingTypeUID;
-import org.eclipse.smarthome.core.types.Type;
+import org.openhab.binding.mysensors.internal.Pair;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
 import org.openhab.binding.mysensors.internal.sensors.type.MySensorsDecimalType;
+import org.openhab.binding.mysensors.internal.sensors.type.MySensorsOnOffType;
+import org.openhab.binding.mysensors.internal.sensors.type.MySensorsOpenCloseType;
+import org.openhab.binding.mysensors.internal.sensors.type.MySensorsPercentType;
+import org.openhab.binding.mysensors.internal.sensors.type.MySensorsStringType;
 import org.openhab.binding.mysensors.internal.sensors.type.MySensorsType;
+import org.openhab.binding.mysensors.internal.sensors.type.MySensorsUpDownType;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
@@ -271,8 +270,8 @@ public class MySensorsBindingConstants {
     public final static String CHANNEL_IR_SEND = "irSend";
     public final static String CHANNEL_IR_RECEIVE = "irReceive";
 
+    // Extra channel names for non-standard MySensors channels
     public final static String CHANNEL_MYSENSORS_MESSAGE = "mySensorsMessage";
-
     public final static String CHANNEL_LAST_UPDATE = "lastupdate";
 
     // Wait time Arduino reset
@@ -281,68 +280,72 @@ public class MySensorsBindingConstants {
     // I version message for startup check
     public static final MySensorsMessage I_VERSION_MESSAGE = new MySensorsMessage(0, 0, 3, 0, false, 2, "");
 
-    public final static Map<Integer, String> CHANNEL_MAP = new HashMap<Integer, String>() {
+    public final static Map<Pair<Integer>, String> CHANNEL_MAP = new HashMap<Pair<Integer>, String>() {
         /**
          *
          */
         private static final long serialVersionUID = -7970323220036599380L;
 
         {
-            put(MYSENSORS_SUBTYPE_V_TEMP, CHANNEL_TEMP);
-            put(MYSENSORS_SUBTYPE_V_HUM, CHANNEL_HUM);
-            put(MYSENSORS_SUBTYPE_V_STATUS, CHANNEL_STATUS);
-            put(MYSENSORS_SUBTYPE_V_VOLTAGE, CHANNEL_VOLT);
-            put(MYSENSORS_SUBTYPE_V_WATT, CHANNEL_WATT);
-            put(MYSENSORS_SUBTYPE_V_KWH, CHANNEL_KWH);
-            put(MYSENSORS_SUBTYPE_V_PRESSURE, CHANNEL_PRESSURE);
-            put(MYSENSORS_SUBTYPE_V_FORECAST, CHANNEL_BARO);
-            put(MYSENSORS_SUBTYPE_V_TRIPPED, CHANNEL_TRIPPED);
-            put(MYSENSORS_SUBTYPE_V_ARMED, CHANNEL_ARMED);
-            put(MYSENSORS_SUBTYPE_V_PERCENTAGE, CHANNEL_DIMMER);
-            put(MYSENSORS_SUBTYPE_V_UP, CHANNEL_COVER);
-            put(MYSENSORS_SUBTYPE_V_DOWN, CHANNEL_COVER);
-            put(MYSENSORS_SUBTYPE_V_STOP, CHANNEL_COVER);
-            put(MYSENSORS_SUBTYPE_V_WIND, CHANNEL_WIND);
-            put(MYSENSORS_SUBTYPE_V_GUST, CHANNEL_GUST);
-            put(MYSENSORS_SUBTYPE_V_RAIN, CHANNEL_RAIN);
-            put(MYSENSORS_SUBTYPE_V_RAINRATE, CHANNEL_RAINRATE);
-            put(MYSENSORS_SUBTYPE_V_UV, CHANNEL_UV);
-            put(MYSENSORS_SUBTYPE_V_WEIGHT, CHANNEL_WEIGHT);
-            put(MYSENSORS_SUBTYPE_V_IMPEDANCE, CHANNEL_IMPEDANCE);
-            put(MYSENSORS_SUBTYPE_V_DISTANCE, CHANNEL_DISTANCE);
-            put(MYSENSORS_SUBTYPE_V_LIGHT_LEVEL, CHANNEL_LIGHT_LEVEL);
-            put(MYSENSORS_SUBTYPE_V_CURRENT, CHANNEL_CURRENT);
-            put(MYSENSORS_SUBTYPE_V_HVAC_FLOW_STATE, CHANNEL_HVAC_FLOW_STATE);
-            put(MYSENSORS_SUBTYPE_V_HVAC_SPEED, CHANNEL_HVAC_SPEED);
-            put(MYSENSORS_SUBTYPE_V_HVAC_SETPOINT_COOL, CHANNEL_HVAC_SETPOINT_COOL);
-            put(MYSENSORS_SUBTYPE_V_HVAC_SETPOINT_HEAT, CHANNEL_HVAC_SETPOINT_HEAT);
-            put(MYSENSORS_SUBTYPE_V_HVAC_FLOW_MODE, CHANNEL_HVAC_FLOW_MODE);
-            put(MYSENSORS_SUBTYPE_V_VAR1, CHANNEL_VAR1);
-            put(MYSENSORS_SUBTYPE_V_VAR2, CHANNEL_VAR2);
-            put(MYSENSORS_SUBTYPE_V_VAR3, CHANNEL_VAR3);
-            put(MYSENSORS_SUBTYPE_V_VAR4, CHANNEL_VAR4);
-            put(MYSENSORS_SUBTYPE_V_VAR5, CHANNEL_VAR5);
-            put(MYSENSORS_SUBTYPE_V_FLOW, CHANNEL_FLOW);
-            put(MYSENSORS_SUBTYPE_V_VOLUME, CHANNEL_VOLUME);
-            put(MYSENSORS_SUBTYPE_V_LOCK_STATUS, CHANNEL_LOCK_STATUS);
-            put(MYSENSORS_SUBTYPE_V_LEVEL, CHANNEL_LEVEL);
-            put(MYSENSORS_SUBTYPE_V_RGB, CHANNEL_RGB);
-            put(MYSENSORS_SUBTYPE_V_RGBW, CHANNEL_RGBW);
-            put(MYSENSORS_SUBTYPE_V_ID, CHANNEL_ID);
-            put(MYSENSORS_SUBTYPE_V_UNIT_PREFIX, CHANNEL_UNIT_PREFIX);
-            put(MYSENSORS_SUBTYPE_V_TEXT, CHANNEL_TEXT);
-            put(MYSENSORS_SUBTYPE_V_CUSTOM, CHANNEL_CUSTOM);
-            put(MYSENSORS_SUBTYPE_V_POSITION, CHANNEL_POSITION);
-            put(MYSENSORS_SUBTYPE_V_IR_RECORD, CHANNEL_IR_RECORD);
-            put(MYSENSORS_SUBTYPE_V_PH, CHANNEL_PH);
-            put(MYSENSORS_SUBTYPE_V_ORP, CHANNEL_ORP);
-            put(MYSENSORS_SUBTYPE_V_EC, CHANNEL_EC);
-            put(MYSENSORS_SUBTYPE_V_VAR, CHANNEL_VAR);
-            put(MYSENSORS_SUBTYPE_V_VA, CHANNEL_VA);
-            put(MYSENSORS_SUBTYPE_V_POWER_FACTOR, CHANNEL_POWER_FACTOR);
-            put(MYSENSORS_SUBTYPE_V_TEXT, CHANNEL_TEXT);
-            put(MYSENSORS_SUBTYPE_V_IR_SEND, CHANNEL_IR_SEND);
-            put(MYSENSORS_SUBTYPE_V_IR_RECEIVE, CHANNEL_IR_RECEIVE);
+            put(Pair.of(MYSENSORS_MSG_TYPE_SET, MYSENSORS_SUBTYPE_V_TEMP), CHANNEL_TEMP);
+            put(Pair.of(MYSENSORS_MSG_TYPE_SET, MYSENSORS_SUBTYPE_V_HUM), CHANNEL_HUM);
+            put(Pair.of(MYSENSORS_MSG_TYPE_SET, MYSENSORS_SUBTYPE_V_STATUS), CHANNEL_STATUS);
+            put(Pair.of(MYSENSORS_MSG_TYPE_SET, MYSENSORS_SUBTYPE_V_VOLTAGE), CHANNEL_VOLT);
+            put(Pair.of(MYSENSORS_MSG_TYPE_SET, MYSENSORS_SUBTYPE_V_WATT), CHANNEL_WATT);
+            put(Pair.of(MYSENSORS_MSG_TYPE_SET, MYSENSORS_SUBTYPE_V_KWH), CHANNEL_KWH);
+            put(Pair.of(MYSENSORS_MSG_TYPE_SET, MYSENSORS_SUBTYPE_V_PRESSURE), CHANNEL_PRESSURE);
+            put(Pair.of(MYSENSORS_MSG_TYPE_SET, MYSENSORS_SUBTYPE_V_FORECAST), CHANNEL_BARO);
+            put(Pair.of(MYSENSORS_MSG_TYPE_SET, MYSENSORS_SUBTYPE_V_TRIPPED), CHANNEL_TRIPPED);
+            put(Pair.of(MYSENSORS_MSG_TYPE_SET, MYSENSORS_SUBTYPE_V_ARMED), CHANNEL_ARMED);
+            put(Pair.of(MYSENSORS_MSG_TYPE_SET, MYSENSORS_SUBTYPE_V_PERCENTAGE), CHANNEL_DIMMER);
+            put(Pair.of(MYSENSORS_MSG_TYPE_SET, MYSENSORS_SUBTYPE_V_UP), CHANNEL_COVER);
+            put(Pair.of(MYSENSORS_MSG_TYPE_SET, MYSENSORS_SUBTYPE_V_DOWN), CHANNEL_COVER);
+            put(Pair.of(MYSENSORS_MSG_TYPE_SET, MYSENSORS_SUBTYPE_V_STOP), CHANNEL_COVER);
+            put(Pair.of(MYSENSORS_MSG_TYPE_SET, MYSENSORS_SUBTYPE_V_WIND), CHANNEL_WIND);
+            put(Pair.of(MYSENSORS_MSG_TYPE_SET, MYSENSORS_SUBTYPE_V_GUST), CHANNEL_GUST);
+            put(Pair.of(MYSENSORS_MSG_TYPE_SET, MYSENSORS_SUBTYPE_V_RAIN), CHANNEL_RAIN);
+            put(Pair.of(MYSENSORS_MSG_TYPE_SET, MYSENSORS_SUBTYPE_V_RAINRATE), CHANNEL_RAINRATE);
+            put(Pair.of(MYSENSORS_MSG_TYPE_SET, MYSENSORS_SUBTYPE_V_UV), CHANNEL_UV);
+            put(Pair.of(MYSENSORS_MSG_TYPE_SET, MYSENSORS_SUBTYPE_V_WEIGHT), CHANNEL_WEIGHT);
+            put(Pair.of(MYSENSORS_MSG_TYPE_SET, MYSENSORS_SUBTYPE_V_IMPEDANCE), CHANNEL_IMPEDANCE);
+            put(Pair.of(MYSENSORS_MSG_TYPE_SET, MYSENSORS_SUBTYPE_V_DISTANCE), CHANNEL_DISTANCE);
+            put(Pair.of(MYSENSORS_MSG_TYPE_SET, MYSENSORS_SUBTYPE_V_LIGHT_LEVEL), CHANNEL_LIGHT_LEVEL);
+            put(Pair.of(MYSENSORS_MSG_TYPE_SET, MYSENSORS_SUBTYPE_V_CURRENT), CHANNEL_CURRENT);
+            put(Pair.of(MYSENSORS_MSG_TYPE_SET, MYSENSORS_SUBTYPE_V_HVAC_FLOW_STATE), CHANNEL_HVAC_FLOW_STATE);
+            put(Pair.of(MYSENSORS_MSG_TYPE_SET, MYSENSORS_SUBTYPE_V_HVAC_SPEED), CHANNEL_HVAC_SPEED);
+            put(Pair.of(MYSENSORS_MSG_TYPE_SET, MYSENSORS_SUBTYPE_V_HVAC_SETPOINT_COOL), CHANNEL_HVAC_SETPOINT_COOL);
+            put(Pair.of(MYSENSORS_MSG_TYPE_SET, MYSENSORS_SUBTYPE_V_HVAC_SETPOINT_HEAT), CHANNEL_HVAC_SETPOINT_HEAT);
+            put(Pair.of(MYSENSORS_MSG_TYPE_SET, MYSENSORS_SUBTYPE_V_HVAC_FLOW_MODE), CHANNEL_HVAC_FLOW_MODE);
+            put(Pair.of(MYSENSORS_MSG_TYPE_SET, MYSENSORS_SUBTYPE_V_VAR1), CHANNEL_VAR1);
+            put(Pair.of(MYSENSORS_MSG_TYPE_SET, MYSENSORS_SUBTYPE_V_VAR2), CHANNEL_VAR2);
+            put(Pair.of(MYSENSORS_MSG_TYPE_SET, MYSENSORS_SUBTYPE_V_VAR3), CHANNEL_VAR3);
+            put(Pair.of(MYSENSORS_MSG_TYPE_SET, MYSENSORS_SUBTYPE_V_VAR4), CHANNEL_VAR4);
+            put(Pair.of(MYSENSORS_MSG_TYPE_SET, MYSENSORS_SUBTYPE_V_VAR5), CHANNEL_VAR5);
+            put(Pair.of(MYSENSORS_MSG_TYPE_SET, MYSENSORS_SUBTYPE_V_FLOW), CHANNEL_FLOW);
+            put(Pair.of(MYSENSORS_MSG_TYPE_SET, MYSENSORS_SUBTYPE_V_VOLUME), CHANNEL_VOLUME);
+            put(Pair.of(MYSENSORS_MSG_TYPE_SET, MYSENSORS_SUBTYPE_V_LOCK_STATUS), CHANNEL_LOCK_STATUS);
+            put(Pair.of(MYSENSORS_MSG_TYPE_SET, MYSENSORS_SUBTYPE_V_LEVEL), CHANNEL_LEVEL);
+            put(Pair.of(MYSENSORS_MSG_TYPE_SET, MYSENSORS_SUBTYPE_V_RGB), CHANNEL_RGB);
+            put(Pair.of(MYSENSORS_MSG_TYPE_SET, MYSENSORS_SUBTYPE_V_RGBW), CHANNEL_RGBW);
+            put(Pair.of(MYSENSORS_MSG_TYPE_SET, MYSENSORS_SUBTYPE_V_ID), CHANNEL_ID);
+            put(Pair.of(MYSENSORS_MSG_TYPE_SET, MYSENSORS_SUBTYPE_V_UNIT_PREFIX), CHANNEL_UNIT_PREFIX);
+            put(Pair.of(MYSENSORS_MSG_TYPE_SET, MYSENSORS_SUBTYPE_V_TEXT), CHANNEL_TEXT);
+            put(Pair.of(MYSENSORS_MSG_TYPE_SET, MYSENSORS_SUBTYPE_V_CUSTOM), CHANNEL_CUSTOM);
+            put(Pair.of(MYSENSORS_MSG_TYPE_SET, MYSENSORS_SUBTYPE_V_POSITION), CHANNEL_POSITION);
+            put(Pair.of(MYSENSORS_MSG_TYPE_SET, MYSENSORS_SUBTYPE_V_IR_RECORD), CHANNEL_IR_RECORD);
+            put(Pair.of(MYSENSORS_MSG_TYPE_SET, MYSENSORS_SUBTYPE_V_PH), CHANNEL_PH);
+            put(Pair.of(MYSENSORS_MSG_TYPE_SET, MYSENSORS_SUBTYPE_V_ORP), CHANNEL_ORP);
+            put(Pair.of(MYSENSORS_MSG_TYPE_SET, MYSENSORS_SUBTYPE_V_EC), CHANNEL_EC);
+            put(Pair.of(MYSENSORS_MSG_TYPE_SET, MYSENSORS_SUBTYPE_V_VAR), CHANNEL_VAR);
+            put(Pair.of(MYSENSORS_MSG_TYPE_SET, MYSENSORS_SUBTYPE_V_VA), CHANNEL_VA);
+            put(Pair.of(MYSENSORS_MSG_TYPE_SET, MYSENSORS_SUBTYPE_V_POWER_FACTOR), CHANNEL_POWER_FACTOR);
+            put(Pair.of(MYSENSORS_MSG_TYPE_SET, MYSENSORS_SUBTYPE_V_TEXT), CHANNEL_TEXT);
+            put(Pair.of(MYSENSORS_MSG_TYPE_SET, MYSENSORS_SUBTYPE_V_IR_SEND), CHANNEL_IR_SEND);
+            put(Pair.of(MYSENSORS_MSG_TYPE_SET, MYSENSORS_SUBTYPE_V_IR_RECEIVE), CHANNEL_IR_RECEIVE);
+
+            // Internal
+            put(Pair.of(MYSENSORS_MSG_TYPE_INTERNAL, MYSENSORS_SUBTYPE_I_VERSION), CHANNEL_VERSION);
+            put(Pair.of(MYSENSORS_MSG_TYPE_INTERNAL, MYSENSORS_SUBTYPE_I_BATTERY_LEVEL), CHANNEL_BATTERY);
         }
     };
 
@@ -352,22 +355,21 @@ public class MySensorsBindingConstants {
          *
          */
         private static final long serialVersionUID = 6273187523631143905L;
-
         {
             put(CHANNEL_TEMP, MySensorsDecimalType.class);
             put(CHANNEL_HUM, MySensorsDecimalType.class);
-            put(CHANNEL_STATUS, OnOffType.class);
+            put(CHANNEL_STATUS, MySensorsOnOffType.class);
             put(CHANNEL_VOLT, MySensorsDecimalType.class);
             put(CHANNEL_WATT, MySensorsDecimalType.class);
             put(CHANNEL_KWH, MySensorsDecimalType.class);
             put(CHANNEL_PRESSURE, MySensorsDecimalType.class);
-            put(CHANNEL_BARO, StringType.class);
-            put(CHANNEL_TRIPPED, OpenClosedType.class);
-            put(CHANNEL_ARMED, OpenClosedType.class);
-            put(CHANNEL_DIMMER, PercentType.class);
-            put(CHANNEL_COVER, UpDownType.class);
-            put(CHANNEL_COVER, UpDownType.class);
-            put(CHANNEL_COVER, UpDownType.class);
+            put(CHANNEL_BARO, MySensorsStringType.class);
+            put(CHANNEL_TRIPPED, MySensorsOpenCloseType.class);
+            put(CHANNEL_ARMED, MySensorsOpenCloseType.class);
+            put(CHANNEL_DIMMER, MySensorsPercentType.class);
+            put(CHANNEL_COVER, MySensorsUpDownType.class);
+            put(CHANNEL_COVER, MySensorsUpDownType.class); // !
+            put(CHANNEL_COVER, MySensorsUpDownType.class); // !
             put(CHANNEL_WIND, MySensorsDecimalType.class);
             put(CHANNEL_GUST, MySensorsDecimalType.class);
             put(CHANNEL_RAIN, MySensorsDecimalType.class);
@@ -378,11 +380,11 @@ public class MySensorsBindingConstants {
             put(CHANNEL_DISTANCE, MySensorsDecimalType.class);
             put(CHANNEL_LIGHT_LEVEL, MySensorsDecimalType.class);
             put(CHANNEL_CURRENT, MySensorsDecimalType.class);
-            put(CHANNEL_HVAC_FLOW_STATE, StringType.class);
-            put(CHANNEL_HVAC_SPEED, StringType.class);
+            put(CHANNEL_HVAC_FLOW_STATE, MySensorsStringType.class);
+            put(CHANNEL_HVAC_SPEED, MySensorsStringType.class);
             put(CHANNEL_HVAC_SETPOINT_COOL, MySensorsDecimalType.class);
             put(CHANNEL_HVAC_SETPOINT_HEAT, MySensorsDecimalType.class);
-            put(CHANNEL_HVAC_FLOW_MODE, StringType.class);
+            put(CHANNEL_HVAC_FLOW_MODE, MySensorsStringType.class);
             put(CHANNEL_VAR1, MySensorsDecimalType.class);
             put(CHANNEL_VAR2, MySensorsDecimalType.class);
             put(CHANNEL_VAR3, MySensorsDecimalType.class);
@@ -396,7 +398,7 @@ public class MySensorsBindingConstants {
             put(CHANNEL_RGBW, MySensorsDecimalType.class);
             put(CHANNEL_ID, MySensorsDecimalType.class);
             put(CHANNEL_UNIT_PREFIX, MySensorsDecimalType.class);
-            put(CHANNEL_TEXT, StringType.class);
+            put(CHANNEL_TEXT, MySensorsStringType.class);
             put(CHANNEL_CUSTOM, MySensorsDecimalType.class);
             put(CHANNEL_POSITION, MySensorsDecimalType.class);
             put(CHANNEL_IR_RECORD, MySensorsDecimalType.class);
@@ -406,36 +408,44 @@ public class MySensorsBindingConstants {
             put(CHANNEL_VAR, MySensorsDecimalType.class);
             put(CHANNEL_VA, MySensorsDecimalType.class);
             put(CHANNEL_POWER_FACTOR, MySensorsDecimalType.class);
-            put(CHANNEL_TEXT, StringType.class);
-            put(CHANNEL_IR_SEND, StringType.class);
-            put(CHANNEL_IR_RECEIVE, StringType.class);
+            put(CHANNEL_TEXT, MySensorsStringType.class);
+            put(CHANNEL_IR_SEND, MySensorsStringType.class);
+            put(CHANNEL_IR_RECEIVE, MySensorsStringType.class);
+
+            // Internal
+            put(CHANNEL_VERSION, MySensorsStringType.class);
+            put(CHANNEL_BATTERY, MySensorsDecimalType.class);
         }
     };
 
-    public final static Map<Integer, String> CHANNEL_MAP_INTERNAL = new HashMap<Integer, String>() {
-        /**
+    /*
+     * public final static Map<Pair<Integer>, String> CHANNEL_MAP_INTERNAL = new HashMap<Pair<Integer>, String>() {
+     *//**
+      *
+      */
+    /*
+     * private static final long serialVersionUID = 6273187523631143905L;
+     *
+     * {
+     * put(MYSENSORS_SUBTYPE_I_VERSION, CHANNEL_VERSION);
+     * put(MYSENSORS_SUBTYPE_I_BATTERY_LEVEL, CHANNEL_BATTERY);
+     * }
+     * };
+     *
+     * public final static Map<String, Class<? extends MySensorsType>> TYPE_MAP_INTERNAL = new HashMap<String, Class<?
+     * extends MySensorsType>>() {
+     *
+     *//**
+      *
+      *//*
+         * private static final long serialVersionUID = -4363396832873428778L;
          *
+         * {
+         * put(CHANNEL_VERSION, StringType.class);
+         * put(CHANNEL_BATTERY, DecimalType.class);
+         * }
+         * };
          */
-        private static final long serialVersionUID = 6273187523631143905L;
-
-        {
-            put(MYSENSORS_SUBTYPE_I_VERSION, CHANNEL_VERSION);
-            put(MYSENSORS_SUBTYPE_I_BATTERY_LEVEL, CHANNEL_BATTERY);
-        }
-    };
-
-    public final static Map<String, Class<? extends Type>> TYPE_MAP_INTERNAL = new HashMap<String, Class<? extends Type>>() {
-
-        /**
-         *
-         */
-        private static final long serialVersionUID = -4363396832873428778L;
-
-        {
-            put(CHANNEL_VERSION, StringType.class);
-            put(CHANNEL_BATTERY, DecimalType.class);
-        }
-    };
 
     /** Supported Things without bridge */
     public final static Set<ThingTypeUID> SUPPORTED_THING_TYPES_UIDS = ImmutableSet.of(THING_TYPE_HUMIDITY,

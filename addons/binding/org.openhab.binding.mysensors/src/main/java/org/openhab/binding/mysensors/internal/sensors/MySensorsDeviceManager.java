@@ -3,6 +3,7 @@ package org.openhab.binding.mysensors.internal.sensors;
 import java.util.Map;
 import java.util.Set;
 
+import org.openhab.binding.mysensors.internal.Pair;
 import org.openhab.binding.mysensors.internal.event.MySensorsEventType;
 import org.openhab.binding.mysensors.internal.event.MySensorsStatusUpdateEvent;
 import org.openhab.binding.mysensors.internal.event.MySensorsUpdateListener;
@@ -33,9 +34,32 @@ public class MySensorsDeviceManager implements MySensorsUpdateListener {
         return nodeMap.get(nodeId);
     }
 
+    public MySensorsChild getChild(int nodeId, int childId) {
+        MySensorsChild ret = null;
+        MySensorsNode node = getNode(nodeId);
+        if (node != null) {
+            ret = node.getChild(childId);
+        }
+
+        return ret;
+    }
+
+    public MySensorsVariable getVariable(int nodeId, int childId, Pair<Integer> typeSubType) {
+        return getVariable(nodeId, childId, typeSubType.getFirst(), typeSubType.getSecond());
+    }
+
+    public MySensorsVariable getVariable(int nodeId, int childId, int messageType, int varNumber) {
+        MySensorsVariable ret = null;
+        MySensorsChild child = getChild(nodeId, childId);
+        if (child != null) {
+            ret = child.getVariable(messageType, varNumber);
+        }
+
+        return ret;
+    }
+
     public void addNode(MySensorsNode node) {
         synchronized (nodeMap) {
-
             nodeMap.put(node.getNodeId(), node);
         }
     }
@@ -58,12 +82,11 @@ public class MySensorsDeviceManager implements MySensorsUpdateListener {
     public Integer reserveId() throws NoMoreIdsException {
         int newId = 1;
 
-        Set<Integer> takenIds = getGivenIds();
-
-        synchronized (takenIds) {
+        synchronized (nodeMap) {
+            Set<Integer> takenIds = getGivenIds();
             while (newId < 255) {
                 if (!takenIds.contains(newId)) {
-                    nodeMap.put(newId, new MySensorsNode(newId));
+                    addNode(new MySensorsNode(newId));
                     break;
                 } else {
                     newId++;

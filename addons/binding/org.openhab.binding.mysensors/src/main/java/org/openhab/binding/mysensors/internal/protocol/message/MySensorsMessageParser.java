@@ -47,6 +47,10 @@ public class MySensorsMessageParser {
 
     }
 
+    /**
+     * Use message.isIVersionMessage() on MySensorsMessage instance
+     */
+    @Deprecated
     public static boolean isIVersionMessage(MySensorsMessage msg) {
         return (msg != null && msg.nodeId == 0 && msg.childId == 0
                 && msg.msgType == MySensorsBindingConstants.MYSENSORS_MSG_TYPE_INTERNAL && msg.ack == 0

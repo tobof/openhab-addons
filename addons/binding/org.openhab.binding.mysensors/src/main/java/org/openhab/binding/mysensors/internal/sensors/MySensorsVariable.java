@@ -1,10 +1,14 @@
 package org.openhab.binding.mysensors.internal.sensors;
 
+import org.eclipse.smarthome.core.types.Command;
 import org.eclipse.smarthome.core.types.State;
 import org.eclipse.smarthome.core.types.UnDefType;
+import org.openhab.binding.mysensors.internal.Pair;
 import org.openhab.binding.mysensors.internal.sensors.type.MySensorsType;
 
 public class MySensorsVariable {
+
+    private int variableType;
 
     private int variableNum;
 
@@ -12,7 +16,7 @@ public class MySensorsVariable {
 
     private MySensorsType type;
 
-    public MySensorsVariable(int variableNum, MySensorsType type) {
+    public MySensorsVariable(Pair<Integer> variableTypeAndNumber, MySensorsType type) {
         setValue(UnDefType.UNDEF);
         setType(type);
         setVariableNum(variableNum);
@@ -32,27 +36,49 @@ public class MySensorsVariable {
         this.variableNum = variableNum;
     }
 
-    public State getValue() {
+    public synchronized State getValue() {
         return value;
     }
 
-    public void setValue(State value) {
+    public synchronized void setValue(State value) {
         if (value == null) {
             throw new NullPointerException("Cannot have state to null. Use UnDefType instead");
         }
         this.value = value;
     }
 
+    public void setValue(Command value) {
+        setValue(type.fromCommand(value));
+    }
+
     public void setValue(String value) throws Throwable {
         setValue(type.fromString(value));
+    }
+
+    public MySensorsType getType() {
+        return type;
+    }
+
+    public void setType(MySensorsType type) {
+        this.type = type;
+    }
+
+    public int getVariableType() {
+        return variableType;
+    }
+
+    public void setVariableType(int variableType) {
+        this.variableType = variableType;
     }
 
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
+        result = prime * result + ((type == null) ? 0 : type.hashCode());
         result = prime * result + ((value == null) ? 0 : value.hashCode());
         result = prime * result + variableNum;
+        result = prime * result + variableType;
         return result;
     }
 
@@ -68,6 +94,13 @@ public class MySensorsVariable {
             return false;
         }
         MySensorsVariable other = (MySensorsVariable) obj;
+        if (type == null) {
+            if (other.type != null) {
+                return false;
+            }
+        } else if (!type.equals(other.type)) {
+            return false;
+        }
         if (value == null) {
             if (other.value != null) {
                 return false;
@@ -78,20 +111,16 @@ public class MySensorsVariable {
         if (variableNum != other.variableNum) {
             return false;
         }
+        if (variableType != other.variableType) {
+            return false;
+        }
         return true;
     }
 
     @Override
     public String toString() {
-        return "MySensorsVariable [variableNum=" + variableNum + ", value=" + value + "]";
-    }
-
-    public MySensorsType getType() {
-        return type;
-    }
-
-    public void setType(MySensorsType type) {
-        this.type = type;
+        return "MySensorsVariable [variableType=" + variableType + ", variableNum=" + variableNum + ", value=" + value
+                + ", type=" + type + "]";
     }
 
 }

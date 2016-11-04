@@ -21,6 +21,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.openhab.binding.mysensors.MySensorsBindingConstants;
 import org.openhab.binding.mysensors.discovery.MySensorsDiscoveryService;
+import org.openhab.binding.mysensors.internal.Pair;
 import org.openhab.binding.mysensors.internal.event.MySensorsEventType;
 import org.openhab.binding.mysensors.internal.event.MySensorsStatusUpdateEvent;
 import org.openhab.binding.mysensors.internal.event.MySensorsUpdateListener;
@@ -389,11 +390,12 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
             if (node != null) {
                 MySensorsChild child = node.getChild(msg.childId);
                 if (child != null) {
-                    MySensorsVariable variable = child.getVariable(msg.subType);
+                    MySensorsVariable variable = child.getVariable(msg.msgType, msg.subType);
                     if (variable != null) {
                         variable.setValue(msg.msg);
                     } else {
-                        logger.warn("Variable {}({}) not present", msg.subType, CHANNEL_MAP.get(msg.subType));
+                        logger.warn("Variable {}({}) not present", msg.subType,
+                                CHANNEL_MAP.get(new Pair<Integer>(msg.msgType, msg.subType)));
                     }
                 } else {
                     logger.debug("Child {} not present into node {}", msg.nodeId, msg.childId);
