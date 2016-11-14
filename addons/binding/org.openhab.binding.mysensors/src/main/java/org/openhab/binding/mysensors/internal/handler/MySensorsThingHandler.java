@@ -306,44 +306,88 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
                 if (childId == msg.getChildId()) { // which child should be updated?
                     if (CHANNEL_MAP.containsKey(msg.getSubType())) {
                         String channel = CHANNEL_MAP.get(msg.getSubType());
-                        if (channel.equals(CHANNEL_BARO)) {
-                            updateState(channel, new StringType(msg.getMsg()));
-                        } else if (channel.equals(CHANNEL_STATUS)) {
-                            if (msg.getMsg().equals("1")) {
-                                updateState(channel, OnOffType.ON);
-                            } else if (msg.getMsg().equals("0")) {
-                                updateState(channel, OnOffType.OFF);
-                            }
-                        } else if (channel.equals(CHANNEL_ARMED) || channel.equals(CHANNEL_TRIPPED)) {
-                            if (msg.getMsg().equals("1")) {
-                                updateState(channel, OpenClosedType.OPEN);
-                            } else {
-                                updateState(channel, OpenClosedType.CLOSED);
-                            }
-                        } else if (channel.equals(CHANNEL_DIMMER)) {
-                            updateState(channel, new PercentType(msg.getMsg()));
-                        } else if (channel.equals(CHANNEL_COVER)) {
-                            if (msg.getMsg().equals(MYSENSORS_SUBTYPE_V_UP)) {
-                                updateState(channel, UpDownType.UP);
-                            } else if (msg.getMsg().equals(MYSENSORS_SUBTYPE_V_DOWN)) {
-                                updateState(channel, UpDownType.DOWN);
-                            }
-                        } else if (channel.equals(CHANNEL_HVAC_FLOW_STATE)) {
-                            updateState(channel, new StringType(msg.getMsg()));
-                        } else if (channel.equals(CHANNEL_HVAC_FLOW_MODE)) {
-                            updateState(channel, new StringType(msg.getMsg()));
-                        } else if (channel.equals(CHANNEL_HVAC_SPEED)) {
-                            updateState(channel, new StringType(msg.getMsg()));
-                        } else if (channel.equals(CHANNEL_TEXT)) {
-                            updateState(channel, new StringType(msg.getMsg()));
-                        } else if (channel.equals(CHANNEL_IR_SEND)) {
-                            updateState(channel, new StringType(msg.getMsg()));
-                        } else if (channel.equals(CHANNEL_IR_RECEIVE)) {
-                            updateState(channel, new StringType(msg.getMsg()));
-                        } else {
-                            updateState(channel, new DecimalType(msg.getMsg()));
+
+                        switch (channel) {
+                            case CHANNEL_STATUS:
+                                if (msg.getMsg().equals("1")) {
+                                    updateState(channel, OnOffType.ON);
+                                } else if (msg.getMsg().equals("0")) {
+                                    updateState(channel, OnOffType.OFF);
+                                }
+                                break;
+
+                            case CHANNEL_ARMED:
+                            case CHANNEL_TRIPPED:
+                            case CHANNEL_LOCK_STATUS:
+                                if (msg.getMsg().equals("1")) {
+                                    updateState(channel, OpenClosedType.OPEN);
+                                } else {
+                                    updateState(channel, OpenClosedType.CLOSED);
+                                }
+                                break;
+
+                            case CHANNEL_DIMMER:
+                                updateState(channel, new PercentType(msg.getMsg()));
+                                break;
+
+                            case CHANNEL_BARO:
+                            case CHANNEL_HVAC_FLOW_STATE:
+                            case CHANNEL_HVAC_FLOW_MODE:
+                            case CHANNEL_HVAC_SPEED:
+                            case CHANNEL_TEXT:
+                            case CHANNEL_IR_SEND:
+                            case CHANNEL_IR_RECEIVE:
+                            case CHANNEL_GUST:
+                            case CHANNEL_RAIN:
+                            case CHANNEL_VAR1:
+                            case CHANNEL_VAR2:
+                            case CHANNEL_VAR3:
+                            case CHANNEL_VAR4:
+                            case CHANNEL_VAR5:
+                            case CHANNEL_RGB:
+                            case CHANNEL_RGBW:
+                            case CHANNEL_CUSTOM:
+                            case CHANNEL_POSITION:
+                            case CHANNEL_IR_RECORD:
+                                updateState(channel, new StringType(msg.getMsg()));
+                                break;
+
+                            case CHANNEL_COVER:
+                                if (msg.getMsg().equals(MYSENSORS_SUBTYPE_V_UP)) {
+                                    updateState(channel, UpDownType.UP);
+                                } else if (msg.getMsg().equals(MYSENSORS_SUBTYPE_V_DOWN)) {
+                                    updateState(channel, UpDownType.DOWN);
+                                }
+                                break;
+
+                            case CHANNEL_TEMP:
+                            case CHANNEL_HUM:
+                            case CHANNEL_VOLT:
+                            case CHANNEL_WATT:
+                            case CHANNEL_KWH:
+                            case CHANNEL_PRESSURE:
+                            case CHANNEL_WIND:
+                            case CHANNEL_UV:
+                            case CHANNEL_RAINRATE:
+                            case CHANNEL_WEIGHT:
+                            case CHANNEL_IMPEDANCE:
+                            case CHANNEL_CURRENT:
+                            case CHANNEL_DISTANCE:
+                            case CHANNEL_LIGHT_LEVEL:
+                            case CHANNEL_FLOW:
+                            case CHANNEL_VOLUME:
+                            case CHANNEL_LEVEL:
+                            case CHANNEL_PH:
+                                updateState(channel, new DecimalType(msg.getMsg()));
+                                break;
+
+                            default:
+                                updateState(channel, new DecimalType(msg.getMsg()));
+
                         }
+
                         oldMsgContent.put(msg.getSubType(), msg.getMsg());
+
                     }
                 }
             } else if (msg.getMsgType() == MYSENSORS_MSG_TYPE_REQ) {
