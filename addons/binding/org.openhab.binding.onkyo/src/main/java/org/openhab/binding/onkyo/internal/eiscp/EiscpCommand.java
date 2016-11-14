@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2016, openHAB.org and others.
+ * Copyright (c) 2014-2016 by the respective copyright holders.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -122,7 +122,7 @@ public enum EiscpCommand {
 
     ZONE2_POWER_OFF("ZPW00", EiscpCommandRef.ZONE2_POWER_SBY),
     ZONE2_POWER_ON("ZPW01", EiscpCommandRef.ZONE2_POWER_ON),
-    ZONE2_POWER_QUERY("ZPWQSTN", EiscpCommandRef.POWER_QUERY),
+    ZONE2_POWER_QUERY("ZPWQSTN", EiscpCommandRef.ZONE2_POWER_QUERY),
 
     ZONE2_UNMUTE("ZMT00", EiscpCommandRef.ZONE2_UNMUTE),
     ZONE2_MUTE("ZMT01", EiscpCommandRef.ZONE2_MUTE),
