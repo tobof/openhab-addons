@@ -56,6 +56,8 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
 
     private Map<Integer, String> oldMsgContent = new HashMap<Integer, String>();
 
+    private MySensorsDeviceManager deviceManager = MySensorsDeviceManager.getInstance();
+
     public MySensorsThingHandler(Thing thing) {
         super(thing);
     }
@@ -118,7 +120,7 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
                 return;
             }
         } else {
-            MySensorsVariable var = MySensorsDeviceManager.getDeviceManager().getVariable(nodeId, childId,
+            MySensorsVariable var = deviceManager.getVariable(nodeId, childId,
                     invertMap(CHANNEL_MAP).get(channelUID.getId()));
             if (var != null) {
 

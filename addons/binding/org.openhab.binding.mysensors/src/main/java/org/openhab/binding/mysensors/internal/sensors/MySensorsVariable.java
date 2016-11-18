@@ -4,6 +4,7 @@ import org.eclipse.smarthome.core.types.Command;
 import org.eclipse.smarthome.core.types.State;
 import org.eclipse.smarthome.core.types.UnDefType;
 import org.openhab.binding.mysensors.internal.Pair;
+import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
 import org.openhab.binding.mysensors.internal.sensors.type.MySensorsType;
 
 public class MySensorsVariable {
@@ -51,8 +52,8 @@ public class MySensorsVariable {
         setValue(type.fromCommand(value));
     }
 
-    public void setValue(String value) throws Throwable {
-        setValue(type.fromString(value));
+    public void setValue(MySensorsMessage value) throws Throwable {
+        setValue(type.fromMessage(value));
     }
 
     public MySensorsType getType() {

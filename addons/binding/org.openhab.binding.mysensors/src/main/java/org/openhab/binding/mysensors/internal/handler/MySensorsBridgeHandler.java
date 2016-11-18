@@ -50,7 +50,7 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
     private MySensorsBridgeConnection myCon = null;
 
     // Device manager
-    private MySensorsDeviceManager myDevManager = null;
+    private MySensorsDeviceManager deviceManager = MySensorsDeviceManager.getInstance();
 
     // Configuration from thing file
     private MySensorsBridgeConfiguration myConfiguration = null;
@@ -85,8 +85,6 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
             myCon.addEventListener(this);
         }
 
-        myCon.addEventListener(myDevManager);
-
         logger.debug("Initialization of the MySensors bridge DONE!");
     }
 
@@ -99,7 +97,6 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
     public void dispose() {
         logger.debug("Disposing of the MySensors bridge");
         if (myCon != null) {
-            myCon.removeEventListener(myDevManager);
             myCon.removeEventListener(this);
             myCon.destroy();
         }
@@ -127,10 +124,6 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
 
     public MySensorsBridgeConnection getBridgeConnection() {
         return myCon;
-    }
-
-    public MySensorsDeviceManager getDeviceManager() {
-        return myDevManager;
     }
 
     @Override
@@ -223,7 +216,7 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
 
     private void saveCacheFile() {
 
-        if (myDevManager != null) {
+        if (deviceManager != null) {
 
             MySensorsCacheFactory cacheFactory = MySensorsCacheFactory.getCacheFactory();
 
@@ -249,7 +242,7 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
                 }
             }
 
-            Set<Integer> onDeviceManager = getDeviceManager().getGivenIds();
+            Set<Integer> onDeviceManager = deviceManager.getGivenIds();
             for (Integer i : onDeviceManager) {
                 if (i != null && !givenIds.contains(i)) {
                     givenIds.add(i);

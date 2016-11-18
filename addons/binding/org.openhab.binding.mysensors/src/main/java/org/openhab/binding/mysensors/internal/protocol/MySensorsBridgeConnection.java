@@ -25,6 +25,7 @@ import org.openhab.binding.mysensors.internal.Pair;
 import org.openhab.binding.mysensors.internal.event.MySensorsEventType;
 import org.openhab.binding.mysensors.internal.event.MySensorsStatusUpdateEvent;
 import org.openhab.binding.mysensors.internal.event.MySensorsUpdateListener;
+import org.openhab.binding.mysensors.internal.exception.NoMoreIdsException;
 import org.openhab.binding.mysensors.internal.handler.MySensorsBridgeHandler;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
@@ -43,6 +44,9 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
 
     // ??
     private boolean pauseWriter = false;
+
+    // Device manager
+    private MySensorsDeviceManager deviceManager = MySensorsDeviceManager.getInstance();
 
     // Blocking queue wait for message
     private BlockingQueue<MySensorsMessage> outboundMessageQueue = null;
@@ -380,19 +384,40 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
         if (msg.isIVersionMessage()) {
             handleIncomingVersionMessage(msg.msg);
         }
+
+        // Requesting ID
+        if (msg.isIdRequestMessage()) {
+            answerIDRequest();
+        }
+    }
+
+    /**
+     * If an ID -Request from a sensor is received the controller will send an id to the sensor
+     */
+    private void answerIDRequest() {
+        logger.info("ID Request received");
+
+        int newId = 0;
+        try {
+            newId = deviceManager.reserveId();
+            MySensorsMessage newMsg = new MySensorsMessage(255, 255, 3, 0, false, 4, newId + "");
+            addMySensorsOutboundMessage(newMsg);
+            logger.info("New Node in the MySensors network has requested an ID. ID is: {}", newId);
+        } catch (NoMoreIdsException e) {
+            logger.error("No more IDs available for this node, try cleaning cache");
+        }
     }
 
     private void handleIncomingMessage(MySensorsMessage msg) throws Throwable {
         if (MySensorsNode.isValidNodeId(msg.nodeId) && MySensorsChild.isValidChildId(msg.childId)
                 && msg.isSetReqMessage()) {
-            MySensorsDeviceManager deviceManager = MySensorsDeviceManager.getDeviceManager();
             MySensorsNode node = deviceManager.getNode(msg.nodeId);
             if (node != null) {
                 MySensorsChild child = node.getChild(msg.childId);
                 if (child != null) {
                     MySensorsVariable variable = child.getVariable(msg.msgType, msg.subType);
                     if (variable != null) {
-                        variable.setValue(msg.msg);
+                        variable.setValue(msg);
                     } else {
                         logger.warn("Variable {}({}) not present", msg.subType,
                                 CHANNEL_MAP.get(new Pair<Integer>(msg.msgType, msg.subType)));

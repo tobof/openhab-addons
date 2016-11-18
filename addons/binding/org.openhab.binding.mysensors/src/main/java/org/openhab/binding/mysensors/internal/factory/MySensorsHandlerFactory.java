@@ -43,11 +43,7 @@ public class MySensorsHandlerFactory extends BaseThingHandlerFactory {
     private Map<ThingUID, ServiceRegistration<?>> discoveryServiceRegs = new HashMap<>();
 
     // Device manager
-    private MySensorsDeviceManager devManager = null;
-
-    public MySensorsHandlerFactory() {
-        devManager = MySensorsDeviceManager.getDeviceManager();
-    }
+    private MySensorsDeviceManager deviceManager = MySensorsDeviceManager.getInstance();
 
     @Override
     public boolean supportsThingType(ThingTypeUID thingTypeUID) {
