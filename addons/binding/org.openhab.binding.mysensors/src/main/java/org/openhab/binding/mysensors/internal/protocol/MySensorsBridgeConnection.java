@@ -212,8 +212,6 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
                 }
             } catch (Exception e) {
                 logger.error("Exception on waiting for I_VERSION message", e);
-            } finally {
-                removeEventListener(this);
             }
         } else {
             logger.warn("Skipping I_VERSION connection test, not recommended...");

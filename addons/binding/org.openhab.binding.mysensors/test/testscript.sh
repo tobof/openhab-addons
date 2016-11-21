@@ -34,9 +34,9 @@ echo "255;255;3;0;3" > $serialPort #Sensor --> gateway
 #echo "172;3;0;0;3;1.4.1" > $serialPort
 
 # Request I_TIME
-echo "172;255;3;0;1;0" > $serialPort # What time is it?
+#echo "172;255;3;0;1;0" > $serialPort # What time is it?
 
-echo "172;255;3;0;6;0" > $serialPort ############################### is metric?
+#echo "172;255;3;0;6;0" > $serialPort ############################### is metric?
 
 # Set Humidty status
 echo "172;0;1;0;1;87" > $serialPort
@@ -51,10 +51,10 @@ echo "172;1;1;0;0;27" > $serialPort
 echo "123;123;1;0;47;ipsumlorum" > $serialPort
 
 # Set V_IR_RECEIVE
-echo "111;111;1;0;33;FADEXXFE" > $serialPort
+#echo "111;111;1;0;33;FADEXXFE" > $serialPort
 
 # Set V_IR_SEND
-echo "111;112;1;0;32;ABCDEFGHIJKL" > $serialPort
+#echo "111;112;1;0;32;ABCDEFGHIJKL" > $serialPort
 
 #### Represent door
 #echo "172;4;0;0;0;1.4.1" > $serialPort
@@ -66,13 +66,13 @@ echo "111;112;1;0;32;ABCDEFGHIJKL" > $serialPort
 #echo "172;4;1;0;15;1" > $serialPort
 
 #### Represent motion
-#echo "172;5;0;0;1;1.4.1" > $serialPort
+echo "174;0;0;0;1;2.0.1" > $serialPort
 
 # Set Tripped status
-echo "172;5;1;0;16;1" > $serialPort
+echo "174;0;1;0;16;1" > $serialPort
 
 # Set Armed status
-echo "172;5;1;0;15;0" > $serialPort
+echo "174;0;1;0;15;0" > $serialPort
 
 #### Represent smoke
 #echo "172;6;0;0;2;1.4.1" > $serialPort
@@ -93,10 +93,10 @@ echo "172;7;1;0;3;49" > $serialPort
 #echo "172;8;0;0;5;1.4.1" > $serialPort
 
 # Set cover status UP(29) == 1, DOWN(30) == 1
-#echo "172;8;1;0;29;1" > $serialPort
+echo "172;8;1;0;29;1" > $serialPort
 
 # Set cover status
-#echo "172;8;1;0;30;1" > $serialPort
+echo "172;8;1;0;30;1" > $serialPort
 
 
 #### Represent wind
