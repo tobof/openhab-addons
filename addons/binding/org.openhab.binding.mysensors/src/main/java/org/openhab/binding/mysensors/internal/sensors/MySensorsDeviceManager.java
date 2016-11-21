@@ -1,5 +1,6 @@
 package org.openhab.binding.mysensors.internal.sensors;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -16,6 +17,7 @@ public class MySensorsDeviceManager {
     public static MySensorsDeviceManager instance = null;
 
     private MySensorsDeviceManager() {
+        nodeMap = new HashMap<>();
     }
 
     public static MySensorsDeviceManager getInstance() {
@@ -98,5 +100,17 @@ public class MySensorsDeviceManager {
         }
 
         return newId;
+    }
+
+    public void mergeNodeChilds(MySensorsNode node) {
+        if (node != null) {
+            MySensorsNode existingNode = getNode(node.getNodeId());
+            if (existingNode != null) {
+                existingNode.mergeChilds(node);
+            } else {
+                addNode(node);
+            }
+        }
+
     }
 }

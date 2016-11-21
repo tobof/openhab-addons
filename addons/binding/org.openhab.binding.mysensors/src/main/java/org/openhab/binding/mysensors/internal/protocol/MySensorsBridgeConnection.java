@@ -207,8 +207,9 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
         reader.startReader();
         writer.startWriter();
 
+        addEventListener(this);
+
         if (!skipStartupCheck) {
-            addEventListener(this);
             try {
                 int i = 0;
                 synchronized (this) {

@@ -418,35 +418,6 @@ public class MySensorsBindingConstants {
         }
     };
 
-    /*
-     * public final static Map<Pair<Integer>, String> CHANNEL_MAP_INTERNAL = new HashMap<Pair<Integer>, String>() {
-     *//**
-      *
-      */
-    /*
-     * private static final long serialVersionUID = 6273187523631143905L;
-     *
-     * {
-     * put(MYSENSORS_SUBTYPE_I_VERSION, CHANNEL_VERSION);
-     * put(MYSENSORS_SUBTYPE_I_BATTERY_LEVEL, CHANNEL_BATTERY);
-     * }
-     * };
-     *
-     * public final static Map<String, Class<? extends MySensorsType>> TYPE_MAP_INTERNAL = new HashMap<String, Class<?
-     * extends MySensorsType>>() {
-     *
-     *//**
-      *
-      *//*
-         * private static final long serialVersionUID = -4363396832873428778L;
-         *
-         * {
-         * put(CHANNEL_VERSION, StringType.class);
-         * put(CHANNEL_BATTERY, DecimalType.class);
-         * }
-         * };
-         */
-
     /** Supported Things without bridge */
     public final static Set<ThingTypeUID> SUPPORTED_THING_TYPES_UIDS = ImmutableSet.of(THING_TYPE_HUMIDITY,
             THING_TYPE_TEMPERATURE, THING_TYPE_LIGHT, THING_TYPE_MULTIMETER, THING_TYPE_POWER, THING_TYPE_BARO,

@@ -47,6 +47,7 @@ public class MySensorsHandlerFactory extends BaseThingHandlerFactory {
 
     @Override
     public boolean supportsThingType(ThingTypeUID thingTypeUID) {
+        logger.trace("Looking for support of: {}", thingTypeUID);
         return SUPPORTED_DEVICE_TYPES_UIDS.contains(thingTypeUID);
     }
 
@@ -61,20 +62,23 @@ public class MySensorsHandlerFactory extends BaseThingHandlerFactory {
     protected ThingHandler createHandler(Thing thing) {
         logger.trace("Creating handler for thing: {}", thing.getUID());
         ThingTypeUID thingTypeUID = thing.getThingTypeUID();
+        ThingHandler handler = null;
 
         if (SUPPORTED_THING_TYPES_UIDS.contains(thingTypeUID)) {
-            return new MySensorsThingHandler(thing);
+            handler = new MySensorsThingHandler(thing);
+            try {
+                deviceManager.mergeNodeChilds(MySensorsSensorsFactory.buildNodeFromThing(thing));
+            } catch (Throwable e) {
+                logger.error("Build node throw and exception, message: {}", e.getMessage());
+            }
+        } else if (thingTypeUID.equals(THING_TYPE_BRIDGE_SER) || thingTypeUID.equals(THING_TYPE_BRIDGE_ETH)) {
+            handler = new MySensorsBridgeHandler((Bridge) thing);
+            registerDeviceDiscoveryService((MySensorsBridgeHandler) handler);
+        } else {
+            logger.error("Thing {} cannot be configured, is this thing supported by the binding?", thingTypeUID);
         }
 
-        if (thingTypeUID.equals(THING_TYPE_BRIDGE_SER) || thingTypeUID.equals(THING_TYPE_BRIDGE_ETH)) {
-            MySensorsBridgeHandler handler = new MySensorsBridgeHandler((Bridge) thing);
-            registerDeviceDiscoveryService(handler);
-            return handler;
-        }
-
-        logger.error("Thing {} cannot be configured, is this thing supported by the binding?", thingTypeUID);
-
-        return null;
+        return handler;
     }
 
     /*

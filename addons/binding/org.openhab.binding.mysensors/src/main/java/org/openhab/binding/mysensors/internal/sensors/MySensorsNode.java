@@ -126,4 +126,10 @@ public class MySensorsNode {
         return "MySensorsNode [nodeId=" + nodeId + ", chidldList=" + chidldMap + "]";
     }
 
+    public void mergeChilds(MySensorsNode node) {
+        if (node != null) {
+
+        }
+    }
+
 }

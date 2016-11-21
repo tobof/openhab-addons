@@ -69,6 +69,12 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
         childId = Integer.parseInt(configuration.childId);
         requestAck = configuration.requestAck;
         revertState = configuration.revertState;
+
+        if (!getBridgeHandler().getBridgeConnection().isEventListenerRegisterd(this)) {
+            logger.debug("Event listener for node {}-{} not registered yet, registering...", nodeId, childId);
+            getBridgeHandler().getBridgeConnection().addEventListener(this);
+        }
+
         logger.debug("Configuration: node {}, chiledId: {}, revertState: {}", nodeId, childId, revertState);
         updateStatus(ThingStatus.OFFLINE);
     }
@@ -79,11 +85,6 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
                 getThing().getUID().toString());
         if (bridgeStatusInfo.getStatus().equals(ThingStatus.ONLINE)
                 || bridgeStatusInfo.getStatus().equals(ThingStatus.OFFLINE)) {
-            if (!getBridgeHandler().getBridgeConnection().isEventListenerRegisterd(this)) {
-                logger.debug("Event listener for node {}-{} not registered yet, registering...", nodeId, childId);
-                getBridgeHandler().getBridgeConnection().addEventListener(this);
-            }
-
             // the node has the same status of the bridge
             updateStatus(bridgeStatusInfo.getStatus());
         }

@@ -18,16 +18,12 @@ import org.openhab.binding.mysensors.internal.sensors.MySensorsVariable;
 import org.openhab.binding.mysensors.internal.sensors.type.MySensorsType;
 
 public class MySensorsSensorsFactory {
-    public static MySensorsNode buildNodeFromThing(Thing t, MySensorsNode node) throws Throwable {
+    public static MySensorsNode buildNodeFromThing(Thing t) throws Throwable {
         MySensorsNode ret = null;
         MySensorsSensorConfiguration conf = t.getConfiguration().as(MySensorsSensorConfiguration.class);
         MySensorsChild child = null;
 
-        if (node == null) {
-            ret = new MySensorsNode(Integer.parseInt(conf.nodeId));
-        } else {
-            ret = node;
-        }
+        ret = new MySensorsNode(Integer.parseInt(conf.nodeId));
 
         child = buildChildsFromThing(Integer.parseInt(conf.childId), t);
         if (child == null) {
