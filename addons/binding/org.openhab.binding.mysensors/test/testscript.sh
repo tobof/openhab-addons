@@ -57,13 +57,13 @@ echo "123;123;1;0;47;ipsumlorum" > $serialPort
 #echo "111;112;1;0;32;ABCDEFGHIJKL" > $serialPort
 
 #### Represent door
-#echo "172;4;0;0;0;1.4.1" > $serialPort
+echo "172;4;0;0;0;1.4.1" > $serialPort
 
 # Set Tripped status
-#echo "172;4;1;0;16;1" > $serialPort
+echo "172;4;1;0;16;1" > $serialPort
 
 # Set Armed status
-#echo "172;4;1;0;15;1" > $serialPort
+echo "172;4;1;0;15;1" > $serialPort
 
 #### Represent motion
 echo "174;0;0;0;1;2.0.1" > $serialPort
