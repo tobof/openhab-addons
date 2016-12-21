@@ -212,7 +212,7 @@ public class MieleBridgeHandler extends BaseBridgeHandler {
                                 for (HomeDevice phd : previousHomeDevices) {
                                     if (phd.UID.equals(hd.UID)) {
                                         isExisting = true;
-                                        continue;
+                                        break;
                                     }
                                 }
                                 if (!isExisting) {
@@ -228,7 +228,7 @@ public class MieleBridgeHandler extends BaseBridgeHandler {
                                 for (HomeDevice chd : currentHomeDevices) {
                                     if (chd.UID.equals(hd.UID)) {
                                         isCurrent = true;
-                                        continue;
+                                        break;
                                     }
                                 }
                                 if (!isCurrent) {
@@ -500,7 +500,6 @@ public class MieleBridgeHandler extends BaseBridgeHandler {
 
             out.write(data.getBytes());
             out.flush();
-            out.close();
 
             int statusCode = connection.getResponseCode();
             if (statusCode != HttpURLConnection.HTTP_OK) {
@@ -583,7 +582,7 @@ public class MieleBridgeHandler extends BaseBridgeHandler {
             throw new NullPointerException("It's not allowed to pass a null ApplianceStatusListener.");
         }
         boolean result = applianceStatusListeners.add(applianceStatusListener);
-        if (result && thingIsInitialized()) {
+        if (result && isInitialized()) {
             onUpdate();
 
             for (HomeDevice hd : getHomeDevices()) {
@@ -596,7 +595,7 @@ public class MieleBridgeHandler extends BaseBridgeHandler {
 
     public boolean unregisterApplianceStatusListener(ApplianceStatusListener applianceStatusListener) {
         boolean result = applianceStatusListeners.remove(applianceStatusListener);
-        if (result && thingIsInitialized()) {
+        if (result && isInitialized()) {
             onUpdate();
         }
         return result;
@@ -608,6 +607,15 @@ public class MieleBridgeHandler extends BaseBridgeHandler {
         if (command instanceof RefreshType) {
             // Placeholder for future refinement
             return;
+        }
+    }
+
+    @Override
+    public void dispose() {
+        super.dispose();
+        if (pollingJob != null) {
+            pollingJob.cancel(true);
+            pollingJob = null;
         }
     }
 }

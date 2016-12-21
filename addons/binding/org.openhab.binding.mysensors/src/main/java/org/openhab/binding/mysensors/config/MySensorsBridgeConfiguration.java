@@ -17,5 +17,4 @@ public class MySensorsBridgeConfiguration {
     public Boolean imperial;
     public Boolean skipStartupCheck;
     public Boolean enableNetworkSanCheck;
-
 }

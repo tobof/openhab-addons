@@ -146,7 +146,6 @@ echo "172;8;1;0;30;1" > $serialPort
 # Set LIGHT_LEVEL
 #echo "172;14;1;0;23;1543.98" > $serialPort
 
-
 # Set watt status
 #echo "172;7;1;0;17;0815" > $serialPort
 
@@ -170,7 +169,6 @@ echo "172;8;1;0;30;1" > $serialPort
 
 # Barometer pressure V_PRESSURE
 #echo "6;3;1;0;4;1.2" > $serialPort
-
 
 # Representation of S_MULTIMETER Sensor
 #echo "12;3;0;0;30;1.5.0" > $serialPort

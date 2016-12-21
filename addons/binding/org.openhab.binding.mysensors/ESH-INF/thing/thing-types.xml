@@ -896,7 +896,6 @@
 			</parameter>
 		</config-description>
 	</thing-type>
-	
 	<thing-type id="mysensorsMessage">
         <supported-bridge-type-refs>
             <bridge-type-ref id="bridge-ser" />
@@ -1024,7 +1023,6 @@
             </parameter>
         </config-description>
     </thing-type>
-
 
 	<!-- CHANNELS -->
 

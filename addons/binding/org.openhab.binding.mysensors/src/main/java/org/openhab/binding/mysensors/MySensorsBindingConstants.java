@@ -261,9 +261,7 @@ public class MySensorsBindingConstants {
     public final static String CHANNEL_POWER_FACTOR = "power-factor";
     public final static String CHANNEL_IR_SEND = "irSend";
     public final static String CHANNEL_IR_RECEIVE = "irReceive";
-
     public final static String CHANNEL_MYSENSORS_MESSAGE = "mySensorsMessage";
-
     public final static String CHANNEL_LAST_UPDATE = "lastupdate";
 
     // Wait time Arduino reset
