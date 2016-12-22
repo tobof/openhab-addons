@@ -17,13 +17,13 @@ echo "255;255;3;0;3" > $serialPort #Sensor --> gateway
 
 # Representation of a new (started) sensor
 #0;0;3;0;9;read: 172-172-0 s=255,c=0,t=18,pt=0,l=5:1.4.1
-echo "172;255;0;0;18;1.4.1" > $serialPort
+#echo "172;255;0;0;18;1.4.1" > $serialPort
 #0;0;3;0;9;read: 172-172-0 s=255,c=3,t=6,pt=1,l=1:0
-echo "172;255;3;0;6;0" > $serialPort ############################### is metric?
+
 #0;0;3;0;9;read: 172-172-0 s=255,c=3,t=11,pt=0,l=23:Humidity + Temp + 
-echo "172;255;3;0;11;Humidity + Temp + Relay" > $serialPort
+#echo "172;255;3;0;11;Humidity + Temp + Relay" > $serialPort
 #0;0;3;0;9;read: 172-172-0 s=255,c=3,t=12,pt=0,l=3:1.0
-echo "172;255;3;0;12;1.0" > $serialPort
+#echo "172;255;3;0;12;1.0" > $serialPort
 #0;0;3;0;9;read: 172-172-0 s=0,c=0,t=7,pt=0,l=5:1.4.1
 #echo "172;0;0;0;7;1.4.1" > $serialPort
 #0;0;3;0;9;read: 172-172-0 s=1,c=0,t=6,pt=0,l=5:1.4.1
@@ -33,30 +33,46 @@ echo "172;255;3;0;12;1.0" > $serialPort
 #0;0;3;0;9;read: 172-172-0 s=3,c=0,t=3,pt=0,l=5:1.4.1
 #echo "172;3;0;0;3;1.4.1" > $serialPort
 
+# Request I_TIME
+#echo "172;255;3;0;1;0" > $serialPort # What time is it?
+
+#echo "172;255;3;0;6;0" > $serialPort ############################### is metric?
+
 # Set Humidty status
 echo "172;0;1;0;1;87" > $serialPort
+
+# Set Humidty status
+echo "173;0;1;0;1;44" > $serialPort
 
 # Set Temperature status
 echo "172;1;1;0;0;27" > $serialPort
 
+# Set V_TEXT
+echo "123;123;1;0;47;ipsumlorum" > $serialPort
+
+# Set V_IR_RECEIVE
+#echo "111;111;1;0;33;FADEXXFE" > $serialPort
+
+# Set V_IR_SEND
+#echo "111;112;1;0;32;ABCDEFGHIJKL" > $serialPort
 
 #### Represent door
-#echo "172;4;0;0;0;1.4.1" > $serialPort
+echo "172;4;0;0;0;1.4.1" > $serialPort
 
 # Set Tripped status
-#echo "172;4;1;0;16;1" > $serialPort
+echo "172;4;1;0;16;1" > $serialPort
 
 # Set Armed status
-#echo "172;4;1;0;15;1" > $serialPort
+echo "172;4;1;0;15;1" > $serialPort
 
 #### Represent motion
-echo "172;5;0;0;1;1.4.1" > $serialPort
+echo "174;0;0;0;1;2.0.1" > $serialPort
 
 # Set Tripped status
-echo "172;5;1;0;16;1" > $serialPort
+echo "174;0;1;0;16;1" > $serialPort
 
 # Set Armed status
-echo "172;5;1;0;15;0" > $serialPort
+echo "174;0;1;0;15;0" > $serialPort
 
 #### Represent smoke
 #echo "172;6;0;0;2;1.4.1" > $serialPort
@@ -65,7 +81,7 @@ echo "172;5;1;0;15;0" > $serialPort
 #echo "172;6;1;0;16;1" > $serialPort
 
 #### Represent Dimmer
-echo "172;7;0;0;4;1.4.1" > $serialPort
+#echo "172;7;0;0;4;1.4.1" > $serialPort
 
 # Set dimmer status
 echo "172;7;1;0;3;49" > $serialPort
@@ -77,10 +93,10 @@ echo "172;7;1;0;3;49" > $serialPort
 #echo "172;8;0;0;5;1.4.1" > $serialPort
 
 # Set cover status UP(29) == 1, DOWN(30) == 1
-#echo "172;8;1;0;29;1" > $serialPort
+echo "172;8;1;0;29;1" > $serialPort
 
 # Set cover status
-#echo "172;8;1;0;30;1" > $serialPort
+echo "172;8;1;0;30;1" > $serialPort
 
 
 #### Represent wind
@@ -125,11 +141,10 @@ echo "172;7;1;0;3;49" > $serialPort
 #echo "172;13;1;0;13;1543.98" > $serialPort
 
 #### Represent LIGHT_LEVEL
-echo "172;14;0;0;16;1.4.1" > $serialPort
+#echo "172;14;0;0;16;1.4.1" > $serialPort
 
 # Set LIGHT_LEVEL
-echo "172;14;1;0;23;1543.98" > $serialPort
-
+#echo "172;14;1;0;23;1543.98" > $serialPort
 
 # Set watt status
 #echo "172;7;1;0;17;0815" > $serialPort
@@ -147,14 +162,13 @@ echo "172;14;1;0;23;1543.98" > $serialPort
 #echo "3;1;1;0;18;106.2550" > $serialPort # the overall power usage since sensor boot (KWH)
 
 # Representation of a S_BARO
-echo "6;3;0;0;8;1.4.1" > $serialPort
+#echo "6;3;0;0;8;1.4.1" > $serialPort
 
 # Barometer forecast V_BARO
-echo "6;3;1;0;5;stable" > $serialPort
+#echo "6;3;1;0;5;stable" > $serialPort
 
 # Barometer pressure V_PRESSURE
-echo "6;3;1;0;4;1.2" > $serialPort
-
+#echo "6;3;1;0;4;1.2" > $serialPort
 
 # Representation of S_MULTIMETER Sensor
 #echo "12;3;0;0;30;1.5.0" > $serialPort

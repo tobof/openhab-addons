@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.smarthome.core.thing.ThingTypeUID;
-import org.openhab.binding.mysensors.internal.MySensorsMessage;
+import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
@@ -61,6 +61,7 @@ public class MySensorsBindingConstants {
     public static final int MYSENSORS_SUBTYPE_S_DISTANCE = 15;
     public static final int MYSENSORS_SUBTYPE_S_LIGHT_LEVEL = 16;
     public static final int MYSENSORS_SUBTYPE_S_LOCK = 19;
+    public static final int MYSENSORS_SUBTYPE_S_IR = 20;
     public static final int MYSENSORS_SUBTYPE_S_WATER = 21;
     public static final int MYSENSORS_SUBTYPE_S_CUSTOM = 23;
     public static final int MYSENSORS_SUBTYPE_S_RGB_LIGHT = 26;
@@ -197,6 +198,10 @@ public class MySensorsBindingConstants {
     public final static ThingTypeUID THING_TYPE_RGB_LIGHT = new ThingTypeUID(BINDING_ID, "rgbLight");
     public final static ThingTypeUID THING_TYPE_RGBW_LIGHT = new ThingTypeUID(BINDING_ID, "rgbwLight");
     public final static ThingTypeUID THING_TYPE_WATER_QUALITY = new ThingTypeUID(BINDING_ID, "waterQuality");
+    public final static ThingTypeUID THING_TYPE_MYSENSORS_MESSAGE = new ThingTypeUID(BINDING_ID, "mySensorsMessage");
+    public final static ThingTypeUID THING_TYPE_TEXT = new ThingTypeUID(BINDING_ID, "text");
+    public final static ThingTypeUID THING_TYPE_IR_SEND = new ThingTypeUID(BINDING_ID, "irSend");
+    public final static ThingTypeUID THING_TYPE_IR_RECEIVE = new ThingTypeUID(BINDING_ID, "irReceive");
 
     public final static ThingTypeUID THING_TYPE_BRIDGE_SER = new ThingTypeUID(BINDING_ID, "bridge-ser");
     public final static ThingTypeUID THING_TYPE_BRIDGE_ETH = new ThingTypeUID(BINDING_ID, "bridge-eth");
@@ -254,7 +259,9 @@ public class MySensorsBindingConstants {
     public final static String CHANNEL_VAR = "var";
     public final static String CHANNEL_VA = "va";
     public final static String CHANNEL_POWER_FACTOR = "power-factor";
-
+    public final static String CHANNEL_IR_SEND = "irSend";
+    public final static String CHANNEL_IR_RECEIVE = "irReceive";
+    public final static String CHANNEL_MYSENSORS_MESSAGE = "mySensorsMessage";
     public final static String CHANNEL_LAST_UPDATE = "lastupdate";
 
     // Wait time Arduino reset
@@ -322,7 +329,9 @@ public class MySensorsBindingConstants {
             put(MYSENSORS_SUBTYPE_V_VAR, CHANNEL_VAR);
             put(MYSENSORS_SUBTYPE_V_VA, CHANNEL_VA);
             put(MYSENSORS_SUBTYPE_V_POWER_FACTOR, CHANNEL_POWER_FACTOR);
-
+            put(MYSENSORS_SUBTYPE_V_TEXT, CHANNEL_TEXT);
+            put(MYSENSORS_SUBTYPE_V_IR_SEND, CHANNEL_IR_SEND);
+            put(MYSENSORS_SUBTYPE_V_IR_RECEIVE, CHANNEL_IR_RECEIVE);
         }
     };
 
@@ -344,7 +353,8 @@ public class MySensorsBindingConstants {
             THING_TYPE_DOOR, THING_TYPE_MOTION, THING_TYPE_SMOKE, THING_TYPE_DIMMER, THING_TYPE_COVER, THING_TYPE_WIND,
             THING_TYPE_RAIN, THING_TYPE_UV, THING_TYPE_WEIGHT, THING_TYPE_DISTANCE, THING_TYPE_LIGHT_LEVEL,
             THING_TYPE_HVAC, THING_TYPE_WATER, THING_TYPE_CUSTOM, THING_TYPE_LOCK, THING_TYPE_SOUND,
-            THING_TYPE_RGB_LIGHT, THING_TYPE_RGBW_LIGHT, THING_TYPE_WATER_QUALITY);
+            THING_TYPE_RGB_LIGHT, THING_TYPE_RGBW_LIGHT, THING_TYPE_WATER_QUALITY, THING_TYPE_MYSENSORS_MESSAGE,
+            THING_TYPE_TEXT, THING_TYPE_IR_SEND, THING_TYPE_IR_RECEIVE);
     /** Supported bridges */
     public final static Set<ThingTypeUID> SUPPORTED_BRIDGE_THING_TYPES_UIDS = ImmutableSet.of(THING_TYPE_BRIDGE_SER,
             THING_TYPE_BRIDGE_ETH);
@@ -355,6 +365,6 @@ public class MySensorsBindingConstants {
             THING_TYPE_DOOR, THING_TYPE_MOTION, THING_TYPE_SMOKE, THING_TYPE_DIMMER, THING_TYPE_COVER, THING_TYPE_WIND,
             THING_TYPE_RAIN, THING_TYPE_UV, THING_TYPE_WEIGHT, THING_TYPE_DISTANCE, THING_TYPE_LIGHT_LEVEL,
             THING_TYPE_HVAC, THING_TYPE_WATER, THING_TYPE_CUSTOM, THING_TYPE_LOCK, THING_TYPE_SOUND,
-            THING_TYPE_RGB_LIGHT, THING_TYPE_RGBW_LIGHT, THING_TYPE_WATER_QUALITY, THING_TYPE_BRIDGE_SER,
-            THING_TYPE_BRIDGE_ETH);
+            THING_TYPE_RGB_LIGHT, THING_TYPE_RGBW_LIGHT, THING_TYPE_WATER_QUALITY, THING_TYPE_MYSENSORS_MESSAGE,
+            THING_TYPE_TEXT, THING_TYPE_IR_SEND, THING_TYPE_IR_RECEIVE, THING_TYPE_BRIDGE_SER, THING_TYPE_BRIDGE_ETH);
 }
