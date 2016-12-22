@@ -16,5 +16,5 @@ public class MySensorsBridgeConfiguration {
     public Integer baudRate;
     public Boolean imperial;
     public Boolean skipStartupCheck;
-
+    public Boolean enableNetworkSanCheck;
 }

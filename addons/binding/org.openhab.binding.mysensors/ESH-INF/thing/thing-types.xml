@@ -11,13 +11,11 @@
 		</description>
 		<config-description>
 			<parameter name="serialPort" type="text" required="true">
-				<context>serial-port</context>
 				<label>Serial Port</label>
 				<description>The serial port the MySensors Gateway is connected to
 				</description>
 			</parameter>
 			<parameter name="sendDelay" type="integer" required="false" min="1" max="1000">
-				<context>senddelay</context>
 				<label>Send Delay</label>
 				<description>The delay between messages send to the gateway 
 				</description>
@@ -30,17 +28,20 @@
 				<default>115200</default>
 			</parameter>
 			<parameter name="skipStartupCheck" type="boolean" required="false">
-				<context>skipstartupchek</context>
 				<label>Skip startup connection check</label>
 				<description>Allow the user to bypass the I_VERSION check on startup</description>
 				<default>false</default>
 			</parameter>
 			<parameter name="imperial" type="boolean" required="false">
-				<context>imperialconfig</context>
 				<label>Imperial/Metric selection</label>
 				<description>Metric answer with imperial instead of metric</description>
 				<default>false</default>
 			</parameter>
+			<parameter name="enableNetworkSanCheck" type="boolean" required="false">
+                <label>Disable network sanity check</label>
+                <description>Network sanity check periodically unsure that gateway is up and running</description>
+                <default>false</default>
+            </parameter>
 		</config-description>
 
 	</bridge-type>
@@ -51,37 +52,37 @@
 		</description>
 		<config-description>
 			<parameter name="ipAddress" type="text" required="true">
-				<context>ipAddress</context>
 				<label>IP Address</label>
 				<description>The IP Address the MySensors Gateway uses
 				</description>
 			</parameter>
 			<parameter name="tcpPort" type="integer" required="true" min="1" max="65535">
-				<context>tcpport</context>
 				<label>TCP Port</label>
 				<description>The TCP Port the MySensors Gateway uses (usually 5003)
 				</description>
 				<default>5003</default>
 			</parameter>
 			<parameter name="sendDelay" type="integer" required="false" min="1" max="1000">
-				<context>senddelay</context>
 				<label>Send Delay</label>
 				<description>The delay between messages send to the gateway 
 				</description>
 				<default>100</default>
 			</parameter>
 			<parameter name="skipStartupCheck" type="boolean" required="false">
-				<context>skipstartupchek</context>
 				<label>Skip startup connection check</label>
 				<description>Allow the user to bypass the I_VERSION check on startup</description>
 				<default>false</default>
 			</parameter>
 			<parameter name="imperial" type="boolean" required="false">
-				<context>imperialconfig</context>
 				<label>Imperial/Metric selection</label>
 				<description>Metric answer with imperial instead of metric</description>
 				<default>false</default>
 			</parameter>
+			<parameter name="enableNetworkSanCheck" type="boolean" required="false">
+                <label>Disable network sanity check</label>
+                <description>Network sanity check periodically unsure that gateway is up and running</description>
+                <default>false</default>
+            </parameter>
 		</config-description>
 
 	</bridge-type>
@@ -895,7 +896,133 @@
 			</parameter>
 		</config-description>
 	</thing-type>
+	<thing-type id="mysensorsMessage">
+        <supported-bridge-type-refs>
+            <bridge-type-ref id="bridge-ser" />
+            <bridge-type-ref id="bridge-eth" />
+        </supported-bridge-type-refs>
 
+        <label>MySensors Message</label>
+        <description>Shows the complete MySensors Message</description>
+
+        <channels>
+            <channel id="mySensorsMessage" typeId="mySensorsMessage-channel" />
+            <channel id="lastupdate" typeId="lastupdate-channel"/>
+        </channels>
+
+        <config-description>
+            <parameter name="nodeId" type="text" required="true">
+                <context>NodeId</context>
+                <label>NodeId</label>
+                <description>The ID of the node in the MySensors network
+                </description>
+                <default>999</default>
+            </parameter>
+            <parameter name="childId" type="text" required="true">
+                <context>ChildId</context>
+                <label>ChildId</label>
+                <description>The ID of the child of a node in the MySensors network
+                </description>
+                <default>999</default>
+            </parameter>
+        </config-description>
+    </thing-type>
+    
+    <thing-type id="text">
+        <supported-bridge-type-refs>
+            <bridge-type-ref id="bridge-ser" />
+            <bridge-type-ref id="bridge-eth" />
+        </supported-bridge-type-refs>
+
+        <label>Text</label>
+        <description>V_TEXT</description>
+
+        <channels>
+            <channel id="text" typeId="text-channel" />
+            <channel id="lastupdate" typeId="lastupdate-channel"/>
+        </channels>
+
+        <config-description>
+            <parameter name="nodeId" type="text" required="true">
+                <context>NodeId</context>
+                <label>NodeId</label>
+                <description>The ID of the node in the MySensors network
+                </description>
+                <default>999</default>
+            </parameter>
+            <parameter name="childId" type="text" required="true">
+                <context>ChildId</context>
+                <label>ChildId</label>
+                <description>The ID of the child of a node in the MySensors network
+                </description>
+                <default>999</default>
+            </parameter>
+        </config-description>
+    </thing-type>
+    
+    <thing-type id="irSend">
+        <supported-bridge-type-refs>
+            <bridge-type-ref id="bridge-ser" />
+            <bridge-type-ref id="bridge-eth" />
+        </supported-bridge-type-refs>
+
+        <label>IR Send</label>
+        <description>Send IR codes</description>
+
+        <channels>
+            <channel id="irSend" typeId="irSend-channel" />
+            <channel id="lastupdate" typeId="lastupdate-channel"/>
+        </channels>
+
+        <config-description>
+            <parameter name="nodeId" type="text" required="true">
+                <context>NodeId</context>
+                <label>NodeId</label>
+                <description>The ID of the node in the MySensors network
+                </description>
+                <default>999</default>
+            </parameter>
+            <parameter name="childId" type="text" required="true">
+                <context>ChildId</context>
+                <label>ChildId</label>
+                <description>The ID of the child of a node in the MySensors network
+                </description>
+                <default>999</default>
+            </parameter>
+        </config-description>
+    </thing-type>
+    
+    <thing-type id="irReceive">
+        <supported-bridge-type-refs>
+            <bridge-type-ref id="bridge-ser" />
+            <bridge-type-ref id="bridge-eth" />
+        </supported-bridge-type-refs>
+
+        <label>IR Receive</label>
+        <description>Receive IR codes</description>
+
+        <channels>
+            <channel id="irReceive" typeId="irReceive-channel" />
+            <channel id="lastupdate" typeId="lastupdate-channel"/>
+        </channels>
+
+        <config-description>
+            <parameter name="nodeId" type="text" required="true">
+                <context>NodeId</context>
+                <label>NodeId</label>
+                <description>The ID of the node in the MySensors network
+                </description>
+                <default>999</default>
+            </parameter>
+            <parameter name="childId" type="text" required="true">
+                <context>ChildId</context>
+                <label>ChildId</label>
+                <description>The ID of the child of a node in the MySensors network
+                </description>
+                <default>999</default>
+            </parameter>
+        </config-description>
+    </thing-type>
 
 	<!-- CHANNELS -->
 
@@ -1153,4 +1280,28 @@
 		<description>MySensors Water Electric Condictivity Channel</description>
 		<state readOnly="false"></state>
 	</channel-type>
+	<channel-type id="mysensorsMessage-channel">
+        <item-type>String</item-type>
+        <label>MySensors Message</label>
+        <description>MySensors Message Channel</description>
+        <state readOnly="false"></state>
+    </channel-type>
+    <channel-type id="text-channel">
+        <item-type>String</item-type>
+        <label>Text</label>
+        <description>MySensors Text Channel</description>
+        <category>Variable</category>
+    </channel-type>
+    <channel-type id="irSend-channel">
+        <item-type>String</item-type>
+        <label>Text</label>
+        <description>MySensors IR Send Channel</description>
+        <category>Variable</category>
+    </channel-type>
+    <channel-type id="irReceive-channel">
+        <item-type>String</item-type>
+        <label>Text</label>
+        <description>MySensors IR Receive Channel</description>
+        <category>Variable</category>
+    </channel-type>
 </thing:thing-descriptions>

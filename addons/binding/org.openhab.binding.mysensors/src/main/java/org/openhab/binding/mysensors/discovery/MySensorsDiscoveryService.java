@@ -16,9 +16,8 @@ import org.eclipse.smarthome.config.discovery.AbstractDiscoveryService;
 import org.eclipse.smarthome.config.discovery.DiscoveryResult;
 import org.eclipse.smarthome.config.discovery.DiscoveryResultBuilder;
 import org.eclipse.smarthome.core.thing.ThingUID;
-import org.openhab.binding.mysensors.handler.MySensorsBridgeHandler;
-import org.openhab.binding.mysensors.internal.MySensorsMessage;
-import org.openhab.binding.mysensors.service.DiscoveryThread;
+import org.openhab.binding.mysensors.internal.handler.MySensorsBridgeHandler;
+import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -169,17 +168,21 @@ public class MySensorsDiscoveryService extends AbstractDiscoveryService {
                     uid = new ThingUID(THING_TYPE_SOUND, bridgeHandler.getThing().getUID(),
                             "Sound_level_" + msg.getNodeId() + "_" + msg.getChildId());
                     break;
-                case MYSENSORS_SUBTYPE_S_RGB_LIGHT :
-                    uid = new ThingUID(THING_TYPE_RGB_LIGHT , bridgeHandler.getThing().getUID(),
+                case MYSENSORS_SUBTYPE_S_RGB_LIGHT:
+                    uid = new ThingUID(THING_TYPE_RGB_LIGHT, bridgeHandler.getThing().getUID(),
                             "RGB_light" + msg.getNodeId() + "_" + msg.getChildId());
                     break;
-                case MYSENSORS_SUBTYPE_S_RGBW_LIGHT :
-                    uid = new ThingUID(THING_TYPE_RGBW_LIGHT , bridgeHandler.getThing().getUID(),
+                case MYSENSORS_SUBTYPE_S_RGBW_LIGHT:
+                    uid = new ThingUID(THING_TYPE_RGBW_LIGHT, bridgeHandler.getThing().getUID(),
                             "RGBW_light" + msg.getNodeId() + "_" + msg.getChildId());
                     break;
-                case MYSENSORS_SUBTYPE_S_WATER_QUALITY :
-                    uid = new ThingUID(THING_TYPE_WATER_QUALITY , bridgeHandler.getThing().getUID(),
+                case MYSENSORS_SUBTYPE_S_WATER_QUALITY:
+                    uid = new ThingUID(THING_TYPE_WATER_QUALITY, bridgeHandler.getThing().getUID(),
                             "Water_quality" + msg.getNodeId() + "_" + msg.getChildId());
+                    break;
+                case MYSENSORS_SUBTYPE_S_INFO:
+                    uid = new ThingUID(THING_TYPE_TEXT, bridgeHandler.getThing().getUID(),
+                            "Text" + msg.getNodeId() + "_" + msg.getChildId());
                     break;
             }
             if (uid != null) {
