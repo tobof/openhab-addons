@@ -11,13 +11,11 @@
 		</description>
 		<config-description>
 			<parameter name="serialPort" type="text" required="true">
-				<context>serial-port</context>
 				<label>Serial Port</label>
 				<description>The serial port the MySensors Gateway is connected to
 				</description>
 			</parameter>
 			<parameter name="sendDelay" type="integer" required="false" min="1" max="1000">
-				<context>senddelay</context>
 				<label>Send Delay</label>
 				<description>The delay between messages send to the gateway 
 				</description>
@@ -30,19 +28,16 @@
 				<default>115200</default>
 			</parameter>
 			<parameter name="skipStartupCheck" type="boolean" required="false">
-				<context>skipstartupchek</context>
 				<label>Skip startup connection check</label>
 				<description>Allow the user to bypass the I_VERSION check on startup</description>
 				<default>false</default>
 			</parameter>
 			<parameter name="imperial" type="boolean" required="false">
-				<context>imperialconfig</context>
 				<label>Imperial/Metric selection</label>
 				<description>Metric answer with imperial instead of metric</description>
 				<default>false</default>
 			</parameter>
 			<parameter name="enableNetworkSanCheck" type="boolean" required="false">
-                <context>enablenetworksancheck</context>
                 <label>Disable network sanity check</label>
                 <description>Network sanity check periodically unsure that gateway is up and running</description>
                 <default>false</default>
@@ -57,39 +52,33 @@
 		</description>
 		<config-description>
 			<parameter name="ipAddress" type="text" required="true">
-				<context>ipAddress</context>
 				<label>IP Address</label>
 				<description>The IP Address the MySensors Gateway uses
 				</description>
 			</parameter>
 			<parameter name="tcpPort" type="integer" required="true" min="1" max="65535">
-				<context>tcpport</context>
 				<label>TCP Port</label>
 				<description>The TCP Port the MySensors Gateway uses (usually 5003)
 				</description>
 				<default>5003</default>
 			</parameter>
 			<parameter name="sendDelay" type="integer" required="false" min="1" max="1000">
-				<context>senddelay</context>
 				<label>Send Delay</label>
 				<description>The delay between messages send to the gateway 
 				</description>
 				<default>100</default>
 			</parameter>
 			<parameter name="skipStartupCheck" type="boolean" required="false">
-				<context>skipstartupchek</context>
 				<label>Skip startup connection check</label>
 				<description>Allow the user to bypass the I_VERSION check on startup</description>
 				<default>false</default>
 			</parameter>
 			<parameter name="imperial" type="boolean" required="false">
-				<context>imperialconfig</context>
 				<label>Imperial/Metric selection</label>
 				<description>Metric answer with imperial instead of metric</description>
 				<default>false</default>
 			</parameter>
 			<parameter name="enableNetworkSanCheck" type="boolean" required="false">
-                <context>enablenetworksancheck</context>
                 <label>Disable network sanity check</label>
                 <description>Network sanity check periodically unsure that gateway is up and running</description>
                 <default>false</default>
@@ -907,7 +896,6 @@
 			</parameter>
 		</config-description>
 	</thing-type>
-	
 	<thing-type id="mysensorsMessage">
         <supported-bridge-type-refs>
             <bridge-type-ref id="bridge-ser" />
@@ -1035,7 +1023,6 @@
             </parameter>
         </config-description>
     </thing-type>
-
 
 	<!-- CHANNELS -->
 
