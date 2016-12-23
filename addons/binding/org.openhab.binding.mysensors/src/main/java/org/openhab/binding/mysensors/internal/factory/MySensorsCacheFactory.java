@@ -105,4 +105,18 @@ public class MySensorsCacheFactory {
             }
         }
     }
+
+    public void deleteCache(String cacheId) {
+        File f = new File(CACHE_BASE_PATH + "/" + cacheId + CACHE_FILE_SUFFIX);
+        if (f.exists()) {
+            if (f.delete()) {
+                logger.debug("Cache {} file deleted", cacheId);
+            } else {
+                logger.error("Cannot delete cache {}", cacheId);
+            }
+        } else {
+            logger.warn("Cache {} not exist", cacheId);
+        }
+
+    }
 }

@@ -122,7 +122,7 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
             }
         } else {
             MySensorsVariable var = deviceManager.getVariable(nodeId, childId,
-                    invertMap(CHANNEL_MAP).get(channelUID.getId()));
+                    invertMap(CHANNEL_MAP, true).get(channelUID.getId()));
             if (var != null) {
 
                 // Update value into the MS device

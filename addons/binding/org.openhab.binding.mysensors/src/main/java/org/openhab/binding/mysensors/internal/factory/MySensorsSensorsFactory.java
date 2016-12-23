@@ -52,7 +52,7 @@ public class MySensorsSensorsFactory {
 
         for (Channel c : channels) {
             ChannelTypeUID channel = c.getChannelTypeUID();
-            Pair<Integer> variableNum = invertMap(CHANNEL_MAP).get(channel);
+            Pair<Integer> variableNum = invertMap(CHANNEL_MAP, true).get(channel);
             Class<? extends MySensorsType> cls = TYPE_MAP.get(channel);
             MySensorsVariable var = getVariable(variableNum, cls.newInstance());
 

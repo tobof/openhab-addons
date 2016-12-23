@@ -59,7 +59,19 @@ public class MySensorsDeviceManager {
 
     public void addNode(MySensorsNode node) {
         synchronized (nodeMap) {
+            if (nodeMap.containsKey(node.getNodeId())) {
+                logger.warn("Overwriting previous node, it was lost.");
+            }
             nodeMap.put(node.getNodeId(), node);
+        }
+    }
+
+    public void addNode(MySensorsNode node, boolean mergeIfExist) {
+        MySensorsNode exist = null;
+        if (mergeIfExist && ((exist = getNode(node.getNodeId())) != null)) {
+            exist.mergeNodeChilds(node);
+        } else {
+            addNode(node);
         }
     }
 
@@ -100,17 +112,5 @@ public class MySensorsDeviceManager {
         }
 
         return newId;
-    }
-
-    public void mergeNodeChilds(MySensorsNode node) {
-        if (node != null) {
-            MySensorsNode existingNode = getNode(node.getNodeId());
-            if (existingNode != null) {
-                existingNode.mergeChilds(node);
-            } else {
-                addNode(node);
-            }
-        }
-
     }
 }

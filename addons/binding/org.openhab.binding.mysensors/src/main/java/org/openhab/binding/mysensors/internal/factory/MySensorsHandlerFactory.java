@@ -66,11 +66,7 @@ public class MySensorsHandlerFactory extends BaseThingHandlerFactory {
 
         if (SUPPORTED_THING_TYPES_UIDS.contains(thingTypeUID)) {
             handler = new MySensorsThingHandler(thing);
-            try {
-                deviceManager.mergeNodeChilds(MySensorsSensorsFactory.buildNodeFromThing(thing));
-            } catch (Throwable e) {
-                logger.error("Build node throw and exception, message: {}", e.getMessage());
-            }
+            addIntoDeviceManager(thing);
         } else if (thingTypeUID.equals(THING_TYPE_BRIDGE_SER) || thingTypeUID.equals(THING_TYPE_BRIDGE_ETH)) {
             handler = new MySensorsBridgeHandler((Bridge) thing);
             registerDeviceDiscoveryService((MySensorsBridgeHandler) handler);
@@ -79,6 +75,14 @@ public class MySensorsHandlerFactory extends BaseThingHandlerFactory {
         }
 
         return handler;
+    }
+
+    private void addIntoDeviceManager(Thing thing) {
+        try {
+            deviceManager.addNode((MySensorsSensorsFactory.buildNodeFromThing(thing)), true);
+        } catch (Throwable e) {
+            logger.error("Build node throw and exception({}), message: {}", e.getClass(), e.getMessage());
+        }
     }
 
     /*

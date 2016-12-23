@@ -7,6 +7,8 @@
  */
 package org.openhab.binding.mysensors.internal.sensors;
 
+import static org.openhab.binding.mysensors.internal.MySensorsUtility.mergeMap;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -57,6 +59,18 @@ public class MySensorsNode {
 
     public Date getLastUpdate() {
         return lastUpdate;
+    }
+
+    public void mergeNodeChilds(MySensorsNode node) {
+        HashMap<Integer, MySensorsChild> toBeMerged = null;
+
+        synchronized (node.chidldMap) {
+            toBeMerged = new HashMap<>(node.chidldMap);
+        }
+
+        synchronized (chidldMap) {
+            mergeMap(chidldMap, toBeMerged);
+        }
     }
 
     public static boolean isValidNodeId(int id) {
@@ -124,12 +138,6 @@ public class MySensorsNode {
     @Override
     public String toString() {
         return "MySensorsNode [nodeId=" + nodeId + ", chidldList=" + chidldMap + "]";
-    }
-
-    public void mergeChilds(MySensorsNode node) {
-        if (node != null) {
-
-        }
     }
 
 }

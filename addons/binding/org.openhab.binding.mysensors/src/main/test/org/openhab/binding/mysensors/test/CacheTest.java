@@ -2,12 +2,21 @@ package org.openhab.binding.mysensors.test;
 
 import java.util.ArrayList;
 
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openhab.binding.mysensors.internal.factory.MySensorsCacheFactory;
 
 import com.google.gson.reflect.TypeToken;
 
 public class CacheTest {
+
+    private MySensorsCacheFactory c = null;
+
+    @BeforeClass
+    public void init() {
+        c = MySensorsCacheFactory.getCacheFactory();
+    }
 
     @Test
     public void writeGivenIdsCache() {
@@ -22,10 +31,15 @@ public class CacheTest {
 
     @Test
     public void readGivenIdsCache() {
-        MySensorsCacheFactory c = MySensorsCacheFactory.getCacheFactory();
+        c = MySensorsCacheFactory.getCacheFactory();
         System.out.println(c.readCache(MySensorsCacheFactory.GIVEN_IDS_CACHE_FILE, new ArrayList<Integer>(),
                 new TypeToken<ArrayList<Integer>>() {
                 }.getType()));
+    }
+
+    @AfterClass
+    public void deleteCache() {
+        c.deleteCache(MySensorsCacheFactory.GIVEN_IDS_CACHE_FILE);
     }
 
 }
