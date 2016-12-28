@@ -9,6 +9,12 @@ package org.openhab.binding.mysensors.internal.sensors;
 
 import java.util.Date;
 
+/**
+ * Every thing/node may have one ore more childs in the MySensors context.
+ *
+ * @author Andrea Cioni
+ *
+ */
 public class MySensorsChild<T> {
 
     private Integer childId = 0;

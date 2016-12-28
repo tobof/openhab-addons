@@ -10,9 +10,10 @@ package org.openhab.binding.mysensors.internal.event;
 import java.util.EventListener;
 
 /**
+ * Handler that implement this interface receive update events from the MySensors network.
+ *
  * @author Tim Oberföll
  *
- *         Handler that implement this interface receive update events from the MySensors network
  */
 public interface MySensorsUpdateListener extends EventListener {
     /**

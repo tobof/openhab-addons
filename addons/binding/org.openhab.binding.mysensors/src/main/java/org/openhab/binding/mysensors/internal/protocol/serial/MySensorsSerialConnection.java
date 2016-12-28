@@ -23,9 +23,11 @@ import gnu.io.CommPortIdentifier;
 import gnu.io.NRSerialPort;
 
 /**
- * @author Tim Oberföll
+ * Connection to the serial interface where the MySensors Gateway is connected.
  *
- *         Connection to the serial interface where the MySensors Gateway is conncted
+ * @author Tim Oberföll
+ * @author Andrea Cioni
+ *
  */
 public class MySensorsSerialConnection extends MySensorsBridgeConnection {
 

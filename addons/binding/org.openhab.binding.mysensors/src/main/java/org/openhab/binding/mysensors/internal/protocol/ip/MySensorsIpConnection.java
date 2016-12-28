@@ -16,6 +16,13 @@ import org.openhab.binding.mysensors.internal.protocol.MySensorsBridgeConnection
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Implements the TCP/IP connection to the ethernet gateway of the MySensors network.
+ *
+ * @author Andrea Cioni
+ * @author Tim Oberföll
+ *
+ */
 public class MySensorsIpConnection extends MySensorsBridgeConnection {
 
     private Logger logger = LoggerFactory.getLogger(MySensorsIpConnection.class);

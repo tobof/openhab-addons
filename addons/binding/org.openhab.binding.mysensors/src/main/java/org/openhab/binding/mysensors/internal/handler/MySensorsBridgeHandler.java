@@ -37,10 +37,11 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.reflect.TypeToken;
 
 /**
+ * MySensorsBridgeHandler is used to initialize a new bridge (in MySensors: Gateway)
+ * The sensors are connected via the gateway/bridge to the controller
+ *
  * @author Tim Oberföll
  *
- *         MySensorsBridgeHandler is used to initialize a new bridge (in MySensors: Gateway)
- *         The sensors are connected via the gateway/bridge to the controller
  */
 public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySensorsUpdateListener {
 

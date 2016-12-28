@@ -20,6 +20,12 @@ import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Regulary checks the status of the link to the gateway to the MySensors network.
+ *
+ * @author Andrea Cioni
+ *
+ */
 public class MySensorsNetworkSanityChecker implements MySensorsUpdateListener, Runnable {
 
     private Logger logger = LoggerFactory.getLogger(getClass());

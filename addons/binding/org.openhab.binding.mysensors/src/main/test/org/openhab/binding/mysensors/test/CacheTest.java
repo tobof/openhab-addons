@@ -7,6 +7,12 @@ import org.openhab.binding.mysensors.internal.factory.MySensorsCacheFactory;
 
 import com.google.gson.reflect.TypeToken;
 
+/**
+ * Test cases for the MySensorsCacheFactory (ID cache).
+ *
+ * @author Andrea Cioni
+ *
+ */
 public class CacheTest {
 
     @Test

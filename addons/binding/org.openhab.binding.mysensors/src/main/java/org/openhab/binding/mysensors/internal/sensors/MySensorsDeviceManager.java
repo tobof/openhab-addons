@@ -1,3 +1,10 @@
+/**
+ * Copyright (c) 2014-2016 openHAB UG (haftungsbeschraenkt) and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ */
 package org.openhab.binding.mysensors.internal.sensors;
 
 import java.util.HashMap;
@@ -15,6 +22,12 @@ import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * ID handling for the MySensors network: Requests for IDs get answered and IDs get stored in a local cache.
+ *
+ * @author Andrea Cioni
+ *
+ */
 public class MySensorsDeviceManager implements MySensorsUpdateListener {
     private Logger logger = LoggerFactory.getLogger(getClass());
 

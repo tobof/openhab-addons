@@ -13,9 +13,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Used to store the content of a MySensors message.
+ *
  * @author Tim Oberföll
  *
- *         Used to store the content of a MySensors message
  */
 public class MySensorsMessage {
     public static String GATEWAY_STARTUP_NOTIFICATION = "Gateway startup complete.";

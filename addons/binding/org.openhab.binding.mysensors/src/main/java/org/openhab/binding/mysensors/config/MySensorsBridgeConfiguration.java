@@ -7,14 +7,19 @@
  */
 package org.openhab.binding.mysensors.config;
 
+/**
+ * Parameters used for bridge configuration.
+ *
+ * @author Tim Oberföll
+ *
+ */
 public class MySensorsBridgeConfiguration {
-    /** The serial port or ip/port the gateway is attached to */
-    public String serialPort;
-    public String ipAddress;
-    public Integer tcpPort;
-    public Integer sendDelay;
-    public Integer baudRate;
-    public Boolean imperial;
-    public Boolean skipStartupCheck;
-    public Boolean enableNetworkSanCheck;
+    public String serialPort; // serial port the gateway is attached to
+    public String ipAddress; // ip address the gateway is attached to
+    public Integer tcpPort; // tcp port the gateway is running at
+    public Integer sendDelay; // delay at which messages are send from the internal queue to the MySensors network
+    public Integer baudRate; // baud rate used to connect the serial port
+    public Boolean imperial; // should nodes send imperial or metric values?
+    public Boolean skipStartupCheck; // should the startup check of the bridge at boot skipped?
+    public Boolean enableNetworkSanCheck; // network sanity check enabled?
 }

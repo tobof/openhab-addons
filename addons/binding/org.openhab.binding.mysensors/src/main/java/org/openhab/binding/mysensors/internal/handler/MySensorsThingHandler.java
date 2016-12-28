@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * The {@link MySensorsThingHandler} is responsible for handling commands, which are
- * sent to one of the channels.
+ * sent to one of the channels and messages received via the MySensors network.
  *
  * @author Tim Oberföll
  */

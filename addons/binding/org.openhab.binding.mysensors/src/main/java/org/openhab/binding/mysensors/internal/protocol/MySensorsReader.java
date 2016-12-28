@@ -22,6 +22,13 @@ import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageP
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Implements the reader (IP & serial) that receives the messages from the MySensors network.
+ *
+ * @author Andrea Cioni
+ * @author Tim Oberföll
+ * 
+ */
 public class MySensorsReader implements MySensorsUpdateListener, Runnable {
 
     protected Logger logger = LoggerFactory.getLogger(MySensorsReader.class);

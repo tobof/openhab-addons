@@ -29,6 +29,13 @@ import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Connection of the bridge (via TCP/IP or serial) to the MySensors network.
+ *
+ * @author Tim Oberföll
+ * @author Andrea Cioni
+ *
+ */
 public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUpdateListener {
 
     private Logger logger = LoggerFactory.getLogger(getClass());

@@ -10,9 +10,10 @@ package org.openhab.binding.mysensors.internal.protocol.message;
 import org.openhab.binding.mysensors.MySensorsBindingConstants;
 
 /**
+ * Parser for the MySensors messages.
+ *
  * @author Tim Oberföll
  *
- *         Parser for the MySensors network.
  */
 public class MySensorsMessageParser {
 
