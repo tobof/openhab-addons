@@ -13,6 +13,7 @@ import java.net.UnknownHostException;
 
 import org.openhab.binding.mysensors.internal.handler.MySensorsBridgeHandler;
 import org.openhab.binding.mysensors.internal.protocol.MySensorsBridgeConnection;
+import org.openhab.binding.mysensors.internal.sensors.MySensorsDeviceManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,8 +27,9 @@ public class MySensorsIpConnection extends MySensorsBridgeConnection {
 
     private Socket sock = null;
 
-    public MySensorsIpConnection(MySensorsBridgeHandler bridgeHandler, String ipAddress, int tcpPort, int sendDelay) {
-        super(bridgeHandler);
+    public MySensorsIpConnection(MySensorsDeviceManager deviceManager, MySensorsBridgeHandler bridgeHandler,
+            String ipAddress, int tcpPort, int sendDelay) {
+        super(deviceManager, bridgeHandler);
         this.ipAddress = ipAddress;
         this.tcpPort = tcpPort;
         this.sendDelay = sendDelay;
@@ -85,4 +87,10 @@ public class MySensorsIpConnection extends MySensorsBridgeConnection {
         }
 
     }
+
+    @Override
+    public String toString() {
+        return "MySensorsIpConnection [ipAddress=" + ipAddress + ", tcpPort=" + tcpPort + "]";
+    }
+
 }

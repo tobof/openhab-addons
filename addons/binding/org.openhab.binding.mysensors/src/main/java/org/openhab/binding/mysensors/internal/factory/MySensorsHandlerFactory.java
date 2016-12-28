@@ -9,8 +9,10 @@ package org.openhab.binding.mysensors.internal.factory;
 
 import static org.openhab.binding.mysensors.MySensorsBindingConstants.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.smarthome.config.core.Configuration;
@@ -25,9 +27,13 @@ import org.openhab.binding.mysensors.discovery.MySensorsDiscoveryService;
 import org.openhab.binding.mysensors.internal.handler.MySensorsBridgeHandler;
 import org.openhab.binding.mysensors.internal.handler.MySensorsThingHandler;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsDeviceManager;
+import org.openhab.binding.mysensors.internal.sensors.MySensorsNode;
 import org.osgi.framework.ServiceRegistration;
+import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.gson.reflect.TypeToken;
 
 /**
  * The {@link MySensorsHandlerFactory} is responsible for creating things and thing
@@ -43,7 +49,15 @@ public class MySensorsHandlerFactory extends BaseThingHandlerFactory {
     private Map<ThingUID, ServiceRegistration<?>> discoveryServiceRegs = new HashMap<>();
 
     // Device manager
-    private MySensorsDeviceManager deviceManager = MySensorsDeviceManager.getInstance();
+    private MySensorsDeviceManager deviceManager;
+
+    @Override
+    protected void activate(ComponentContext componentContext) {
+        super.activate(componentContext);
+        logger.debug("Initializing MySensorsHandlerFactory");
+        Map<Integer, MySensorsNode> nodes = loadCacheFile();
+        deviceManager = new MySensorsDeviceManager(nodes);
+    }
 
     @Override
     public boolean supportsThingType(ThingTypeUID thingTypeUID) {
@@ -65,10 +79,10 @@ public class MySensorsHandlerFactory extends BaseThingHandlerFactory {
         ThingHandler handler = null;
 
         if (SUPPORTED_THING_TYPES_UIDS.contains(thingTypeUID)) {
-            handler = new MySensorsThingHandler(thing);
+            handler = new MySensorsThingHandler(deviceManager, thing);
             addIntoDeviceManager(thing);
         } else if (thingTypeUID.equals(THING_TYPE_BRIDGE_SER) || thingTypeUID.equals(THING_TYPE_BRIDGE_ETH)) {
-            handler = new MySensorsBridgeHandler((Bridge) thing);
+            handler = new MySensorsBridgeHandler(deviceManager, (Bridge) thing);
             registerDeviceDiscoveryService((MySensorsBridgeHandler) handler);
         } else {
             logger.error("Thing {} cannot be configured, is this thing supported by the binding?", thingTypeUID);
@@ -120,5 +134,22 @@ public class MySensorsHandlerFactory extends BaseThingHandlerFactory {
                 discoveryServiceRegs.remove(thingHandler.getThing().getUID());
             }
         }
+    }
+
+    private Map<Integer, MySensorsNode> loadCacheFile() {
+        MySensorsCacheFactory cacheFactory = MySensorsCacheFactory.getCacheFactory();
+        Map<Integer, MySensorsNode> nodes = new HashMap<Integer, MySensorsNode>();
+
+        List<Integer> givenIds = cacheFactory.readCache(MySensorsCacheFactory.GIVEN_IDS_CACHE_FILE,
+                new ArrayList<Integer>(), new TypeToken<ArrayList<Integer>>() {
+                }.getType());
+
+        for (Integer i : givenIds) {
+            if (i != null) {
+                nodes.put(i, new MySensorsNode(i));
+            }
+        }
+
+        return nodes;
     }
 }

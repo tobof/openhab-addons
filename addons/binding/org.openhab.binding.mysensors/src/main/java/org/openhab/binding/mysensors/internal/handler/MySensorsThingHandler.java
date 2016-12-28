@@ -24,6 +24,7 @@ import org.eclipse.smarthome.core.thing.ThingStatusInfo;
 import org.eclipse.smarthome.core.thing.binding.BaseThingHandler;
 import org.eclipse.smarthome.core.types.Command;
 import org.eclipse.smarthome.core.types.RefreshType;
+import org.eclipse.smarthome.core.types.State;
 import org.openhab.binding.mysensors.config.MySensorsSensorConfiguration;
 import org.openhab.binding.mysensors.internal.event.MySensorsStatusUpdateEvent;
 import org.openhab.binding.mysensors.internal.event.MySensorsUpdateListener;
@@ -56,10 +57,11 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
 
     private Map<Integer, String> oldMsgContent = new HashMap<Integer, String>();
 
-    private MySensorsDeviceManager deviceManager = MySensorsDeviceManager.getInstance();
+    private MySensorsDeviceManager deviceManager;
 
-    public MySensorsThingHandler(Thing thing) {
+    public MySensorsThingHandler(MySensorsDeviceManager deviceManager, Thing thing) {
         super(thing);
+        this.deviceManager = deviceManager;
     }
 
     @Override
@@ -204,7 +206,10 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
     }
 
     private void handleChildUpdateEvent(MySensorsVariable var) {
-        updateState(CHANNEL_MAP.get(var.getVariableNum()), var.getValue());
+        String channelName = CHANNEL_MAP.get(var.getVariableTypeAndNumber());
+        State newState = var.getValue();
+        logger.debug("Updating channel: {}({}) value to: {}", channelName, var.getVariableTypeAndNumber(), newState);
+        updateState(channelName, newState);
     }
 
     private void handleIncomingMessageEvent(MySensorsMessage msg) {
@@ -215,4 +220,10 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
 
         }
     }
+
+    @Override
+    public String toString() {
+        return "MySensorsThingHandler [nodeId=" + nodeId + ", childId=" + childId + "]";
+    }
+
 }

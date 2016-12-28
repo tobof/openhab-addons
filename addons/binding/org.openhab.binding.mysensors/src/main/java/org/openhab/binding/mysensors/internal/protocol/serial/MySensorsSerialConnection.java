@@ -16,6 +16,7 @@ import org.apache.commons.lang.StringUtils;
 import org.openhab.binding.mysensors.MySensorsBindingConstants;
 import org.openhab.binding.mysensors.internal.handler.MySensorsBridgeHandler;
 import org.openhab.binding.mysensors.internal.protocol.MySensorsBridgeConnection;
+import org.openhab.binding.mysensors.internal.sensors.MySensorsDeviceManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,9 +38,9 @@ public class MySensorsSerialConnection extends MySensorsBridgeConnection {
 
     private NRSerialPort serialConnection = null;
 
-    public MySensorsSerialConnection(MySensorsBridgeHandler bridgeHandler, String serialPort, int baudRate,
-            int sendDelay) {
-        super(bridgeHandler);
+    public MySensorsSerialConnection(MySensorsDeviceManager deviceManager, MySensorsBridgeHandler bridgeHandler,
+            String serialPort, int baudRate, int sendDelay) {
+        super(deviceManager, bridgeHandler);
 
         this.serialPort = serialPort;
         this.baudRate = baudRate;
@@ -188,4 +189,10 @@ public class MySensorsSerialConnection extends MySensorsBridgeConnection {
         //
         System.setProperty("gnu.io.rxtx.SerialPorts", finalPorts);
     }
+
+    @Override
+    public String toString() {
+        return "MySensorsSerialConnection [serialPort=" + serialPort + ", baudRate=" + baudRate + "]";
+    }
+
 }

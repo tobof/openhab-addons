@@ -50,13 +50,14 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
     private MySensorsBridgeConnection myCon = null;
 
     // Device manager
-    private MySensorsDeviceManager deviceManager = MySensorsDeviceManager.getInstance();
+    private MySensorsDeviceManager deviceManager;
 
     // Configuration from thing file
     private MySensorsBridgeConfiguration myConfiguration = null;
 
-    public MySensorsBridgeHandler(Bridge bridge) {
+    public MySensorsBridgeHandler(MySensorsDeviceManager deviceManager, Bridge bridge) {
         super(bridge);
+        this.deviceManager = deviceManager;
     }
 
     /*
@@ -71,10 +72,10 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
         myConfiguration = getConfigAs(MySensorsBridgeConfiguration.class);
 
         if (getThing().getThingTypeUID().equals(THING_TYPE_BRIDGE_SER)) {
-            myCon = new MySensorsSerialConnection(this, myConfiguration.serialPort, myConfiguration.baudRate,
-                    myConfiguration.sendDelay);
+            myCon = new MySensorsSerialConnection(deviceManager, this, myConfiguration.serialPort,
+                    myConfiguration.baudRate, myConfiguration.sendDelay);
         } else if (getThing().getThingTypeUID().equals(THING_TYPE_BRIDGE_ETH)) {
-            myCon = new MySensorsIpConnection(this, myConfiguration.ipAddress, myConfiguration.tcpPort,
+            myCon = new MySensorsIpConnection(deviceManager, this, myConfiguration.ipAddress, myConfiguration.tcpPort,
                     myConfiguration.sendDelay);
         } else {
             logger.error("Not recognized bridge: {}", getThing().getThingTypeUID());
@@ -143,40 +144,6 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
                 break;
         }
 
-    }
-
-    private List<MySensorsNode> loadCacheFile() {
-        MySensorsCacheFactory cacheFactory = MySensorsCacheFactory.getCacheFactory();
-        List<MySensorsNode> nodes = new ArrayList<MySensorsNode>();
-
-        List<Integer> givenIds = cacheFactory.readCache(MySensorsCacheFactory.GIVEN_IDS_CACHE_FILE,
-                new ArrayList<Integer>(), new TypeToken<ArrayList<Integer>>() {
-                }.getType());
-
-        // Add ids taken by Thing list of OpenHAB
-        Collection<Thing> thingList = thingRegistry.getAll();
-        Iterator<Thing> iterator = thingList.iterator();
-        while (iterator.hasNext()) {
-            Thing thing = iterator.next();
-            Configuration conf = thing.getConfiguration();
-            if (conf != null) {
-                Object nodeIdobj = conf.get("nodeId");
-                if (nodeIdobj != null) {
-                    int nodeId = Integer.parseInt(nodeIdobj.toString());
-                    if (!givenIds.contains(nodeId)) {
-                        givenIds.add(nodeId);
-                    }
-                }
-            }
-        }
-
-        for (Integer i : givenIds) {
-            if (i != null) {
-                nodes.add(new MySensorsNode(i));
-            }
-        }
-
-        return nodes;
     }
 
     private void updateCacheFile(MySensorsNode newNode) {
@@ -254,4 +221,10 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
         }
 
     }
+
+    @Override
+    public String toString() {
+        return "MySensorsBridgeHandler []";
+    }
+
 }

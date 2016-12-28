@@ -46,7 +46,7 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
     private boolean pauseWriter = false;
 
     // Device manager
-    private MySensorsDeviceManager deviceManager = MySensorsDeviceManager.getInstance();
+    private MySensorsDeviceManager deviceManager;
 
     // Blocking queue wait for message
     private BlockingQueue<MySensorsMessage> outboundMessageQueue = null;
@@ -85,7 +85,8 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
     private ScheduledExecutorService watchdogExecutor = null;
     private Future<?> futureWatchdog = null;
 
-    public MySensorsBridgeConnection(MySensorsBridgeHandler bridgeHandler) {
+    public MySensorsBridgeConnection(MySensorsDeviceManager deviceManager, MySensorsBridgeHandler bridgeHandler) {
+        this.deviceManager = deviceManager;
         this.outboundMessageQueue = new LinkedBlockingQueue<MySensorsMessage>();
         this.bridgeHandler = bridgeHandler;
         this.updateListeners = new ArrayList<>();
@@ -296,7 +297,7 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
     public void broadCastEvent(MySensorsStatusUpdateEvent event) {
         synchronized (updateListeners) {
             for (MySensorsUpdateListener mySensorsEventListener : updateListeners) {
-                logger.trace("Broadcasting event to: " + mySensorsEventListener);
+                logger.trace("Broadcasting event {} to: {}", event.toString(), mySensorsEventListener);
                 try {
                     mySensorsEventListener.statusUpdateReceived(event);
                 } catch (Throwable e) {
@@ -409,39 +410,60 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
         }
     }
 
-    private void handleIncomingMessage(MySensorsMessage msg) throws Throwable {
+    /**
+     * Handle the incoming message from serial
+     *
+     * @param msg the incoming message
+     * @return true if ,and only if, the message is propagated to one of the defined node or message arrives from a
+     *         device new device in the network
+     * @throws Throwable
+     */
+    private boolean handleIncomingMessage(MySensorsMessage msg) throws Throwable {
+        boolean ret = false;
         if (MySensorsNode.isValidNodeId(msg.nodeId) && MySensorsChild.isValidChildId(msg.childId)
                 && msg.isSetReqMessage()) {
             MySensorsNode node = deviceManager.getNode(msg.nodeId);
             if (node != null) {
+                logger.debug("Node {} found in device manager", msg.nodeId);
+
                 MySensorsChild child = node.getChild(msg.childId);
                 if (child != null) {
+                    logger.debug("Child {} found in node {}", msg.childId, msg.nodeId);
+
                     MySensorsVariable variable = child.getVariable(msg.msgType, msg.subType);
                     if (variable != null) {
                         variable.setValue(msg);
+                        broadCastEvent(
+                                new MySensorsStatusUpdateEvent(MySensorsEventType.CHILD_VALUE_CHANGED, variable));
+                        ret = true;
                     } else {
                         logger.warn("Variable {}({}) not present", msg.subType,
                                 CHANNEL_MAP.get(new Pair<Integer>(msg.msgType, msg.subType)));
                     }
                 } else {
-                    logger.debug("Child {} not present into node {}", msg.nodeId, msg.childId);
+                    logger.debug("Child {} not present into node {}", msg.childId, msg.nodeId);
                 }
             } else {
-                // This node was not present previously, send new node discovered event
+                logger.debug("Node {} not present, send new node discovered event", msg.nodeId);
+
                 node = new MySensorsNode(msg.nodeId);
                 deviceManager.addNode(node);
                 broadCastEvent(new MySensorsStatusUpdateEvent(MySensorsEventType.NEW_NODE_DISCOVERED, node));
+                ret = true;
             }
         }
 
+        return ret;
     }
 
     @Override
     public void statusUpdateReceived(MySensorsStatusUpdateEvent event) throws Throwable {
         switch (event.getEventType()) {
             case INCOMING_MESSAGE:
-                handleSpecialMessageEvent((MySensorsMessage) event.getData());
-                handleIncomingMessage((MySensorsMessage) event.getData());
+                if (!handleIncomingMessage((MySensorsMessage) event.getData())) {
+                    // If the message was not handled previously try to handle it as a special one
+                    handleSpecialMessageEvent((MySensorsMessage) event.getData());
+                }
                 break;
             default:
                 break;

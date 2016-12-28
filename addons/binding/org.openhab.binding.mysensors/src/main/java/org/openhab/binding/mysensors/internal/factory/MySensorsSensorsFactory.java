@@ -9,7 +9,6 @@ import java.util.Map;
 
 import org.eclipse.smarthome.core.thing.Channel;
 import org.eclipse.smarthome.core.thing.Thing;
-import org.eclipse.smarthome.core.thing.type.ChannelTypeUID;
 import org.openhab.binding.mysensors.config.MySensorsSensorConfiguration;
 import org.openhab.binding.mysensors.internal.Pair;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
@@ -51,9 +50,22 @@ public class MySensorsSensorsFactory {
         List<Channel> channels = t.getChannels();
 
         for (Channel c : channels) {
-            ChannelTypeUID channel = c.getChannelTypeUID();
-            Pair<Integer> variableNum = invertMap(CHANNEL_MAP, true).get(channel);
-            Class<? extends MySensorsType> cls = TYPE_MAP.get(channel);
+            String channelID = c.getUID().getId();
+            Pair<Integer> variableNum = invertMap(CHANNEL_MAP, true).get(channelID);
+            Class<? extends MySensorsType> cls = TYPE_MAP.get(channelID);
+
+            if (variableNum == null || cls == null) {
+                if (!channelID.equals(CHANNEL_LAST_UPDATE) && !channelID.equals(CHANNEL_MYSENSORS_MESSAGE)) {
+                    throw new NullPointerException(
+                            "Variable for channel " + channelID + " not defined in CHANNEL_MAP/TYPE_MAP");
+                } else {
+                    // CHANNEL_LAST_UPDATE/CHANNEL_MYSENSORS_MESSAGE are NOT standard channel. Their correspondent
+                    // channel is not part of MySensors standard protocol. Just continue iteration of other channels
+
+                    continue;
+                }
+            }
+
             MySensorsVariable var = getVariable(variableNum, cls.newInstance());
 
             if (variableNum == null || var == null) {

@@ -16,11 +16,15 @@ public class MySensorsDeviceManager {
 
     public static MySensorsDeviceManager instance = null;
 
-    private MySensorsDeviceManager() {
+    public MySensorsDeviceManager() {
         nodeMap = new HashMap<>();
     }
 
-    public static MySensorsDeviceManager getInstance() {
+    public MySensorsDeviceManager(Map<Integer, MySensorsNode> nodeMap) {
+        this.nodeMap = nodeMap;
+    }
+
+    private static MySensorsDeviceManager getInstance() {
         if (instance == null) {
             instance = new MySensorsDeviceManager();
         }
@@ -69,8 +73,11 @@ public class MySensorsDeviceManager {
     public void addNode(MySensorsNode node, boolean mergeIfExist) {
         MySensorsNode exist = null;
         if (mergeIfExist && ((exist = getNode(node.getNodeId())) != null)) {
+            logger.info("Merging child map: {} with: {}", exist.getChildMap(), node.getChildMap());
             exist.mergeNodeChilds(node);
+            logger.trace("Merging result is: {}", exist.getChildMap());
         } else {
+            logger.info("Adding device {}", node.toString());
             addNode(node);
         }
     }

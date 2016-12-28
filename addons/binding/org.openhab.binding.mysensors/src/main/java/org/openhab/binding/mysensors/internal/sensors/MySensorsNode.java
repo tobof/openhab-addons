@@ -35,6 +35,10 @@ public class MySensorsNode {
         this.chidldMap = chidldMap;
     }
 
+    public Map<Integer, MySensorsChild> getChildMap() {
+        return chidldMap;
+    }
+
     public int getNodeId() {
         return nodeId;
     }
@@ -62,14 +66,8 @@ public class MySensorsNode {
     }
 
     public void mergeNodeChilds(MySensorsNode node) {
-        HashMap<Integer, MySensorsChild> toBeMerged = null;
-
-        synchronized (node.chidldMap) {
-            toBeMerged = new HashMap<>(node.chidldMap);
-        }
-
         synchronized (chidldMap) {
-            mergeMap(chidldMap, toBeMerged);
+            mergeMap(chidldMap, node.chidldMap);
         }
     }
 
@@ -137,7 +135,8 @@ public class MySensorsNode {
 
     @Override
     public String toString() {
-        return "MySensorsNode [nodeId=" + nodeId + ", chidldList=" + chidldMap + "]";
+        return "MySensorsNode [nodeId=" + nodeId + ", childNumber=" + chidldMap.size() + ", chidldList=" + chidldMap
+                + "]";
     }
 
 }

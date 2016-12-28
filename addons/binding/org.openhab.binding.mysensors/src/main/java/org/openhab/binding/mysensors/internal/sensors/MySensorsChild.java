@@ -53,7 +53,7 @@ public class MySensorsChild {
     }
 
     public static boolean isValidChildId(int id) {
-        return (id > 0 && id < 255);
+        return (id >= 0 && id < 255);
     }
 
     @Override

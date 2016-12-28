@@ -9,9 +9,11 @@ import org.openhab.binding.mysensors.internal.sensors.type.MySensorsType;
 
 public class MySensorsVariable {
 
-    private int variableType;
+    // private int variableType;
 
-    private int variableNum;
+    // private int variableNum;
+
+    private Pair<Integer> variableTypeAndNumber;
 
     private State value;
 
@@ -20,21 +22,8 @@ public class MySensorsVariable {
     public MySensorsVariable(Pair<Integer> variableTypeAndNumber, MySensorsType type) {
         setValue(UnDefType.UNDEF);
         setType(type);
-        setVariableNum(variableNum);
-    }
+        setVariableTypeAndNumber(variableTypeAndNumber);
 
-    public MySensorsVariable(int variableNum, MySensorsType type, State state) {
-        setValue(state);
-        setType(type);
-        setVariableNum(variableNum);
-    }
-
-    public int getVariableNum() {
-        return variableNum;
-    }
-
-    public void setVariableNum(int variableNum) {
-        this.variableNum = variableNum;
     }
 
     public synchronized State getValue() {
@@ -64,12 +53,12 @@ public class MySensorsVariable {
         this.type = type;
     }
 
-    public int getVariableType() {
-        return variableType;
+    public Pair<Integer> getVariableTypeAndNumber() {
+        return variableTypeAndNumber;
     }
 
-    public void setVariableType(int variableType) {
-        this.variableType = variableType;
+    public void setVariableTypeAndNumber(Pair<Integer> variableTypeAndNumber) {
+        this.variableTypeAndNumber = variableTypeAndNumber;
     }
 
     @Override
@@ -78,8 +67,7 @@ public class MySensorsVariable {
         int result = 1;
         result = prime * result + ((type == null) ? 0 : type.hashCode());
         result = prime * result + ((value == null) ? 0 : value.hashCode());
-        result = prime * result + variableNum;
-        result = prime * result + variableType;
+        result = prime * result + ((variableTypeAndNumber == null) ? 0 : variableTypeAndNumber.hashCode());
         return result;
     }
 
@@ -109,10 +97,11 @@ public class MySensorsVariable {
         } else if (!value.equals(other.value)) {
             return false;
         }
-        if (variableNum != other.variableNum) {
-            return false;
-        }
-        if (variableType != other.variableType) {
+        if (variableTypeAndNumber == null) {
+            if (other.variableTypeAndNumber != null) {
+                return false;
+            }
+        } else if (!variableTypeAndNumber.equals(other.variableTypeAndNumber)) {
             return false;
         }
         return true;
@@ -120,8 +109,8 @@ public class MySensorsVariable {
 
     @Override
     public String toString() {
-        return "MySensorsVariable [variableType=" + variableType + ", variableNum=" + variableNum + ", value=" + value
-                + ", type=" + type + "]";
+        return "MySensorsVariable [variableTypeAndNumber=" + variableTypeAndNumber + ", value=" + value + ", type="
+                + type + "]";
     }
 
 }

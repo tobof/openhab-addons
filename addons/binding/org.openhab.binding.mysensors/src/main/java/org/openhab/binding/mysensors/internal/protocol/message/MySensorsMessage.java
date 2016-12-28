@@ -213,4 +213,79 @@ public class MySensorsMessage {
         return msgType == MYSENSORS_MSG_TYPE_INTERNAL;
     }
 
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ack;
+        result = prime * result + childId;
+        result = prime * result + ((msg == null) ? 0 : msg.hashCode());
+        result = prime * result + msgType;
+        result = prime * result + (int) (nextSend ^ (nextSend >>> 32));
+        result = prime * result + nodeId;
+        result = prime * result + ((oldMsg == null) ? 0 : oldMsg.hashCode());
+        result = prime * result + retries;
+        result = prime * result + (revert ? 1231 : 1237);
+        result = prime * result + subType;
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        MySensorsMessage other = (MySensorsMessage) obj;
+        if (ack != other.ack) {
+            return false;
+        }
+        if (childId != other.childId) {
+            return false;
+        }
+        if (msg == null) {
+            if (other.msg != null) {
+                return false;
+            }
+        } else if (!msg.equals(other.msg)) {
+            return false;
+        }
+        if (msgType != other.msgType) {
+            return false;
+        }
+        if (nextSend != other.nextSend) {
+            return false;
+        }
+        if (nodeId != other.nodeId) {
+            return false;
+        }
+        if (oldMsg == null) {
+            if (other.oldMsg != null) {
+                return false;
+            }
+        } else if (!oldMsg.equals(other.oldMsg)) {
+            return false;
+        }
+        if (retries != other.retries) {
+            return false;
+        }
+        if (revert != other.revert) {
+            return false;
+        }
+        if (subType != other.subType) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "MySensorsMessage [msg=" + msg + "]";
+    }
+
 }
