@@ -52,6 +52,13 @@ public class MySensorsChild {
         }
     }
 
+    public void setLastUpdate(Date childLastUpdate) {
+        synchronized (childLastUpdate) {
+            this.childLastUpdate = childLastUpdate;
+        }
+
+    }
+
     public static boolean isValidChildId(int id) {
         return (id >= 0 && id < 255);
     }

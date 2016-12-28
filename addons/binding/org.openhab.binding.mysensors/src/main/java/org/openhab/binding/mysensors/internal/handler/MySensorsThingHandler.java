@@ -185,9 +185,20 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
                 break;
             case CHILD_VALUE_CHANGED:
                 handleChildUpdateEvent((MySensorsVariable) event.getData());
+                updateLastUpdate();
                 break;
             default:
                 break;
+        }
+    }
+
+    private void updateLastUpdate() {
+        // Don't always fire last update channel, do it only after a minute by
+        if (lastUpdate == null || (System.currentTimeMillis() > (lastUpdate.getCalendar().getTimeInMillis() + 60000))) {
+            DateTimeType dt = new DateTimeType();
+            lastUpdate = dt;
+            updateState(CHANNEL_LAST_UPDATE, dt);
+            logger.debug("Setting last update for node/child {}/{} to {}", nodeId, childId, dt.toString());
         }
     }
 

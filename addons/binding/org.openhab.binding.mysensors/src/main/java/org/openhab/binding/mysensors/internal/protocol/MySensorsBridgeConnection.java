@@ -10,6 +10,7 @@ package org.openhab.binding.mysensors.internal.protocol;
 import static org.openhab.binding.mysensors.MySensorsBindingConstants.*;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
@@ -426,9 +427,13 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
             if (node != null) {
                 logger.debug("Node {} found in device manager", msg.nodeId);
 
+                node.setLastUpdate(new Date());
+
                 MySensorsChild child = node.getChild(msg.childId);
                 if (child != null) {
                     logger.debug("Child {} found in node {}", msg.childId, msg.nodeId);
+
+                    child.setLastUpdate(new Date());
 
                     MySensorsVariable variable = child.getVariable(msg.msgType, msg.subType);
                     if (variable != null) {

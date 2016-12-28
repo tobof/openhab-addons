@@ -62,7 +62,15 @@ public class MySensorsNode {
     }
 
     public Date getLastUpdate() {
-        return lastUpdate;
+        synchronized (this.lastUpdate) {
+            return lastUpdate;
+        }
+    }
+
+    public void setLastUpdate(Date lastUpdate) {
+        synchronized (this.lastUpdate) {
+            this.lastUpdate = lastUpdate;
+        }
     }
 
     public void mergeNodeChilds(MySensorsNode node) {
