@@ -18,12 +18,12 @@ public class MySensorsChild {
     private Integer childId = 0;
     private Map<Pair<Integer>, MySensorsVariable> variableMap = null;
 
-    private Date childLastUpdate = null;
+    private Date lastUpdate = null;
 
     public MySensorsChild(int childId) {
         this.childId = childId;
         variableMap = new HashMap<Pair<Integer>, MySensorsVariable>();
-
+        lastUpdate = new Date(0);
     }
 
     public MySensorsChild(int childId, Map<Pair<Integer>, MySensorsVariable> variableMap) throws NullPointerException {
@@ -34,6 +34,7 @@ public class MySensorsChild {
         }
 
         this.variableMap = variableMap;
+        lastUpdate = new Date(0);
     }
 
     public MySensorsVariable getVariable(int messageType, int variableNum) {
@@ -47,16 +48,15 @@ public class MySensorsChild {
     }
 
     public Date getLastUpdate() {
-        synchronized (childLastUpdate) {
-            return childLastUpdate;
+        synchronized (lastUpdate) {
+            return lastUpdate;
         }
     }
 
     public void setLastUpdate(Date childLastUpdate) {
-        synchronized (childLastUpdate) {
-            this.childLastUpdate = childLastUpdate;
+        synchronized (this.lastUpdate) {
+            this.lastUpdate = childLastUpdate;
         }
-
     }
 
     public static boolean isValidChildId(int id) {
