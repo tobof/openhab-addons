@@ -65,6 +65,7 @@ public class MySensorsBindingConstants {
     public static final int MYSENSORS_SUBTYPE_S_LOCK = 19;
     public static final int MYSENSORS_SUBTYPE_S_IR = 20;
     public static final int MYSENSORS_SUBTYPE_S_WATER = 21;
+    public static final int MYSENSORS_SUBTYPE_S_AIR_QUALITY = 22;
     public static final int MYSENSORS_SUBTYPE_S_CUSTOM = 23;
     public static final int MYSENSORS_SUBTYPE_S_RGB_LIGHT = 26;
     public static final int MYSENSORS_SUBTYPE_S_RGBW_LIGHT = 27;
@@ -203,6 +204,7 @@ public class MySensorsBindingConstants {
     public final static ThingTypeUID THING_TYPE_TEXT = new ThingTypeUID(BINDING_ID, "text");
     public final static ThingTypeUID THING_TYPE_IR_SEND = new ThingTypeUID(BINDING_ID, "irSend");
     public final static ThingTypeUID THING_TYPE_IR_RECEIVE = new ThingTypeUID(BINDING_ID, "irReceive");
+    public final static ThingTypeUID THING_TYPE_AIR_QUALITY = new ThingTypeUID(BINDING_ID, "airQuality");
 
     // List of bridges
     public final static ThingTypeUID THING_TYPE_BRIDGE_SER = new ThingTypeUID(BINDING_ID, "bridge-ser");
@@ -265,7 +267,8 @@ public class MySensorsBindingConstants {
     public final static String CHANNEL_IR_RECEIVE = "irReceive";
     public final static String CHANNEL_MYSENSORS_MESSAGE = "mySensorsMessage";
     public final static String CHANNEL_LAST_UPDATE = "lastupdate";
-
+    public final static String CHANNEL_CO2_LEVEL = "co2-level";
+    
     // Wait time Arduino reset
     public final static int RESET_TIME = 3000;
 
@@ -320,6 +323,7 @@ public class MySensorsBindingConstants {
             put(MYSENSORS_SUBTYPE_V_VOLUME, CHANNEL_VOLUME);
             put(MYSENSORS_SUBTYPE_V_LOCK_STATUS, CHANNEL_LOCK_STATUS);
             put(MYSENSORS_SUBTYPE_V_LEVEL, CHANNEL_LEVEL);
+            put(MYSENSORS_SUBTYPE_V_LEVEL, CHANNEL_CO2_LEVEL);
             put(MYSENSORS_SUBTYPE_V_RGB, CHANNEL_RGB);
             put(MYSENSORS_SUBTYPE_V_RGBW, CHANNEL_RGBW);
             put(MYSENSORS_SUBTYPE_V_ID, CHANNEL_ID);
@@ -362,7 +366,7 @@ public class MySensorsBindingConstants {
             THING_TYPE_RAIN, THING_TYPE_UV, THING_TYPE_WEIGHT, THING_TYPE_DISTANCE, THING_TYPE_LIGHT_LEVEL,
             THING_TYPE_HVAC, THING_TYPE_WATER, THING_TYPE_CUSTOM, THING_TYPE_LOCK, THING_TYPE_SOUND,
             THING_TYPE_RGB_LIGHT, THING_TYPE_RGBW_LIGHT, THING_TYPE_WATER_QUALITY, THING_TYPE_MYSENSORS_MESSAGE,
-            THING_TYPE_TEXT, THING_TYPE_IR_SEND, THING_TYPE_IR_RECEIVE);
+            THING_TYPE_TEXT, THING_TYPE_IR_SEND, THING_TYPE_IR_RECEIVE, THING_TYPE_AIR_QUALITY);
     /** Supported bridges */
     public final static Set<ThingTypeUID> SUPPORTED_BRIDGE_THING_TYPES_UIDS = ImmutableSet.of(THING_TYPE_BRIDGE_SER,
             THING_TYPE_BRIDGE_ETH);
@@ -374,5 +378,6 @@ public class MySensorsBindingConstants {
             THING_TYPE_RAIN, THING_TYPE_UV, THING_TYPE_WEIGHT, THING_TYPE_DISTANCE, THING_TYPE_LIGHT_LEVEL,
             THING_TYPE_HVAC, THING_TYPE_WATER, THING_TYPE_CUSTOM, THING_TYPE_LOCK, THING_TYPE_SOUND,
             THING_TYPE_RGB_LIGHT, THING_TYPE_RGBW_LIGHT, THING_TYPE_WATER_QUALITY, THING_TYPE_MYSENSORS_MESSAGE,
-            THING_TYPE_TEXT, THING_TYPE_IR_SEND, THING_TYPE_IR_RECEIVE, THING_TYPE_BRIDGE_SER, THING_TYPE_BRIDGE_ETH);
+            THING_TYPE_TEXT, THING_TYPE_IR_SEND, THING_TYPE_IR_RECEIVE, THING_TYPE_AIR_QUALITY, THING_TYPE_BRIDGE_SER, 
+            THING_TYPE_BRIDGE_ETH);
 }
