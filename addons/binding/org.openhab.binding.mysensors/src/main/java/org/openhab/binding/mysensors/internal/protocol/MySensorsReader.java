@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Andrea Cioni
  * @author Tim Oberföll
- * 
+ *
  */
 public class MySensorsReader implements MySensorsUpdateListener, Runnable {
 
@@ -76,7 +76,7 @@ public class MySensorsReader implements MySensorsUpdateListener, Runnable {
                     mysCon.broadCastEvent(event);
                 }
             } catch (Exception e) {
-                logger.error("({}) on reading from serial port, message: {}", e, getClass(), e.getMessage());
+                logger.error("({}) on reading from connection, message: {}", e, getClass(), e.getMessage());
             }
 
         }

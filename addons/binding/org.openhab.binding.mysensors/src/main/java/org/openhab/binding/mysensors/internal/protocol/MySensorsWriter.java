@@ -98,7 +98,7 @@ public abstract class MySensorsWriter implements MySensorsUpdateListener, Runnab
                     }
 
                 } catch (Exception e) {
-                    logger.error("({}) on writing from serial port, message: {}", e, getClass(), e.getMessage());
+                    logger.error("({}) on writing to connection, message: {}", e, getClass(), e.getMessage());
                 }
             }
         }
