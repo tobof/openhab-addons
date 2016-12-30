@@ -15,15 +15,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import org.openhab.binding.mysensors.MySensorsBindingConstants;
-import org.openhab.binding.mysensors.internal.event.MySensorsEventType;
-import org.openhab.binding.mysensors.internal.event.MySensorsStatusUpdateEvent;
-import org.openhab.binding.mysensors.internal.event.MySensorsUpdateListener;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class MySensorsWriter implements MySensorsUpdateListener, Runnable {
+public abstract class MySensorsWriter implements Runnable {
     protected Logger logger = LoggerFactory.getLogger(MySensorsWriter.class);
 
     protected boolean stopWriting = false;
@@ -68,9 +65,7 @@ public abstract class MySensorsWriter implements MySensorsUpdateListener, Runnab
                                         logger.debug("Reverting status!");
                                         msg.setMsg(msg.getOldMsg());
                                         msg.setAck(0);
-                                        MySensorsStatusUpdateEvent event = new MySensorsStatusUpdateEvent(
-                                                MySensorsEventType.INCOMING_MESSAGE, msg);
-                                        mysCon.broadCastEvent(event);
+                                        mysCon.broadCastEvent(msg);
                                     } else if (!msg.getRevert()) {
                                         logger.debug("Not reverted due to configuration!");
                                     }
@@ -133,11 +128,6 @@ public abstract class MySensorsWriter implements MySensorsUpdateListener, Runnab
         } catch (IOException e) {
             logger.error("Cannot close writer stream");
         }
-
-    }
-
-    @Override
-    public void statusUpdateReceived(MySensorsStatusUpdateEvent event) {
 
     }
 }

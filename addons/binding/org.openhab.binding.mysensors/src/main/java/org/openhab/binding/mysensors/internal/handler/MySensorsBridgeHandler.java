@@ -17,13 +17,16 @@ import org.eclipse.smarthome.core.thing.ThingStatus;
 import org.eclipse.smarthome.core.thing.binding.BaseBridgeHandler;
 import org.eclipse.smarthome.core.types.Command;
 import org.openhab.binding.mysensors.config.MySensorsBridgeConfiguration;
-import org.openhab.binding.mysensors.internal.event.MySensorsStatusUpdateEvent;
 import org.openhab.binding.mysensors.internal.event.MySensorsUpdateListener;
 import org.openhab.binding.mysensors.internal.factory.MySensorsCacheFactory;
 import org.openhab.binding.mysensors.internal.protocol.MySensorsBridgeConnection;
 import org.openhab.binding.mysensors.internal.protocol.ip.MySensorsIpConnection;
+import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
 import org.openhab.binding.mysensors.internal.protocol.serial.MySensorsSerialConnection;
+import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsDeviceManager;
+import org.openhab.binding.mysensors.internal.sensors.MySensorsNode;
+import org.openhab.binding.mysensors.internal.sensors.MySensorsVariable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -118,25 +121,6 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
         return myCon;
     }
 
-    @Override
-    public void statusUpdateReceived(MySensorsStatusUpdateEvent event) {
-        switch (event.getEventType()) {
-            case NEW_NODE_DISCOVERED:
-                updateCacheFile();
-                break;
-            case BRIDGE_STATUS_UPDATE:
-                if (((MySensorsBridgeConnection) event.getData()).isConnected()) {
-                    updateStatus(ThingStatus.ONLINE);
-                } else {
-                    updateStatus(ThingStatus.OFFLINE);
-                }
-                break;
-            default:
-                break;
-        }
-
-    }
-
     private void updateCacheFile() {
         MySensorsCacheFactory cacheFactory = MySensorsCacheFactory.getCacheFactory();
 
@@ -144,6 +128,44 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
 
         cacheFactory.writeCache(MySensorsCacheFactory.GIVEN_IDS_CACHE_FILE, givenIds.toArray(new Integer[] {}),
                 Integer[].class);
+    }
+
+    @Override
+    public void messageReceived(MySensorsMessage message) throws Throwable {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void nodeIdReservationDone(Integer reservedId) throws Throwable {
+        updateCacheFile();
+    }
+
+    @Override
+    public void newNodeDiscovered(MySensorsNode message) throws Throwable {
+        updateCacheFile();
+    }
+
+    @Override
+    public void nodeUpdateEvent(MySensorsNode node, MySensorsChild child, MySensorsVariable var) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void nodeReachStatusChanged(MySensorsNode node, boolean reach) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void bridgeStatusUpdate(MySensorsBridgeConnection connection, boolean connected) throws Throwable {
+        if (connected) {
+            updateStatus(ThingStatus.ONLINE);
+        } else {
+            updateStatus(ThingStatus.OFFLINE);
+        }
+
     }
 
     @Override

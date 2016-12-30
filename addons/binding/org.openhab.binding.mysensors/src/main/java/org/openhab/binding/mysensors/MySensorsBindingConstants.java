@@ -392,7 +392,7 @@ public class MySensorsBindingConstants {
             put(CHANNEL_VAR5, MySensorsDecimalType.class);
             put(CHANNEL_FLOW, MySensorsDecimalType.class);
             put(CHANNEL_VOLUME, MySensorsDecimalType.class);
-            put(CHANNEL_LOCK_STATUS, MySensorsDecimalType.class);
+            put(CHANNEL_LOCK_STATUS, MySensorsOpenCloseType.class);
             put(CHANNEL_LEVEL, MySensorsDecimalType.class);
             put(CHANNEL_RGB, MySensorsDecimalType.class);
             put(CHANNEL_RGBW, MySensorsDecimalType.class);

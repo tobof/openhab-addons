@@ -7,11 +7,12 @@
  */
 package org.openhab.binding.mysensors.discovery;
 
-import org.openhab.binding.mysensors.internal.event.MySensorsEventType;
-import org.openhab.binding.mysensors.internal.event.MySensorsStatusUpdateEvent;
 import org.openhab.binding.mysensors.internal.event.MySensorsUpdateListener;
 import org.openhab.binding.mysensors.internal.protocol.MySensorsBridgeConnection;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
+import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
+import org.openhab.binding.mysensors.internal.sensors.MySensorsNode;
+import org.openhab.binding.mysensors.internal.sensors.MySensorsVariable;
 
 public class DiscoveryThread implements MySensorsUpdateListener {
     private MySensorsBridgeConnection mysCon;
@@ -31,10 +32,38 @@ public class DiscoveryThread implements MySensorsUpdateListener {
     }
 
     @Override
-    public void statusUpdateReceived(MySensorsStatusUpdateEvent event) {
-        if (event.getEventType() == MySensorsEventType.INCOMING_MESSAGE) {
-            mysDiscoServ.newDevicePresented((MySensorsMessage) event.getData());
-        }
+    public void messageReceived(MySensorsMessage message) throws Throwable {
+        mysDiscoServ.newDevicePresented(message);
+
+    }
+
+    @Override
+    public void nodeIdReservationDone(Integer reservedId) throws Throwable {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void newNodeDiscovered(MySensorsNode message) throws Throwable {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void nodeUpdateEvent(MySensorsNode node, MySensorsChild child, MySensorsVariable var) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void nodeReachStatusChanged(MySensorsNode node, boolean reach) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void bridgeStatusUpdate(MySensorsBridgeConnection connection, boolean connected) throws Throwable {
+        // TODO Auto-generated method stub
 
     }
 }

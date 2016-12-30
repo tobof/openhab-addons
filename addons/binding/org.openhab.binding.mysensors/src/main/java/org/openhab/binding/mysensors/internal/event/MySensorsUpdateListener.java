@@ -9,6 +9,12 @@ package org.openhab.binding.mysensors.internal.event;
 
 import java.util.EventListener;
 
+import org.openhab.binding.mysensors.internal.protocol.MySensorsBridgeConnection;
+import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
+import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
+import org.openhab.binding.mysensors.internal.sensors.MySensorsNode;
+import org.openhab.binding.mysensors.internal.sensors.MySensorsVariable;
+
 /**
  * @author Tim Oberföll
  *
@@ -16,7 +22,25 @@ import java.util.EventListener;
  */
 public interface MySensorsUpdateListener extends EventListener {
     /**
-     * Procedure for receive status update from MySensorsNetwork.
+     * Procedure to notify new message from MySensorsNetwork.
      */
-    public void statusUpdateReceived(MySensorsStatusUpdateEvent event) throws Throwable;
+    default public void messageReceived(MySensorsMessage message) throws Throwable {
+    }
+
+    default public void nodeIdReservationDone(Integer reservedId) throws Throwable {
+    }
+
+    default public void newNodeDiscovered(MySensorsNode node) throws Throwable {
+    }
+
+    default public void nodeUpdateEvent(MySensorsNode node, MySensorsChild child, MySensorsVariable var)
+            throws Throwable {
+    }
+
+    default public void nodeReachStatusChanged(MySensorsNode node, boolean reach) throws Throwable {
+    }
+
+    default public void bridgeStatusUpdate(MySensorsBridgeConnection connection, boolean connected) throws Throwable {
+
+    }
 }

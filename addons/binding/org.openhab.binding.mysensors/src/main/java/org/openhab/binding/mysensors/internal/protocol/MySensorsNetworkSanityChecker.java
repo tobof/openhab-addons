@@ -13,8 +13,6 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.openhab.binding.mysensors.MySensorsBindingConstants;
-import org.openhab.binding.mysensors.internal.event.MySensorsEventType;
-import org.openhab.binding.mysensors.internal.event.MySensorsStatusUpdateEvent;
 import org.openhab.binding.mysensors.internal.event.MySensorsUpdateListener;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
 import org.slf4j.Logger;
@@ -110,13 +108,12 @@ public class MySensorsNetworkSanityChecker implements MySensorsUpdateListener, R
     }
 
     @Override
-    public void statusUpdateReceived(MySensorsStatusUpdateEvent event) {
-        if (event.getEventType() == MySensorsEventType.INCOMING_MESSAGE) {
-            synchronized (iVersionMessageMissing) {
-                if (!iVersionMessageArrived) {
-                    iVersionMessageArrived = ((MySensorsMessage) event.getData()).isIVersionMessage();
-                }
+    public void messageReceived(MySensorsMessage message) throws Throwable {
+        synchronized (iVersionMessageMissing) {
+            if (!iVersionMessageArrived) {
+                iVersionMessageArrived = message.isIVersionMessage();
             }
         }
     }
+
 }

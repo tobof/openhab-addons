@@ -26,10 +26,11 @@ import org.eclipse.smarthome.core.types.Command;
 import org.eclipse.smarthome.core.types.RefreshType;
 import org.eclipse.smarthome.core.types.State;
 import org.openhab.binding.mysensors.config.MySensorsSensorConfiguration;
-import org.openhab.binding.mysensors.internal.event.MySensorsStatusUpdateEvent;
 import org.openhab.binding.mysensors.internal.event.MySensorsUpdateListener;
+import org.openhab.binding.mysensors.internal.protocol.MySensorsBridgeConnection;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageParser;
+import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsDeviceManager;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsNode;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsVariable;
@@ -104,7 +105,7 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
      */
     @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
-
+        logger.trace("Command {} received for channel uid {}", command, channelUID);
         /*
          * TODO We don't handle refresh commands yet
          *
@@ -163,33 +164,48 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
         // logger.debug("handleUpdate called");
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * org.openhab.binding.mysensors.handler.MySensorsUpdateListener#statusUpdateReceived(org.openhab.binding.mysensors.
-     * handler.MySensorsStatusUpdateEvent)
-     */
     @Override
-    public void statusUpdateReceived(MySensorsStatusUpdateEvent event) {
-        switch (event.getEventType()) {
-            case INCOMING_MESSAGE:
-                handleIncomingMessageEvent((MySensorsMessage) event.getData());
-                break;
-            case NODE_STATUS_UPDATE:
-                // TODO Network Sanity Checker could put node to 'unreachable' causing, here, to set this thing to
-                // OFFLINE
-                if (!((MySensorsNode) event.getData()).isReachable()) {
-                    updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR);
-                }
-                break;
-            case CHILD_VALUE_CHANGED:
-                handleChildUpdateEvent((MySensorsVariable) event.getData());
-                updateLastUpdate();
-                break;
-            default:
-                break;
+    public void messageReceived(MySensorsMessage message) throws Throwable {
+        handleIncomingMessageEvent(message);
+
+    }
+
+    @Override
+    public void nodeIdReservationDone(Integer reservedId) throws Throwable {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void newNodeDiscovered(MySensorsNode message) throws Throwable {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void nodeUpdateEvent(MySensorsNode node, MySensorsChild child, MySensorsVariable var) {
+        if (node.getNodeId() == nodeId && child.getChildId() == childId) {
+            handleChildUpdateEvent(var);
+            updateLastUpdate();
         }
+    }
+
+    @Override
+    public void nodeReachStatusChanged(MySensorsNode node, boolean reach) {
+        // TODO Network Sanity Checker could put node to 'unreachable' causing, here, to set this thing to
+        // OFFLINE
+        if (!reach) {
+            updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR);
+        } else {
+            updateStatus(ThingStatus.ONLINE);
+        }
+
+    }
+
+    @Override
+    public void bridgeStatusUpdate(MySensorsBridgeConnection connection, boolean connected) throws Throwable {
+        // TODO Auto-generated method stub
+
     }
 
     private void updateLastUpdate() {

@@ -14,15 +14,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import org.openhab.binding.mysensors.internal.event.MySensorsEventType;
-import org.openhab.binding.mysensors.internal.event.MySensorsStatusUpdateEvent;
-import org.openhab.binding.mysensors.internal.event.MySensorsUpdateListener;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class MySensorsReader implements MySensorsUpdateListener, Runnable {
+public class MySensorsReader implements Runnable {
 
     protected Logger logger = LoggerFactory.getLogger(MySensorsReader.class);
 
@@ -64,9 +61,7 @@ public class MySensorsReader implements MySensorsUpdateListener, Runnable {
                 logger.debug(line);
                 MySensorsMessage msg = MySensorsMessageParser.parse(line);
                 if (msg != null) {
-                    MySensorsStatusUpdateEvent event = new MySensorsStatusUpdateEvent(
-                            MySensorsEventType.INCOMING_MESSAGE, msg);
-                    mysCon.broadCastEvent(event);
+                    mysCon.broadCastEvent(msg);
                 }
             } catch (Exception e) {
                 logger.error("({}) on reading from serial port, message: {}", e, getClass(), e.getMessage());
@@ -106,11 +101,6 @@ public class MySensorsReader implements MySensorsUpdateListener, Runnable {
         } catch (IOException e) {
             logger.error("Cannot close reader stream");
         }
-
-    }
-
-    @Override
-    public void statusUpdateReceived(MySensorsStatusUpdateEvent event) {
 
     }
 
