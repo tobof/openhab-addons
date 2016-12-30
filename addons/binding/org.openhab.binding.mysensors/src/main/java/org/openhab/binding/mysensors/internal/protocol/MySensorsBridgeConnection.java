@@ -9,10 +9,8 @@ package org.openhab.binding.mysensors.internal.protocol;
 
 import static org.openhab.binding.mysensors.MySensorsBindingConstants.*;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -23,6 +21,7 @@ import java.util.concurrent.TimeUnit;
 import org.openhab.binding.mysensors.MySensorsBindingConstants;
 import org.openhab.binding.mysensors.discovery.MySensorsDiscoveryService;
 import org.openhab.binding.mysensors.internal.Pair;
+import org.openhab.binding.mysensors.internal.event.MySensorsEventObserver;
 import org.openhab.binding.mysensors.internal.event.MySensorsUpdateListener;
 import org.openhab.binding.mysensors.internal.exception.NoMoreIdsException;
 import org.openhab.binding.mysensors.internal.handler.MySensorsBridgeHandler;
@@ -77,9 +76,6 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
     // Connection retry done
     private int numOfRetry = 0;
 
-    // Update listener
-    private List<MySensorsUpdateListener> updateListeners = null;
-
     // Connection status watchdog
     private ScheduledExecutorService watchdogExecutor = null;
     private Future<?> futureWatchdog = null;
@@ -88,7 +84,6 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
         this.deviceManager = deviceManager;
         this.outboundMessageQueue = new LinkedBlockingQueue<MySensorsMessage>();
         this.bridgeHandler = bridgeHandler;
-        this.updateListeners = new ArrayList<>();
         this.watchdogExecutor = Executors.newSingleThreadScheduledExecutor();
         this.iVersionResponse = false;
     }
@@ -152,7 +147,7 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
      */
     private boolean connect() {
         connected = _connect();
-        broadCastEvent(this, isConnected());
+        MySensorsEventObserver.notifyBridgeStatusUpdate(this, isConnected());
         return connected;
     }
 
@@ -173,7 +168,7 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
         requestDisconnection = false;
         iVersionResponse = false;
 
-        broadCastEvent(this, isConnected());
+        MySensorsEventObserver.notifyBridgeStatusUpdate(this, isConnected());
     }
 
     protected abstract void _disconnect();
@@ -207,7 +202,7 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
         reader.startReader();
         writer.startWriter();
 
-        addEventListener(this);
+        MySensorsEventObserver.addEventListener(this);
 
         if (!skipStartupCheck) {
             try {
@@ -255,118 +250,6 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
 
     public MySensorsMessage pollMySensorsOutboundQueue() throws InterruptedException {
         return outboundMessageQueue.poll(1, TimeUnit.DAYS);
-    }
-
-    public boolean isEventListenerRegisterd(MySensorsUpdateListener listener) {
-        boolean ret = false;
-        synchronized (updateListeners) {
-            ret = updateListeners.contains(listener);
-        }
-
-        return ret;
-    }
-
-    /**
-     * @param listener An Object, that wants to listen on status updates
-     */
-    public void addEventListener(MySensorsUpdateListener listener) {
-        synchronized (updateListeners) {
-            if (!updateListeners.contains(listener)) {
-                logger.trace("Adding listener: " + listener);
-                updateListeners.add(listener);
-            }
-        }
-    }
-
-    public void removeEventListener(MySensorsUpdateListener listener) {
-        synchronized (updateListeners) {
-            if (updateListeners.contains(listener)) {
-                logger.trace("Removing listener: " + listener);
-                updateListeners.remove(listener);
-            }
-        }
-    }
-
-    public List<MySensorsUpdateListener> getEventListeners() {
-        return updateListeners;
-    }
-
-    public void broadCastEvent(MySensorsMessage message) {
-        synchronized (updateListeners) {
-            for (MySensorsUpdateListener mySensorsEventListener : updateListeners) {
-                logger.trace("Broadcasting event {} to: {}", message.toString(), mySensorsEventListener);
-                try {
-                    mySensorsEventListener.messageReceived(message);
-                } catch (Throwable e) {
-                    logger.error("Event broadcasting throw an exception", e);
-                }
-            }
-        }
-    }
-
-    public void broadCastEvent(Integer reserved) {
-        synchronized (updateListeners) {
-            for (MySensorsUpdateListener mySensorsEventListener : updateListeners) {
-                logger.trace("Broadcasting event {} to: {}", reserved.toString(), mySensorsEventListener);
-                try {
-                    mySensorsEventListener.nodeIdReservationDone(reserved);
-                } catch (Throwable e) {
-                    logger.error("Event broadcasting throw an exception", e);
-                }
-            }
-        }
-    }
-
-    public void broadCastEvent(MySensorsNode node) {
-        synchronized (updateListeners) {
-            for (MySensorsUpdateListener mySensorsEventListener : updateListeners) {
-                logger.trace("Broadcasting event {} to: {}", node.toString(), mySensorsEventListener);
-                try {
-                    mySensorsEventListener.newNodeDiscovered(node);
-                } catch (Throwable e) {
-                    logger.error("Event broadcasting throw an exception", e);
-                }
-            }
-        }
-    }
-
-    public void broadCastEvent(MySensorsNode node, MySensorsChild child, MySensorsVariable var) {
-        synchronized (updateListeners) {
-            for (MySensorsUpdateListener mySensorsEventListener : updateListeners) {
-                logger.trace("Broadcasting event {} to: {}", var.toString(), mySensorsEventListener);
-                try {
-                    mySensorsEventListener.nodeUpdateEvent(node, child, var);
-                } catch (Throwable e) {
-                    logger.error("Event broadcasting throw an exception", e);
-                }
-            }
-        }
-    }
-
-    public void broadCastEvent(MySensorsNode node, boolean reach) {
-        synchronized (updateListeners) {
-            for (MySensorsUpdateListener mySensorsEventListener : updateListeners) {
-                logger.trace("Broadcasting event {} to: {}", node.toString(), mySensorsEventListener);
-                try {
-                    mySensorsEventListener.nodeReachStatusChanged(node, reach);
-                } catch (Throwable e) {
-                    logger.error("Event broadcasting throw an exception", e);
-                }
-            }
-        }
-    }
-
-    public void broadCastEvent(MySensorsBridgeConnection connection, boolean connected) {
-        synchronized (updateListeners) {
-            for (MySensorsUpdateListener mySensorsEventListener : updateListeners) {
-                logger.trace("Broadcasting event {} to: {}", connection.toString(), mySensorsEventListener);
-                try {
-                    mySensorsEventListener.bridgeStatusUpdate(connection, connected);
-                } catch (Throwable e) {
-                    logger.error("Event broadcasting throw an exception", e);
-                }
-            }
-        }
     }
 
     public void removeMySensorsOutboundMessage(MySensorsMessage msg) {
@@ -464,7 +347,7 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
     }
 
     /**
-     * If an ID -Request from a sensor is received the controller will send an id to the sensor
+     * If an ID-Request from a sensor is received the controller will send an id to the sensor
      */
     private void answerIDRequest() {
         logger.info("ID Request received");
@@ -475,7 +358,7 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
             logger.info("New Node in the MySensors network has requested an ID. ID is: {}", newId);
             MySensorsMessage newMsg = new MySensorsMessage(255, 255, 3, 0, false, 4, newId + "");
             addMySensorsOutboundMessage(newMsg);
-
+            MySensorsEventObserver.notifyNodeIdReserved(newId);
         } catch (NoMoreIdsException e) {
             logger.error("No more IDs available for this node, try cleaning cache");
         }
@@ -508,7 +391,7 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
                     MySensorsVariable variable = child.getVariable(msg.msgType, msg.subType);
                     if (variable != null) {
                         variable.setValue(msg);
-                        broadCastEvent(node, child, variable);
+                        MySensorsEventObserver.notifyNodeUpdateEvent(node, child, variable);
                         ret = true;
                     } else {
                         logger.warn("Variable {}({}) not present", msg.subType,
@@ -522,7 +405,7 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
 
                 node = new MySensorsNode(msg.nodeId);
                 deviceManager.addNode(node);
-                broadCastEvent(node);
+                MySensorsEventObserver.notifyNewNodeDiscovered(node);
                 ret = true;
             }
         }

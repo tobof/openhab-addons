@@ -7,6 +7,7 @@
  */
 package org.openhab.binding.mysensors.discovery;
 
+import org.openhab.binding.mysensors.internal.event.MySensorsEventObserver;
 import org.openhab.binding.mysensors.internal.event.MySensorsUpdateListener;
 import org.openhab.binding.mysensors.internal.protocol.MySensorsBridgeConnection;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
@@ -24,11 +25,11 @@ public class DiscoveryThread implements MySensorsUpdateListener {
     }
 
     public void start() {
-        mysCon.addEventListener(this);
+        MySensorsEventObserver.addEventListener(this);
     }
 
     public void stop() {
-        mysCon.removeEventListener(this);
+        MySensorsEventObserver.removeEventListener(this);
     }
 
     @Override

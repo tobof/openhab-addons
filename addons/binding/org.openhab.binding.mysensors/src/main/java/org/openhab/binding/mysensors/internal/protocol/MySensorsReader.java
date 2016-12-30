@@ -14,6 +14,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import org.openhab.binding.mysensors.internal.event.MySensorsEventObserver;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageParser;
 import org.slf4j.Logger;
@@ -61,7 +62,7 @@ public class MySensorsReader implements Runnable {
                 logger.debug(line);
                 MySensorsMessage msg = MySensorsMessageParser.parse(line);
                 if (msg != null) {
-                    mysCon.broadCastEvent(msg);
+                    MySensorsEventObserver.notifyMessageReceived(msg);
                 }
             } catch (Exception e) {
                 logger.error("({}) on reading from serial port, message: {}", e, getClass(), e.getMessage());
