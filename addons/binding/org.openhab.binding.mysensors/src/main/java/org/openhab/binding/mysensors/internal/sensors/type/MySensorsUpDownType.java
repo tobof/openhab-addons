@@ -25,4 +25,21 @@ public class MySensorsUpDownType implements MySensorsType {
         return UnDefType.UNDEF;
     }
 
+    @Override
+    public String toPayloadString(State state) {
+        return "";
+    }
+
+    @Override
+    public Integer toSubtypeInt(State state) {
+        if (state == UpDownType.DOWN) {
+            return MySensorsBindingConstants.MYSENSORS_SUBTYPE_V_DOWN;
+        } else if (state == UpDownType.UP) {
+            return MySensorsBindingConstants.MYSENSORS_SUBTYPE_V_UP;
+        } else {
+            throw new IllegalArgumentException("Invalid state passed for UpDown type: " + state);
+        }
+
+    }
+
 }

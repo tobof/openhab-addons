@@ -31,4 +31,16 @@ public class MySensorsOpenCloseType implements MySensorsType {
             throw new IllegalArgumentException("Passed command: " + value + " is not an OpenClose command");
         }
     }
+
+    @Override
+    public String toPayloadString(State state) {
+        if (state == OpenClosedType.CLOSED) {
+            return "0";
+        } else if (state == OpenClosedType.OPEN) {
+            return "1";
+        } else {
+            throw new IllegalArgumentException("State: " + state + ", could not be converted to string");
+        }
+    }
+
 }

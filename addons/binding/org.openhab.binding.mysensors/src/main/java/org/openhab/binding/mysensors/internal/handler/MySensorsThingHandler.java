@@ -136,7 +136,10 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
 
                 // Create the real message to send
                 MySensorsMessage newMsg = new MySensorsMessage(nodeId, childId, MYSENSORS_MSG_TYPE_SET, int_requestack,
-                        revertState, subType, var.getValue().toString());
+                        revertState);
+
+                newMsg.setSubType(var.getSubtypeValue());
+                newMsg.setMsg(var.getPayloadValue());
 
                 String oldPayload = oldMsgContent.get(subType);
                 if (oldPayload == null) {

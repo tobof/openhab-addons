@@ -15,4 +15,12 @@ public interface MySensorsType {
     default public State fromCommand(Command value) {
         return fromString(value.toString());
     }
+
+    default public String toPayloadString(State state) {
+        return state.toString();
+    }
+
+    default public Integer toSubtypeInt(State state) {
+        return null;
+    }
 }

@@ -32,4 +32,15 @@ public class MySensorsOnOffType implements MySensorsType {
         }
     }
 
+    @Override
+    public String toPayloadString(State state) {
+        if (state == OnOffType.OFF) {
+            return "0";
+        } else if (state == OnOffType.ON) {
+            return "1";
+        } else {
+            throw new IllegalArgumentException("State: " + state + ", could not be converted to string");
+        }
+    }
+
 }

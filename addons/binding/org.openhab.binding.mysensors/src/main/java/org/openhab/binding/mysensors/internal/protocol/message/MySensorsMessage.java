@@ -37,6 +37,14 @@ public class MySensorsMessage {
 
     }
 
+    public MySensorsMessage(int nodeId, int childId, int msgType, int ack, boolean revert) {
+        this.nodeId = nodeId;
+        this.childId = childId;
+        this.msgType = msgType;
+        this.ack = ack;
+        this.revert = revert;
+    }
+
     public MySensorsMessage(int nodeId, int childId, int msgType, int ack, boolean revert, int subType, String msg) {
         this.nodeId = nodeId;
         this.childId = childId;

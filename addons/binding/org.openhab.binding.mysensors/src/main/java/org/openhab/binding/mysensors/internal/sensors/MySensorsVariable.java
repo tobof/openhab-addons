@@ -26,6 +26,19 @@ public class MySensorsVariable {
 
     }
 
+    public synchronized String getPayloadValue() {
+        return getType().toPayloadString(getValue());
+    }
+
+    public synchronized int getSubtypeValue() {
+        Integer subType = getType().toSubtypeInt(getValue());
+        if (subType != null) {
+            return subType;
+        } else {
+            return variableTypeAndNumber.getSecond();
+        }
+    }
+
     public synchronized State getValue() {
         return value;
     }
@@ -38,18 +51,18 @@ public class MySensorsVariable {
     }
 
     public void setValue(Command value) {
-        setValue(type.fromCommand(value));
+        setValue(getType().fromCommand(value));
     }
 
     public void setValue(MySensorsMessage value) throws Throwable {
-        setValue(type.fromMessage(value));
+        setValue(getType().fromMessage(value));
     }
 
-    public MySensorsType getType() {
+    public synchronized MySensorsType getType() {
         return type;
     }
 
-    public void setType(MySensorsType type) {
+    public synchronized void setType(MySensorsType type) {
         this.type = type;
     }
 
