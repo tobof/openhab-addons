@@ -27,7 +27,6 @@ import org.openhab.binding.mysensors.internal.event.MySensorsEventType;
 import org.openhab.binding.mysensors.internal.event.MySensorsStatusUpdateEvent;
 import org.openhab.binding.mysensors.internal.event.MySensorsUpdateListener;
 import org.openhab.binding.mysensors.internal.exception.NoMoreIdsException;
-import org.openhab.binding.mysensors.internal.factory.MySensorsCacheFactory;
 import org.openhab.binding.mysensors.internal.handler.MySensorsBridgeHandler;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
@@ -225,8 +224,6 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
                 }
             } catch (Exception e) {
                 logger.error("Exception on waiting for I_VERSION message", e);
-            } finally {
-                removeEventListener(this);
             }
         } else {
             logger.warn("Skipping I_VERSION connection test, not recommended...");
@@ -407,20 +404,10 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
             logger.info("New Node in the MySensors network has requested an ID. ID is: {}", newId);
             MySensorsMessage newMsg = new MySensorsMessage(255, 255, 3, 0, false, 4, newId + "");
             addMySensorsOutboundMessage(newMsg);
-            updateCacheFile();
 
         } catch (NoMoreIdsException e) {
             logger.error("No more IDs available for this node, try cleaning cache");
         }
-    }
-
-    private void updateCacheFile() {
-        MySensorsCacheFactory cacheFactory = MySensorsCacheFactory.getCacheFactory();
-
-        List<Integer> givenIds = new ArrayList<>(deviceManager.getGivenIds());
-
-        cacheFactory.writeCache(MySensorsCacheFactory.GIVEN_IDS_CACHE_FILE, givenIds.toArray(new Integer[] {}),
-                Integer[].class);
     }
 
     /**

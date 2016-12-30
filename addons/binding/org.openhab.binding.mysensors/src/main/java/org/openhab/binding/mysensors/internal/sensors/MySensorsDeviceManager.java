@@ -1,8 +1,9 @@
 package org.openhab.binding.mysensors.internal.sensors;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.openhab.binding.mysensors.internal.Pair;
 import org.openhab.binding.mysensors.internal.exception.NoMoreIdsException;
@@ -93,9 +94,9 @@ public class MySensorsDeviceManager {
         }
     }
 
-    public Set<Integer> getGivenIds() {
+    public List<Integer> getGivenIds() {
         synchronized (nodeMap) {
-            return nodeMap.keySet();
+            return new ArrayList<Integer>(nodeMap.keySet());
         }
     }
 
@@ -103,7 +104,7 @@ public class MySensorsDeviceManager {
         int newId = 1;
 
         synchronized (nodeMap) {
-            Set<Integer> takenIds = getGivenIds();
+            List<Integer> takenIds = getGivenIds();
             while (newId < 255) {
                 if (!takenIds.contains(newId)) {
                     addNode(new MySensorsNode(newId));

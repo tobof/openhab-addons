@@ -9,16 +9,10 @@ package org.openhab.binding.mysensors.internal.handler;
 
 import static org.openhab.binding.mysensors.MySensorsBindingConstants.*;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
-import org.eclipse.smarthome.config.core.Configuration;
 import org.eclipse.smarthome.core.thing.Bridge;
 import org.eclipse.smarthome.core.thing.ChannelUID;
-import org.eclipse.smarthome.core.thing.Thing;
 import org.eclipse.smarthome.core.thing.ThingStatus;
 import org.eclipse.smarthome.core.thing.binding.BaseBridgeHandler;
 import org.eclipse.smarthome.core.types.Command;
@@ -30,11 +24,8 @@ import org.openhab.binding.mysensors.internal.protocol.MySensorsBridgeConnection
 import org.openhab.binding.mysensors.internal.protocol.ip.MySensorsIpConnection;
 import org.openhab.binding.mysensors.internal.protocol.serial.MySensorsSerialConnection;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsDeviceManager;
-import org.openhab.binding.mysensors.internal.sensors.MySensorsNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.gson.reflect.TypeToken;
 
 /**
  * @author Tim Oberföll
@@ -102,7 +93,7 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
             myCon.destroy();
         }
 
-        saveCacheFile();
+        updateCacheFile();
 
         super.dispose();
     }
@@ -131,7 +122,7 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
     public void statusUpdateReceived(MySensorsStatusUpdateEvent event) {
         switch (event.getEventType()) {
             case NEW_NODE_DISCOVERED:
-                updateCacheFile((MySensorsNode) event.getData());
+                updateCacheFile();
                 break;
             case BRIDGE_STATUS_UPDATE:
                 if (((MySensorsBridgeConnection) event.getData()).isConnected()) {
@@ -146,80 +137,13 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
 
     }
 
-    private void updateCacheFile(MySensorsNode newNode) {
-
+    private void updateCacheFile() {
         MySensorsCacheFactory cacheFactory = MySensorsCacheFactory.getCacheFactory();
 
-        List<Integer> givenIds = cacheFactory.readCache(MySensorsCacheFactory.GIVEN_IDS_CACHE_FILE,
-                new ArrayList<Integer>(), new TypeToken<ArrayList<Integer>>() {
-                }.getType());
-
-        // Add ids taken by Thing list of OpenHAB
-        Collection<Thing> thingList = thingRegistry.getAll();
-        Iterator<Thing> iterator = thingList.iterator();
-
-        while (iterator.hasNext()) {
-            Thing thing = iterator.next();
-            Configuration conf = thing.getConfiguration();
-            if (conf != null) {
-                Object nodeIdobj = conf.get("nodeId");
-                if (nodeIdobj != null) {
-                    int nodeId = Integer.parseInt(nodeIdobj.toString());
-                    if (!givenIds.contains(nodeId)) {
-                        givenIds.add(nodeId);
-                    }
-                }
-            }
-        }
-
-        if (newNode != null) {
-            givenIds.add(newNode.getNodeId());
-        }
+        List<Integer> givenIds = deviceManager.getGivenIds();
 
         cacheFactory.writeCache(MySensorsCacheFactory.GIVEN_IDS_CACHE_FILE, givenIds.toArray(new Integer[] {}),
                 Integer[].class);
-
-    }
-
-    private void saveCacheFile() {
-
-        if (deviceManager != null) {
-
-            MySensorsCacheFactory cacheFactory = MySensorsCacheFactory.getCacheFactory();
-
-            List<Integer> givenIds = cacheFactory.readCache(MySensorsCacheFactory.GIVEN_IDS_CACHE_FILE,
-                    new ArrayList<Integer>(), new TypeToken<ArrayList<Integer>>() {
-                    }.getType());
-
-            // Add ids taken by Thing list of OpenHAB
-            Collection<Thing> thingList = thingRegistry.getAll();
-            Iterator<Thing> iterator = thingList.iterator();
-
-            while (iterator.hasNext()) {
-                Thing thing = iterator.next();
-                Configuration conf = thing.getConfiguration();
-                if (conf != null) {
-                    Object nodeIdobj = conf.get("nodeId");
-                    if (nodeIdobj != null) {
-                        int nodeId = Integer.parseInt(nodeIdobj.toString());
-                        if (!givenIds.contains(nodeId)) {
-                            givenIds.add(nodeId);
-                        }
-                    }
-                }
-            }
-
-            Set<Integer> onDeviceManager = deviceManager.getGivenIds();
-            for (Integer i : onDeviceManager) {
-                if (i != null && !givenIds.contains(i)) {
-                    givenIds.add(i);
-                }
-            }
-
-            cacheFactory.writeCache(MySensorsCacheFactory.GIVEN_IDS_CACHE_FILE, givenIds.toArray(new Integer[] {}),
-                    Integer[].class);
-        }
-
     }
 
     @Override
