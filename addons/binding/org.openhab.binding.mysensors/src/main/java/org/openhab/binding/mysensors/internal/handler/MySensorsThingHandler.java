@@ -28,7 +28,6 @@ import org.eclipse.smarthome.core.types.State;
 import org.openhab.binding.mysensors.config.MySensorsSensorConfiguration;
 import org.openhab.binding.mysensors.internal.event.MySensorsEventObserver;
 import org.openhab.binding.mysensors.internal.event.MySensorsUpdateListener;
-import org.openhab.binding.mysensors.internal.protocol.MySensorsBridgeConnection;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageParser;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
@@ -175,18 +174,6 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
     }
 
     @Override
-    public void nodeIdReservationDone(Integer reservedId) throws Throwable {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void newNodeDiscovered(MySensorsNode message) throws Throwable {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
     public void nodeUpdateEvent(MySensorsNode node, MySensorsChild child, MySensorsVariable var) {
         if (node.getNodeId() == nodeId && child.getChildId() == childId) {
             handleChildUpdateEvent(var);
@@ -203,12 +190,6 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
         } else {
             updateStatus(ThingStatus.ONLINE);
         }
-
-    }
-
-    @Override
-    public void bridgeStatusUpdate(MySensorsBridgeConnection connection, boolean connected) throws Throwable {
-        // TODO Auto-generated method stub
 
     }
 
