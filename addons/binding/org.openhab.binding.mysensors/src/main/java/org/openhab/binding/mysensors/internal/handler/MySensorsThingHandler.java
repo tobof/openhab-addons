@@ -8,7 +8,6 @@
 package org.openhab.binding.mysensors.internal.handler;
 
 import static org.openhab.binding.mysensors.MySensorsBindingConstants.*;
-import static org.openhab.binding.mysensors.internal.MySensorsUtility.invertMap;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -128,7 +127,7 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
             }
         } else {
             MySensorsVariable var = deviceManager.getVariable(nodeId, childId,
-                    invertMap(CHANNEL_MAP, true).get(channelUID.getId()));
+                    INVERSE_CHANNEL_MAP.get(channelUID.getId()));
             if (var != null) {
 
                 // Update value into the MS device

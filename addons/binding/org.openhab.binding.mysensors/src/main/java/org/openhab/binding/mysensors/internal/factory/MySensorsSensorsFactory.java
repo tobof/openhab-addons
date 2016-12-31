@@ -1,7 +1,6 @@
 package org.openhab.binding.mysensors.internal.factory;
 
 import static org.openhab.binding.mysensors.MySensorsBindingConstants.*;
-import static org.openhab.binding.mysensors.internal.MySensorsUtility.invertMap;
 
 import java.util.HashMap;
 import java.util.List;
@@ -51,7 +50,7 @@ public class MySensorsSensorsFactory {
 
         for (Channel c : channels) {
             String channelID = c.getUID().getId();
-            Pair<Integer> variableNum = invertMap(CHANNEL_MAP, true).get(channelID);
+            Pair<Integer> variableNum = INVERSE_CHANNEL_MAP.get(channelID);
             Class<? extends MySensorsType> cls = TYPE_MAP.get(channelID);
 
             if (variableNum == null || cls == null) {

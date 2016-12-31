@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.smarthome.core.thing.ThingTypeUID;
+import org.openhab.binding.mysensors.internal.MySensorsUtility;
 import org.openhab.binding.mysensors.internal.Pair;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
 import org.openhab.binding.mysensors.internal.sensors.type.MySensorsDecimalType;
@@ -348,6 +349,8 @@ public class MySensorsBindingConstants {
             put(Pair.of(MYSENSORS_MSG_TYPE_INTERNAL, MYSENSORS_SUBTYPE_I_BATTERY_LEVEL), CHANNEL_BATTERY);
         }
     };
+
+    public final static Map<String, Pair<Integer>> INVERSE_CHANNEL_MAP = MySensorsUtility.invertMap(CHANNEL_MAP, true);
 
     public final static Map<String, Class<? extends MySensorsType>> TYPE_MAP = new HashMap<String, Class<? extends MySensorsType>>() {
 
