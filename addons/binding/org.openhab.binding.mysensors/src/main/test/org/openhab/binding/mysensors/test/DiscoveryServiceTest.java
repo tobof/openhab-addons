@@ -16,7 +16,7 @@ public class DiscoveryServiceTest {
 
         for (Integer key : keySet) {
             ThingTypeUID thingTypeUid = THING_UID_MAP.get(key);
-            System.out.println(thingTypeUid.getId());
+            // System.out.println(thingTypeUid.getId());
             assertEquals(true, thingTypeUid.getId().matches("^[a-zA-Z-]*$"));
         }
     }

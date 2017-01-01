@@ -78,7 +78,7 @@ public class MySensorsDiscoveryService extends AbstractDiscoveryService {
             ThingTypeUID thingUid = THING_UID_MAP.get(msg.getSubType());
 
             if (thingUid != null) {
-                logger.debug("Preparing new thing for inbox: ", thingUid);
+                logger.debug("Preparing new thing for inbox: {}", thingUid);
 
                 ThingUID uid = new ThingUID(thingUid, bridgeHandler.getThing().getUID(),
                         thingUid.getId().toLowerCase() + "_" + msg.getNodeId() + "_" + msg.getChildId());
