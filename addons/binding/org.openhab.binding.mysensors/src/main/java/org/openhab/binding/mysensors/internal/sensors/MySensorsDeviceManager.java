@@ -74,11 +74,11 @@ public class MySensorsDeviceManager {
     public void addNode(MySensorsNode node, boolean mergeIfExist) {
         MySensorsNode exist = null;
         if (mergeIfExist && ((exist = getNode(node.getNodeId())) != null)) {
-            logger.info("Merging child map: {} with: {}", exist.getChildMap(), node.getChildMap());
+            logger.debug("Merging child map: {} with: {}", exist.getChildMap(), node.getChildMap());
             exist.mergeNodeChilds(node);
             logger.trace("Merging result is: {}", exist.getChildMap());
         } else {
-            logger.info("Adding device {}", node.toString());
+            logger.debug("Adding device {}", node.toString());
             addNode(node);
         }
     }
