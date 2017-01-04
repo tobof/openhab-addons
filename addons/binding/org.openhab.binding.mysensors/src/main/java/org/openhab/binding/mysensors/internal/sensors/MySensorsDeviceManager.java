@@ -66,17 +66,17 @@ public class MySensorsDeviceManager implements MySensorsUpdateListener {
 
     }
 
-    public MySensorsNode getNode(int nodeId) {
+    private MySensorsNode getNode(int nodeId) {
         return nodeMap.get(nodeId);
     }
 
-    public void addNode(MySensorsNode node) {
+    private void addNode(MySensorsNode node) {
         synchronized (nodeMap) {
             nodeMap.put(node.getNodeId(), node);
         }
     }
 
-    public void addChild(int nodeId, MySensorsChild<?> child) {
+    private void addChild(int nodeId, MySensorsChild<?> child) {
         synchronized (nodeMap) {
             MySensorsNode node = nodeMap.get(nodeId);
             if (node != null) {
@@ -87,11 +87,14 @@ public class MySensorsDeviceManager implements MySensorsUpdateListener {
         }
     }
 
+    /**
+     * @return a Set of Ids that is already used and known to the binding.
+     */
     public Set<Integer> getGivenIds() {
         return nodeMap.keySet();
     }
 
-    public Integer reserveId() throws NoMoreIdsException {
+    private Integer reserveId() throws NoMoreIdsException {
         int newId = 1;
 
         // clearNullOnMap();
@@ -161,6 +164,11 @@ public class MySensorsDeviceManager implements MySensorsUpdateListener {
         }
     }
 
+    /**
+     * Checks if the
+     *
+     * @param msg
+     */
     @SuppressWarnings("unused")
     private void checkChildFound(MySensorsMessage msg) {
         synchronized (nodeMap) {

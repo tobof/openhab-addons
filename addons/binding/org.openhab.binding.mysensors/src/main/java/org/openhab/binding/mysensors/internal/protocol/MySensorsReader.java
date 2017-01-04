@@ -42,6 +42,9 @@ public class MySensorsReader implements MySensorsUpdateListener, Runnable {
 
     protected boolean stopReader = false;
 
+    /**
+     * Starts the reader process that will receive the messages from the MySensors network.
+     */
     public void startReader() {
         future = executor.submit(this);
     }
@@ -83,6 +86,9 @@ public class MySensorsReader implements MySensorsUpdateListener, Runnable {
 
     }
 
+    /**
+     * Stops the reader process of the bridge that receives messages from the MySensors network.
+     */
     public void stopReader() {
 
         logger.debug("Stopping Reader thread");

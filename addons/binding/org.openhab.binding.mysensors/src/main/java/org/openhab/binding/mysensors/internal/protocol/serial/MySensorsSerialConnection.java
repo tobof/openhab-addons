@@ -48,6 +48,9 @@ public class MySensorsSerialConnection extends MySensorsBridgeConnection {
         this.sendDelay = sendDelay;
     }
 
+    /**
+     * Tries to accomplish a connection via a serial port to the serial gateway.
+     */
     @Override
     public boolean _connect() {
         logger.debug("Connecting to {} [baudRate:{}]", serialPort, baudRate);
@@ -80,6 +83,9 @@ public class MySensorsSerialConnection extends MySensorsBridgeConnection {
         return ret;
     }
 
+    /**
+     * Initiates a clean disconnect from the serial gateway.
+     */
     @Override
     public void _disconnect() {
         logger.debug("Shutting down serial connection!");
