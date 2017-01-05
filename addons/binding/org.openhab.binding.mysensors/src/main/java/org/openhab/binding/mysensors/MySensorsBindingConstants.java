@@ -174,6 +174,20 @@ public class MySensorsBindingConstants {
     public static final int MYSENSORS_NUMBER_OF_RETRIES = 5;
     public static final int[] MYSENSORS_RETRY_TIMES = { 0, 100, 500, 1000, 2000 };
 
+    /**
+     * All knowing thing. A node with nodeId 999 and childId 999 receives all messages
+     * received from the MySensors bridge/gateway. Useful for debugging and for implementation
+     * of features not covered by the binding (for example with rules)
+     */
+    public static final int MYSENSORS_NODE_ID_ALL_KNOWING = 999;
+    public static final int MYSENSORS_CHILD_ID_ALL_KNOWING = 999;
+
+    // Reserved ids
+    public static final int MYSENSORS_NODE_ID_RESERVED_0 = 0;
+    public static final int MYSENSORS_NODE_ID_RESERVED_255 = 255;
+    public static final int MYSENSORS_CHILD_ID_RESERVED_0 = 0;
+    public static final int MYSENSORS_CHILD_ID_RESERVED_255 = 255;
+
     // List of all Thing Type UIDs
     public final static ThingTypeUID THING_TYPE_HUMIDITY = new ThingTypeUID(BINDING_ID, "humidity");
     public final static ThingTypeUID THING_TYPE_TEMPERATURE = new ThingTypeUID(BINDING_ID, "temperature");
@@ -268,7 +282,7 @@ public class MySensorsBindingConstants {
     public final static String CHANNEL_MYSENSORS_MESSAGE = "mySensorsMessage";
     public final static String CHANNEL_LAST_UPDATE = "lastupdate";
     public final static String CHANNEL_CO2_LEVEL = "co2-level";
-    
+
     // Wait time Arduino reset
     public final static int RESET_TIME = 3000;
 
@@ -378,6 +392,6 @@ public class MySensorsBindingConstants {
             THING_TYPE_RAIN, THING_TYPE_UV, THING_TYPE_WEIGHT, THING_TYPE_DISTANCE, THING_TYPE_LIGHT_LEVEL,
             THING_TYPE_HVAC, THING_TYPE_WATER, THING_TYPE_CUSTOM, THING_TYPE_LOCK, THING_TYPE_SOUND,
             THING_TYPE_RGB_LIGHT, THING_TYPE_RGBW_LIGHT, THING_TYPE_WATER_QUALITY, THING_TYPE_MYSENSORS_MESSAGE,
-            THING_TYPE_TEXT, THING_TYPE_IR_SEND, THING_TYPE_IR_RECEIVE, THING_TYPE_AIR_QUALITY, THING_TYPE_BRIDGE_SER, 
+            THING_TYPE_TEXT, THING_TYPE_IR_SEND, THING_TYPE_IR_RECEIVE, THING_TYPE_AIR_QUALITY, THING_TYPE_BRIDGE_SER,
             THING_TYPE_BRIDGE_ETH);
 }
