@@ -7,7 +7,6 @@
  */
 package org.openhab.binding.mysensors.internal.protocol.serial;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -108,35 +107,6 @@ public class MySensorsSerialConnection extends MySensorsBridgeConnection {
             serialConnection = null;
         }
 
-    }
-
-    /**
-     * This method delete lock file (if present).
-     * RXTX library not removes them after call NRSerialPort.disconnect().
-     * If lock file was not removed, new connection fail to startup
-     *
-     * @param devName is the device used as COM/UART port
-     */
-    @SuppressWarnings("unused")
-    private void deleteLockFile(String devName) {
-        try {
-            String[] namePart = devName.split("/");
-            File lockFile = new File("/var/lock/LCK.." + namePart[namePart.length - 1]);
-            if (lockFile.exists()) {
-                logger.warn("Lock file found ({}), this is not good...try removing it", lockFile.toString());
-                lockFile.delete();
-
-                if (lockFile.exists()) {
-                    logger.error("Warn! Lock file cannot be deleted, probably connection will fail");
-                } else {
-                    logger.info("Ok, lock file removed...");
-                }
-            } else {
-                logger.debug("Lock file doesn't not exists");
-            }
-        } catch (Exception e) {
-            logger.error("Serial lock file not removed, cause: {} ({})", e.getClass(), e.getMessage());
-        }
     }
 
     /**

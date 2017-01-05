@@ -44,6 +44,7 @@
     <module>org.openhab.binding.miele</module>
     <module>org.openhab.binding.milight</module>
     <module>org.openhab.binding.minecraft</module>
+    <module>org.openhab.binding.mysensors</module>
     <module>org.openhab.binding.netatmo</module>
     <module>org.openhab.binding.network</module>
     <module>org.openhab.binding.oceanic</module>
@@ -65,7 +66,6 @@
     <module>org.openhab.binding.toon</module>
     <module>org.openhab.binding.urtsi</module>
     <module>org.openhab.binding.vitotronic</module>
-    <module>org.openhab.binding.mysensors</module>
     <module>org.openhab.binding.yamahareceiver</module>
   </modules>
 
