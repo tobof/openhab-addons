@@ -10,33 +10,59 @@ package org.openhab.binding.mysensors.internal.event;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
 
 /**
+ * If a new message from the gateway/bridge is received
+ * a MySensorsStatusUpdateEvent is generated containing the MySensors message
+ *
  * @author Tim Oberföll
  *
- *         If a new message from the gateway/bridge is received
- *         a MySensorsStatusUpdateEvent is generated containing the MySensors message
  */
 public class MySensorsStatusUpdateEvent {
     private Object data;
 
     private MySensorsEventType eventType;
 
+    /**
+     * Initialization of the StatusUpdateEvent class.
+     *
+     * @param eventType Type of event received from the gateway.
+     * @param data data received with the event.
+     */
     public MySensorsStatusUpdateEvent(MySensorsEventType eventType, Object data) {
         this.eventType = eventType;
         this.data = data;
     }
 
+    /**
+     * Set event type of the update.
+     *
+     * @param event type of event of the update.
+     */
     public void setEventType(MySensorsEventType event) {
         this.eventType = event;
     }
 
+    /**
+     * Get event type of the update.
+     *
+     * @return type of event of the update.
+     */
     public MySensorsEventType getEventType() {
         return eventType;
     }
 
+    /**
+     *
+     * @return Returns the data that was received with the update.
+     */
     public Object getData() {
         return data;
     }
 
+    /**
+     * Set the content / data of the update.
+     *
+     * @param data content / data of the update.
+     */
     public void setData(MySensorsMessage data) {
         this.data = data;
     }

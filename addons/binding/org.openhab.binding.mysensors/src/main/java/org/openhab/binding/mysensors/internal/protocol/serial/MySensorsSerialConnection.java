@@ -23,9 +23,11 @@ import gnu.io.CommPortIdentifier;
 import gnu.io.NRSerialPort;
 
 /**
- * @author Tim Oberföll
+ * Connection to the serial interface where the MySensors Gateway is connected.
  *
- *         Connection to the serial interface where the MySensors Gateway is conncted
+ * @author Tim Oberföll
+ * @author Andrea Cioni
+ *
  */
 public class MySensorsSerialConnection extends MySensorsBridgeConnection {
 
@@ -46,6 +48,9 @@ public class MySensorsSerialConnection extends MySensorsBridgeConnection {
         this.sendDelay = sendDelay;
     }
 
+    /**
+     * Tries to accomplish a connection via a serial port to the serial gateway.
+     */
     @Override
     public boolean _connect() {
         logger.debug("Connecting to {} [baudRate:{}]", serialPort, baudRate);
@@ -78,6 +83,9 @@ public class MySensorsSerialConnection extends MySensorsBridgeConnection {
         return ret;
     }
 
+    /**
+     * Initiates a clean disconnect from the serial gateway.
+     */
     @Override
     public void _disconnect() {
         logger.debug("Shutting down serial connection!");

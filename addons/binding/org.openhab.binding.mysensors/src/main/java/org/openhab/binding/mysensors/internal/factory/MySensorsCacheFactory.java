@@ -1,3 +1,10 @@
+/**
+ * Copyright (c) 2014-2016 openHAB UG (haftungsbeschraenkt) and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ */
 package org.openhab.binding.mysensors.internal.factory;
 
 import java.io.File;
@@ -13,6 +20,12 @@ import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 
+/**
+ * ID Cache is used to store the ids used in the MySensors network.
+ *
+ * @author Andrea Cioni
+ *
+ */
 public class MySensorsCacheFactory {
     private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -25,6 +38,11 @@ public class MySensorsCacheFactory {
 
     private Gson gson = null;
 
+    /**
+     * Singelton of the CacheFactory
+     *
+     * @return Returns the singleton of the CacheFactory. Only one instance is allowed at a time.
+     */
     public static MySensorsCacheFactory getCacheFactory() {
         if (singleton == null) {
             singleton = new MySensorsCacheFactory();
@@ -46,14 +64,23 @@ public class MySensorsCacheFactory {
         }
     }
 
+    /**
+     * Read the cache file.
+     */
     public <T> T readCache(String cacheName, T defaulT, Type clasz) {
         return jsonFromFile(cacheName, defaulT, clasz);
     }
 
+    /**
+     * Write the cache file.
+     */
     public <T> void writeCache(String cacheName, T obj, Type clasz) {
         jsonToFile(cacheName, obj, clasz);
     }
 
+    /**
+     * Read the cache file.
+     */
     private synchronized <T> T jsonFromFile(String fileName, T def, Type clasz) {
 
         T ret = def;
@@ -84,6 +111,9 @@ public class MySensorsCacheFactory {
         return ret;
     }
 
+    /**
+     * Write the cache file.
+     */
     private synchronized <T> void jsonToFile(String fileName, T obj, Type clasz) {
         JsonWriter jsonWriter = null;
         try {

@@ -45,13 +45,6 @@ public class MySensorsHandlerFactory extends BaseThingHandlerFactory {
         return SUPPORTED_DEVICE_TYPES_UIDS.contains(thingTypeUID);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * org.eclipse.smarthome.core.thing.binding.BaseThingHandlerFactory#createHandler(org.eclipse.smarthome.core.thing.
-     * Thing)
-     */
     @Override
     protected ThingHandler createHandler(Thing thing) {
 
@@ -72,13 +65,6 @@ public class MySensorsHandlerFactory extends BaseThingHandlerFactory {
         return null;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * org.eclipse.smarthome.core.thing.binding.BaseThingHandlerFactory#createThing(org.eclipse.smarthome.core.thing.
-     * ThingTypeUID, org.eclipse.smarthome.config.core.Configuration, org.eclipse.smarthome.core.thing.ThingUID)
-     */
     @Override
     protected Thing createThing(ThingTypeUID thingTypeUID, Configuration configuration, ThingUID thingUID) {
         return super.createThing(thingTypeUID, configuration, thingUID);

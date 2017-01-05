@@ -22,12 +22,13 @@ import com.google.common.collect.Lists;
  * The {@link MySensorsBinding} class defines common constants, which are
  * used across the whole binding.
  *
- * @author Tim Oberföll - Initial contribution
+ * @author Tim Oberföll
  */
 public class MySensorsBindingConstants {
 
     public static final String BINDING_ID = "mysensors";
 
+    // parameters / fields of a MySensors message
     public static final String PARAMETER_NODEID = "nodeId";
     public static final String PARAMETER_CHILDID = "childId";
     public static final String PARAMETER_IPADDRESS = "ipAddress";
@@ -36,6 +37,7 @@ public class MySensorsBindingConstants {
     public static final String PARAMETER_BAUDRATE = "baudRate";
     public static final String PARAMETER_REQUESTACK = "requestack";
 
+    // Message types of the MySensors network
     public static final int MYSENSORS_MSG_TYPE_PRESENTATION = 0;
     public static final int MYSENSORS_MSG_TYPE_SET = 1;
     public static final int MYSENSORS_MSG_TYPE_REQ = 2;
@@ -63,6 +65,7 @@ public class MySensorsBindingConstants {
     public static final int MYSENSORS_SUBTYPE_S_LOCK = 19;
     public static final int MYSENSORS_SUBTYPE_S_IR = 20;
     public static final int MYSENSORS_SUBTYPE_S_WATER = 21;
+    public static final int MYSENSORS_SUBTYPE_S_AIR_QUALITY = 22;
     public static final int MYSENSORS_SUBTYPE_S_CUSTOM = 23;
     public static final int MYSENSORS_SUBTYPE_S_RGB_LIGHT = 26;
     public static final int MYSENSORS_SUBTYPE_S_RGBW_LIGHT = 27;
@@ -167,6 +170,7 @@ public class MySensorsBindingConstants {
     public static final int MYSENSORS_SUBTYPE_I_REGISTRATION_RESPONSE = 27;
     public static final int MYSENSORS_SUBTYPE_I_DEBUG = 28;
 
+    // How often and at which times should the binding retry to send a message if requestAck is true?
     public static final int MYSENSORS_NUMBER_OF_RETRIES = 5;
     public static final int[] MYSENSORS_RETRY_TIMES = { 0, 100, 500, 1000, 2000 };
 
@@ -190,9 +194,7 @@ public class MySensorsBindingConstants {
     public final static ThingTypeUID THING_TYPE_LIGHT_LEVEL = new ThingTypeUID(BINDING_ID, "light-level");
     public final static ThingTypeUID THING_TYPE_WATER = new ThingTypeUID(BINDING_ID, "waterMeter");
     public final static ThingTypeUID THING_TYPE_CUSTOM = new ThingTypeUID(BINDING_ID, "customSensor");
-
     public final static ThingTypeUID THING_TYPE_HVAC = new ThingTypeUID(BINDING_ID, "hvacThermostat");
-
     public final static ThingTypeUID THING_TYPE_LOCK = new ThingTypeUID(BINDING_ID, "lock");
     public final static ThingTypeUID THING_TYPE_SOUND = new ThingTypeUID(BINDING_ID, "sound");
     public final static ThingTypeUID THING_TYPE_RGB_LIGHT = new ThingTypeUID(BINDING_ID, "rgbLight");
@@ -202,7 +204,9 @@ public class MySensorsBindingConstants {
     public final static ThingTypeUID THING_TYPE_TEXT = new ThingTypeUID(BINDING_ID, "text");
     public final static ThingTypeUID THING_TYPE_IR_SEND = new ThingTypeUID(BINDING_ID, "irSend");
     public final static ThingTypeUID THING_TYPE_IR_RECEIVE = new ThingTypeUID(BINDING_ID, "irReceive");
+    public final static ThingTypeUID THING_TYPE_AIR_QUALITY = new ThingTypeUID(BINDING_ID, "airQuality");
 
+    // List of bridges
     public final static ThingTypeUID THING_TYPE_BRIDGE_SER = new ThingTypeUID(BINDING_ID, "bridge-ser");
     public final static ThingTypeUID THING_TYPE_BRIDGE_ETH = new ThingTypeUID(BINDING_ID, "bridge-eth");
 
@@ -263,13 +267,17 @@ public class MySensorsBindingConstants {
     public final static String CHANNEL_IR_RECEIVE = "irReceive";
     public final static String CHANNEL_MYSENSORS_MESSAGE = "mySensorsMessage";
     public final static String CHANNEL_LAST_UPDATE = "lastupdate";
-
+    public final static String CHANNEL_CO2_LEVEL = "co2-level";
+    
     // Wait time Arduino reset
     public final static int RESET_TIME = 3000;
 
     // I version message for startup check
     public static final MySensorsMessage I_VERSION_MESSAGE = new MySensorsMessage(0, 0, 3, 0, false, 2, "");
 
+    /**
+     * Mapping MySensors subtypes to channels.
+     */
     public final static Map<Number, String> CHANNEL_MAP = new HashMap<Number, String>() {
         /**
          *
@@ -315,6 +323,7 @@ public class MySensorsBindingConstants {
             put(MYSENSORS_SUBTYPE_V_VOLUME, CHANNEL_VOLUME);
             put(MYSENSORS_SUBTYPE_V_LOCK_STATUS, CHANNEL_LOCK_STATUS);
             put(MYSENSORS_SUBTYPE_V_LEVEL, CHANNEL_LEVEL);
+            put(MYSENSORS_SUBTYPE_V_LEVEL, CHANNEL_CO2_LEVEL);
             put(MYSENSORS_SUBTYPE_V_RGB, CHANNEL_RGB);
             put(MYSENSORS_SUBTYPE_V_RGBW, CHANNEL_RGBW);
             put(MYSENSORS_SUBTYPE_V_ID, CHANNEL_ID);
@@ -335,6 +344,9 @@ public class MySensorsBindingConstants {
         }
     };
 
+    /**
+     * Mapping MySensors internal messages to channels.
+     */
     public final static Map<Number, String> CHANNEL_MAP_INTERNAL = new HashMap<Number, String>() {
         /**
          *
@@ -347,24 +359,25 @@ public class MySensorsBindingConstants {
         }
     };
 
-    /** Supported Things without bridge */
+    /** Supported Things without bridges */
     public final static Set<ThingTypeUID> SUPPORTED_THING_TYPES_UIDS = ImmutableSet.of(THING_TYPE_HUMIDITY,
             THING_TYPE_TEMPERATURE, THING_TYPE_LIGHT, THING_TYPE_MULTIMETER, THING_TYPE_POWER, THING_TYPE_BARO,
             THING_TYPE_DOOR, THING_TYPE_MOTION, THING_TYPE_SMOKE, THING_TYPE_DIMMER, THING_TYPE_COVER, THING_TYPE_WIND,
             THING_TYPE_RAIN, THING_TYPE_UV, THING_TYPE_WEIGHT, THING_TYPE_DISTANCE, THING_TYPE_LIGHT_LEVEL,
             THING_TYPE_HVAC, THING_TYPE_WATER, THING_TYPE_CUSTOM, THING_TYPE_LOCK, THING_TYPE_SOUND,
             THING_TYPE_RGB_LIGHT, THING_TYPE_RGBW_LIGHT, THING_TYPE_WATER_QUALITY, THING_TYPE_MYSENSORS_MESSAGE,
-            THING_TYPE_TEXT, THING_TYPE_IR_SEND, THING_TYPE_IR_RECEIVE);
+            THING_TYPE_TEXT, THING_TYPE_IR_SEND, THING_TYPE_IR_RECEIVE, THING_TYPE_AIR_QUALITY);
     /** Supported bridges */
     public final static Set<ThingTypeUID> SUPPORTED_BRIDGE_THING_TYPES_UIDS = ImmutableSet.of(THING_TYPE_BRIDGE_SER,
             THING_TYPE_BRIDGE_ETH);
 
-    /** Supported devices (things + brdiges) */
+    /** Supported devices (things + bridges) */
     public final static Collection<ThingTypeUID> SUPPORTED_DEVICE_TYPES_UIDS = Lists.newArrayList(THING_TYPE_HUMIDITY,
             THING_TYPE_TEMPERATURE, THING_TYPE_LIGHT, THING_TYPE_MULTIMETER, THING_TYPE_POWER, THING_TYPE_BARO,
             THING_TYPE_DOOR, THING_TYPE_MOTION, THING_TYPE_SMOKE, THING_TYPE_DIMMER, THING_TYPE_COVER, THING_TYPE_WIND,
             THING_TYPE_RAIN, THING_TYPE_UV, THING_TYPE_WEIGHT, THING_TYPE_DISTANCE, THING_TYPE_LIGHT_LEVEL,
             THING_TYPE_HVAC, THING_TYPE_WATER, THING_TYPE_CUSTOM, THING_TYPE_LOCK, THING_TYPE_SOUND,
             THING_TYPE_RGB_LIGHT, THING_TYPE_RGBW_LIGHT, THING_TYPE_WATER_QUALITY, THING_TYPE_MYSENSORS_MESSAGE,
-            THING_TYPE_TEXT, THING_TYPE_IR_SEND, THING_TYPE_IR_RECEIVE, THING_TYPE_BRIDGE_SER, THING_TYPE_BRIDGE_ETH);
+            THING_TYPE_TEXT, THING_TYPE_IR_SEND, THING_TYPE_IR_RECEIVE, THING_TYPE_AIR_QUALITY, THING_TYPE_BRIDGE_SER, 
+            THING_TYPE_BRIDGE_ETH);
 }

@@ -12,6 +12,13 @@ import java.io.PrintWriter;
 
 import org.openhab.binding.mysensors.internal.protocol.MySensorsWriter;
 
+/**
+ * Responsible for sending messages to the serial link.
+ *
+ * @author Andrea Cioni
+ * @author Tim Oberföll
+ *
+ */
 public class MySensorsSerialWriter extends MySensorsWriter {
 
     public MySensorsSerialWriter(OutputStream outStream, MySensorsSerialConnection mysCon, int sendDelay) {

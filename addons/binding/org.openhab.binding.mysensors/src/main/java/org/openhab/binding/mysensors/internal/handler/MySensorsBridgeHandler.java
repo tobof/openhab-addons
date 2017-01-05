@@ -37,10 +37,11 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.reflect.TypeToken;
 
 /**
+ * MySensorsBridgeHandler is used to initialize a new bridge (in MySensors: Gateway)
+ * The sensors are connected via the gateway/bridge to the controller
+ *
  * @author Tim Oberföll
  *
- *         MySensorsBridgeHandler is used to initialize a new bridge (in MySensors: Gateway)
- *         The sensors are connected via the gateway/bridge to the controller
  */
 public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySensorsUpdateListener {
 
@@ -62,11 +63,6 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
         super(bridge);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.eclipse.smarthome.core.thing.binding.BaseThingHandler#initialize()
-     */
     @Override
     public void initialize() {
         logger.debug("Initialization of the MySensors bridge");
@@ -94,11 +90,6 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
         logger.debug("Initialization of the MySensors bridge DONE!");
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.eclipse.smarthome.core.thing.binding.BaseThingHandler#dispose()
-     */
     @Override
     public void dispose() {
         logger.debug("Disposing of the MySensors bridge");
@@ -113,26 +104,35 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
         super.dispose();
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * org.eclipse.smarthome.core.thing.binding.ThingHandler#handleCommand(org.eclipse.smarthome.core.thing.ChannelUID,
-     * org.eclipse.smarthome.core.types.Command)
-     */
     @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
 
     }
 
+    /**
+     * Getter for the configuration of the bridge.
+     *
+     * @return Configuration of the MySensors bridge.
+     */
     public MySensorsBridgeConfiguration getBridgeConfiguration() {
         return myConfiguration;
     }
 
+    /**
+     * Getter for the connection to the MySensors bridge / gateway.
+     * Used for receiving (register handler) and sending of messages.
+     *
+     * @return Connection to the MySensors bridge / gateway.
+     */
     public MySensorsBridgeConnection getBridgeConnection() {
         return myCon;
     }
 
+    /**
+     * Getter for the device manager of the MySensors binding.
+     *
+     * @return Link to the device manager of the MySensors binding.
+     */
     public MySensorsDeviceManager getDeviceManager() {
         return myDevManager;
     }
@@ -156,6 +156,11 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
 
     }
 
+    /**
+     * Reads the cache file in which the known node ids from the MySensors network are stored.
+     *
+     * @return A list of known node ids.
+     */
     private List<MySensorsNode> loadCacheFile() {
         MySensorsCacheFactory cacheFactory = MySensorsCacheFactory.getCacheFactory();
         List<MySensorsNode> nodes = new ArrayList<MySensorsNode>();
@@ -190,6 +195,11 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
         return nodes;
     }
 
+    /**
+     * Stores a new node id in the cache file. The node ids are persisted during restarts.
+     *
+     * @param newNode The new discovered / configured node.
+     */
     private void updateCacheFile(MySensorsNode newNode) {
 
         MySensorsCacheFactory cacheFactory = MySensorsCacheFactory.getCacheFactory();
@@ -225,6 +235,10 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
 
     }
 
+    /**
+     * Save the id cache to the filesystem to persist the data during restarts.
+     *
+     */
     private void saveCacheFile() {
 
         if (myDevManager != null) {

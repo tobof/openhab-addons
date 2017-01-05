@@ -1,3 +1,10 @@
+/**
+ * Copyright (c) 2014-2016 openHAB UG (haftungsbeschraenkt) and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ */
 package org.openhab.binding.mysensors.internal.sensors;
 
 import java.util.HashMap;
@@ -15,6 +22,12 @@ import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * ID handling for the MySensors network: Requests for IDs get answered and IDs get stored in a local cache.
+ *
+ * @author Andrea Cioni
+ *
+ */
 public class MySensorsDeviceManager implements MySensorsUpdateListener {
     private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -53,17 +66,17 @@ public class MySensorsDeviceManager implements MySensorsUpdateListener {
 
     }
 
-    public MySensorsNode getNode(int nodeId) {
+    private MySensorsNode getNode(int nodeId) {
         return nodeMap.get(nodeId);
     }
 
-    public void addNode(MySensorsNode node) {
+    private void addNode(MySensorsNode node) {
         synchronized (nodeMap) {
             nodeMap.put(node.getNodeId(), node);
         }
     }
 
-    public void addChild(int nodeId, MySensorsChild<?> child) {
+    private void addChild(int nodeId, MySensorsChild<?> child) {
         synchronized (nodeMap) {
             MySensorsNode node = nodeMap.get(nodeId);
             if (node != null) {
@@ -74,11 +87,14 @@ public class MySensorsDeviceManager implements MySensorsUpdateListener {
         }
     }
 
+    /**
+     * @return a Set of Ids that is already used and known to the binding.
+     */
     public Set<Integer> getGivenIds() {
         return nodeMap.keySet();
     }
 
-    public Integer reserveId() throws NoMoreIdsException {
+    private Integer reserveId() throws NoMoreIdsException {
         int newId = 1;
 
         // clearNullOnMap();
@@ -148,6 +164,11 @@ public class MySensorsDeviceManager implements MySensorsUpdateListener {
         }
     }
 
+    /**
+     * Checks if the
+     *
+     * @param msg
+     */
     @SuppressWarnings("unused")
     private void checkChildFound(MySensorsMessage msg) {
         synchronized (nodeMap) {

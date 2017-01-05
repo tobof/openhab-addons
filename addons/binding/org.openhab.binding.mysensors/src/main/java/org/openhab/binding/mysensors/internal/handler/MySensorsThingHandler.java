@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * The {@link MySensorsThingHandler} is responsible for handling commands, which are
- * sent to one of the channels.
+ * sent to one of the channels and messages received via the MySensors network.
  *
  * @author Tim Oberföll
  */
@@ -94,13 +94,6 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
         }
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * org.eclipse.smarthome.core.thing.binding.ThingHandler#handleCommand(org.eclipse.smarthome.core.thing.ChannelUID,
-     * org.eclipse.smarthome.core.types.Command)
-     */
     @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
 
@@ -236,24 +229,11 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
         getBridgeHandler().getBridgeConnection().addMySensorsOutboundMessage(newMsg);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.eclipse.smarthome.core.thing.binding.BaseThingHandler#handleUpdate(org.eclipse.smarthome.core.thing.
-     * ChannelUID, org.eclipse.smarthome.core.types.State)
-     */
     @Override
     public void handleUpdate(ChannelUID channelUID, org.eclipse.smarthome.core.types.State newState) {
         // logger.debug("handleUpdate called");
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * org.openhab.binding.mysensors.handler.MySensorsUpdateListener#statusUpdateReceived(org.openhab.binding.mysensors.
-     * handler.MySensorsStatusUpdateEvent)
-     */
     @Override
     public void statusUpdateReceived(MySensorsStatusUpdateEvent event) {
         switch (event.getEventType()) {
@@ -286,6 +266,12 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
         return myBridgeHandler;
     }
 
+    /**
+     * If a new message is received via the MySensors bridge it is handed over to the ThingHandler
+     * and processed in this method. After parsing the message the corresponding channel is updated.
+     *
+     * @param msg The message that was received by the MySensors gateway.
+     */
     private void handleIncomingMessageEvent(MySensorsMessage msg) {
         // Am I the all knowing node that receives all messages?
         if (nodeId == 999 && childId == 999) {
@@ -381,6 +367,7 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
                             case CHANNEL_FLOW:
                             case CHANNEL_VOLUME:
                             case CHANNEL_LEVEL:
+                            case CHANNEL_CO2_LEVEL:
                             case CHANNEL_PH:
                                 updateState(channel, new DecimalType(msg.getMsg()));
                                 break;
@@ -410,6 +397,10 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
         }
     }
 
+    /**
+     * For every thing there is a lastUpdate channel in which the date/time is stored
+     * a message was received from this thing.
+     */
     private void updateLastUpdate() {
         // Don't always fire last update channel, do it only after a minute by
         if (lastUpdate == null || (System.currentTimeMillis() > (lastUpdate.getCalendar().getTimeInMillis() + 60000))) {

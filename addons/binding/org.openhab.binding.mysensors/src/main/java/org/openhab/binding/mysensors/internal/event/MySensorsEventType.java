@@ -7,6 +7,12 @@
  */
 package org.openhab.binding.mysensors.internal.event;
 
+/**
+ * Identifies the event that was received by the bridge.
+ *
+ * @author Andrea Cioni
+ *
+ */
 public enum MySensorsEventType {
     INCOMING_MESSAGE,
     NEW_NODE_DISCOVERED,

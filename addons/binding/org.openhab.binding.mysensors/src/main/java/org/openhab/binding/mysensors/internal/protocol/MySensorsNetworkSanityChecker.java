@@ -20,12 +20,18 @@ import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Regulary checks the status of the link to the gateway to the MySensors network.
+ *
+ * @author Andrea Cioni
+ *
+ */
 public class MySensorsNetworkSanityChecker implements MySensorsUpdateListener, Runnable {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
-    private static final int SHEDULE_MINUTES_DELAY = 1; // only for test will be: 3
-    private static final int MAX_ATTEMPTS_BEFORE_DISCONNECT = 1; // only for test will be: 3
+    private static final int SHEDULE_MINUTES_DELAY = 3; // only for test will be: 3
+    private static final int MAX_ATTEMPTS_BEFORE_DISCONNECT = 3; // only for test will be: 3
 
     private MySensorsBridgeConnection bridgeConnection = null;
 
@@ -39,13 +45,17 @@ public class MySensorsNetworkSanityChecker implements MySensorsUpdateListener, R
         this.bridgeConnection = bridgeConnection;
     }
 
-    public void reset() {
+    private void reset() {
         synchronized (iVersionMessageMissing) {
             iVersionMessageArrived = false;
             iVersionMessageMissing = 0;
         }
     }
 
+    /**
+     * Starts the sanity check of the network.
+     * Tests if the connection to the bridge is still alive.
+     */
     public void start() {
         reset();
 
@@ -54,6 +64,9 @@ public class MySensorsNetworkSanityChecker implements MySensorsUpdateListener, R
 
     }
 
+    /**
+     * Stops the sanity check of the network.
+     */
     public void stop() {
         logger.info("Network Sanity Checker thread stopped");
 

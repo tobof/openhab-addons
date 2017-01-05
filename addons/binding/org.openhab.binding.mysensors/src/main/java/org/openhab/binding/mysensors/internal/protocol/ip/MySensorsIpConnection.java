@@ -16,6 +16,13 @@ import org.openhab.binding.mysensors.internal.protocol.MySensorsBridgeConnection
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Implements the TCP/IP connection to the ethernet gateway of the MySensors network.
+ *
+ * @author Andrea Cioni
+ * @author Tim Oberföll
+ *
+ */
 public class MySensorsIpConnection extends MySensorsBridgeConnection {
 
     private Logger logger = LoggerFactory.getLogger(MySensorsIpConnection.class);
@@ -33,6 +40,9 @@ public class MySensorsIpConnection extends MySensorsBridgeConnection {
         this.sendDelay = sendDelay;
     }
 
+    /**
+     * Tries to accomplish a TCP/IP connection via socket to ethernet gateway.
+     */
     @Override
     public boolean _connect() {
         logger.debug("Connecting to IP bridge [{}:{}]", ipAddress, tcpPort);
@@ -60,6 +70,9 @@ public class MySensorsIpConnection extends MySensorsBridgeConnection {
         return ret;
     }
 
+    /**
+     * Ensures a clean disconnect from the TCP/IP connection to the gateway.
+     */
     @Override
     public void _disconnect() {
         logger.debug("Disconnecting from IP bridge ...");

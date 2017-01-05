@@ -7,9 +7,16 @@
  */
 package org.openhab.binding.mysensors.config;
 
+/**
+ * Parameters used for node / thing configuration.
+ *
+ * @author toberfoe
+ *
+ */
 public class MySensorsSensorConfiguration {
-    public String nodeId;
-    public String childId;
-    public boolean requestAck;
-    public boolean revertState;
+    public String nodeId; // node ID in the MySensors network
+    public String childId; // child ID in the MySensors network
+    public boolean requestAck; // should a message request an ACK?
+    public boolean revertState; // If no ACK was received after the defined retries, should the state of the item get
+                                // reverted?
 }

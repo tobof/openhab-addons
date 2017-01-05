@@ -29,6 +29,13 @@ import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Connection of the bridge (via TCP/IP or serial) to the MySensors network.
+ *
+ * @author Tim Oberföll
+ * @author Andrea Cioni
+ *
+ */
 public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUpdateListener {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
@@ -84,6 +91,9 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
         this.iVersionResponse = false;
     }
 
+    /**
+     * Initialization of the BridgeConnection
+     */
     public void initialize() {
         logger.debug("Set skip check on startup to: {}", bridgeHandler.getBridgeConfiguration().skipStartupCheck);
         skipStartupCheck = bridgeHandler.getBridgeConfiguration().skipStartupCheck;
@@ -169,6 +179,9 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
 
     protected abstract void _disconnect();
 
+    /**
+     * Stop all threads holding the connection (serial/tcp).
+     */
     public void destroy() {
         logger.debug("Destroying connection");
 
@@ -226,11 +239,22 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
         return iVersionResponse;
     }
 
+    /**
+     * Add a message to the outbound queue. The message will be send automatically. FIFO queue.
+     *
+     * @param msg The message that should be send.
+     */
     public void addMySensorsOutboundMessage(MySensorsMessage msg) {
         addMySensorsOutboundMessage(msg, 1);
     }
 
-    public void addMySensorsOutboundMessage(MySensorsMessage msg, int copy) {
+    /**
+     * Store more than one message in the outbound queue.
+     *
+     * @param msg the message that should be stored in the queue.
+     * @param copy the number of copies that should be stored.
+     */
+    private void addMySensorsOutboundMessage(MySensorsMessage msg, int copy) {
         synchronized (outboundMessageQueue) {
             try {
                 for (int i = 0; i < copy; i++) {
@@ -243,10 +267,22 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
 
     }
 
+    /**
+     * Get the next message in line from the queue.
+     *
+     * @return the next message in line.
+     * @throws InterruptedException
+     */
     public MySensorsMessage pollMySensorsOutboundQueue() throws InterruptedException {
         return outboundMessageQueue.poll(1, TimeUnit.DAYS);
     }
 
+    /**
+     * Check if UpdateListener is registered to receive messages from the bridge.
+     *
+     * @param listener The listener which should be checked.
+     * @return true if listener is registered (and should be able to receive messages)
+     */
     public boolean isEventListenerRegisterd(MySensorsUpdateListener listener) {
         boolean ret = false;
         synchronized (updateListeners) {
@@ -257,6 +293,8 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
     }
 
     /**
+     * Messages received from the bridge/gateway are handed over to the Things via this UpdateListener
+     *
      * @param listener An Object, that wants to listen on status updates
      */
     public void addEventListener(MySensorsUpdateListener listener) {
@@ -268,6 +306,11 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
         }
     }
 
+    /**
+     * Remove the UpdateListener and stop receiving messages from the bridge.
+     *
+     * @param listener The Listener that wants to stop to receive messages.
+     */
     public void removeEventListener(MySensorsUpdateListener listener) {
         synchronized (updateListeners) {
             if (updateListeners.contains(listener)) {
@@ -277,10 +320,20 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
         }
     }
 
+    /**
+     * Get a list of the event listeners that are currently registered.
+     *
+     * @return a list of event listeners.
+     */
     public List<MySensorsUpdateListener> getEventListeners() {
         return updateListeners;
     }
 
+    /**
+     * Broadcast a message to all registered handlers (things).
+     *
+     * @param event The message that should be forwarded.
+     */
     public void broadCastEvent(MySensorsStatusUpdateEvent event) {
         synchronized (updateListeners) {
             for (MySensorsUpdateListener mySensorsEventListener : updateListeners) {
@@ -290,6 +343,11 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
         }
     }
 
+    /**
+     * Remove a message from the outbound message queue.
+     *
+     * @param msg The message that should be removed from the queue.
+     */
     public void removeMySensorsOutboundMessage(MySensorsMessage msg) {
 
         pauseWriter = true;
@@ -313,18 +371,33 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
         pauseWriter = false;
     }
 
+    /**
+     * Status for the writer / message sender.
+     *
+     * @return true if writer is paused.
+     */
     public boolean isWriterPaused() {
         return pauseWriter;
     }
 
+    /**
+     * Is a connection to the bridge available?
+     *
+     * @return true, if connection is up and running.
+     */
     public boolean isConnected() {
         return connected;
     }
 
-    public boolean requestingDisconnection() {
+    private boolean requestingDisconnection() {
         return requestDisconnection;
     }
 
+    /**
+     * Start the disconnection process.
+     *
+     * @param flag true if the connection should be stopped.
+     */
     public void requestDisconnection(boolean flag) {
         logger.debug("Request disconnection flag setted to: " + flag);
         requestDisconnection = flag;
