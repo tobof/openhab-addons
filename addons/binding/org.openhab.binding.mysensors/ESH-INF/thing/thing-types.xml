@@ -1034,7 +1034,7 @@
         <description>Air Quality Meter</description>
 
         <channels>
-            <channel id="co2-level" typeId="co2-level-channel" />
+	    <channel id="level" typeId="level-channel" />
             <channel id="battery" typeId="battery-channel" />
             <channel id="lastupdate" typeId="lastupdate-channel"/>
         </channels>
