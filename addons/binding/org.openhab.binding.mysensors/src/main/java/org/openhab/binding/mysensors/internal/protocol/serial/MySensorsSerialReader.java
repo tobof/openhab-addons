@@ -13,6 +13,13 @@ import java.io.InputStreamReader;
 
 import org.openhab.binding.mysensors.internal.protocol.MySensorsReader;
 
+/**
+ * Implements the serial reader that receives the messages from the MySensors network.
+ *
+ * @author Andrea Cioni
+ * @author Tim Oberföll
+ *
+ */
 public class MySensorsSerialReader extends MySensorsReader {
 
     public MySensorsSerialReader(InputStream inStream, MySensorsSerialConnection mysCon) {

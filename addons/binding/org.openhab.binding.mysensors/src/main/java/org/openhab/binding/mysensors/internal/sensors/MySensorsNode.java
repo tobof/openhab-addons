@@ -13,6 +13,15 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Characteristics of a thing/node are stored here:
+ * - List of childs
+ * - Last update (DateTime) from the node
+ * - is the child reachable?
+ *
+ * @author Andrea Cioni
+ *
+ */
 public class MySensorsNode {
 
     private Integer nodeId = null;

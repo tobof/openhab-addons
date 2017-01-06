@@ -13,6 +13,12 @@ import java.util.Map;
 
 import org.openhab.binding.mysensors.internal.Pair;
 
+/**
+ * Every thing/node may have one ore more childs in the MySensors context.
+ *
+ * @author Andrea Cioni
+ *
+ */
 public class MySensorsChild {
 
     private Integer childId = 0;
@@ -37,28 +43,56 @@ public class MySensorsChild {
         lastUpdate = new Date(0);
     }
 
+    /**
+     * Get MySensorsVariable of this child
+     *
+     * @param messageType the integer of message type
+     * @param variableNum the integer of the subtype
+     * @return one MySensorsVariable if present, otherwise null
+     */
     public MySensorsVariable getVariable(int messageType, int variableNum) {
         synchronized (variableMap) {
             return variableMap.get(new Pair<Integer>(messageType, variableNum));
         }
     }
 
+    /**
+     * Get child id
+     *
+     * @return child id
+     */
     public int getChildId() {
         return childId;
     }
 
+    /**
+     * Get child last update
+     *
+     * @return the date represent when the child has received and update from network. Default value is 1970/01/01-00:00
+     */
     public Date getLastUpdate() {
         synchronized (lastUpdate) {
             return lastUpdate;
         }
     }
 
+    /**
+     * Set child last update
+     *
+     * @param childLastUpdate new date represents when child has received an update from network
+     */
     public void setLastUpdate(Date childLastUpdate) {
         synchronized (this.lastUpdate) {
             this.lastUpdate = childLastUpdate;
         }
     }
 
+    /**
+     * Static method to ensure if one id belongs to a valid range
+     *
+     * @param id, child id probably from a message
+     * @return true if passed id is valid
+     */
     public static boolean isValidChildId(int id) {
         return (id >= 0 && id < 255);
     }

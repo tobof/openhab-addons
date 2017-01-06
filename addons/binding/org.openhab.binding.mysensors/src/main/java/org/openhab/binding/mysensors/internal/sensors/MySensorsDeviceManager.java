@@ -1,3 +1,10 @@
+/**
+ * Copyright (c) 2014-2016 openHAB UG (haftungsbeschraenkt) and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ */
 package org.openhab.binding.mysensors.internal.sensors;
 
 import java.util.ArrayList;
@@ -10,12 +17,16 @@ import org.openhab.binding.mysensors.internal.exception.NoMoreIdsException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * ID handling for the MySensors network: Requests for IDs get answered and IDs get stored in a local cache.
+ *
+ * @author Andrea Cioni
+ *
+ */
 public class MySensorsDeviceManager {
     private Logger logger = LoggerFactory.getLogger(getClass());
 
     private Map<Integer, MySensorsNode> nodeMap = null;
-
-    public static MySensorsDeviceManager instance = null;
 
     public MySensorsDeviceManager() {
         nodeMap = new HashMap<>();
@@ -23,13 +34,6 @@ public class MySensorsDeviceManager {
 
     public MySensorsDeviceManager(Map<Integer, MySensorsNode> nodeMap) {
         this.nodeMap = nodeMap;
-    }
-
-    private static MySensorsDeviceManager getInstance() {
-        if (instance == null) {
-            instance = new MySensorsDeviceManager();
-        }
-        return instance;
     }
 
     public MySensorsNode getNode(int nodeId) {
@@ -62,6 +66,11 @@ public class MySensorsDeviceManager {
         return ret;
     }
 
+    /**
+     * Simple method that add node to DeviceManager (only if node is not present previously).
+     *
+     * @param node the node to add
+     */
     public void addNode(MySensorsNode node) {
         synchronized (nodeMap) {
             if (nodeMap.containsKey(node.getNodeId())) {
@@ -71,6 +80,12 @@ public class MySensorsDeviceManager {
         }
     }
 
+    /**
+     * Add node to device manager
+     *
+     * @param node the node to add
+     * @param mergeIfExist if true and node is already present that two nodes will be merged in one
+     */
     public void addNode(MySensorsNode node, boolean mergeIfExist) {
         MySensorsNode exist = null;
         if (mergeIfExist && ((exist = getNode(node.getNodeId())) != null)) {
@@ -83,7 +98,13 @@ public class MySensorsDeviceManager {
         }
     }
 
-    public void addChild(int nodeId, MySensorsChild child) {
+    /**
+     * Add child to node
+     *
+     * @param nodeId the id of the node to add the child
+     * @param child the child to add
+     */
+    public void addChild(int nodeId, MySensorsChild child) throws IllegalArgumentException {
         synchronized (nodeMap) {
             MySensorsNode node = nodeMap.get(nodeId);
             if (node != null) {
@@ -94,12 +115,21 @@ public class MySensorsDeviceManager {
         }
     }
 
+    /**
+     * @return a Set of Ids that is already used and known to the binding.
+     */
     public List<Integer> getGivenIds() {
         synchronized (nodeMap) {
             return new ArrayList<Integer>(nodeMap.keySet());
         }
     }
 
+    /**
+     * Reserve an id for network, mainly for request id messages
+     *
+     * @return a free id not present in node map
+     * @throws NoMoreIdsException if no more ids are available to be reserved
+     */
     public Integer reserveId() throws NoMoreIdsException {
         int newId = 1;
 

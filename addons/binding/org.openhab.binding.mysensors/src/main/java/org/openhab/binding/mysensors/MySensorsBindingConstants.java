@@ -31,12 +31,13 @@ import com.google.common.collect.Lists;
  * The {@link MySensorsBinding} class defines common constants, which are
  * used across the whole binding.
  *
- * @author Tim Oberföll - Initial contribution
+ * @author Tim Oberföll
  */
 public class MySensorsBindingConstants {
 
     public static final String BINDING_ID = "mysensors";
 
+    // parameters / fields of a MySensors message
     public static final String PARAMETER_NODEID = "nodeId";
     public static final String PARAMETER_CHILDID = "childId";
     public static final String PARAMETER_IPADDRESS = "ipAddress";
@@ -45,6 +46,7 @@ public class MySensorsBindingConstants {
     public static final String PARAMETER_BAUDRATE = "baudRate";
     public static final String PARAMETER_REQUESTACK = "requestack";
 
+    // Message types of the MySensors network
     public static final int MYSENSORS_MSG_TYPE_PRESENTATION = 0;
     public static final int MYSENSORS_MSG_TYPE_SET = 1;
     public static final int MYSENSORS_MSG_TYPE_REQ = 2;
@@ -72,6 +74,7 @@ public class MySensorsBindingConstants {
     public static final int MYSENSORS_SUBTYPE_S_LOCK = 19;
     public static final int MYSENSORS_SUBTYPE_S_IR = 20;
     public static final int MYSENSORS_SUBTYPE_S_WATER = 21;
+    public static final int MYSENSORS_SUBTYPE_S_AIR_QUALITY = 22;
     public static final int MYSENSORS_SUBTYPE_S_CUSTOM = 23;
     public static final int MYSENSORS_SUBTYPE_S_RGB_LIGHT = 26;
     public static final int MYSENSORS_SUBTYPE_S_RGBW_LIGHT = 27;
@@ -176,6 +179,7 @@ public class MySensorsBindingConstants {
     public static final int MYSENSORS_SUBTYPE_I_REGISTRATION_RESPONSE = 27;
     public static final int MYSENSORS_SUBTYPE_I_DEBUG = 28;
 
+    // How often and at which times should the binding retry to send a message if requestAck is true?
     public static final int MYSENSORS_NUMBER_OF_RETRIES = 5;
     public static final int[] MYSENSORS_RETRY_TIMES = { 0, 100, 500, 1000, 2000 };
 
@@ -199,9 +203,7 @@ public class MySensorsBindingConstants {
     public final static ThingTypeUID THING_TYPE_LIGHT_LEVEL = new ThingTypeUID(BINDING_ID, "light-level");
     public final static ThingTypeUID THING_TYPE_WATER = new ThingTypeUID(BINDING_ID, "waterMeter");
     public final static ThingTypeUID THING_TYPE_CUSTOM = new ThingTypeUID(BINDING_ID, "customSensor");
-
     public final static ThingTypeUID THING_TYPE_HVAC = new ThingTypeUID(BINDING_ID, "hvacThermostat");
-
     public final static ThingTypeUID THING_TYPE_LOCK = new ThingTypeUID(BINDING_ID, "lock");
     public final static ThingTypeUID THING_TYPE_SOUND = new ThingTypeUID(BINDING_ID, "sound");
     public final static ThingTypeUID THING_TYPE_RGB_LIGHT = new ThingTypeUID(BINDING_ID, "rgbLight");
@@ -211,7 +213,9 @@ public class MySensorsBindingConstants {
     public final static ThingTypeUID THING_TYPE_TEXT = new ThingTypeUID(BINDING_ID, "text");
     public final static ThingTypeUID THING_TYPE_IR_SEND = new ThingTypeUID(BINDING_ID, "irSend");
     public final static ThingTypeUID THING_TYPE_IR_RECEIVE = new ThingTypeUID(BINDING_ID, "irReceive");
+    public final static ThingTypeUID THING_TYPE_AIR_QUALITY = new ThingTypeUID(BINDING_ID, "airQuality");
 
+    // List of bridges
     public final static ThingTypeUID THING_TYPE_BRIDGE_SER = new ThingTypeUID(BINDING_ID, "bridge-ser");
     public final static ThingTypeUID THING_TYPE_BRIDGE_ETH = new ThingTypeUID(BINDING_ID, "bridge-eth");
 
@@ -270,6 +274,7 @@ public class MySensorsBindingConstants {
     public final static String CHANNEL_POWER_FACTOR = "power-factor";
     public final static String CHANNEL_IR_SEND = "irSend";
     public final static String CHANNEL_IR_RECEIVE = "irReceive";
+    public final static String CHANNEL_CO2_LEVEL = "co2-level";
 
     // Extra channel names for non-standard MySensors channels
     public final static String CHANNEL_MYSENSORS_MESSAGE = "mySensorsMessage";
@@ -281,6 +286,9 @@ public class MySensorsBindingConstants {
     // I version message for startup check
     public static final MySensorsMessage I_VERSION_MESSAGE = new MySensorsMessage(0, 0, 3, 0, false, 2, "");
 
+    /**
+     * Mapping MySensors message type/subtypes to channels.
+     */
     public final static Map<Pair<Integer>, String> CHANNEL_MAP = new HashMap<Pair<Integer>, String>() {
         /**
          *
@@ -350,8 +358,14 @@ public class MySensorsBindingConstants {
         }
     };
 
+    /**
+     * Inverse of the CHANNEL_MAP
+     */
     public final static Map<String, Pair<Integer>> INVERSE_CHANNEL_MAP = MySensorsUtility.invertMap(CHANNEL_MAP, true);
 
+    /**
+     * Mappings between ChannelUID and class that represents the type of the channel
+     */
     public final static Map<String, Class<? extends MySensorsType>> TYPE_MAP = new HashMap<String, Class<? extends MySensorsType>>() {
 
         /**
@@ -421,6 +435,9 @@ public class MySensorsBindingConstants {
         }
     };
 
+    /**
+     * Used in DiscoveryService to map subtype of a presentation message to thing type
+     */
     public final static Map<Integer, ThingTypeUID> THING_UID_MAP = new HashMap<Integer, ThingTypeUID>() {
 
         /**

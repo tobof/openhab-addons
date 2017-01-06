@@ -21,11 +21,19 @@ import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageP
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Implements the writer (IP & serial) that sends messages to the MySensors network.
+ *
+ * @author Andrea Cioni
+ * @author Tim Oberföll
+ *
+ */
 public abstract class MySensorsWriter implements Runnable {
     protected Logger logger = LoggerFactory.getLogger(MySensorsWriter.class);
 
-    protected boolean stopWriting = false;
-    protected long lastSend = System.currentTimeMillis();
+    protected boolean stopWriting = false; // Stop the thread that sends the messages to the MySensors network
+    protected long lastSend = System.currentTimeMillis(); // date when the last message was sent. Messages are send with
+                                                          // a delay in between.
     protected PrintWriter outs = null;
     protected OutputStream outStream = null;
     protected MySensorsBridgeConnection mysCon = null;
@@ -35,6 +43,10 @@ public abstract class MySensorsWriter implements Runnable {
 
     protected int sendDelay = 1000;
 
+    /**
+     * Start the writer Process that will poll messages from the FIFO outbound queue
+     * and send them to the MySensors network.
+     */
     public void startWriter() {
         future = executor.submit(this);
     }
@@ -87,17 +99,25 @@ public abstract class MySensorsWriter implements Runnable {
                     }
 
                 } catch (Exception e) {
-                    logger.error("({}) on writing from serial port, message: {}", e, getClass(), e.getMessage());
+                    logger.error("({}) on writing to connection, message: {}", e, getClass(), e.getMessage());
                 }
             }
         }
     }
 
+    /**
+     * Send a message to the MySensors network.
+     *
+     * @param output the message/string/line that should be send to the MySensors gateway.
+     */
     protected void sendMessage(String output) {
         outs.println(output);
         outs.flush();
     }
 
+    /**
+     * Stops the writer process.
+     */
     public void stopWriting() {
 
         logger.debug("Stopping Writer thread");

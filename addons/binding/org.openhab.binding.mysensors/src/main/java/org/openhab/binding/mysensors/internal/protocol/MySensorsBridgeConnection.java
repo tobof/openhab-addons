@@ -33,6 +33,13 @@ import org.openhab.binding.mysensors.internal.sensors.MySensorsVariable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Connection of the bridge (via TCP/IP or serial) to the MySensors network.
+ *
+ * @author Tim Oberföll
+ * @author Andrea Cioni
+ *
+ */
 public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUpdateListener {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
@@ -88,6 +95,9 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
         this.iVersionResponse = false;
     }
 
+    /**
+     * Initialization of the BridgeConnection
+     */
     public void initialize() {
         logger.debug("Set skip check on startup to: {}", bridgeHandler.getBridgeConfiguration().skipStartupCheck);
         skipStartupCheck = bridgeHandler.getBridgeConfiguration().skipStartupCheck;
@@ -173,6 +183,9 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
 
     protected abstract void _disconnect();
 
+    /**
+     * Stop all threads holding the connection (serial/tcp).
+     */
     public void destroy() {
         logger.debug("Destroying connection");
 
@@ -231,11 +244,22 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
         return iVersionResponse;
     }
 
+    /**
+     * Add a message to the outbound queue. The message will be send automatically. FIFO queue.
+     *
+     * @param msg The message that should be send.
+     */
     public void addMySensorsOutboundMessage(MySensorsMessage msg) {
         addMySensorsOutboundMessage(msg, 1);
     }
 
-    public void addMySensorsOutboundMessage(MySensorsMessage msg, int copy) {
+    /**
+     * Store more than one message in the outbound queue.
+     *
+     * @param msg the message that should be stored in the queue.
+     * @param copy the number of copies that should be stored.
+     */
+    private void addMySensorsOutboundMessage(MySensorsMessage msg, int copy) {
         synchronized (outboundMessageQueue) {
             try {
                 for (int i = 0; i < copy; i++) {
@@ -248,10 +272,21 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
 
     }
 
+    /**
+     * Get the next message in line from the queue.
+     *
+     * @return the next message in line.
+     * @throws InterruptedException
+     */
     public MySensorsMessage pollMySensorsOutboundQueue() throws InterruptedException {
         return outboundMessageQueue.poll(1, TimeUnit.DAYS);
     }
 
+    /**
+     * Remove a message from the outbound message queue.
+     *
+     * @param msg The message that should be removed from the queue.
+     */
     public void removeMySensorsOutboundMessage(MySensorsMessage msg) {
 
         pauseWriter = true;
@@ -275,10 +310,20 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
         pauseWriter = false;
     }
 
+    /**
+     * Status for the writer / message sender.
+     *
+     * @return true if writer is paused.
+     */
     public boolean isWriterPaused() {
         return pauseWriter;
     }
 
+    /**
+     * Is a connection to the bridge available?
+     *
+     * @return true, if connection is up and running.
+     */
     public boolean isConnected() {
         return connected;
     }
@@ -287,6 +332,11 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
         return requestDisconnection;
     }
 
+    /**
+     * Start the disconnection process.
+     *
+     * @param flag true if the connection should be stopped.
+     */
     public void requestDisconnection(boolean flag) {
         logger.debug("Request disconnection flag setted to: " + flag);
         requestDisconnection = flag;

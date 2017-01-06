@@ -13,6 +13,13 @@ import java.net.Socket;
 
 import org.openhab.binding.mysensors.internal.protocol.MySensorsWriter;
 
+/**
+ * Responsible for sending messages to the TCP/IP link.
+ *
+ * @author Andrea Cioni
+ * @author Tim Oberföll
+ *
+ */
 public class MySensorsIpWriter extends MySensorsWriter {
 
     public MySensorsIpWriter(Socket sock, MySensorsIpConnection mysCon, int sendDelay) {

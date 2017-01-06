@@ -13,25 +13,26 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Used to store the content of a MySensors message.
+ *
  * @author Tim Oberföll
  *
- *         Used to store the content of a MySensors message
  */
 public class MySensorsMessage {
     public static String GATEWAY_STARTUP_NOTIFICATION = "Gateway startup complete.";
 
     private Logger logger = LoggerFactory.getLogger(MySensorsMessage.class);
 
-    public int nodeId = 0;
-    public int childId = 0;
-    public int msgType = 0;
-    public int ack = 0;
-    public boolean revert = true;
-    public int subType = 0;
-    public String msg = "";
-    public String oldMsg = "";
-    public int retries = 0;
-    public long nextSend = 0;
+    public int nodeId = 0; // id of the node in the MySensors network
+    public int childId = 0; // id of the child of the node (more than one possible)
+    public int msgType = 0; // type of message: request, internal, presentation ...
+    public int ack = 0; // is an acknoledgement requested?
+    public boolean revert = true; // revert status if no ack was received from the node
+    public int subType = 0; // like: humidity, temperature, light ...
+    public String msg = ""; // content of the message
+    public String oldMsg = ""; // content of the last message send to or received by the node
+    public int retries = 0; // number of retries if a message is not acknowledged by the receiver
+    public long nextSend = 0; // timestamp when the message should be send
 
     public MySensorsMessage() {
 
@@ -55,11 +56,17 @@ public class MySensorsMessage {
         this.msg = msg;
     }
 
+    /**
+     * Write message to DEBUG.
+     */
     public void printDebug() {
         logger.debug(String.format("nodeId: %d, childId: %d, msgType: %d, ack: %d, revert: %b, subType: %d ,msg: %s",
                 this.nodeId, this.childId, this.msgType, this.ack, this.revert, this.subType, this.msg));
     }
 
+    /**
+     * @return the content of the message as a String.
+     */
     public String getDebugInfo() {
         return String.format("nodeId: %d, childId: %d, msgType: %d, ack: %d, revert: %b, subType: %d ,msg: %s",
                 this.nodeId, this.childId, this.msgType, this.ack, this.revert, this.subType, this.msg);
@@ -141,6 +148,11 @@ public class MySensorsMessage {
         this.oldMsg = oldMsg;
     }
 
+    /**
+     * Checks if the received message is a I_CONFIG (internal MySensors) message.
+     *
+     * @return true, if the received message is a I_CONFIG message.
+     */
     public boolean isIConfigMessage() {
         boolean ret = false;
 
@@ -157,6 +169,11 @@ public class MySensorsMessage {
         return ret;
     }
 
+    /**
+     * Checks if the received message is a I_VERSION (internal MySensors) message.
+     *
+     * @return true, if the received message is a I_VERSION message.
+     */
     public boolean isIVersionMessage() {
         boolean ret = false;
 
@@ -175,6 +192,11 @@ public class MySensorsMessage {
         return ret;
     }
 
+    /**
+     * Checks if the received message is a I_TIME (internal MySensors) message.
+     *
+     * @return true, if the received message is a I_TIME message.
+     */
     public boolean isITimeMessage() {
         boolean ret = false;
 
@@ -191,6 +213,11 @@ public class MySensorsMessage {
         return ret;
     }
 
+    /**
+     * Checks if the received message is a I_ID_REQUEST (internal MySensors) message.
+     *
+     * @return true, if the received message is a I_ID_REQUEST message.
+     */
     public boolean isIdRequestMessage() {
         boolean ret = false;
 
@@ -209,6 +236,11 @@ public class MySensorsMessage {
         return ret;
     }
 
+    /**
+     * Checks if the received message is a presentation message.
+     *
+     * @return true, if the received message is a presentation message.
+     */
     public boolean isPresentationMessage() {
         return msgType == MYSENSORS_MSG_TYPE_PRESENTATION;
     }

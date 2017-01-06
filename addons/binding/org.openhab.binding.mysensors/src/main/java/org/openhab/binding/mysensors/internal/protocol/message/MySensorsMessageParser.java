@@ -10,9 +10,10 @@ package org.openhab.binding.mysensors.internal.protocol.message;
 import org.openhab.binding.mysensors.MySensorsBindingConstants;
 
 /**
+ * Parser for the MySensors messages.
+ *
  * @author Tim Oberföll
  *
- *         Parser for the MySensors network.
  */
 public class MySensorsMessageParser {
 
@@ -48,15 +49,11 @@ public class MySensorsMessageParser {
     }
 
     /**
-     * Use message.isIVersionMessage() on MySensorsMessage instance
+     * Converts a MySensorsMessage object to a String.
+     *
+     * @param msg the MySensorsMessage that should be converted.
+     * @return the MySensorsMessage as a String.
      */
-    @Deprecated
-    public static boolean isIVersionMessage(MySensorsMessage msg) {
-        return (msg != null && msg.nodeId == 0 && msg.childId == 0
-                && msg.msgType == MySensorsBindingConstants.MYSENSORS_MSG_TYPE_INTERNAL && msg.ack == 0
-                && msg.subType == MySensorsBindingConstants.MYSENSORS_SUBTYPE_I_VERSION && msg.msg != null);
-    }
-
     public static String generateAPIString(MySensorsMessage msg) {
         String APIString = "";
         APIString += msg.getNodeId() + ";";

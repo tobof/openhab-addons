@@ -11,17 +11,36 @@ import org.openhab.binding.mysensors.internal.event.MySensorsEventObserver;
 import org.openhab.binding.mysensors.internal.event.MySensorsUpdateListener;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
 
+/**
+ * Thread is started for discovery of new things / nodes.
+ *
+ * @author Tim Oberföll
+ * @author Andrea Cioni
+ *
+ */
 public class DiscoveryThread implements MySensorsUpdateListener {
     private MySensorsDiscoveryService mysDiscoServ;
 
+    /**
+     * Initialize the discovery thread.
+     *
+     * @param mysCon Location of the EventListener to receive messages from the MySensors network.
+     * @param mysDiscoServ Location of the service that started this thread
+     */
     public DiscoveryThread(MySensorsDiscoveryService mysDiscoServ) {
         this.mysDiscoServ = mysDiscoServ;
     }
 
+    /**
+     * Start the discovery process.
+     */
     public void start() {
         MySensorsEventObserver.addEventListener(this);
     }
 
+    /**
+     * Stop the discovery process.
+     */
     public void stop() {
         MySensorsEventObserver.removeEventListener(this);
     }

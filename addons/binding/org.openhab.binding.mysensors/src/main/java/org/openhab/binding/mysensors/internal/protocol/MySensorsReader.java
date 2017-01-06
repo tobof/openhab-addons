@@ -20,6 +20,13 @@ import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageP
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Implements the reader (IP & serial) that receives the messages from the MySensors network.
+ *
+ * @author Andrea Cioni
+ * @author Tim Oberföll
+ *
+ */
 public class MySensorsReader implements Runnable {
 
     protected Logger logger = LoggerFactory.getLogger(MySensorsReader.class);
@@ -33,6 +40,9 @@ public class MySensorsReader implements Runnable {
 
     protected boolean stopReader = false;
 
+    /**
+     * Starts the reader process that will receive the messages from the MySensors network.
+     */
     public void startReader() {
         future = executor.submit(this);
     }
@@ -65,13 +75,16 @@ public class MySensorsReader implements Runnable {
                     MySensorsEventObserver.notifyMessageReceived(msg);
                 }
             } catch (Exception e) {
-                logger.error("({}) on reading from serial port, message: {}", e, getClass(), e.getMessage());
+                logger.error("({}) on reading from connection, message: {}", e, getClass(), e.getMessage());
             }
 
         }
 
     }
 
+    /**
+     * Stops the reader process of the bridge that receives messages from the MySensors network.
+     */
     public void stopReader() {
 
         logger.debug("Stopping Reader thread");

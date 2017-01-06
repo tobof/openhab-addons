@@ -23,9 +23,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Discoveryservice for MySensors devices. Starts DiscoveryThread to listen for new things / nodes.
+ *
  * @author Tim Oberföll
  *
- *         Discoveryservice for MySensors devices
  */
 public class MySensorsDiscoveryService extends AbstractDiscoveryService {
 
@@ -49,7 +50,7 @@ public class MySensorsDiscoveryService extends AbstractDiscoveryService {
     }
 
     public void activate() {
-
+		//TODO should be removed?
     }
 
     @Override
@@ -68,6 +69,12 @@ public class MySensorsDiscoveryService extends AbstractDiscoveryService {
         discoThread.stop();
     }
 
+    /**
+     * Gets called if message from the MySensors network was received.
+     * Distinguishes if a new thing was discovered.
+     *
+     * @param msg MySensors message received from the bridge / gateway.
+     */
     public void newDevicePresented(MySensorsMessage msg) {
 
         // Representation Message?

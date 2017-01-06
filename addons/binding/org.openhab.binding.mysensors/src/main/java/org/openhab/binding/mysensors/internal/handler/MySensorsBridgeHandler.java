@@ -32,10 +32,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * MySensorsBridgeHandler is used to initialize a new bridge (in MySensors: Gateway)
+ * The sensors are connected via the gateway/bridge to the controller
+ *
  * @author Tim Oberföll
  *
- *         MySensorsBridgeHandler is used to initialize a new bridge (in MySensors: Gateway)
- *         The sensors are connected via the gateway/bridge to the controller
  */
 public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySensorsUpdateListener {
 
@@ -55,11 +56,6 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
         this.deviceManager = deviceManager;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.eclipse.smarthome.core.thing.binding.BaseThingHandler#initialize()
-     */
     @Override
     public void initialize() {
         logger.debug("Initialization of the MySensors bridge");
@@ -84,11 +80,6 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
         logger.debug("Initialization of the MySensors bridge DONE!");
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.eclipse.smarthome.core.thing.binding.BaseThingHandler#dispose()
-     */
     @Override
     public void dispose() {
         logger.debug("Disposing of the MySensors bridge");
@@ -102,22 +93,26 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
         super.dispose();
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * org.eclipse.smarthome.core.thing.binding.ThingHandler#handleCommand(org.eclipse.smarthome.core.thing.ChannelUID,
-     * org.eclipse.smarthome.core.types.Command)
-     */
     @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
 
     }
 
+    /**
+     * Getter for the configuration of the bridge.
+     *
+     * @return Configuration of the MySensors bridge.
+     */
     public MySensorsBridgeConfiguration getBridgeConfiguration() {
         return myConfiguration;
     }
 
+    /**
+     * Getter for the connection to the MySensors bridge / gateway.
+     * Used for receiving (register handler) and sending of messages.
+     *
+     * @return Connection to the MySensors bridge / gateway.
+     */
     public MySensorsBridgeConnection getBridgeConnection() {
         return myCon;
     }
@@ -132,12 +127,6 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
     }
 
     @Override
-    public void messageReceived(MySensorsMessage message) throws Throwable {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
     public void nodeIdReservationDone(Integer reservedId) throws Throwable {
         updateCacheFile();
     }
@@ -145,18 +134,6 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
     @Override
     public void newNodeDiscovered(MySensorsNode message) throws Throwable {
         updateCacheFile();
-    }
-
-    @Override
-    public void nodeUpdateEvent(MySensorsNode node, MySensorsChild child, MySensorsVariable var) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void nodeReachStatusChanged(MySensorsNode node, boolean reach) {
-        // TODO Auto-generated method stub
-
     }
 
     @Override

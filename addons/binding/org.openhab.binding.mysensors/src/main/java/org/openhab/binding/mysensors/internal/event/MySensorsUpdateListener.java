@@ -16,9 +16,10 @@ import org.openhab.binding.mysensors.internal.sensors.MySensorsNode;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsVariable;
 
 /**
+ * Handler that implement this interface receive update events from the MySensors network.
+ *
  * @author Tim Oberföll
  *
- *         Handler that implement this interface receive update events from the MySensors network
  */
 public interface MySensorsUpdateListener extends EventListener {
     /**
