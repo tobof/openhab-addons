@@ -60,8 +60,7 @@ public class MySensorsMessage {
      * Write message to DEBUG.
      */
     public void printDebug() {
-        logger.debug(String.format("nodeId: %d, childId: %d, msgType: %d, ack: %d, revert: %b, subType: %d ,msg: %s",
-                this.nodeId, this.childId, this.msgType, this.ack, this.revert, this.subType, this.msg));
+        logger.debug(getDebugInfo());
     }
 
     /**
@@ -156,7 +155,7 @@ public class MySensorsMessage {
     public boolean isIConfigMessage() {
         boolean ret = false;
 
-        if (childId == 0 || childId == 255) {
+        if (childId == MYSENSORS_NODE_ID_RESERVED_0 || childId == MYSENSORS_CHILD_ID_RESERVED_255) {
             if (msgType == MYSENSORS_MSG_TYPE_INTERNAL) {
                 if (ack == 0) {
                     if (subType == MYSENSORS_SUBTYPE_I_CONFIG) {
@@ -178,7 +177,7 @@ public class MySensorsMessage {
         boolean ret = false;
 
         if (nodeId == 0) {
-            if (childId == 0 || childId == 255) {
+            if (childId == MYSENSORS_NODE_ID_RESERVED_0 || childId == MYSENSORS_CHILD_ID_RESERVED_255) {
                 if (msgType == MYSENSORS_MSG_TYPE_INTERNAL) {
                     if (ack == 0) {
                         if (subType == MYSENSORS_SUBTYPE_I_VERSION) {
@@ -200,7 +199,7 @@ public class MySensorsMessage {
     public boolean isITimeMessage() {
         boolean ret = false;
 
-        if (childId == 0 || childId == 255) {
+        if (childId == MYSENSORS_NODE_ID_RESERVED_0 || childId == MYSENSORS_CHILD_ID_RESERVED_255) {
             if (msgType == MYSENSORS_MSG_TYPE_INTERNAL) {
                 if (ack == 0) {
                     if (subType == MYSENSORS_SUBTYPE_I_TIME) {
@@ -221,8 +220,8 @@ public class MySensorsMessage {
     public boolean isIdRequestMessage() {
         boolean ret = false;
 
-        if (nodeId == 255) {
-            if (childId == 255) {
+        if (nodeId == MYSENSORS_NODE_ID_RESERVED_255) {
+            if (childId == MYSENSORS_CHILD_ID_RESERVED_255) {
                 if (msgType == MYSENSORS_SUBTYPE_I_ID_REQUEST) {
                     if (ack == 0) {
                         if (subType == MYSENSORS_MSG_TYPE_INTERNAL) {

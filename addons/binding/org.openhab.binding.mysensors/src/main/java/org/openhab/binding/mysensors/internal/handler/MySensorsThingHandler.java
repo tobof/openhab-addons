@@ -214,7 +214,7 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
         updateState(channelName, newState);
     }
 
-	/**
+    /**
      * If a new message is received via the MySensors bridge it is handed over to the ThingHandler
      * and processed in this method. After parsing the message the corresponding channel is updated.
      *
@@ -222,7 +222,7 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
      */
     private void handleIncomingMessageEvent(MySensorsMessage msg) {
         // Am I the all knowing node that receives all messages?
-        if (nodeId == 999 && childId == 999) {
+        if (nodeId == MYSENSORS_NODE_ID_ALL_KNOWING && childId == MYSENSORS_CHILD_ID_ALL_KNOWING) {
             updateState(CHANNEL_MYSENSORS_MESSAGE,
                     new StringType(MySensorsMessageParser.generateAPIString(msg).replaceAll("(\\r|\\n)", "")));
 

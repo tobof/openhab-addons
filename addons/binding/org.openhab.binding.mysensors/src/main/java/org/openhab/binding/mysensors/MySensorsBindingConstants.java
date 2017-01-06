@@ -183,6 +183,20 @@ public class MySensorsBindingConstants {
     public static final int MYSENSORS_NUMBER_OF_RETRIES = 5;
     public static final int[] MYSENSORS_RETRY_TIMES = { 0, 100, 500, 1000, 2000 };
 
+    /**
+     * All knowing thing. A node with nodeId 999 and childId 999 receives all messages
+     * received from the MySensors bridge/gateway. Useful for debugging and for implementation
+     * of features not covered by the binding (for example with rules)
+     */
+    public static final int MYSENSORS_NODE_ID_ALL_KNOWING = 999;
+    public static final int MYSENSORS_CHILD_ID_ALL_KNOWING = 999;
+
+    // Reserved ids
+    public static final int MYSENSORS_NODE_ID_RESERVED_0 = 0;
+    public static final int MYSENSORS_NODE_ID_RESERVED_255 = 255;
+    public static final int MYSENSORS_CHILD_ID_RESERVED_0 = 0;
+    public static final int MYSENSORS_CHILD_ID_RESERVED_255 = 255;
+
     // List of all Thing Type UIDs
     public final static ThingTypeUID THING_TYPE_HUMIDITY = new ThingTypeUID(BINDING_ID, "humidity");
     public final static ThingTypeUID THING_TYPE_TEMPERATURE = new ThingTypeUID(BINDING_ID, "temperature");

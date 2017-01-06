@@ -8,7 +8,7 @@
 package org.openhab.binding.mysensors.internal.exception;
 
 /**
- * Exception occures if no more ids are available.
+ * Exception occurs if no more ids are available.
  *
  * @author Andrea Cioni
  *

@@ -16,11 +16,13 @@
   <packaging>pom</packaging>
  
   <modules>
+    <module>org.openhab.binding.allplay</module>
     <module>org.openhab.binding.amazondashbutton</module>
     <module>org.openhab.binding.astro</module>
     <module>org.openhab.binding.autelis</module>
     <module>org.openhab.binding.avmfritz</module>
     <module>org.openhab.binding.chromecast</module>
+    <module>org.openhab.binding.coolmasternet</module>
     <module>org.openhab.binding.dscalarm</module>
     <module>org.openhab.binding.exec</module>
     <module>org.openhab.binding.feed</module>
@@ -30,6 +32,7 @@
     <module>org.openhab.binding.hdanywhere</module>
     <module>org.openhab.binding.hdpowerview</module>
     <module>org.openhab.binding.homematic</module>
+    <module>org.openhab.binding.globalcache</module>
     <module>org.openhab.binding.ipp</module>
     <module>org.openhab.binding.keba</module>
     <module>org.openhab.binding.kodi</module>
@@ -41,6 +44,7 @@
     <module>org.openhab.binding.miele</module>
     <module>org.openhab.binding.milight</module>
     <module>org.openhab.binding.minecraft</module>
+    <module>org.openhab.binding.mysensors</module>
     <module>org.openhab.binding.netatmo</module>
     <module>org.openhab.binding.network</module>
     <module>org.openhab.binding.oceanic</module>
@@ -62,7 +66,6 @@
     <module>org.openhab.binding.toon</module>
     <module>org.openhab.binding.urtsi</module>
     <module>org.openhab.binding.vitotronic</module>
-    <module>org.openhab.binding.mysensors</module>
     <module>org.openhab.binding.yamahareceiver</module>
   </modules>
 
