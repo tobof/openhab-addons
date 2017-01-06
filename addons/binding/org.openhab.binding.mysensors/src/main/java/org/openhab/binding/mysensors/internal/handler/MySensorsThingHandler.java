@@ -362,7 +362,6 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
                             case CHANNEL_FLOW:
                             case CHANNEL_VOLUME:
                             case CHANNEL_LEVEL:
-                            case CHANNEL_CO2_LEVEL:
                             case CHANNEL_PH:
                                 updateState(channel, new DecimalType(msg.getMsg()));
                                 break;
