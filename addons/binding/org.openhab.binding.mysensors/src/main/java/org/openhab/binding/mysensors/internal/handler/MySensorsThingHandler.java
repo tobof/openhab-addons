@@ -25,7 +25,7 @@ import org.eclipse.smarthome.core.types.Command;
 import org.eclipse.smarthome.core.types.RefreshType;
 import org.eclipse.smarthome.core.types.State;
 import org.openhab.binding.mysensors.config.MySensorsSensorConfiguration;
-import org.openhab.binding.mysensors.internal.event.MySensorsEventObserver;
+import org.openhab.binding.mysensors.internal.event.MySensorsEventObserver_OLD;
 import org.openhab.binding.mysensors.internal.event.MySensorsUpdateListener;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageParser;
@@ -72,9 +72,9 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
         requestAck = configuration.requestAck;
         revertState = configuration.revertState;
         logger.debug("Configuration: node {}, chiledId: {}, revertState: {}", nodeId, childId, revertState);
-        if (!MySensorsEventObserver.isEventListenerRegisterd(this)) {
+        if (!MySensorsEventObserver_OLD.isEventListenerRegisterd(this)) {
             logger.debug("Event listener for node {}-{} not registered yet, registering...", nodeId, childId);
-            MySensorsEventObserver.addEventListener(this);
+            MySensorsEventObserver_OLD.addEventListener(this);
         }
         updateStatus(ThingStatus.ONLINE);
     }
@@ -85,9 +85,9 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
                 getThing().getUID().toString());
         if (bridgeStatusInfo.getStatus().equals(ThingStatus.ONLINE)
                 || bridgeStatusInfo.getStatus().equals(ThingStatus.OFFLINE)) {
-            if (!MySensorsEventObserver.isEventListenerRegisterd(this)) {
+            if (!MySensorsEventObserver_OLD.isEventListenerRegisterd(this)) {
                 logger.debug("Event listener for node {}-{} not registered yet, registering...", nodeId, childId);
-                MySensorsEventObserver.addEventListener(this);
+                MySensorsEventObserver_OLD.addEventListener(this);
             }
 
             // the node has the same status of the bridge

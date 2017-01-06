@@ -17,7 +17,7 @@ import org.eclipse.smarthome.core.thing.ThingStatus;
 import org.eclipse.smarthome.core.thing.binding.BaseBridgeHandler;
 import org.eclipse.smarthome.core.types.Command;
 import org.openhab.binding.mysensors.config.MySensorsBridgeConfiguration;
-import org.openhab.binding.mysensors.internal.event.MySensorsEventObserver;
+import org.openhab.binding.mysensors.internal.event.MySensorsEventObserver_OLD;
 import org.openhab.binding.mysensors.internal.event.MySensorsUpdateListener;
 import org.openhab.binding.mysensors.internal.factory.MySensorsCacheFactory;
 import org.openhab.binding.mysensors.internal.protocol.MySensorsBridgeConnection;
@@ -74,7 +74,7 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
 
         if (myCon != null) {
             myCon.initialize();
-            MySensorsEventObserver.addEventListener(this);
+            MySensorsEventObserver_OLD.addEventListener(this);
         }
 
         logger.debug("Initialization of the MySensors bridge DONE!");
@@ -84,7 +84,7 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
     public void dispose() {
         logger.debug("Disposing of the MySensors bridge");
         if (myCon != null) {
-            MySensorsEventObserver.removeEventListener(this);
+            MySensorsEventObserver_OLD.removeEventListener(this);
             myCon.destroy();
         }
 

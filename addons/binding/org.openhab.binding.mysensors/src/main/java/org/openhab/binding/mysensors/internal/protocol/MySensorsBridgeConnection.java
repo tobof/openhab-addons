@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 import org.openhab.binding.mysensors.MySensorsBindingConstants;
 import org.openhab.binding.mysensors.discovery.MySensorsDiscoveryService;
 import org.openhab.binding.mysensors.internal.Pair;
-import org.openhab.binding.mysensors.internal.event.MySensorsEventObserver;
+import org.openhab.binding.mysensors.internal.event.MySensorsEventObserver_OLD;
 import org.openhab.binding.mysensors.internal.event.MySensorsUpdateListener;
 import org.openhab.binding.mysensors.internal.exception.NoMoreIdsException;
 import org.openhab.binding.mysensors.internal.handler.MySensorsBridgeHandler;
@@ -157,7 +157,7 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
      */
     private boolean connect() {
         connected = _connect();
-        MySensorsEventObserver.notifyBridgeStatusUpdate(this, isConnected());
+        MySensorsEventObserver_OLD.notifyBridgeStatusUpdate(this, isConnected());
         return connected;
     }
 
@@ -178,7 +178,7 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
         requestDisconnection = false;
         iVersionResponse = false;
 
-        MySensorsEventObserver.notifyBridgeStatusUpdate(this, isConnected());
+        MySensorsEventObserver_OLD.notifyBridgeStatusUpdate(this, isConnected());
     }
 
     protected abstract void _disconnect();
@@ -202,6 +202,8 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
             watchdogExecutor.shutdown();
             watchdogExecutor.shutdownNow();
         }
+
+        MySensorsEventObserver_OLD.clearAllListeners();
     }
 
     /**
@@ -215,7 +217,7 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
         reader.startReader();
         writer.startWriter();
 
-        MySensorsEventObserver.addEventListener(this);
+        MySensorsEventObserver_OLD.addEventListener(this);
 
         if (!skipStartupCheck) {
             try {
@@ -408,7 +410,7 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
             logger.info("New Node in the MySensors network has requested an ID. ID is: {}", newId);
             MySensorsMessage newMsg = new MySensorsMessage(255, 255, 3, 0, false, 4, newId + "");
             addMySensorsOutboundMessage(newMsg);
-            MySensorsEventObserver.notifyNodeIdReserved(newId);
+            MySensorsEventObserver_OLD.notifyNodeIdReserved(newId);
         } catch (NoMoreIdsException e) {
             logger.error("No more IDs available for this node, try cleaning cache");
         }
@@ -441,7 +443,7 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
                     MySensorsVariable variable = child.getVariable(msg.msgType, msg.subType);
                     if (variable != null) {
                         variable.setValue(msg);
-                        MySensorsEventObserver.notifyNodeUpdateEvent(node, child, variable);
+                        MySensorsEventObserver_OLD.notifyNodeUpdateEvent(node, child, variable);
                         ret = true;
                     } else {
                         logger.warn("Variable {}({}) not present", msg.subType,
@@ -455,7 +457,7 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
 
                 node = new MySensorsNode(msg.nodeId);
                 deviceManager.addNode(node);
-                MySensorsEventObserver.notifyNewNodeDiscovered(node);
+                MySensorsEventObserver_OLD.notifyNewNodeDiscovered(node);
                 ret = true;
             }
         }
