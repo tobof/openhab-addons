@@ -193,7 +193,7 @@ public class MySensorsDiscoveryService extends AbstractDiscoveryService {
                     break;
                 case MYSENSORS_SUBTYPE_S_AIR_QUALITY:
                     uid = new ThingUID(THING_TYPE_AIR_QUALITY, bridgeHandler.getThing().getUID(),
-                            "CO2_Level_" + msg.getNodeId() + "_" + msg.getChildId());
+                            "AirQuality_level_" + msg.getNodeId() + "_" + msg.getChildId());
                     break;
             }
             if (uid != null) {
