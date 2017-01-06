@@ -1333,10 +1333,4 @@
         <description>MySensors IR Receive Channel</description>
         <category>Variable</category>
     </channel-type>
-    <channel-type id="co2-level-channel">
-        <item-type>Number</item-type>
-        <label>CO2 ppm</label>
-        <description>MySensors CO2 Level Channel</description>
-        <category>Variable</category>
-    </channel-type>
 </thing:thing-descriptions>
