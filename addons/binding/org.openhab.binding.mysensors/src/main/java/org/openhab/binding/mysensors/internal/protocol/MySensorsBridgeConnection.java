@@ -7,8 +7,14 @@
  */
 package org.openhab.binding.mysensors.internal.protocol;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -21,6 +27,7 @@ import org.openhab.binding.mysensors.internal.event.MySensorsBridgeConnectionEve
 import org.openhab.binding.mysensors.internal.event.MySensorsEventObserver;
 import org.openhab.binding.mysensors.internal.event.MySensorsEventRegister;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
+import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -402,7 +409,7 @@ public abstract class MySensorsBridgeConnection implements Runnable,
      *
      * @param msg the message to send
      */
-    void notifyMessageReceived(MySensorsMessage msg) {
+    private void notifyMessageReceived(MySensorsMessage msg) {
         Iterator<MySensorsBridgeConnectionEventListener> iterator = eventRegister.getEventListenersIterator();
         while (iterator.hasNext()) {
             MySensorsBridgeConnectionEventListener listener = iterator.next();
@@ -415,6 +422,241 @@ public abstract class MySensorsBridgeConnection implements Runnable,
             }
         }
 
+    }
+
+    /**
+     * Implements the reader (IP & serial) that receives the messages from the MySensors network.
+     *
+     * @author Andrea Cioni
+     * @author Tim Oberföll
+     *
+     */
+    public class MySensorsReader implements Runnable {
+
+        protected Logger logger = LoggerFactory.getLogger(MySensorsReader.class);
+
+        protected ExecutorService executor = Executors.newSingleThreadExecutor();
+        protected Future<?> future = null;
+
+        protected MySensorsBridgeConnection mysCon = null;
+        protected InputStream inStream = null;
+        protected BufferedReader reads = null;
+
+        protected boolean stopReader = false;
+
+        /**
+         * Starts the reader process that will receive the messages from the MySensors network.
+         */
+        public void startReader() {
+            future = executor.submit(this);
+        }
+
+        @Override
+        public void run() {
+            Thread.currentThread().setName(MySensorsReader.class.getName());
+            String line = null;
+
+            while (!stopReader) {
+                // Is there something to read?
+
+                try {
+                    if (!reads.ready()) {
+                        Thread.sleep(10);
+                        continue;
+                    }
+                    line = reads.readLine();
+
+                    // We lost connection
+                    if (line == null) {
+                        logger.warn("Connection to Gateway lost!");
+                        mysCon.requestDisconnection(true);
+                        break;
+                    }
+
+                    logger.debug(line);
+                    MySensorsMessage msg = MySensorsMessageParser.parse(line);
+                    if (msg != null) {
+                        notifyMessageReceived(msg);
+                    }
+                } catch (Exception e) {
+                    logger.error("({}) on reading from connection, message: {}", e, getClass(), e.getMessage());
+                }
+
+            }
+
+        }
+
+        /**
+         * Stops the reader process of the bridge that receives messages from the MySensors network.
+         */
+        public void stopReader() {
+
+            logger.debug("Stopping Reader thread");
+
+            this.stopReader = true;
+
+            if (future != null) {
+                future.cancel(true);
+                future = null;
+            }
+
+            if (executor != null) {
+                executor.shutdown();
+                executor.shutdownNow();
+                executor = null;
+            }
+
+            try {
+                if (reads != null) {
+                    reads.close();
+                    reads = null;
+                }
+
+                if (inStream != null) {
+                    inStream.close();
+                    inStream = null;
+                }
+            } catch (IOException e) {
+                logger.error("Cannot close reader stream");
+            }
+
+        }
+
+    }
+
+    /**
+     * Implements the writer (IP & serial) that sends messages to the MySensors network.
+     *
+     * @author Andrea Cioni
+     * @author Tim Oberföll
+     *
+     */
+    public abstract class MySensorsWriter implements Runnable {
+        protected Logger logger = LoggerFactory.getLogger(MySensorsWriter.class);
+
+        protected boolean stopWriting = false; // Stop the thread that sends the messages to the MySensors network
+        protected long lastSend = System.currentTimeMillis(); // date when the last message was sent. Messages are send
+                                                              // with
+                                                              // a delay in between.
+        protected PrintWriter outs = null;
+        protected OutputStream outStream = null;
+        protected MySensorsBridgeConnection mysCon = null;
+
+        protected ExecutorService executor = Executors.newSingleThreadExecutor();
+        protected Future<?> future = null;
+
+        protected int sendDelay = 1000;
+
+        /**
+         * Start the writer Process that will poll messages from the FIFO outbound queue
+         * and send them to the MySensors network.
+         */
+        public void startWriter() {
+            future = executor.submit(this);
+        }
+
+        @Override
+        public void run() {
+            Thread.currentThread().setName(MySensorsWriter.class.getName());
+            while (!stopWriting) {
+                if (!mysCon.isWriterPaused()) {
+                    try {
+                        MySensorsMessage msg = mysCon.pollMySensorsOutboundQueue();
+
+                        if (msg != null) {
+                            if (msg.getNextSend() < System.currentTimeMillis()
+                                    && (lastSend + sendDelay) < System.currentTimeMillis()) {
+                                // if we request an ACK we will wait for it and keep the message in the queue (at the
+                                // end)
+                                // otherwise we remove the message from the queue
+                                if (msg.getAck() == 1) {
+                                    msg.setRetries(msg.getRetries() + 1);
+                                    if (!(msg.getRetries() > MySensorsBindingConstants.MYSENSORS_NUMBER_OF_RETRIES)) {
+                                        msg.setNextSend(System.currentTimeMillis()
+                                                + MySensorsBindingConstants.MYSENSORS_RETRY_TIMES[msg.getRetries()
+                                                        - 1]);
+                                        mysCon.addMySensorsOutboundMessage(msg);
+                                    } else {
+                                        logger.warn("NO ACK from nodeId: " + msg.getNodeId());
+                                        if (msg.getOldMsg().isEmpty()) {
+                                            logger.debug("No old status know to revert to!");
+                                        } else if (msg.getRevert()) {
+                                            logger.debug("Reverting status!");
+                                            msg.setMsg(msg.getOldMsg());
+                                            msg.setAck(0);
+                                            notifyMessageReceived(msg);
+                                        } else if (!msg.getRevert()) {
+                                            logger.debug("Not reverted due to configuration!");
+                                        }
+                                        continue;
+                                    }
+                                }
+                                String output = MySensorsMessageParser.generateAPIString(msg);
+                                logger.debug("Sending to MySensors: {}", output.trim());
+
+                                sendMessage(output);
+                                lastSend = System.currentTimeMillis();
+                            } else {
+                                // Is not time for send again...
+                                mysCon.addMySensorsOutboundMessage(msg);
+                            }
+                        } else {
+                            logger.warn("Message returned from queue is null");
+                        }
+
+                    } catch (Exception e) {
+                        logger.error("({}) on writing to connection, message: {}", e, getClass(), e.getMessage());
+                    }
+                }
+            }
+        }
+
+        /**
+         * Send a message to the MySensors network.
+         *
+         * @param output the message/string/line that should be send to the MySensors gateway.
+         */
+        protected void sendMessage(String output) {
+            outs.println(output);
+            outs.flush();
+        }
+
+        /**
+         * Stops the writer process.
+         */
+        public void stopWriting() {
+
+            logger.debug("Stopping Writer thread");
+
+            this.stopWriting = true;
+
+            if (future != null) {
+                future.cancel(true);
+                future = null;
+            }
+
+            if (executor != null) {
+                executor.shutdown();
+                executor.shutdownNow();
+                executor = null;
+            }
+
+            try {
+                if (outs != null) {
+                    outs.flush();
+                    outs.close();
+                    outs = null;
+                }
+
+                if (outStream != null) {
+                    outStream.close();
+                    outStream = null;
+                }
+            } catch (IOException e) {
+                logger.error("Cannot close writer stream");
+            }
+
+        }
     }
 
 }

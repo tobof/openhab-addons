@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-import org.openhab.binding.mysensors.internal.protocol.MySensorsWriter;
+import org.openhab.binding.mysensors.internal.protocol.MySensorsBridgeConnection.MySensorsWriter;
 
 /**
  * Responsible for sending messages to the TCP/IP link.
@@ -23,6 +23,7 @@ import org.openhab.binding.mysensors.internal.protocol.MySensorsWriter;
 public class MySensorsIpWriter extends MySensorsWriter {
 
     public MySensorsIpWriter(Socket sock, MySensorsIpConnection mysCon, int sendDelay) {
+        mysCon.super();
         this.mysCon = mysCon;
         try {
             this.outStream = sock.getOutputStream();

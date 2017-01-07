@@ -10,7 +10,7 @@ package org.openhab.binding.mysensors.internal.protocol.serial;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 
-import org.openhab.binding.mysensors.internal.protocol.MySensorsWriter;
+import org.openhab.binding.mysensors.internal.protocol.MySensorsBridgeConnection.MySensorsWriter;
 
 /**
  * Responsible for sending messages to the serial link.
@@ -22,6 +22,7 @@ import org.openhab.binding.mysensors.internal.protocol.MySensorsWriter;
 public class MySensorsSerialWriter extends MySensorsWriter {
 
     public MySensorsSerialWriter(OutputStream outStream, MySensorsSerialConnection mysCon, int sendDelay) {
+        mysCon.super();
         this.mysCon = mysCon;
         this.outStream = outStream;
         outs = new PrintWriter(outStream);
