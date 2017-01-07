@@ -7,8 +7,6 @@
  */
 package org.openhab.binding.mysensors.internal.protocol;
 
-import static org.openhab.binding.mysensors.MySensorsBindingConstants.*;
-
 import java.util.Iterator;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executors;
@@ -18,14 +16,11 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import org.openhab.binding.mysensors.MySensorsBindingConstants;
-import org.openhab.binding.mysensors.discovery.MySensorsDiscoveryService;
+import org.openhab.binding.mysensors.config.MySensorsBridgeConfiguration;
 import org.openhab.binding.mysensors.internal.event.MySensorsBridgeConnectionEventListener;
 import org.openhab.binding.mysensors.internal.event.MySensorsEventObserver;
 import org.openhab.binding.mysensors.internal.event.MySensorsEventRegister;
-import org.openhab.binding.mysensors.internal.exception.NoMoreIdsException;
-import org.openhab.binding.mysensors.internal.handler.MySensorsBridgeHandler;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
-import org.openhab.binding.mysensors.internal.sensors.MySensorsDeviceManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,8 +31,8 @@ import org.slf4j.LoggerFactory;
  * @author Andrea Cioni
  *
  */
-public abstract class MySensorsBridgeConnection
-        implements Runnable, MySensorsEventObserver<MySensorsBridgeConnectionEventListener> {
+public abstract class MySensorsBridgeConnection implements Runnable,
+        MySensorsEventObserver<MySensorsBridgeConnectionEventListener>, MySensorsBridgeConnectionEventListener {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -47,14 +42,8 @@ public abstract class MySensorsBridgeConnection
     // Connector will check for connection status every CONNECTOR_INTERVAL_CHECK seconds
     public static final int CONNECTOR_INTERVAL_CHECK = 10;
 
-    // Handler for special messages
-    private MySensorsSpecialMessageHandler specialMessageHandler;
-
     // ??
     private boolean pauseWriter = false;
-
-    // Device manager
-    private MySensorsDeviceManager deviceManager;
 
     // Blocking queue wait for message
     private BlockingQueue<MySensorsMessage> outboundMessageQueue = null;
@@ -67,6 +56,8 @@ public abstract class MySensorsBridgeConnection
 
     private MySensorsBridgeConnection waitingObj = null;
 
+    private MySensorsBridgeConfiguration bridgeConfiguration;
+
     // I_VERSION response flag
     private boolean iVersionResponse = false;
 
@@ -76,9 +67,6 @@ public abstract class MySensorsBridgeConnection
     // Reader and writer thread
     protected MySensorsWriter mysConWriter = null;
     protected MySensorsReader mysConReader = null;
-
-    // Bridge handler dependency
-    private MySensorsBridgeHandler bridgeHandler = null;
 
     // Sanity checker
     private MySensorsNetworkSanityChecker netSanityChecker = null;
@@ -90,10 +78,9 @@ public abstract class MySensorsBridgeConnection
     private ScheduledExecutorService watchdogExecutor = null;
     private Future<?> futureWatchdog = null;
 
-    public MySensorsBridgeConnection(MySensorsDeviceManager deviceManager, MySensorsBridgeHandler bridgeHandler) {
-        this.deviceManager = deviceManager;
+    public MySensorsBridgeConnection(MySensorsBridgeConfiguration bridgeConfiguration) {
         this.outboundMessageQueue = new LinkedBlockingQueue<MySensorsMessage>();
-        this.bridgeHandler = bridgeHandler;
+        this.bridgeConfiguration = bridgeConfiguration;
         this.watchdogExecutor = Executors.newSingleThreadScheduledExecutor();
         this.iVersionResponse = false;
         this.eventRegister = new MySensorsEventRegister<>();
@@ -103,8 +90,8 @@ public abstract class MySensorsBridgeConnection
      * Initialization of the BridgeConnection
      */
     public void initialize() {
-        logger.debug("Set skip check on startup to: {}", bridgeHandler.getBridgeConfiguration().skipStartupCheck);
-        skipStartupCheck = bridgeHandler.getBridgeConfiguration().skipStartupCheck;
+        logger.debug("Set skip check on startup to: {}", bridgeConfiguration.skipStartupCheck);
+        skipStartupCheck = bridgeConfiguration.skipStartupCheck;
 
         // Launch connection watchdog
         logger.debug("Enabling connection watchdog");
@@ -128,10 +115,10 @@ public abstract class MySensorsBridgeConnection
                 numOfRetry = 0;
 
                 // Start discovery service
-                MySensorsDiscoveryService discoveryService = new MySensorsDiscoveryService(bridgeHandler);
-                discoveryService.activate();
+                // MySensorsDiscoveryService discoveryService = new MySensorsDiscoveryService(bridgeHandler);
+                // discoveryService.activate();
 
-                if (bridgeHandler.getBridgeConfiguration().enableNetworkSanCheck) {
+                if (bridgeConfiguration.enableNetworkSanCheck) {
 
                     // Start network sanity check
                     netSanityChecker = new MySensorsNetworkSanityChecker(this);
@@ -220,9 +207,9 @@ public abstract class MySensorsBridgeConnection
         reader.startReader();
         writer.startWriter();
 
-        addEventListener(specialMessageHandler);
-
         if (!skipStartupCheck) {
+            addEventListener(this);
+
             try {
                 int i = 0;
                 synchronized (this) {
@@ -235,6 +222,8 @@ public abstract class MySensorsBridgeConnection
                 }
             } catch (Exception e) {
                 logger.error("Exception on waiting for I_VERSION message", e);
+            } finally {
+                addEventListener(this);
             }
         } else {
             logger.warn("Skipping I_VERSION connection test, not recommended...");
@@ -374,6 +363,25 @@ public abstract class MySensorsBridgeConnection
         eventRegister.removeEventListener(listener);
     }
 
+    @Override
+    public void messageReceived(MySensorsMessage msg) throws Throwable {
+        // Have we get a I_VERSION message?
+        if (msg.isIVersionMessage()) {
+            iVersionMessageReceived(msg.msg);
+        }
+    }
+
+    private void iVersionMessageReceived(String msg) {
+        if (waitingObj != null) {
+            logger.debug("Good,Gateway is up and running! (Ver:{})", msg);
+            synchronized (waitingObj) {
+                iVersionResponse = true;
+                waitingObj.notifyAll();
+                waitingObj = null;
+            }
+        }
+    }
+
     private void notifyBridgeStatusUpdate(MySensorsBridgeConnection connection, boolean connected) {
         Iterator<MySensorsBridgeConnectionEventListener> iterator = eventRegister.getEventListenersIterator();
         while (iterator.hasNext()) {
@@ -388,107 +396,25 @@ public abstract class MySensorsBridgeConnection
         }
     }
 
-    private class MySensorsSpecialMessageHandler implements MySensorsBridgeConnectionEventListener {
+    /**
+     * Notify message to listeners. <b>Should be</b> left with 'package' visibility to be available to reader/writer
+     * class
+     *
+     * @param msg the message to send
+     */
+    void notifyMessageReceived(MySensorsMessage msg) {
+        Iterator<MySensorsBridgeConnectionEventListener> iterator = eventRegister.getEventListenersIterator();
+        while (iterator.hasNext()) {
+            MySensorsBridgeConnectionEventListener listener = iterator.next();
+            logger.trace("Broadcasting event {} to: {}", msg, listener);
 
-        @Override
-        public void messageReceived(MySensorsMessage message) throws Throwable {
-            handleSpecialMessageEvent(message);
-        }
-
-        private void handleSpecialMessageEvent(MySensorsMessage msg) {
-            // Do we get an ACK?
-            if (msg.getAck() == 1) {
-                logger.debug(String.format("ACK received! Node: %d, Child: %d", msg.nodeId, msg.childId));
-                removeMySensorsOutboundMessage(msg);
-            }
-
-            // Have we get a I_CONFIG message?
-            if (msg.isIConfigMessage()) {
-                answerIConfigMessage(msg);
-            }
-
-            // Have we get a I_TIME message?
-            if (msg.isITimeMessage()) {
-                answerITimeMessage(msg);
-            }
-
-            // Have we get a I_VERSION message?
-            if (msg.isIVersionMessage()) {
-                handleIncomingVersionMessage(msg.msg);
-            }
-
-            // Requesting ID
-            if (msg.isIdRequestMessage()) {
-                answerIDRequest();
-            }
-        }
-
-        /**
-         * Answer to I_TIME message for gateway time request from sensor
-         *
-         * @param msg, the incoming I_TIME message from sensor
-         */
-        private void answerITimeMessage(MySensorsMessage msg) {
-            logger.info("I_TIME request received from {}, answering...", msg.nodeId);
-
-            String time = Long.toString(System.currentTimeMillis() / 1000);
-            MySensorsMessage newMsg = new MySensorsMessage(msg.nodeId, msg.childId, MYSENSORS_MSG_TYPE_INTERNAL, 0,
-                    false, MYSENSORS_SUBTYPE_I_TIME, time);
-            addMySensorsOutboundMessage(newMsg);
-
-        }
-
-        /**
-         * Answer to I_CONFIG message for imperial/metric request from sensor
-         *
-         * @param msg, the incoming I_CONFIG message from sensor
-         */
-        private void answerIConfigMessage(MySensorsMessage msg) {
-            boolean imperial = bridgeHandler.getBridgeConfiguration().imperial;
-            String iConfig = imperial ? "I" : "M";
-
-            logger.debug("I_CONFIG request received from {}, answering: (is imperial?){}", iConfig, imperial);
-
-            MySensorsMessage newMsg = new MySensorsMessage(msg.nodeId, msg.childId, MYSENSORS_MSG_TYPE_INTERNAL, 0,
-                    false, MYSENSORS_SUBTYPE_I_CONFIG, iConfig);
-            addMySensorsOutboundMessage(newMsg);
-
-        }
-
-        /**
-         * Wake up main thread that is waiting for confirmation of link up
-         */
-        private void handleIncomingVersionMessage(String message) {
-            iVersionMessageReceived(message);
-        }
-
-        private void iVersionMessageReceived(String msg) {
-            if (waitingObj != null) {
-                logger.debug("Good,Gateway is up and running! (Ver:{})", msg);
-                synchronized (waitingObj) {
-                    iVersionResponse = true;
-                    waitingObj.notifyAll();
-                    waitingObj = null;
-                }
-            }
-        }
-
-        /**
-         * If an ID-Request from a sensor is received the controller will send an id to the sensor
-         */
-        private void answerIDRequest() {
-            logger.info("ID Request received");
-
-            int newId = 0;
             try {
-                newId = deviceManager.reserveId();
-                logger.info("New Node in the MySensors network has requested an ID. ID is: {}", newId);
-                MySensorsMessage newMsg = new MySensorsMessage(255, 255, 3, 0, false, 4, newId + "");
-                addMySensorsOutboundMessage(newMsg);
-            } catch (NoMoreIdsException e) {
-                logger.error("No more IDs available for this node, you could try cleaning cache file");
+                listener.messageReceived(msg);
+            } catch (Throwable e) {
+                logger.error("Event broadcasting throw an exception", e);
             }
         }
+
     }
 
 }

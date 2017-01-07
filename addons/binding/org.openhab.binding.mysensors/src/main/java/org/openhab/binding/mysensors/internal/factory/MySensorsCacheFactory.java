@@ -21,7 +21,7 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 
 /**
- * ID Cache is used to store the ids used in the MySensors network.
+ * Cache may be used to store information across restart of MySensors connection.
  *
  * @author Andrea Cioni
  *

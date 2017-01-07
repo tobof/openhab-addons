@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.openhab.binding.mysensors.internal.Pair;
+import org.openhab.binding.mysensors.internal.event.MySensorsBridgeConnectionEventListener;
 import org.openhab.binding.mysensors.internal.event.MySensorsDeviceEventListener;
 import org.openhab.binding.mysensors.internal.event.MySensorsEventObserver;
 import org.openhab.binding.mysensors.internal.event.MySensorsEventRegister;
@@ -31,7 +32,8 @@ import org.slf4j.LoggerFactory;
  * @author Andrea Cioni
  *
  */
-public class MySensorsDeviceManager implements MySensorsEventObserver<MySensorsDeviceEventListener> {
+public class MySensorsDeviceManager
+        implements MySensorsEventObserver<MySensorsDeviceEventListener>, MySensorsBridgeConnectionEventListener {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -193,7 +195,12 @@ public class MySensorsDeviceManager implements MySensorsEventObserver<MySensorsD
         eventRegister.removeEventListener(listener);
     }
 
-    public void notifyNewNodeDiscovered(MySensorsNode node) {
+    @Override
+    public void messageReceived(MySensorsMessage message) throws Throwable {
+        handleIncomingMessage(message);
+    }
+
+    private void notifyNewNodeDiscovered(MySensorsNode node) {
         Iterator<MySensorsDeviceEventListener> iterator = eventRegister.getEventListenersIterator();
         while (iterator.hasNext()) {
             MySensorsDeviceEventListener listener = iterator.next();

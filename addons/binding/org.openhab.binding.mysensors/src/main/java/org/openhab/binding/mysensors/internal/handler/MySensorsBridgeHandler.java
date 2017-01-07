@@ -48,6 +48,8 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
     // Update cache when event arrives
     private MySensorsCacheUpdateHandler cacheUpdateHandler;
 
+    private MySensorsMessageHandler messageHandler;
+
     // Configuration from thing file
     private MySensorsBridgeConfiguration myConfiguration = null;
 
@@ -65,11 +67,9 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
         myConfiguration = getConfigAs(MySensorsBridgeConfiguration.class);
 
         if (getThing().getThingTypeUID().equals(THING_TYPE_BRIDGE_SER)) {
-            myCon = new MySensorsSerialConnection(deviceManager, this, myConfiguration.serialPort,
-                    myConfiguration.baudRate, myConfiguration.sendDelay);
+            myCon = new MySensorsSerialConnection(getBridgeConfiguration());
         } else if (getThing().getThingTypeUID().equals(THING_TYPE_BRIDGE_ETH)) {
-            myCon = new MySensorsIpConnection(deviceManager, this, myConfiguration.ipAddress, myConfiguration.tcpPort,
-                    myConfiguration.sendDelay);
+            myCon = new MySensorsIpConnection(getBridgeConfiguration());
         } else {
             logger.error("Not recognized bridge: {}", getThing().getThingTypeUID());
         }
@@ -89,6 +89,7 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
     @Override
     public void dispose() {
         logger.debug("Disposing of the MySensors bridge");
+
         if (myCon != null) {
             myCon.removeEventListener(this);
             myCon.removeEventListener(cacheUpdateHandler);
@@ -127,8 +128,10 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
     @Override
     public void bridgeStatusUpdate(MySensorsBridgeConnection connection, boolean connected) throws Throwable {
         if (connected) {
+            myCon.addEventListener(deviceManager);
             updateStatus(ThingStatus.ONLINE);
         } else {
+            myCon.addEventListener(deviceManager);
             updateStatus(ThingStatus.OFFLINE);
         }
 

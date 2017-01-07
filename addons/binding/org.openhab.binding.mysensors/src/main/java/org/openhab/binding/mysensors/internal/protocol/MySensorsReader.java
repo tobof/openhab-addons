@@ -14,7 +14,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import org.openhab.binding.mysensors.internal.event.MySensorsEventObserver_OLD;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageParser;
 import org.slf4j.Logger;
@@ -27,7 +26,7 @@ import org.slf4j.LoggerFactory;
  * @author Tim Oberföll
  *
  */
-public class MySensorsReader implements Runnable {
+public abstract class MySensorsReader implements Runnable {
 
     protected Logger logger = LoggerFactory.getLogger(MySensorsReader.class);
 
@@ -72,7 +71,7 @@ public class MySensorsReader implements Runnable {
                 logger.debug(line);
                 MySensorsMessage msg = MySensorsMessageParser.parse(line);
                 if (msg != null) {
-                    MySensorsEventObserver_OLD.notifyMessageReceived(msg);
+                    mysCon.notifyMessageReceived(msg);
                 }
             } catch (Exception e) {
                 logger.error("({}) on reading from connection, message: {}", e, getClass(), e.getMessage());
