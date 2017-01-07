@@ -17,17 +17,14 @@ import org.eclipse.smarthome.core.thing.ThingStatus;
 import org.eclipse.smarthome.core.thing.binding.BaseBridgeHandler;
 import org.eclipse.smarthome.core.types.Command;
 import org.openhab.binding.mysensors.config.MySensorsBridgeConfiguration;
-import org.openhab.binding.mysensors.internal.event.MySensorsEventObserver_OLD;
-import org.openhab.binding.mysensors.internal.event.MySensorsUpdateListener;
+import org.openhab.binding.mysensors.internal.event.MySensorsBridgeConnectionEventListener;
+import org.openhab.binding.mysensors.internal.event.MySensorsDeviceEventListener;
 import org.openhab.binding.mysensors.internal.factory.MySensorsCacheFactory;
 import org.openhab.binding.mysensors.internal.protocol.MySensorsBridgeConnection;
 import org.openhab.binding.mysensors.internal.protocol.ip.MySensorsIpConnection;
-import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
 import org.openhab.binding.mysensors.internal.protocol.serial.MySensorsSerialConnection;
-import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsDeviceManager;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsNode;
-import org.openhab.binding.mysensors.internal.sensors.MySensorsVariable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,15 +35,18 @@ import org.slf4j.LoggerFactory;
  * @author Tim Oberföll
  *
  */
-public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySensorsUpdateListener {
+public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySensorsBridgeConnectionEventListener {
 
     private Logger logger = LoggerFactory.getLogger(MySensorsBridgeHandler.class);
 
     // Bridge connection
-    private MySensorsBridgeConnection myCon = null;
+    private MySensorsBridgeConnection myCon;
 
     // Device manager
     private MySensorsDeviceManager deviceManager;
+
+    // Update cache when event arrives
+    private MySensorsCacheUpdateHandler cacheUpdateHandler;
 
     // Configuration from thing file
     private MySensorsBridgeConfiguration myConfiguration = null;
@@ -54,6 +54,8 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
     public MySensorsBridgeHandler(MySensorsDeviceManager deviceManager, Bridge bridge) {
         super(bridge);
         this.deviceManager = deviceManager;
+        this.cacheUpdateHandler = new MySensorsCacheUpdateHandler();
+
     }
 
     @Override
@@ -74,7 +76,11 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
 
         if (myCon != null) {
             myCon.initialize();
-            MySensorsEventObserver_OLD.addEventListener(this);
+
+            myCon.addEventListener(this);
+            myCon.addEventListener(cacheUpdateHandler);
+            deviceManager.addEventListener(cacheUpdateHandler);
+
         }
 
         logger.debug("Initialization of the MySensors bridge DONE!");
@@ -84,11 +90,12 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
     public void dispose() {
         logger.debug("Disposing of the MySensors bridge");
         if (myCon != null) {
-            MySensorsEventObserver_OLD.removeEventListener(this);
+            myCon.removeEventListener(this);
+            myCon.removeEventListener(cacheUpdateHandler);
+            deviceManager.removeEventListener(cacheUpdateHandler);
+
             myCon.destroy();
         }
-
-        updateCacheFile();
 
         super.dispose();
     }
@@ -117,25 +124,6 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
         return myCon;
     }
 
-    private void updateCacheFile() {
-        MySensorsCacheFactory cacheFactory = MySensorsCacheFactory.getCacheFactory();
-
-        List<Integer> givenIds = deviceManager.getGivenIds();
-
-        cacheFactory.writeCache(MySensorsCacheFactory.GIVEN_IDS_CACHE_FILE, givenIds.toArray(new Integer[] {}),
-                Integer[].class);
-    }
-
-    @Override
-    public void nodeIdReservationDone(Integer reservedId) throws Throwable {
-        updateCacheFile();
-    }
-
-    @Override
-    public void newNodeDiscovered(MySensorsNode message) throws Throwable {
-        updateCacheFile();
-    }
-
     @Override
     public void bridgeStatusUpdate(MySensorsBridgeConnection connection, boolean connected) throws Throwable {
         if (connected) {
@@ -149,6 +137,34 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
     @Override
     public String toString() {
         return "MySensorsBridgeHandler []";
+    }
+
+    private class MySensorsCacheUpdateHandler
+            implements MySensorsDeviceEventListener, MySensorsBridgeConnectionEventListener {
+
+        private void updateCacheFile() {
+            MySensorsCacheFactory cacheFactory = MySensorsCacheFactory.getCacheFactory();
+
+            List<Integer> givenIds = deviceManager.getGivenIds();
+
+            cacheFactory.writeCache(MySensorsCacheFactory.GIVEN_IDS_CACHE_FILE, givenIds.toArray(new Integer[] {}),
+                    Integer[].class);
+        }
+
+        @Override
+        public void nodeIdReservationDone(Integer reservedId) throws Throwable {
+            updateCacheFile();
+        }
+
+        @Override
+        public void newNodeDiscovered(MySensorsNode message) throws Throwable {
+            updateCacheFile();
+        }
+
+        @Override
+        public void bridgeStatusUpdate(MySensorsBridgeConnection connection, boolean connected) throws Throwable {
+            updateCacheFile();
+        }
     }
 
 }

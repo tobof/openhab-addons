@@ -25,8 +25,9 @@ import org.eclipse.smarthome.core.types.Command;
 import org.eclipse.smarthome.core.types.RefreshType;
 import org.eclipse.smarthome.core.types.State;
 import org.openhab.binding.mysensors.config.MySensorsSensorConfiguration;
-import org.openhab.binding.mysensors.internal.event.MySensorsEventObserver_OLD;
-import org.openhab.binding.mysensors.internal.event.MySensorsUpdateListener;
+import org.openhab.binding.mysensors.internal.event.MySensorsBridgeConnectionEventListener;
+import org.openhab.binding.mysensors.internal.event.MySensorsDeviceEventListener;
+import org.openhab.binding.mysensors.internal.protocol.MySensorsBridgeConnection;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageParser;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
@@ -42,7 +43,8 @@ import org.slf4j.LoggerFactory;
  *
  * @author Tim Oberföll
  */
-public class MySensorsThingHandler extends BaseThingHandler implements MySensorsUpdateListener {
+public class MySensorsThingHandler extends BaseThingHandler
+        implements MySensorsDeviceEventListener, MySensorsBridgeConnectionEventListener {
 
     private Logger logger = LoggerFactory.getLogger(MySensorsThingHandler.class);
 
@@ -59,6 +61,8 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
 
     private MySensorsDeviceManager deviceManager;
 
+    private MySensorsBridgeConnection myConn;
+
     public MySensorsThingHandler(MySensorsDeviceManager deviceManager, Thing thing) {
         super(thing);
         this.deviceManager = deviceManager;
@@ -71,11 +75,13 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
         childId = Integer.parseInt(configuration.childId);
         requestAck = configuration.requestAck;
         revertState = configuration.revertState;
+
+        myConn = getBridgeHandler().getBridgeConnection();
+
         logger.debug("Configuration: node {}, chiledId: {}, revertState: {}", nodeId, childId, revertState);
-        if (!MySensorsEventObserver_OLD.isEventListenerRegisterd(this)) {
-            logger.debug("Event listener for node {}-{} not registered yet, registering...", nodeId, childId);
-            MySensorsEventObserver_OLD.addEventListener(this);
-        }
+
+        registerListeners();
+
         updateStatus(ThingStatus.ONLINE);
     }
 
@@ -85,10 +91,7 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
                 getThing().getUID().toString());
         if (bridgeStatusInfo.getStatus().equals(ThingStatus.ONLINE)
                 || bridgeStatusInfo.getStatus().equals(ThingStatus.OFFLINE)) {
-            if (!MySensorsEventObserver_OLD.isEventListenerRegisterd(this)) {
-                logger.debug("Event listener for node {}-{} not registered yet, registering...", nodeId, childId);
-                MySensorsEventObserver_OLD.addEventListener(this);
-            }
+            registerListeners();
 
             // the node has the same status of the bridge
             updateStatus(bridgeStatusInfo.getStatus());
@@ -226,6 +229,18 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
             updateState(CHANNEL_MYSENSORS_MESSAGE,
                     new StringType(MySensorsMessageParser.generateAPIString(msg).replaceAll("(\\r|\\n)", "")));
 
+        }
+    }
+
+    private void registerListeners() {
+        if (!myConn.isEventListenerRegisterd(this)) {
+            logger.debug("Event listener for node {}-{} not registered yet, registering...", nodeId, childId);
+            myConn.addEventListener(this);
+        }
+
+        if (!deviceManager.isEventListenerRegisterd(this)) {
+            logger.debug("Event listener for node {}-{} not registered yet, registering...", nodeId, childId);
+            deviceManager.addEventListener(this);
         }
     }
 

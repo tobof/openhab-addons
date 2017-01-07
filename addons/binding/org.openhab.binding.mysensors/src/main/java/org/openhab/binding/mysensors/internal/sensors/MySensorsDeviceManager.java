@@ -7,13 +7,21 @@
  */
 package org.openhab.binding.mysensors.internal.sensors;
 
+import static org.openhab.binding.mysensors.MySensorsBindingConstants.CHANNEL_MAP;
+
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import org.openhab.binding.mysensors.internal.Pair;
+import org.openhab.binding.mysensors.internal.event.MySensorsDeviceEventListener;
+import org.openhab.binding.mysensors.internal.event.MySensorsEventObserver;
+import org.openhab.binding.mysensors.internal.event.MySensorsEventRegister;
 import org.openhab.binding.mysensors.internal.exception.NoMoreIdsException;
+import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,13 +31,17 @@ import org.slf4j.LoggerFactory;
  * @author Andrea Cioni
  *
  */
-public class MySensorsDeviceManager {
+public class MySensorsDeviceManager implements MySensorsEventObserver<MySensorsDeviceEventListener> {
+
     private Logger logger = LoggerFactory.getLogger(getClass());
 
     private Map<Integer, MySensorsNode> nodeMap = null;
 
+    private MySensorsEventRegister<MySensorsDeviceEventListener> eventRegister;
+
     public MySensorsDeviceManager() {
         nodeMap = new HashMap<>();
+        eventRegister = new MySensorsEventRegister<>();
     }
 
     public MySensorsDeviceManager(Map<Integer, MySensorsNode> nodeMap) {
@@ -149,6 +161,126 @@ public class MySensorsDeviceManager {
             throw new NoMoreIdsException();
         }
 
+        notifyNodeIdReserved(newId);
+
         return newId;
+    }
+
+    @Override
+    public void addEventListener(MySensorsDeviceEventListener listener) {
+        eventRegister.addEventListener(listener);
+
+    }
+
+    @Override
+    public void clearAllListeners() {
+        eventRegister.clearAllListeners();
+
+    }
+
+    @Override
+    public Iterator<MySensorsDeviceEventListener> getEventListenersIterator() {
+        return eventRegister.getEventListenersIterator();
+    }
+
+    @Override
+    public boolean isEventListenerRegisterd(MySensorsDeviceEventListener listener) {
+        return eventRegister.isEventListenerRegisterd(listener);
+    }
+
+    @Override
+    public void removeEventListener(MySensorsDeviceEventListener listener) {
+        eventRegister.removeEventListener(listener);
+    }
+
+    public void notifyNewNodeDiscovered(MySensorsNode node) {
+        Iterator<MySensorsDeviceEventListener> iterator = eventRegister.getEventListenersIterator();
+        while (iterator.hasNext()) {
+            MySensorsDeviceEventListener listener = iterator.next();
+            logger.trace("Broadcasting event {} to: {}", node.toString(), listener);
+
+            try {
+                listener.newNodeDiscovered(node);
+            } catch (Throwable e) {
+                logger.error("Event broadcasting throw an exception", e);
+            }
+        }
+    }
+
+    private void notifyNodeIdReserved(Integer reserved) {
+        Iterator<MySensorsDeviceEventListener> iterator = eventRegister.getEventListenersIterator();
+        while (iterator.hasNext()) {
+            MySensorsDeviceEventListener listener = iterator.next();
+            logger.trace("Broadcasting event {} to: {}", reserved, listener);
+
+            try {
+                listener.nodeIdReservationDone(reserved);
+            } catch (Throwable e) {
+                logger.error("Event broadcasting throw an exception", e);
+            }
+        }
+    }
+
+    private void notifyNodeUpdateEvent(MySensorsNode node, MySensorsChild child, MySensorsVariable variable) {
+        Iterator<MySensorsDeviceEventListener> iterator = eventRegister.getEventListenersIterator();
+        while (iterator.hasNext()) {
+            MySensorsDeviceEventListener listener = iterator.next();
+            logger.trace("Broadcasting event {} to: {}", variable.toString(), listener);
+
+            try {
+                listener.nodeUpdateEvent(node, child, variable);
+            } catch (Throwable e) {
+                logger.error("Event broadcasting throw an exception", e);
+            }
+        }
+    }
+
+    /**
+     * Handle the incoming message from serial
+     *
+     * @param msg the incoming message
+     * @return true if ,and only if, the message is propagated to one of the defined node or message arrives from a
+     *         device new device in the network
+     * @throws Throwable
+     */
+    private boolean handleIncomingMessage(MySensorsMessage msg) throws Throwable {
+        boolean ret = false;
+        if (MySensorsNode.isValidNodeId(msg.nodeId) && MySensorsChild.isValidChildId(msg.childId)
+                && msg.isSetReqMessage()) {
+            MySensorsNode node = getNode(msg.nodeId);
+            if (node != null) {
+                logger.debug("Node {} found in device manager", msg.nodeId);
+
+                node.setLastUpdate(new Date());
+
+                MySensorsChild child = node.getChild(msg.childId);
+                if (child != null) {
+                    logger.debug("Child {} found in node {}", msg.childId, msg.nodeId);
+
+                    child.setLastUpdate(new Date());
+
+                    MySensorsVariable variable = child.getVariable(msg.msgType, msg.subType);
+                    if (variable != null) {
+                        variable.setValue(msg);
+                        notifyNodeUpdateEvent(node, child, variable);
+                        ret = true;
+                    } else {
+                        logger.warn("Variable {}({}) not present", msg.subType,
+                                CHANNEL_MAP.get(new Pair<Integer>(msg.msgType, msg.subType)));
+                    }
+                } else {
+                    logger.debug("Child {} not present into node {}", msg.childId, msg.nodeId);
+                }
+            } else {
+                logger.debug("Node {} not present, send new node discovered event", msg.nodeId);
+
+                node = new MySensorsNode(msg.nodeId);
+                addNode(node);
+                notifyNewNodeDiscovered(node);
+                ret = true;
+            }
+        }
+
+        return ret;
     }
 }

@@ -1,8 +1,9 @@
 package org.openhab.binding.mysensors.internal.event;
 
-import java.util.List;
+import java.util.EventListener;
+import java.util.Iterator;
 
-public interface MySensorsEventObserver<T> {
+public interface MySensorsEventObserver<T extends EventListener> {
 
     public boolean isEventListenerRegisterd(T listener);
 
@@ -15,5 +16,5 @@ public interface MySensorsEventObserver<T> {
 
     public void clearAllListeners();
 
-    public List<T> getEventListeners();
+    public Iterator<T> getEventListenersIterator();
 }

@@ -9,7 +9,6 @@ package org.openhab.binding.mysensors.internal.protocol;
 
 import static org.openhab.binding.mysensors.MySensorsBindingConstants.*;
 
-import java.util.Date;
 import java.util.Iterator;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executors;
@@ -20,16 +19,13 @@ import java.util.concurrent.TimeUnit;
 
 import org.openhab.binding.mysensors.MySensorsBindingConstants;
 import org.openhab.binding.mysensors.discovery.MySensorsDiscoveryService;
-import org.openhab.binding.mysensors.internal.Pair;
-import org.openhab.binding.mysensors.internal.event.MySensorsEventObserver_OLD;
-import org.openhab.binding.mysensors.internal.event.MySensorsUpdateListener;
+import org.openhab.binding.mysensors.internal.event.MySensorsBridgeConnectionEventListener;
+import org.openhab.binding.mysensors.internal.event.MySensorsEventObserver;
+import org.openhab.binding.mysensors.internal.event.MySensorsEventRegister;
 import org.openhab.binding.mysensors.internal.exception.NoMoreIdsException;
 import org.openhab.binding.mysensors.internal.handler.MySensorsBridgeHandler;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
-import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsDeviceManager;
-import org.openhab.binding.mysensors.internal.sensors.MySensorsNode;
-import org.openhab.binding.mysensors.internal.sensors.MySensorsVariable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,12 +36,19 @@ import org.slf4j.LoggerFactory;
  * @author Andrea Cioni
  *
  */
-public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUpdateListener {
+public abstract class MySensorsBridgeConnection
+        implements Runnable, MySensorsEventObserver<MySensorsBridgeConnectionEventListener> {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
+    // Event register for MySensorsConnectionEventListener
+    private MySensorsEventRegister<MySensorsBridgeConnectionEventListener> eventRegister;
+
     // Connector will check for connection status every CONNECTOR_INTERVAL_CHECK seconds
     public static final int CONNECTOR_INTERVAL_CHECK = 10;
+
+    // Handler for special messages
+    private MySensorsSpecialMessageHandler specialMessageHandler;
 
     // ??
     private boolean pauseWriter = false;
@@ -93,6 +96,7 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
         this.bridgeHandler = bridgeHandler;
         this.watchdogExecutor = Executors.newSingleThreadScheduledExecutor();
         this.iVersionResponse = false;
+        this.eventRegister = new MySensorsEventRegister<>();
     }
 
     /**
@@ -157,7 +161,7 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
      */
     private boolean connect() {
         connected = _connect();
-        MySensorsEventObserver_OLD.notifyBridgeStatusUpdate(this, isConnected());
+        notifyBridgeStatusUpdate(this, isConnected());
         return connected;
     }
 
@@ -178,7 +182,7 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
         requestDisconnection = false;
         iVersionResponse = false;
 
-        MySensorsEventObserver_OLD.notifyBridgeStatusUpdate(this, isConnected());
+        notifyBridgeStatusUpdate(this, isConnected());
     }
 
     protected abstract void _disconnect();
@@ -203,7 +207,6 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
             watchdogExecutor.shutdownNow();
         }
 
-        MySensorsEventObserver_OLD.clearAllListeners();
     }
 
     /**
@@ -217,7 +220,7 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
         reader.startReader();
         writer.startWriter();
 
-        MySensorsEventObserver_OLD.addEventListener(this);
+        addEventListener(specialMessageHandler);
 
         if (!skipStartupCheck) {
             try {
@@ -345,156 +348,147 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
     }
 
     @Override
-    public void messageReceived(MySensorsMessage message) throws Throwable {
-        if (!handleIncomingMessage(message)) {
-            // If the message was not handled previously try to handle it as a special one
+    public void addEventListener(MySensorsBridgeConnectionEventListener listener) {
+        eventRegister.addEventListener(listener);
+
+    }
+
+    @Override
+    public void clearAllListeners() {
+        eventRegister.clearAllListeners();
+
+    }
+
+    @Override
+    public Iterator<MySensorsBridgeConnectionEventListener> getEventListenersIterator() {
+        return eventRegister.getEventListenersIterator();
+    }
+
+    @Override
+    public boolean isEventListenerRegisterd(MySensorsBridgeConnectionEventListener listener) {
+        return eventRegister.isEventListenerRegisterd(listener);
+    }
+
+    @Override
+    public void removeEventListener(MySensorsBridgeConnectionEventListener listener) {
+        eventRegister.removeEventListener(listener);
+    }
+
+    private void notifyBridgeStatusUpdate(MySensorsBridgeConnection connection, boolean connected) {
+        Iterator<MySensorsBridgeConnectionEventListener> iterator = eventRegister.getEventListenersIterator();
+        while (iterator.hasNext()) {
+            MySensorsBridgeConnectionEventListener listener = iterator.next();
+            logger.trace("Broadcasting event {} to: {}", connection.toString(), listener);
+
+            try {
+                listener.bridgeStatusUpdate(this, connected);
+            } catch (Throwable e) {
+                logger.error("Event broadcasting throw an exception", e);
+            }
+        }
+    }
+
+    private class MySensorsSpecialMessageHandler implements MySensorsBridgeConnectionEventListener {
+
+        @Override
+        public void messageReceived(MySensorsMessage message) throws Throwable {
             handleSpecialMessageEvent(message);
         }
-    }
 
-    /**
-     * Wake up main thread that is waiting for confirmation of link up
-     */
-    private void handleIncomingVersionMessage(String message) {
-        iVersionMessageReceived(message);
-    }
+        private void handleSpecialMessageEvent(MySensorsMessage msg) {
+            // Do we get an ACK?
+            if (msg.getAck() == 1) {
+                logger.debug(String.format("ACK received! Node: %d, Child: %d", msg.nodeId, msg.childId));
+                removeMySensorsOutboundMessage(msg);
+            }
 
-    private void iVersionMessageReceived(String msg) {
-        if (waitingObj != null) {
-            logger.debug("Good,Gateway is up and running! (Ver:{})", msg);
-            synchronized (waitingObj) {
-                iVersionResponse = true;
-                waitingObj.notifyAll();
-                waitingObj = null;
+            // Have we get a I_CONFIG message?
+            if (msg.isIConfigMessage()) {
+                answerIConfigMessage(msg);
+            }
+
+            // Have we get a I_TIME message?
+            if (msg.isITimeMessage()) {
+                answerITimeMessage(msg);
+            }
+
+            // Have we get a I_VERSION message?
+            if (msg.isIVersionMessage()) {
+                handleIncomingVersionMessage(msg.msg);
+            }
+
+            // Requesting ID
+            if (msg.isIdRequestMessage()) {
+                answerIDRequest();
             }
         }
-    }
 
-    private void handleSpecialMessageEvent(MySensorsMessage msg) {
-        // Do we get an ACK?
-        if (msg.getAck() == 1) {
-            logger.debug(String.format("ACK received! Node: %d, Child: %d", msg.nodeId, msg.childId));
-            removeMySensorsOutboundMessage(msg);
-        }
+        /**
+         * Answer to I_TIME message for gateway time request from sensor
+         *
+         * @param msg, the incoming I_TIME message from sensor
+         */
+        private void answerITimeMessage(MySensorsMessage msg) {
+            logger.info("I_TIME request received from {}, answering...", msg.nodeId);
 
-        // Have we get a I_CONFIG message?
-        if (msg.isIConfigMessage()) {
-            answerIConfigMessage(msg);
-        }
-
-        // Have we get a I_TIME message?
-        if (msg.isITimeMessage()) {
-            answerITimeMessage(msg);
-        }
-
-        // Have we get a I_VERSION message?
-        if (msg.isIVersionMessage()) {
-            handleIncomingVersionMessage(msg.msg);
-        }
-
-        // Requesting ID
-        if (msg.isIdRequestMessage()) {
-            answerIDRequest();
-        }
-    }
-
-    /**
-     * If an ID-Request from a sensor is received the controller will send an id to the sensor
-     */
-    private void answerIDRequest() {
-        logger.info("ID Request received");
-
-        int newId = 0;
-        try {
-            newId = deviceManager.reserveId();
-            logger.info("New Node in the MySensors network has requested an ID. ID is: {}", newId);
-            MySensorsMessage newMsg = new MySensorsMessage(255, 255, 3, 0, false, 4, newId + "");
+            String time = Long.toString(System.currentTimeMillis() / 1000);
+            MySensorsMessage newMsg = new MySensorsMessage(msg.nodeId, msg.childId, MYSENSORS_MSG_TYPE_INTERNAL, 0,
+                    false, MYSENSORS_SUBTYPE_I_TIME, time);
             addMySensorsOutboundMessage(newMsg);
-            MySensorsEventObserver_OLD.notifyNodeIdReserved(newId);
-        } catch (NoMoreIdsException e) {
-            logger.error("No more IDs available for this node, try cleaning cache");
+
         }
-    }
 
-    /**
-     * Handle the incoming message from serial
-     *
-     * @param msg the incoming message
-     * @return true if ,and only if, the message is propagated to one of the defined node or message arrives from a
-     *         device new device in the network
-     * @throws Throwable
-     */
-    private boolean handleIncomingMessage(MySensorsMessage msg) throws Throwable {
-        boolean ret = false;
-        if (MySensorsNode.isValidNodeId(msg.nodeId) && MySensorsChild.isValidChildId(msg.childId)
-                && msg.isSetReqMessage()) {
-            MySensorsNode node = deviceManager.getNode(msg.nodeId);
-            if (node != null) {
-                logger.debug("Node {} found in device manager", msg.nodeId);
+        /**
+         * Answer to I_CONFIG message for imperial/metric request from sensor
+         *
+         * @param msg, the incoming I_CONFIG message from sensor
+         */
+        private void answerIConfigMessage(MySensorsMessage msg) {
+            boolean imperial = bridgeHandler.getBridgeConfiguration().imperial;
+            String iConfig = imperial ? "I" : "M";
 
-                node.setLastUpdate(new Date());
+            logger.debug("I_CONFIG request received from {}, answering: (is imperial?){}", iConfig, imperial);
 
-                MySensorsChild child = node.getChild(msg.childId);
-                if (child != null) {
-                    logger.debug("Child {} found in node {}", msg.childId, msg.nodeId);
+            MySensorsMessage newMsg = new MySensorsMessage(msg.nodeId, msg.childId, MYSENSORS_MSG_TYPE_INTERNAL, 0,
+                    false, MYSENSORS_SUBTYPE_I_CONFIG, iConfig);
+            addMySensorsOutboundMessage(newMsg);
 
-                    child.setLastUpdate(new Date());
+        }
 
-                    MySensorsVariable variable = child.getVariable(msg.msgType, msg.subType);
-                    if (variable != null) {
-                        variable.setValue(msg);
-                        MySensorsEventObserver_OLD.notifyNodeUpdateEvent(node, child, variable);
-                        ret = true;
-                    } else {
-                        logger.warn("Variable {}({}) not present", msg.subType,
-                                CHANNEL_MAP.get(new Pair<Integer>(msg.msgType, msg.subType)));
-                    }
-                } else {
-                    logger.debug("Child {} not present into node {}", msg.childId, msg.nodeId);
+        /**
+         * Wake up main thread that is waiting for confirmation of link up
+         */
+        private void handleIncomingVersionMessage(String message) {
+            iVersionMessageReceived(message);
+        }
+
+        private void iVersionMessageReceived(String msg) {
+            if (waitingObj != null) {
+                logger.debug("Good,Gateway is up and running! (Ver:{})", msg);
+                synchronized (waitingObj) {
+                    iVersionResponse = true;
+                    waitingObj.notifyAll();
+                    waitingObj = null;
                 }
-            } else {
-                logger.debug("Node {} not present, send new node discovered event", msg.nodeId);
-
-                node = new MySensorsNode(msg.nodeId);
-                deviceManager.addNode(node);
-                MySensorsEventObserver_OLD.notifyNewNodeDiscovered(node);
-                ret = true;
             }
         }
 
-        return ret;
-    }
+        /**
+         * If an ID-Request from a sensor is received the controller will send an id to the sensor
+         */
+        private void answerIDRequest() {
+            logger.info("ID Request received");
 
-    /**
-     * Answer to I_TIME message for gateway time request from sensor
-     *
-     * @param msg, the incoming I_TIME message from sensor
-     */
-    private void answerITimeMessage(MySensorsMessage msg) {
-        logger.info("I_TIME request received from {}, answering...", msg.nodeId);
-
-        String time = Long.toString(System.currentTimeMillis() / 1000);
-        MySensorsMessage newMsg = new MySensorsMessage(msg.nodeId, msg.childId, MYSENSORS_MSG_TYPE_INTERNAL, 0, false,
-                MYSENSORS_SUBTYPE_I_TIME, time);
-        addMySensorsOutboundMessage(newMsg);
-
-    }
-
-    /**
-     * Answer to I_CONFIG message for imperial/metric request from sensor
-     *
-     * @param msg, the incoming I_CONFIG message from sensor
-     */
-    private void answerIConfigMessage(MySensorsMessage msg) {
-        boolean imperial = bridgeHandler.getBridgeConfiguration().imperial;
-        String iConfig = imperial ? "I" : "M";
-
-        logger.debug("I_CONFIG request received from {}, answering: (is imperial?){}", iConfig, imperial);
-
-        MySensorsMessage newMsg = new MySensorsMessage(msg.nodeId, msg.childId, MYSENSORS_MSG_TYPE_INTERNAL, 0, false,
-                MYSENSORS_SUBTYPE_I_CONFIG, iConfig);
-        addMySensorsOutboundMessage(newMsg);
-
+            int newId = 0;
+            try {
+                newId = deviceManager.reserveId();
+                logger.info("New Node in the MySensors network has requested an ID. ID is: {}", newId);
+                MySensorsMessage newMsg = new MySensorsMessage(255, 255, 3, 0, false, 4, newId + "");
+                addMySensorsOutboundMessage(newMsg);
+            } catch (NoMoreIdsException e) {
+                logger.error("No more IDs available for this node, you could try cleaning cache file");
+            }
+        }
     }
 
 }

@@ -7,8 +7,6 @@
  */
 package org.openhab.binding.mysensors.internal.protocol.message;
 
-import org.openhab.binding.mysensors.MySensorsBindingConstants;
-
 /**
  * Parser for the MySensors messages.
  *

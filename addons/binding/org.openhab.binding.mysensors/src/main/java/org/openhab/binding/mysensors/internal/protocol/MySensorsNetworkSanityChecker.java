@@ -13,8 +13,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.openhab.binding.mysensors.MySensorsBindingConstants;
-import org.openhab.binding.mysensors.internal.event.MySensorsEventObserver_OLD;
-import org.openhab.binding.mysensors.internal.event.MySensorsUpdateListener;
+import org.openhab.binding.mysensors.internal.event.MySensorsBridgeConnectionEventListener;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +24,7 @@ import org.slf4j.LoggerFactory;
  * @author Andrea Cioni
  *
  */
-public class MySensorsNetworkSanityChecker implements MySensorsUpdateListener, Runnable {
+public class MySensorsNetworkSanityChecker implements MySensorsBridgeConnectionEventListener, Runnable {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -87,7 +86,7 @@ public class MySensorsNetworkSanityChecker implements MySensorsUpdateListener, R
         Thread.currentThread().setName(MySensorsNetworkSanityChecker.class.getName());
 
         try {
-            MySensorsEventObserver_OLD.addEventListener(this);
+            bridgeConnection.addEventListener(this);
 
             bridgeConnection.addMySensorsOutboundMessage(MySensorsBindingConstants.I_VERSION_MESSAGE);
 
@@ -117,7 +116,7 @@ public class MySensorsNetworkSanityChecker implements MySensorsUpdateListener, R
         } catch (InterruptedException e) {
             logger.error("interrupted exception in network sanity thread checker");
         } finally {
-            MySensorsEventObserver_OLD.removeEventListener(this);
+            bridgeConnection.removeEventListener(this);
         }
     }
 

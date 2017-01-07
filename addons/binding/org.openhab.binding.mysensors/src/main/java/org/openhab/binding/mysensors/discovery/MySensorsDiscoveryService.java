@@ -23,7 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Discoveryservice for MySensors devices. Starts DiscoveryThread to listen for new things / nodes.
+ * Discovery service for MySensors devices. Starts DiscoveryThread to listen for new things / nodes.
  *
  * @author Tim Oberföll
  *
@@ -44,19 +44,19 @@ public class MySensorsDiscoveryService extends AbstractDiscoveryService {
     @Override
     protected void startScan() {
         if (discoThread == null) {
-            discoThread = new DiscoveryThread(this);
+            discoThread = new DiscoveryThread(bridgeHandler.getBridgeConnection(), this);
         }
         discoThread.start();
     }
 
     public void activate() {
-		//TODO should be removed?
+        // TODO should be removed?
     }
 
     @Override
     public void deactivate() {
         if (discoThread == null) {
-            discoThread = new DiscoveryThread(this);
+            discoThread = new DiscoveryThread(bridgeHandler.getBridgeConnection(), this);
         }
         discoThread.stop();
     }
@@ -64,7 +64,7 @@ public class MySensorsDiscoveryService extends AbstractDiscoveryService {
     @Override
     protected void stopScan() {
         if (discoThread == null) {
-            discoThread = new DiscoveryThread(this);
+            discoThread = new DiscoveryThread(bridgeHandler.getBridgeConnection(), this);
         }
         discoThread.stop();
     }
