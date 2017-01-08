@@ -320,4 +320,9 @@ public class MySensorsDeviceManager
 
         return ret;
     }
+
+    private class MySensorsDeviceReachabilityChecker {
+        // TODO this class will hold the rules that determine if a node is reachable, in case of error a notification:
+        // notifyNodeReachEvent will be launched
+    }
 }
