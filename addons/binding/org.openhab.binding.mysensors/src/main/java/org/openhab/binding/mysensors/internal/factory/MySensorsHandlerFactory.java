@@ -15,7 +15,6 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.smarthome.config.core.Configuration;
 import org.eclipse.smarthome.config.discovery.DiscoveryService;
 import org.eclipse.smarthome.core.thing.Bridge;
 import org.eclipse.smarthome.core.thing.Thing;
@@ -84,30 +83,11 @@ public class MySensorsHandlerFactory extends BaseThingHandlerFactory {
         return handler;
     }
 
-    private void addIntoDeviceManager(Thing thing) {
-        try {
-            deviceManager.addNode((MySensorsSensorsFactory.buildNodeFromThing(thing)), true);
-        } catch (Throwable e) {
-            logger.error("Build node throw and exception({}), message: {}", e.getClass(), e.getMessage());
-        }
-    }
-
-    @Override
-    protected Thing createThing(ThingTypeUID thingTypeUID, Configuration configuration, ThingUID thingUID) {
-        logger.trace("Create thing: {}", thingUID);
-        return super.createThing(thingTypeUID, configuration, thingUID);
-    }
-
     private void registerDeviceDiscoveryService(MySensorsBridgeHandler mySensorsBridgeHandler) {
         MySensorsDiscoveryService discoveryService = new MySensorsDiscoveryService(mySensorsBridgeHandler);
+        discoveryService.activate();
         this.discoveryServiceRegs.put(mySensorsBridgeHandler.getThing().getUID(), bundleContext
                 .registerService(DiscoveryService.class.getName(), discoveryService, new Hashtable<String, Object>()));
-    }
-
-    @Override
-    public void removeThing(ThingUID thingUID) {
-        logger.trace("Removing thing: {}", thingUID);
-        super.removeThing(thingUID);
     }
 
     @Override
@@ -119,6 +99,28 @@ public class MySensorsHandlerFactory extends BaseThingHandlerFactory {
                 serviceReg.unregister();
                 discoveryServiceRegs.remove(thingHandler.getThing().getUID());
             }
+        }
+
+        super.removeHandler(thingHandler);
+    }
+
+    @Override
+    public ThingHandler registerHandler(Thing thing) {
+        logger.trace("Handler registered {}", thing);
+        return super.registerHandler(thing);
+    }
+
+    @Override
+    public void unregisterHandler(Thing thing) {
+        logger.trace("Handler unregistered {}", thing);
+        super.unregisterHandler(thing);
+    }
+
+    private void addIntoDeviceManager(Thing thing) {
+        try {
+            deviceManager.addNode((MySensorsSensorsFactory.buildNodeFromThing(thing)), true);
+        } catch (Throwable e) {
+            logger.error("Build node throw and exception({}), message: {}", e.getClass(), e.getMessage());
         }
     }
 

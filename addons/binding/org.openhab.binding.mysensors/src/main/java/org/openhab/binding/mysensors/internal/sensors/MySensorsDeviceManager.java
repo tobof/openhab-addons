@@ -12,16 +12,16 @@ import static org.openhab.binding.mysensors.MySensorsBindingConstants.CHANNEL_MA
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import org.openhab.binding.mysensors.internal.Pair;
 import org.openhab.binding.mysensors.internal.event.MySensorsBridgeConnectionEventListener;
 import org.openhab.binding.mysensors.internal.event.MySensorsDeviceEventListener;
-import org.openhab.binding.mysensors.internal.event.MySensorsEventObserver;
+import org.openhab.binding.mysensors.internal.event.MySensorsEventObservable;
 import org.openhab.binding.mysensors.internal.event.MySensorsEventRegister;
 import org.openhab.binding.mysensors.internal.exception.NoMoreIdsException;
+import org.openhab.binding.mysensors.internal.protocol.MySensorsBridgeConnection;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class MySensorsDeviceManager
-        implements MySensorsEventObserver<MySensorsDeviceEventListener>, MySensorsBridgeConnectionEventListener {
+        implements MySensorsEventObservable<MySensorsDeviceEventListener>, MySensorsBridgeConnectionEventListener {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -48,6 +48,7 @@ public class MySensorsDeviceManager
 
     public MySensorsDeviceManager(Map<Integer, MySensorsNode> nodeMap) {
         this.nodeMap = nodeMap;
+        eventRegister = new MySensorsEventRegister<>();
     }
 
     public MySensorsNode getNode(int nodeId) {
@@ -181,8 +182,8 @@ public class MySensorsDeviceManager
     }
 
     @Override
-    public Iterator<MySensorsDeviceEventListener> getEventListenersIterator() {
-        return eventRegister.getEventListenersIterator();
+    public List<MySensorsDeviceEventListener> getEventListeners() {
+        return eventRegister.getEventListeners();
     }
 
     @Override
@@ -200,44 +201,73 @@ public class MySensorsDeviceManager
         handleIncomingMessage(message);
     }
 
-    private void notifyNewNodeDiscovered(MySensorsNode node) {
-        Iterator<MySensorsDeviceEventListener> iterator = eventRegister.getEventListenersIterator();
-        while (iterator.hasNext()) {
-            MySensorsDeviceEventListener listener = iterator.next();
-            logger.trace("Broadcasting event {} to: {}", node.toString(), listener);
+    @Override
+    public void bridgeStatusUpdate(MySensorsBridgeConnection connection, boolean connected) throws Throwable {
+        handleBridgeStatusUpdate(connected);
+    }
 
-            try {
-                listener.newNodeDiscovered(node);
-            } catch (Throwable e) {
-                logger.error("Event broadcasting throw an exception", e);
+    private void notifyNewNodeDiscovered(MySensorsNode node) {
+        synchronized (eventRegister.getEventListeners()) {
+            for (MySensorsDeviceEventListener listener : eventRegister.getEventListeners()) {
+                logger.trace("Broadcasting event {} to: {}", node, listener);
+
+                try {
+                    listener.newNodeDiscovered(node);
+                } catch (Throwable e) {
+                    logger.error("Event broadcasting throw an exception", e);
+                }
             }
         }
     }
 
     private void notifyNodeIdReserved(Integer reserved) {
-        Iterator<MySensorsDeviceEventListener> iterator = eventRegister.getEventListenersIterator();
-        while (iterator.hasNext()) {
-            MySensorsDeviceEventListener listener = iterator.next();
-            logger.trace("Broadcasting event {} to: {}", reserved, listener);
+        synchronized (eventRegister.getEventListeners()) {
+            for (MySensorsDeviceEventListener listener : eventRegister.getEventListeners()) {
+                logger.trace("Broadcasting event {} to: {}", reserved, listener);
 
-            try {
-                listener.nodeIdReservationDone(reserved);
-            } catch (Throwable e) {
-                logger.error("Event broadcasting throw an exception", e);
+                try {
+                    listener.nodeIdReservationDone(reserved);
+                } catch (Throwable e) {
+                    logger.error("Event broadcasting throw an exception", e);
+                }
             }
         }
     }
 
     private void notifyNodeUpdateEvent(MySensorsNode node, MySensorsChild child, MySensorsVariable variable) {
-        Iterator<MySensorsDeviceEventListener> iterator = eventRegister.getEventListenersIterator();
-        while (iterator.hasNext()) {
-            MySensorsDeviceEventListener listener = iterator.next();
-            logger.trace("Broadcasting event {} to: {}", variable.toString(), listener);
+        synchronized (eventRegister.getEventListeners()) {
+            for (MySensorsDeviceEventListener listener : eventRegister.getEventListeners()) {
+                logger.trace("Broadcasting event {} to: {}", variable, listener);
 
-            try {
-                listener.nodeUpdateEvent(node, child, variable);
-            } catch (Throwable e) {
-                logger.error("Event broadcasting throw an exception", e);
+                try {
+                    listener.nodeUpdateEvent(node, child, variable);
+                } catch (Throwable e) {
+                    logger.error("Event broadcasting throw an exception", e);
+                }
+            }
+        }
+    }
+
+    private void notifyNodeReachEvent(MySensorsNode node, boolean reach) {
+        synchronized (eventRegister.getEventListeners()) {
+            for (MySensorsDeviceEventListener listener : eventRegister.getEventListeners()) {
+                logger.trace("Broadcasting event {} to: {}", node, listener);
+
+                try {
+                    listener.nodeReachStatusChanged(node, reach);
+                } catch (Throwable e) {
+                    logger.error("Event broadcasting throw an exception", e);
+                }
+            }
+        }
+    }
+
+    private void handleBridgeStatusUpdate(boolean connected) {
+        synchronized (nodeMap) {
+            for (Integer i : nodeMap.keySet()) {
+                MySensorsNode node = nodeMap.get(i);
+                node.setReachable(connected);
+                notifyNodeReachEvent(node, connected);
             }
         }
     }

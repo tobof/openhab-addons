@@ -13,6 +13,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -24,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 import org.openhab.binding.mysensors.MySensorsBindingConstants;
 import org.openhab.binding.mysensors.config.MySensorsBridgeConfiguration;
 import org.openhab.binding.mysensors.internal.event.MySensorsBridgeConnectionEventListener;
-import org.openhab.binding.mysensors.internal.event.MySensorsEventObserver;
+import org.openhab.binding.mysensors.internal.event.MySensorsEventObservable;
 import org.openhab.binding.mysensors.internal.event.MySensorsEventRegister;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageParser;
@@ -39,7 +40,7 @@ import org.slf4j.LoggerFactory;
  *
  */
 public abstract class MySensorsBridgeConnection implements Runnable,
-        MySensorsEventObserver<MySensorsBridgeConnectionEventListener>, MySensorsBridgeConnectionEventListener {
+        MySensorsEventObservable<MySensorsBridgeConnectionEventListener>, MySensorsBridgeConnectionEventListener {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -61,7 +62,7 @@ public abstract class MySensorsBridgeConnection implements Runnable,
     // Flag to be set (through available method below)
     private boolean requestDisconnection = false;
 
-    private MySensorsBridgeConnection waitingObj = null;
+    private Object waitingObj = null;
 
     private MySensorsBridgeConfiguration bridgeConfiguration;
 
@@ -230,7 +231,7 @@ public abstract class MySensorsBridgeConnection implements Runnable,
             } catch (Exception e) {
                 logger.error("Exception on waiting for I_VERSION message", e);
             } finally {
-                addEventListener(this);
+                removeEventListener(this);
             }
         } else {
             logger.warn("Skipping I_VERSION connection test, not recommended...");
@@ -356,8 +357,8 @@ public abstract class MySensorsBridgeConnection implements Runnable,
     }
 
     @Override
-    public Iterator<MySensorsBridgeConnectionEventListener> getEventListenersIterator() {
-        return eventRegister.getEventListenersIterator();
+    public List<MySensorsBridgeConnectionEventListener> getEventListeners() {
+        return eventRegister.getEventListeners();
     }
 
     @Override
@@ -390,35 +391,29 @@ public abstract class MySensorsBridgeConnection implements Runnable,
     }
 
     private void notifyBridgeStatusUpdate(MySensorsBridgeConnection connection, boolean connected) {
-        Iterator<MySensorsBridgeConnectionEventListener> iterator = eventRegister.getEventListenersIterator();
-        while (iterator.hasNext()) {
-            MySensorsBridgeConnectionEventListener listener = iterator.next();
-            logger.trace("Broadcasting event {} to: {}", connection.toString(), listener);
+        synchronized (eventRegister.getEventListeners()) {
+            for (MySensorsBridgeConnectionEventListener listener : eventRegister.getEventListeners()) {
+                logger.trace("Broadcasting event {} to: {}", connection.toString(), listener);
 
-            try {
-                listener.bridgeStatusUpdate(this, connected);
-            } catch (Throwable e) {
-                logger.error("Event broadcasting throw an exception", e);
+                try {
+                    listener.bridgeStatusUpdate(this, connected);
+                } catch (Throwable e) {
+                    logger.error("Event broadcasting throw an exception", e);
+                }
             }
         }
     }
 
-    /**
-     * Notify message to listeners. <b>Should be</b> left with 'package' visibility to be available to reader/writer
-     * class
-     *
-     * @param msg the message to send
-     */
     private void notifyMessageReceived(MySensorsMessage msg) {
-        Iterator<MySensorsBridgeConnectionEventListener> iterator = eventRegister.getEventListenersIterator();
-        while (iterator.hasNext()) {
-            MySensorsBridgeConnectionEventListener listener = iterator.next();
-            logger.trace("Broadcasting event {} to: {}", msg, listener);
+        synchronized (eventRegister.getEventListeners()) {
+            for (MySensorsBridgeConnectionEventListener listener : eventRegister.getEventListeners()) {
+                logger.trace("Broadcasting event {} to: {}", msg, listener);
 
-            try {
-                listener.messageReceived(msg);
-            } catch (Throwable e) {
-                logger.error("Event broadcasting throw an exception", e);
+                try {
+                    listener.messageReceived(msg);
+                } catch (Throwable e) {
+                    logger.error("Event broadcasting throw an exception", e);
+                }
             }
         }
 

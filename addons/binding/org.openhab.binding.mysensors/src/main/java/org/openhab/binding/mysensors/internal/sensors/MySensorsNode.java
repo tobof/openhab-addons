@@ -64,6 +64,11 @@ public class MySensorsNode {
         return chidldMap.get(childId);
     }
 
+    public void setReachable(boolean reachable) {
+        this.reachable = reachable;
+
+    }
+
     public boolean isReachable() {
         return reachable;
     }

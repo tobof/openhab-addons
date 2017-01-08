@@ -9,8 +9,6 @@ package org.openhab.binding.mysensors.internal.handler;
 
 import static org.openhab.binding.mysensors.MySensorsBindingConstants.*;
 
-import java.util.List;
-
 import org.eclipse.smarthome.core.thing.Bridge;
 import org.eclipse.smarthome.core.thing.ChannelUID;
 import org.eclipse.smarthome.core.thing.ThingStatus;
@@ -18,13 +16,10 @@ import org.eclipse.smarthome.core.thing.binding.BaseBridgeHandler;
 import org.eclipse.smarthome.core.types.Command;
 import org.openhab.binding.mysensors.config.MySensorsBridgeConfiguration;
 import org.openhab.binding.mysensors.internal.event.MySensorsBridgeConnectionEventListener;
-import org.openhab.binding.mysensors.internal.event.MySensorsDeviceEventListener;
-import org.openhab.binding.mysensors.internal.factory.MySensorsCacheFactory;
 import org.openhab.binding.mysensors.internal.protocol.MySensorsBridgeConnection;
 import org.openhab.binding.mysensors.internal.protocol.ip.MySensorsIpConnection;
 import org.openhab.binding.mysensors.internal.protocol.serial.MySensorsSerialConnection;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsDeviceManager;
-import org.openhab.binding.mysensors.internal.sensors.MySensorsNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,7 +51,7 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
     public MySensorsBridgeHandler(MySensorsDeviceManager deviceManager, Bridge bridge) {
         super(bridge);
         this.deviceManager = deviceManager;
-        this.cacheUpdateHandler = new MySensorsCacheUpdateHandler();
+        this.cacheUpdateHandler = new MySensorsCacheUpdateHandler(deviceManager);
 
     }
 
@@ -79,6 +74,8 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
 
             myCon.addEventListener(this);
             myCon.addEventListener(cacheUpdateHandler);
+            myCon.addEventListener(deviceManager);
+            myCon.addEventListener(messageHandler);
             deviceManager.addEventListener(cacheUpdateHandler);
 
         }
@@ -91,9 +88,8 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
         logger.debug("Disposing of the MySensors bridge");
 
         if (myCon != null) {
-            myCon.removeEventListener(this);
-            myCon.removeEventListener(cacheUpdateHandler);
-            deviceManager.removeEventListener(cacheUpdateHandler);
+            myCon.clearAllListeners();
+            deviceManager.clearAllListeners();
 
             myCon.destroy();
         }
@@ -128,10 +124,8 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
     @Override
     public void bridgeStatusUpdate(MySensorsBridgeConnection connection, boolean connected) throws Throwable {
         if (connected) {
-            myCon.addEventListener(deviceManager);
             updateStatus(ThingStatus.ONLINE);
         } else {
-            myCon.addEventListener(deviceManager);
             updateStatus(ThingStatus.OFFLINE);
         }
 
@@ -140,34 +134,6 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
     @Override
     public String toString() {
         return "MySensorsBridgeHandler []";
-    }
-
-    private class MySensorsCacheUpdateHandler
-            implements MySensorsDeviceEventListener, MySensorsBridgeConnectionEventListener {
-
-        private void updateCacheFile() {
-            MySensorsCacheFactory cacheFactory = MySensorsCacheFactory.getCacheFactory();
-
-            List<Integer> givenIds = deviceManager.getGivenIds();
-
-            cacheFactory.writeCache(MySensorsCacheFactory.GIVEN_IDS_CACHE_FILE, givenIds.toArray(new Integer[] {}),
-                    Integer[].class);
-        }
-
-        @Override
-        public void nodeIdReservationDone(Integer reservedId) throws Throwable {
-            updateCacheFile();
-        }
-
-        @Override
-        public void newNodeDiscovered(MySensorsNode message) throws Throwable {
-            updateCacheFile();
-        }
-
-        @Override
-        public void bridgeStatusUpdate(MySensorsBridgeConnection connection, boolean connected) throws Throwable {
-            updateCacheFile();
-        }
     }
 
 }

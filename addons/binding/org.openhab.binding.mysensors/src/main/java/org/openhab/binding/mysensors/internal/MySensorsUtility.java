@@ -5,6 +5,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+/**
+ * Class gives some utility methods that not belong to a specific class
+ *
+ * @author Andrea Cioni
+ *
+ */
 public class MySensorsUtility {
     /**
      * Invert a generics map swapping key with value

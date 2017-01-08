@@ -18,7 +18,6 @@ import org.eclipse.smarthome.core.thing.Bridge;
 import org.eclipse.smarthome.core.thing.ChannelUID;
 import org.eclipse.smarthome.core.thing.Thing;
 import org.eclipse.smarthome.core.thing.ThingStatus;
-import org.eclipse.smarthome.core.thing.ThingStatusDetail;
 import org.eclipse.smarthome.core.thing.ThingStatusInfo;
 import org.eclipse.smarthome.core.thing.binding.BaseThingHandler;
 import org.eclipse.smarthome.core.types.Command;
@@ -173,12 +172,7 @@ public class MySensorsThingHandler extends BaseThingHandler
     @Override
     public void nodeReachStatusChanged(MySensorsNode node, boolean reach) {
         // TODO Network Sanity Checker could put node to 'unreachable' causing, here, to set this thing to
-        // OFFLINE
-        if (!reach) {
-            updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR);
-        } else {
-            updateStatus(ThingStatus.ONLINE);
-        }
+        // OFFLINE, by now thing reachability depends only on bridgeStatusChanged method
 
     }
 

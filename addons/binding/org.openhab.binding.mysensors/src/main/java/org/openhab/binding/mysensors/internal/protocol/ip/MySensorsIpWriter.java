@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-import org.openhab.binding.mysensors.internal.protocol.MySensorsBridgeConnection.MySensorsWriter;
+import org.openhab.binding.mysensors.internal.protocol.MySensorsBridgeConnection;
 
 /**
  * Responsible for sending messages to the TCP/IP link.
@@ -20,7 +20,7 @@ import org.openhab.binding.mysensors.internal.protocol.MySensorsBridgeConnection
  * @author Tim Oberföll
  *
  */
-public class MySensorsIpWriter extends MySensorsWriter {
+public class MySensorsIpWriter extends MySensorsBridgeConnection.MySensorsWriter {
 
     public MySensorsIpWriter(Socket sock, MySensorsIpConnection mysCon, int sendDelay) {
         mysCon.super();
@@ -29,8 +29,7 @@ public class MySensorsIpWriter extends MySensorsWriter {
             this.outStream = sock.getOutputStream();
             outs = new PrintWriter(outStream);
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Exception creating PrintWriter", e);
         }
         this.sendDelay = sendDelay;
     }

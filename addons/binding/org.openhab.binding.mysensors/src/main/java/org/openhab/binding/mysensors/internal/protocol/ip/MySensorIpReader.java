@@ -11,7 +11,7 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import org.openhab.binding.mysensors.internal.protocol.MySensorsBridgeConnection.MySensorsReader;
+import org.openhab.binding.mysensors.internal.protocol.MySensorsBridgeConnection;
 
 /**
  * Implements the IP reader that receives the messages from the MySensors network.
@@ -20,7 +20,7 @@ import org.openhab.binding.mysensors.internal.protocol.MySensorsBridgeConnection
  * @author Tim Oberföll
  *
  */
-public class MySensorIpReader extends MySensorsReader {
+public class MySensorIpReader extends MySensorsBridgeConnection.MySensorsReader {
     public MySensorIpReader(InputStream inStream, MySensorsIpConnection mysCon) {
         mysCon.super();
         this.mysCon = mysCon;

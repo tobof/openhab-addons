@@ -8,7 +8,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class MySensorsEventRegister<T extends EventListener> implements MySensorsEventObserver<T> {
+public class MySensorsEventRegister<T extends EventListener> implements MySensorsEventObservable<T> {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -21,6 +21,7 @@ public class MySensorsEventRegister<T extends EventListener> implements MySensor
     @Override
     public boolean isEventListenerRegisterd(T listener) {
         boolean ret = false;
+
         synchronized (registeredEventListener) {
             ret = registeredEventListener.contains(listener);
         }
@@ -29,8 +30,14 @@ public class MySensorsEventRegister<T extends EventListener> implements MySensor
 
     @Override
     public void addEventListener(T listener) {
+
+        if (listener == null) {
+            return;
+        }
+
         synchronized (registeredEventListener) {
             if (!isEventListenerRegisterd(listener)) {
+                logger.trace("Adding listener {} to {}", listener, this);
                 registeredEventListener.add(listener);
             } else {
                 logger.debug("Event listener {} already registered", listener);
@@ -40,9 +47,23 @@ public class MySensorsEventRegister<T extends EventListener> implements MySensor
 
     @Override
     public void removeEventListener(T listener) {
+
+        if (listener == null) {
+            return;
+        }
+
+        // Thread-safe remove
         synchronized (registeredEventListener) {
             if (isEventListenerRegisterd(listener)) {
-                registeredEventListener.remove(listener);
+                logger.trace("Removing listener {} from {}", listener, this);
+                Iterator<T> iter = registeredEventListener.iterator();
+                while (iter.hasNext()) {
+                    T elem = iter.next();
+                    if (elem.equals(listener)) {
+                        iter.remove();
+                        return;
+                    }
+                }
             } else {
                 logger.debug("Listener {} not present, cannot remove it", listener);
             }
@@ -51,7 +72,7 @@ public class MySensorsEventRegister<T extends EventListener> implements MySensor
 
     @Override
     public void clearAllListeners() {
-        logger.debug("Clearing all listeners");
+        logger.trace("Clearing all listeners from {}", this);
         synchronized (registeredEventListener) {
             registeredEventListener.clear();
         }
@@ -59,8 +80,8 @@ public class MySensorsEventRegister<T extends EventListener> implements MySensor
     }
 
     @Override
-    public Iterator<T> getEventListenersIterator() {
-        return registeredEventListener.iterator();
+    public List<T> getEventListeners() {
+        return registeredEventListener;
     }
 
 }
