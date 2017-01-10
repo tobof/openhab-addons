@@ -182,9 +182,13 @@ echo "172;8;1;0;30;1" > $serialPort
 # set impedance
 #echo "12;3;1;0;14;1000000" > $serialPort
 
+# waterQuality
+echo "10;0;1;0;52;996.3" > $serialPort
+
 #get time
 #echo "172;255;3;0;1;0" > $serialPort # I_TIME
 
 # INTERNAL
 # batteryLevel
 #echo "12;255;3;0;0;100" > $serialPort
+

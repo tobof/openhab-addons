@@ -211,7 +211,9 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
         } else if (channelUID.getId().equals(CHANNEL_IR_RECEIVE)) {
             subType = MYSENSORS_SUBTYPE_V_IR_RECEIVE;
             msgPayload = command.toString();
-
+        } else if (channelUID.getId().equals(CHANNEL_ORP)) {
+        	subType = MYSENSORS_SUBTYPE_V_ORP;
+        	msgPayload = command.toString();
         } else {
             msgPayload = "";
         }
