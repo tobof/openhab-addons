@@ -264,7 +264,25 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
                 logger.error("Interrupted message while ruuning");
             }
         }
-
+    }
+    
+    /**
+     * A message to a node that supports smartsleep is not send instantly.
+     * The message is send in response to a heartbeat received from this node.
+     * Only one message is allowed in the queue. If a new one arrives the old one
+     * gets deleted.
+     * 
+     * @param msg the message that should be added to the queue.
+     */
+    public void addMySensorsOutboundSmartSleepMessage(MySensorsMessage msg) {
+    	
+    	// Only one pending message is allowed in the queue. 
+    	removeAllMySensorsOutboundMessagesPerNode(msg.getNodeId(), msg.getChildId());
+    	
+    	// Message is not send instantly
+    	msg.nextSend = System.currentTimeMillis() + MYSENSORS_SMARTSLEEP_TIMEOUT;
+    	
+    	addMySensorsOutboundMessage(msg);
     }
 
     /**
@@ -370,6 +388,31 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
 
         pauseWriter = false;
     }
+    
+    /**
+     * Remove all messages in the outbound queue for a corresponding nodeId / childId combination
+     * 
+     * @param nodeId the nodeId which messages should be deleted.
+     * @param childId the childId which messages should be deleted.
+     */
+    private void removeAllMySensorsOutboundMessagesPerNode(int nodeId, int childId) {
+    	pauseWriter = true;
+
+        Iterator<MySensorsMessage> iterator = outboundMessageQueue.iterator();
+        if (iterator != null) {
+            while (iterator.hasNext()) {
+                MySensorsMessage msgInQueue = iterator.next();
+                // logger.debug("Msg in Queue: " + msgInQueue.getDebugInfo());
+                if (msgInQueue.getNodeId() == nodeId && msgInQueue.getChildId() == childId) {
+                    iterator.remove();
+                } else {
+                    logger.debug("Message NOT removed for nodeId: {} and childId: {}.", nodeId, childId);
+                }
+            }
+        }
+
+        pauseWriter = false;
+    }
 
     /**
      * Status for the writer / message sender.
@@ -422,25 +465,30 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
     }
 
     private void handleIncomingMessageEvent(MySensorsMessage msg) {
-        // Do we get an ACK?
+        // Is this an ACK message?
         if (msg.getAck() == 1) {
             logger.debug(String.format("ACK received! Node: %d, Child: %d", msg.nodeId, msg.childId));
             removeMySensorsOutboundMessage(msg);
         }
 
-        // Have we get a I_CONFIG message?
+        // Is this an I_CONFIG message?
         if (msg.isIConfigMessage()) {
             answerIConfigMessage(msg);
         }
 
-        // Have we get a I_TIME message?
+        // Is this an I_TIME message?
         if (msg.isITimeMessage()) {
             answerITimeMessage(msg);
         }
 
-        // Have we get a I_VERSION message?
+        // Is this an I_VERSION message?
         if (msg.isIVersionMessage()) {
             handleIncomingVersionMessage(msg.msg);
+        }
+        
+        // Is this an I_HEARTBEAT_RESPONSE
+        if (msg.isHeartbeatResponseMessage()) {
+        	handleIncomingHeartbeatMessage(msg);
         }
     }
 
@@ -485,6 +533,40 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
                 MYSENSORS_SUBTYPE_I_CONFIG, iConfig);
         addMySensorsOutboundMessage(newMsg);
 
+    }
+    
+    /**
+     * If a heartbeat is received from a node the queue should be checked
+     * for pending messages for this node. If a message is pending it has to be send immediately.
+     * 
+     * @param msg The heartbeat message received from a node.
+     */
+    private void handleIncomingHeartbeatMessage(MySensorsMessage msg) {
+    	logger.debug("I_HEARTBEAT_RESPONSE received from {}.", msg.getNodeId());
+    	sendMySensorsMessageImmediately(msg.getNodeId());
+    }
+    
+    /**
+     * Resets the nextSend value in a message in the queue to 0, so it is send immediately.
+     * 
+     * @param nodeId of the messages that should be send immediately
+     */
+    private void sendMySensorsMessageImmediately(int nodeId) {
+    	pauseWriter = true;
+
+        Iterator<MySensorsMessage> iterator = outboundMessageQueue.iterator();
+        if (iterator != null) {
+            while (iterator.hasNext()) {
+                MySensorsMessage msgInQueue = iterator.next();
+                if (msgInQueue.getNodeId() == nodeId) {
+                    msgInQueue.nextSend = 0;
+                    iterator.remove();
+                    addMySensorsOutboundMessage(msgInQueue);
+                }
+            }
+        }
+
+        pauseWriter = false;
     }
 
 }

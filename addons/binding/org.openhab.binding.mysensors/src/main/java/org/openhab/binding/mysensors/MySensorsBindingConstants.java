@@ -173,6 +173,9 @@ public class MySensorsBindingConstants {
     // How often and at which times should the binding retry to send a message if requestAck is true?
     public static final int MYSENSORS_NUMBER_OF_RETRIES = 5;
     public static final int[] MYSENSORS_RETRY_TIMES = { 0, 100, 500, 1000, 2000 };
+    
+    // How long should a Smartsleep message be left in the queue?
+    public static final int MYSENSORS_SMARTSLEEP_TIMEOUT = 216000; // 6 hours
 
     /**
      * All knowing thing. A node with nodeId 999 and childId 999 receives all messages
