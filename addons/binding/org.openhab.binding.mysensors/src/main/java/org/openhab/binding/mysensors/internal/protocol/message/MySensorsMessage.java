@@ -250,7 +250,7 @@ public class MySensorsMessage {
     public boolean isHeartbeatResponseMessage() {
     	boolean ret = false;
     	
-    	if (subType == MYSENSORS_SUBTYPE_I_HEARTBEAT_RESPONSE){
+    	if (subType == MYSENSORS_SUBTYPE_I_HEARTBEAT_RESPONSE && childId == MYSENSORS_CHILD_ID_RESERVED_255){
     		ret = true;
     	}
     	
