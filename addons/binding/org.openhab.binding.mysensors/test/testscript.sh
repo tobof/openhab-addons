@@ -5,13 +5,13 @@ serialPort=$1
 # socat -d -d pty,raw,echo=0 pty,raw,echo=0
 
 # Gateway startup notification
-echo "0;0;3;0;14;Gateway startup complete." > $serialPort
+#echo "0;0;3;0;14;Gateway startup complete." > $serialPort
 
 # Switch light on:
 # 102;1;1;0;2;1
 
 # Request node id
-echo "255;255;3;0;3" > $serialPort #Sensor --> gateway
+#echo "255;255;3;0;3" > $serialPort #Sensor --> gateway
 # 255;255;3;0;4;<id> gateway --> sensor
 
 
@@ -39,16 +39,16 @@ echo "255;255;3;0;3" > $serialPort #Sensor --> gateway
 #echo "172;255;3;0;6;0" > $serialPort ############################### is metric?
 
 # Set Humidty status
-echo "172;0;1;0;1;87" > $serialPort
+#echo "172;0;1;0;1;87" > $serialPort
 
 # Set Humidty status
-echo "173;0;1;0;1;44" > $serialPort
+#echo "173;0;1;0;1;44" > $serialPort
 
 # Set Temperature status
-echo "172;1;1;0;0;27" > $serialPort
+#echo "172;1;1;0;0;27" > $serialPort
 
 # Set V_TEXT
-echo "123;123;1;0;47;ipsumlorum" > $serialPort
+#echo "123;123;1;0;47;ipsumlorum" > $serialPort
 
 # Set V_IR_RECEIVE
 #echo "111;111;1;0;33;FADEXXFE" > $serialPort
@@ -57,22 +57,22 @@ echo "123;123;1;0;47;ipsumlorum" > $serialPort
 #echo "111;112;1;0;32;ABCDEFGHIJKL" > $serialPort
 
 #### Represent door
-echo "172;4;0;0;0;1.4.1" > $serialPort
+#echo "172;4;0;0;0;1.4.1" > $serialPort
 
 # Set Tripped status
-echo "172;4;1;0;16;1" > $serialPort
+#echo "172;4;1;0;16;1" > $serialPort
 
 # Set Armed status
-echo "172;4;1;0;15;1" > $serialPort
+#echo "172;4;1;0;15;1" > $serialPort
 
 #### Represent motion
-echo "174;0;0;0;1;2.0.1" > $serialPort
+#echo "174;0;0;0;1;2.0.1" > $serialPort
 
 # Set Tripped status
-echo "174;0;1;0;16;1" > $serialPort
+#echo "174;0;1;0;16;1" > $serialPort
 
 # Set Armed status
-echo "174;0;1;0;15;0" > $serialPort
+#echo "174;0;1;0;15;0" > $serialPort
 
 #### Represent smoke
 #echo "172;6;0;0;2;1.4.1" > $serialPort
@@ -84,7 +84,7 @@ echo "174;0;1;0;15;0" > $serialPort
 #echo "172;7;0;0;4;1.4.1" > $serialPort
 
 # Set dimmer status
-echo "172;7;1;0;3;49" > $serialPort
+#echo "172;7;1;0;3;49" > $serialPort
 
 # Set dimmer status
 #echo "172;7;1;0;2;1" > $serialPort
@@ -93,10 +93,10 @@ echo "172;7;1;0;3;49" > $serialPort
 #echo "172;8;0;0;5;1.4.1" > $serialPort
 
 # Set cover status UP(29) == 1, DOWN(30) == 1
-echo "172;8;1;0;29;1" > $serialPort
+#echo "172;8;1;0;29;1" > $serialPort
 
 # Set cover status
-echo "172;8;1;0;30;1" > $serialPort
+#echo "172;8;1;0;30;1" > $serialPort
 
 
 #### Represent wind
@@ -183,7 +183,7 @@ echo "172;8;1;0;30;1" > $serialPort
 #echo "12;3;1;0;14;1000000" > $serialPort
 
 # waterQuality
-echo "10;0;1;0;52;996.3" > $serialPort
+#echo "10;0;1;0;52;996.3" > $serialPort
 
 #get time
 #echo "172;255;3;0;1;0" > $serialPort # I_TIME
@@ -191,4 +191,7 @@ echo "10;0;1;0;52;996.3" > $serialPort
 # INTERNAL
 # batteryLevel
 #echo "12;255;3;0;0;100" > $serialPort
+
+# I_HEARTBEAT_RESPONSE
+echo "172;3;3;0;22;1" > $serialPort
 
