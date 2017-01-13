@@ -13,10 +13,9 @@ import java.util.Enumeration;
 
 import org.apache.commons.lang.StringUtils;
 import org.openhab.binding.mysensors.MySensorsBindingConstants;
-import org.openhab.binding.mysensors.config.MySensorsBridgeConfiguration;
-import org.openhab.binding.mysensors.internal.protocol.MySensorsBridgeConnection;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.openhab.binding.mysensors.internal.event.MySensorsEventRegister;
+import org.openhab.binding.mysensors.internal.gateway.MySensorsGatewayConfig;
+import org.openhab.binding.mysensors.internal.protocol.MySensorsAbstractConnection;
 
 import gnu.io.CommPortIdentifier;
 import gnu.io.NRSerialPort;
@@ -28,21 +27,12 @@ import gnu.io.NRSerialPort;
  * @author Andrea Cioni
  *
  */
-public class MySensorsSerialConnection extends MySensorsBridgeConnection {
-
-    private Logger logger = LoggerFactory.getLogger(MySensorsSerialConnection.class);
-
-    private String serialPort = "";
-    private int baudRate = 115200;
-    private int sendDelay = 0;
+public class MySensorsSerialConnection extends MySensorsAbstractConnection {
 
     private NRSerialPort serialConnection = null;
 
-    public MySensorsSerialConnection(MySensorsBridgeConfiguration bridgeConfiguration) {
-        super(bridgeConfiguration);
-        this.serialPort = bridgeConfiguration.serialPort;
-        this.baudRate = bridgeConfiguration.baudRate;
-        this.sendDelay = bridgeConfiguration.sendDelay;
+    public MySensorsSerialConnection(MySensorsGatewayConfig myConf, MySensorsEventRegister myEventRegister) {
+        super(myConf, myEventRegister);
     }
 
     /**
@@ -50,14 +40,14 @@ public class MySensorsSerialConnection extends MySensorsBridgeConnection {
      */
     @Override
     public boolean _connect() {
-        logger.debug("Connecting to {} [baudRate:{}]", serialPort, baudRate);
+        logger.debug("Connecting to {} [baudRate:{}]", myGatewayConfig.getSerialPort(), myGatewayConfig.getBaudRate());
 
         boolean ret = false;
 
-        updateSerialProperties(serialPort);
+        updateSerialProperties(myGatewayConfig.getSerialPort());
         // deleteLockFile(serialPort);
 
-        serialConnection = new NRSerialPort(serialPort, baudRate);
+        serialConnection = new NRSerialPort(myGatewayConfig.getSerialPort(), myGatewayConfig.getBaudRate());
         if (serialConnection.connect()) {
             logger.debug("Successfully connected to serial port.");
 
@@ -69,8 +59,8 @@ public class MySensorsSerialConnection extends MySensorsBridgeConnection {
                 logger.error("Interrupted reset time wait");
             }
 
-            mysConReader = new MySensorsSerialReader(serialConnection.getInputStream(), this);
-            mysConWriter = new MySensorsSerialWriter(serialConnection.getOutputStream(), this, sendDelay);
+            mysConReader = new MySensorsReader(serialConnection.getInputStream());
+            mysConWriter = new MySensorsWriter(serialConnection.getOutputStream());
 
             ret = startReaderWriterThread(mysConReader, mysConWriter);
         } else {
@@ -167,7 +157,8 @@ public class MySensorsSerialConnection extends MySensorsBridgeConnection {
 
     @Override
     public String toString() {
-        return "MySensorsSerialConnection [serialPort=" + serialPort + ", baudRate=" + baudRate + "]";
+        return "MySensorsSerialConnection [serialPort=" + myGatewayConfig.getSerialPort() + ", baudRate="
+                + myGatewayConfig.getBaudRate() + "]";
     }
 
 }

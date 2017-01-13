@@ -7,8 +7,8 @@
  */
 package org.openhab.binding.mysensors.discovery;
 
-import org.openhab.binding.mysensors.internal.event.MySensorsBridgeConnectionEventListener;
-import org.openhab.binding.mysensors.internal.protocol.MySensorsBridgeConnection;
+import org.openhab.binding.mysensors.internal.event.MySensorsGatewayEventListener;
+import org.openhab.binding.mysensors.internal.gateway.MySensorsGateway;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
 
 /**
@@ -18,9 +18,9 @@ import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
  * @author Andrea Cioni
  *
  */
-public class DiscoveryThread implements MySensorsBridgeConnectionEventListener {
+public class DiscoveryThread implements MySensorsGatewayEventListener {
 
-    private MySensorsBridgeConnection mysCon;
+    private MySensorsGateway myGateway;
 
     private MySensorsDiscoveryService mysDiscoServ;
 
@@ -30,8 +30,8 @@ public class DiscoveryThread implements MySensorsBridgeConnectionEventListener {
      * @param mysCon Location of the EventListener to receive messages from the MySensors network.
      * @param mysDiscoServ Location of the service that started this thread
      */
-    public DiscoveryThread(MySensorsBridgeConnection mysCon, MySensorsDiscoveryService mysDiscoServ) {
-        this.mysCon = mysCon;
+    public DiscoveryThread(MySensorsGateway myGateway, MySensorsDiscoveryService mysDiscoServ) {
+        this.myGateway = myGateway;
         this.mysDiscoServ = mysDiscoServ;
     }
 
@@ -39,14 +39,14 @@ public class DiscoveryThread implements MySensorsBridgeConnectionEventListener {
      * Start the discovery process.
      */
     public void start() {
-        mysCon.addEventListener(this);
+        myGateway.getEventRegister().addEventListener(this);
     }
 
     /**
      * Stop the discovery process.
      */
     public void stop() {
-        mysCon.removeEventListener(this);
+        myGateway.getEventRegister().removeEventListener(this);
     }
 
     @Override

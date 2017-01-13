@@ -9,10 +9,6 @@ import org.openhab.binding.mysensors.internal.sensors.type.MySensorsType;
 
 public class MySensorsVariable {
 
-    // private int variableType;
-
-    // private int variableNum;
-
     private Pair<Integer> variableTypeAndNumber;
 
     private State value;

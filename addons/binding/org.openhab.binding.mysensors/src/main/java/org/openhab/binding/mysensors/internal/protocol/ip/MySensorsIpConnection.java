@@ -11,10 +11,9 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-import org.openhab.binding.mysensors.config.MySensorsBridgeConfiguration;
-import org.openhab.binding.mysensors.internal.protocol.MySensorsBridgeConnection;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.openhab.binding.mysensors.internal.event.MySensorsEventRegister;
+import org.openhab.binding.mysensors.internal.gateway.MySensorsGatewayConfig;
+import org.openhab.binding.mysensors.internal.protocol.MySensorsAbstractConnection;
 
 /**
  * Implements the TCP/IP connection to the ethernet gateway of the MySensors network.
@@ -23,21 +22,12 @@ import org.slf4j.LoggerFactory;
  * @author Tim Oberföll
  *
  */
-public class MySensorsIpConnection extends MySensorsBridgeConnection {
-
-    private Logger logger = LoggerFactory.getLogger(MySensorsIpConnection.class);
-
-    private String ipAddress = "";
-    private int tcpPort = 0;
-    public int sendDelay = 0;
+public class MySensorsIpConnection extends MySensorsAbstractConnection {
 
     private Socket sock = null;
 
-    public MySensorsIpConnection(MySensorsBridgeConfiguration bridgeConfiguration) {
-        super(bridgeConfiguration);
-        this.ipAddress = bridgeConfiguration.ipAddress;
-        this.tcpPort = bridgeConfiguration.tcpPort;
-        this.sendDelay = bridgeConfiguration.sendDelay;
+    public MySensorsIpConnection(MySensorsGatewayConfig myConf, MySensorsEventRegister myEventRegister) {
+        super(myConf, myEventRegister);
     }
 
     /**
@@ -45,21 +35,22 @@ public class MySensorsIpConnection extends MySensorsBridgeConnection {
      */
     @Override
     public boolean _connect() {
-        logger.debug("Connecting to IP bridge [{}:{}]", ipAddress, tcpPort);
+        logger.debug("Connecting to IP bridge [{}:{}]", myGatewayConfig.getIpAddress(), myGatewayConfig.getTcpPort());
 
         boolean ret = false;
 
-        if (ipAddress == null || ipAddress.isEmpty()) {
+        if (myGatewayConfig.getIpAddress() == null || myGatewayConfig.getIpAddress().isEmpty()) {
             logger.error("IP must be not null/empty");
         } else {
             try {
-                sock = new Socket(ipAddress, tcpPort);
-                mysConReader = new MySensorIpReader(sock.getInputStream(), this);
-                mysConWriter = new MySensorsIpWriter(sock, this, sendDelay);
+                sock = new Socket(myGatewayConfig.getIpAddress(), myGatewayConfig.getTcpPort());
+                mysConReader = new MySensorsReader(sock.getInputStream());
+                mysConWriter = new MySensorsWriter(sock.getOutputStream());
 
                 ret = startReaderWriterThread(mysConReader, mysConWriter);
             } catch (UnknownHostException e) {
-                logger.error("Error while trying to connect to: " + ipAddress + ":" + tcpPort);
+                logger.error("Error while trying to connect to: " + myGatewayConfig.getIpAddress() + ":"
+                        + myGatewayConfig.getTcpPort());
                 e.printStackTrace();
             } catch (IOException e) {
                 logger.error("Error while trying to connect InputStreamReader");
@@ -101,7 +92,8 @@ public class MySensorsIpConnection extends MySensorsBridgeConnection {
 
     @Override
     public String toString() {
-        return "MySensorsIpConnection [ipAddress=" + ipAddress + ", tcpPort=" + tcpPort + "]";
+        return "MySensorsIpConnection [ipAddress=" + myGatewayConfig.getIpAddress() + ", tcpPort="
+                + myGatewayConfig.getTcpPort() + "]";
     }
 
 }

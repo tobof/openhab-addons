@@ -9,19 +9,31 @@ package org.openhab.binding.mysensors.internal.handler;
 
 import static org.openhab.binding.mysensors.MySensorsBindingConstants.*;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.eclipse.smarthome.core.thing.Bridge;
 import org.eclipse.smarthome.core.thing.ChannelUID;
+import org.eclipse.smarthome.core.thing.Thing;
 import org.eclipse.smarthome.core.thing.ThingStatus;
+import org.eclipse.smarthome.core.thing.ThingTypeUID;
 import org.eclipse.smarthome.core.thing.binding.BaseBridgeHandler;
 import org.eclipse.smarthome.core.types.Command;
 import org.openhab.binding.mysensors.config.MySensorsBridgeConfiguration;
-import org.openhab.binding.mysensors.internal.event.MySensorsBridgeConnectionEventListener;
-import org.openhab.binding.mysensors.internal.protocol.MySensorsBridgeConnection;
-import org.openhab.binding.mysensors.internal.protocol.ip.MySensorsIpConnection;
-import org.openhab.binding.mysensors.internal.protocol.serial.MySensorsSerialConnection;
-import org.openhab.binding.mysensors.internal.sensors.MySensorsDeviceManager;
+import org.openhab.binding.mysensors.internal.event.MySensorsGatewayEventListener;
+import org.openhab.binding.mysensors.internal.factory.MySensorsCacheFactory;
+import org.openhab.binding.mysensors.internal.factory.MySensorsSensorsFactory;
+import org.openhab.binding.mysensors.internal.gateway.MySensorsGateway;
+import org.openhab.binding.mysensors.internal.gateway.MySensorsGatewayConfig;
+import org.openhab.binding.mysensors.internal.gateway.MySensorsGatewayType;
+import org.openhab.binding.mysensors.internal.protocol.MySensorsAbstractConnection;
+import org.openhab.binding.mysensors.internal.sensors.MySensorsNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.gson.reflect.TypeToken;
 
 /**
  * MySensorsBridgeHandler is used to initialize a new bridge (in MySensors: Gateway)
@@ -30,55 +42,32 @@ import org.slf4j.LoggerFactory;
  * @author Tim Oberföll
  *
  */
-public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySensorsBridgeConnectionEventListener {
+public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySensorsGatewayEventListener {
 
     private Logger logger = LoggerFactory.getLogger(MySensorsBridgeHandler.class);
 
-    // Bridge connection
-    private MySensorsBridgeConnection myCon;
-
-    // Device manager
-    private MySensorsDeviceManager deviceManager;
-
-    // Update cache when event arrives
-    private MySensorsCacheUpdateHandler cacheUpdateHandler;
-
-    private MySensorsMessageHandler messageHandler;
+    // Gateway instance
+    private MySensorsGateway myGateway;
 
     // Configuration from thing file
-    private MySensorsBridgeConfiguration myConfiguration = null;
+    private MySensorsBridgeConfiguration myBridgeConfiguration;
 
-    public MySensorsBridgeHandler(MySensorsDeviceManager deviceManager, Bridge bridge) {
+    public MySensorsBridgeHandler(Bridge bridge) {
         super(bridge);
-        this.deviceManager = deviceManager;
-        this.cacheUpdateHandler = new MySensorsCacheUpdateHandler(deviceManager);
-
     }
 
     @Override
     public void initialize() {
         logger.debug("Initialization of the MySensors bridge");
 
-        myConfiguration = getConfigAs(MySensorsBridgeConfiguration.class);
+        myBridgeConfiguration = getConfigAs(MySensorsBridgeConfiguration.class);
 
-        if (getThing().getThingTypeUID().equals(THING_TYPE_BRIDGE_SER)) {
-            myCon = new MySensorsSerialConnection(getBridgeConfiguration());
-        } else if (getThing().getThingTypeUID().equals(THING_TYPE_BRIDGE_ETH)) {
-            myCon = new MySensorsIpConnection(getBridgeConfiguration());
-        } else {
-            logger.error("Not recognized bridge: {}", getThing().getThingTypeUID());
-        }
+        myGateway = new MySensorsGateway(
+                openhabToMySensorsGatewayConfig(myBridgeConfiguration, getThing().getThingTypeUID()), loadCacheFile());
 
-        if (myCon != null) {
-            myCon.initialize();
+        myGateway.startup();
 
-            myCon.addEventListener(this);
-            myCon.addEventListener(cacheUpdateHandler);
-            myCon.addEventListener(deviceManager);
-            myCon.addEventListener(messageHandler);
-            deviceManager.addEventListener(cacheUpdateHandler);
-
-        }
+        reloadSensors();
 
         logger.debug("Initialization of the MySensors bridge DONE!");
     }
@@ -87,11 +76,8 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
     public void dispose() {
         logger.debug("Disposing of the MySensors bridge");
 
-        if (myCon != null) {
-            myCon.clearAllListeners();
-            deviceManager.clearAllListeners();
-
-            myCon.destroy();
+        if (myGateway != null) {
+            myGateway.shutdown();
         }
 
         super.dispose();
@@ -108,7 +94,7 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
      * @return Configuration of the MySensors bridge.
      */
     public MySensorsBridgeConfiguration getBridgeConfiguration() {
-        return myConfiguration;
+        return myBridgeConfiguration;
     }
 
     /**
@@ -117,18 +103,79 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
      *
      * @return Connection to the MySensors bridge / gateway.
      */
-    public MySensorsBridgeConnection getBridgeConnection() {
-        return myCon;
+    public MySensorsGateway getMySensorsGateway() {
+        return myGateway;
     }
 
     @Override
-    public void bridgeStatusUpdate(MySensorsBridgeConnection connection, boolean connected) throws Throwable {
+    public void connectionStatusUpdate(MySensorsAbstractConnection connection, boolean connected) throws Throwable {
         if (connected) {
             updateStatus(ThingStatus.ONLINE);
         } else {
             updateStatus(ThingStatus.OFFLINE);
         }
 
+    }
+
+    @Override
+    public void handleConfigurationUpdate(Map<String, Object> configurationParameters) {
+        logger.debug("Configuation update for bridge: {}", configurationParameters);
+        super.handleConfigurationUpdate(configurationParameters);
+    }
+
+    private Map<Integer, MySensorsNode> loadCacheFile() {
+        MySensorsCacheFactory cacheFactory = MySensorsCacheFactory.getCacheFactory();
+        Map<Integer, MySensorsNode> nodes = new HashMap<Integer, MySensorsNode>();
+
+        List<Integer> givenIds = cacheFactory.readCache(MySensorsCacheFactory.GIVEN_IDS_CACHE_FILE,
+                new ArrayList<Integer>(), new TypeToken<ArrayList<Integer>>() {
+                }.getType());
+
+        for (Integer i : givenIds) {
+            if (i != null) {
+                nodes.put(i, new MySensorsNode(i));
+            }
+        }
+
+        return nodes;
+    }
+
+    private void addIntoGateway(Thing thing) {
+        try {
+            myGateway.addNode((MySensorsSensorsFactory.buildNodeFromThing(thing)), true);
+        } catch (Throwable e) {
+            logger.error("Build node throw and exception({}), message: {}", e.getClass(), e.getMessage());
+        }
+    }
+
+    private void reloadSensors() {
+        for (Thing t : thingRegistry.getAll()) {
+            addIntoGateway(t);
+        }
+    }
+
+    private static MySensorsGatewayConfig openhabToMySensorsGatewayConfig(MySensorsBridgeConfiguration conf,
+            ThingTypeUID bridgeuid) {
+        MySensorsGatewayConfig ret = new MySensorsGatewayConfig();
+
+        if (bridgeuid.equals(THING_TYPE_BRIDGE_SER)) {
+            ret.setGatewayType(MySensorsGatewayType.SERIAL);
+            ret.setBaudRate(conf.baudRate);
+            ret.setSerialPort(conf.serialPort);
+        } else if (bridgeuid.equals(THING_TYPE_BRIDGE_ETH)) {
+            ret.setGatewayType(MySensorsGatewayType.IP);
+            ret.setIpAddress(conf.ipAddress);
+            ret.setTcpPort(conf.tcpPort);
+        } else {
+            throw new IllegalArgumentException("BridgeUID is unkonown: " + bridgeuid);
+        }
+
+        ret.setSendDelay(conf.sendDelay);
+        ret.setEnableNetworkSanCheck(conf.enableNetworkSanCheck);
+        ret.setImperial(conf.imperial);
+        ret.setSkipStartupCheck(conf.skipStartupCheck);
+
+        return ret;
     }
 
     @Override

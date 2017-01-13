@@ -2,26 +2,24 @@ package org.openhab.binding.mysensors.internal.handler;
 
 import java.util.List;
 
-import org.openhab.binding.mysensors.internal.event.MySensorsBridgeConnectionEventListener;
-import org.openhab.binding.mysensors.internal.event.MySensorsDeviceEventListener;
+import org.openhab.binding.mysensors.internal.event.MySensorsGatewayEventListener;
 import org.openhab.binding.mysensors.internal.factory.MySensorsCacheFactory;
-import org.openhab.binding.mysensors.internal.protocol.MySensorsBridgeConnection;
-import org.openhab.binding.mysensors.internal.sensors.MySensorsDeviceManager;
+import org.openhab.binding.mysensors.internal.gateway.MySensorsGateway;
+import org.openhab.binding.mysensors.internal.protocol.MySensorsAbstractConnection;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsNode;
 
-public class MySensorsCacheUpdateHandler
-        implements MySensorsDeviceEventListener, MySensorsBridgeConnectionEventListener {
+public class MySensorsCacheUpdateHandler implements MySensorsGatewayEventListener {
 
-    private MySensorsDeviceManager deviceManager;
+    private MySensorsGateway myGateway;
 
-    public MySensorsCacheUpdateHandler(MySensorsDeviceManager deviceManager) {
-        this.deviceManager = deviceManager;
+    public MySensorsCacheUpdateHandler(MySensorsGateway myGateway) {
+        this.myGateway = myGateway;
     }
 
     private void updateCacheFile() {
         MySensorsCacheFactory cacheFactory = MySensorsCacheFactory.getCacheFactory();
 
-        List<Integer> givenIds = deviceManager.getGivenIds();
+        List<Integer> givenIds = myGateway.getGivenIds();
 
         cacheFactory.writeCache(MySensorsCacheFactory.GIVEN_IDS_CACHE_FILE, givenIds.toArray(new Integer[] {}),
                 Integer[].class);
@@ -38,7 +36,7 @@ public class MySensorsCacheUpdateHandler
     }
 
     @Override
-    public void bridgeStatusUpdate(MySensorsBridgeConnection connection, boolean connected) throws Throwable {
+    public void connectionStatusUpdate(MySensorsAbstractConnection connection, boolean connected) throws Throwable {
         updateCacheFile();
     }
 }

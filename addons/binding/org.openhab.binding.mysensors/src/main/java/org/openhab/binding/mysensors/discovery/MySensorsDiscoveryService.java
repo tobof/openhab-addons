@@ -44,7 +44,7 @@ public class MySensorsDiscoveryService extends AbstractDiscoveryService {
     @Override
     protected void startScan() {
         if (discoThread == null) {
-            discoThread = new DiscoveryThread(bridgeHandler.getBridgeConnection(), this);
+            discoThread = new DiscoveryThread(bridgeHandler.getMySensorsGateway(), this);
         }
         discoThread.start();
     }
@@ -56,7 +56,7 @@ public class MySensorsDiscoveryService extends AbstractDiscoveryService {
     @Override
     public void deactivate() {
         if (discoThread == null) {
-            discoThread = new DiscoveryThread(bridgeHandler.getBridgeConnection(), this);
+            discoThread = new DiscoveryThread(bridgeHandler.getMySensorsGateway(), this);
         }
         discoThread.stop();
     }
@@ -64,7 +64,7 @@ public class MySensorsDiscoveryService extends AbstractDiscoveryService {
     @Override
     protected void stopScan() {
         if (discoThread == null) {
-            discoThread = new DiscoveryThread(bridgeHandler.getBridgeConnection(), this);
+            discoThread = new DiscoveryThread(bridgeHandler.getMySensorsGateway(), this);
         }
         discoThread.stop();
     }

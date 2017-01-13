@@ -13,23 +13,20 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Iterator;
-import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.openhab.binding.mysensors.MySensorsBindingConstants;
-import org.openhab.binding.mysensors.config.MySensorsBridgeConfiguration;
-import org.openhab.binding.mysensors.internal.event.MySensorsBridgeConnectionEventListener;
-import org.openhab.binding.mysensors.internal.event.MySensorsEventObservable;
 import org.openhab.binding.mysensors.internal.event.MySensorsEventRegister;
+import org.openhab.binding.mysensors.internal.event.MySensorsGatewayEventListener;
+import org.openhab.binding.mysensors.internal.gateway.MySensorsGatewayConfig;
+import org.openhab.binding.mysensors.internal.gateway.MySensorsNetworkSanityChecker;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
-import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,13 +37,9 @@ import org.slf4j.LoggerFactory;
  * @author Andrea Cioni
  *
  */
-public abstract class MySensorsBridgeConnection implements Runnable,
-        MySensorsEventObservable<MySensorsBridgeConnectionEventListener>, MySensorsBridgeConnectionEventListener {
+public abstract class MySensorsAbstractConnection implements Runnable, MySensorsGatewayEventListener {
 
-    private Logger logger = LoggerFactory.getLogger(getClass());
-
-    // Event register for MySensorsConnectionEventListener
-    private MySensorsEventRegister<MySensorsBridgeConnectionEventListener> eventRegister;
+    protected Logger logger = LoggerFactory.getLogger(getClass());
 
     // Connector will check for connection status every CONNECTOR_INTERVAL_CHECK seconds
     public static final int CONNECTOR_INTERVAL_CHECK = 10;
@@ -65,8 +58,6 @@ public abstract class MySensorsBridgeConnection implements Runnable,
 
     private Object waitingObj = null;
 
-    private MySensorsBridgeConfiguration bridgeConfiguration;
-
     // I_VERSION response flag
     private boolean iVersionResponse = false;
 
@@ -76,6 +67,10 @@ public abstract class MySensorsBridgeConnection implements Runnable,
     // Reader and writer thread
     protected MySensorsWriter mysConWriter = null;
     protected MySensorsReader mysConReader = null;
+
+    protected MySensorsEventRegister myEventRegister = null;
+
+    protected MySensorsGatewayConfig myGatewayConfig = null;
 
     // Sanity checker
     private MySensorsNetworkSanityChecker netSanityChecker = null;
@@ -87,20 +82,20 @@ public abstract class MySensorsBridgeConnection implements Runnable,
     private ScheduledExecutorService watchdogExecutor = null;
     private Future<?> futureWatchdog = null;
 
-    public MySensorsBridgeConnection(MySensorsBridgeConfiguration bridgeConfiguration) {
+    public MySensorsAbstractConnection(MySensorsGatewayConfig myGatewayConfig, MySensorsEventRegister myEventRegister) {
+        this.myEventRegister = myEventRegister;
         this.outboundMessageQueue = new LinkedBlockingQueue<MySensorsMessage>();
-        this.bridgeConfiguration = bridgeConfiguration;
+        this.myGatewayConfig = myGatewayConfig;
         this.watchdogExecutor = Executors.newSingleThreadScheduledExecutor();
         this.iVersionResponse = false;
-        this.eventRegister = new MySensorsEventRegister<>();
     }
 
     /**
      * Initialization of the BridgeConnection
      */
     public void initialize() {
-        logger.debug("Set skip check on startup to: {}", bridgeConfiguration.skipStartupCheck);
-        skipStartupCheck = bridgeConfiguration.skipStartupCheck;
+        logger.debug("Set skip check on startup to: {}", myGatewayConfig.getSkipStartupCheck());
+        skipStartupCheck = myGatewayConfig.getSkipStartupCheck();
 
         // Launch connection watchdog
         logger.debug("Enabling connection watchdog");
@@ -109,7 +104,7 @@ public abstract class MySensorsBridgeConnection implements Runnable,
 
     @Override
     public void run() {
-        Thread.currentThread().setName(MySensorsBridgeConnection.class.getName());
+        Thread.currentThread().setName(MySensorsAbstractConnection.class.getName());
 
         if (requestingDisconnection()) {
             logger.info("Connection request disconnection...");
@@ -122,21 +117,6 @@ public abstract class MySensorsBridgeConnection implements Runnable,
                 logger.info("Successfully connected to MySensors Bridge.");
 
                 numOfRetry = 0;
-
-                // Start discovery service
-                // MySensorsDiscoveryService discoveryService = new MySensorsDiscoveryService(bridgeHandler);
-                // discoveryService.activate();
-
-                if (bridgeConfiguration.enableNetworkSanCheck) {
-
-                    // Start network sanity check
-                    netSanityChecker = new MySensorsNetworkSanityChecker();
-                    netSanityChecker.start();
-
-                } else {
-                    logger.warn("Network Sanity Checker thread disabled from bridge configuration");
-                }
-
             } else {
                 logger.error("Failed connecting to bridge...next retry in {} seconds (Retry No.:{})",
                         CONNECTOR_INTERVAL_CHECK, numOfRetry);
@@ -157,7 +137,7 @@ public abstract class MySensorsBridgeConnection implements Runnable,
      */
     private boolean connect() {
         connected = _connect();
-        notifyBridgeStatusUpdate(this, isConnected());
+        myEventRegister.notifyBridgeStatusUpdate(this, isConnected());
         return connected;
     }
 
@@ -178,7 +158,7 @@ public abstract class MySensorsBridgeConnection implements Runnable,
         requestDisconnection = false;
         iVersionResponse = false;
 
-        notifyBridgeStatusUpdate(this, isConnected());
+        myEventRegister.notifyBridgeStatusUpdate(this, isConnected());
     }
 
     protected abstract void _disconnect();
@@ -217,7 +197,7 @@ public abstract class MySensorsBridgeConnection implements Runnable,
         writer.startWriter();
 
         if (!skipStartupCheck) {
-            addEventListener(this);
+            myEventRegister.addEventListener(this);
 
             try {
                 int i = 0;
@@ -232,7 +212,7 @@ public abstract class MySensorsBridgeConnection implements Runnable,
             } catch (Exception e) {
                 logger.error("Exception on waiting for I_VERSION message", e);
             } finally {
-                removeEventListener(this);
+                myEventRegister.removeEventListener(this);
             }
         } else {
             logger.warn("Skipping I_VERSION connection test, not recommended...");
@@ -340,36 +320,9 @@ public abstract class MySensorsBridgeConnection implements Runnable,
      *
      * @param flag true if the connection should be stopped.
      */
-    private void requestDisconnection(boolean flag) {
+    public void requestDisconnection(boolean flag) {
         logger.debug("Request disconnection flag setted to: " + flag);
         requestDisconnection = flag;
-    }
-
-    @Override
-    public void addEventListener(MySensorsBridgeConnectionEventListener listener) {
-        eventRegister.addEventListener(listener);
-
-    }
-
-    @Override
-    public void clearAllListeners() {
-        eventRegister.clearAllListeners();
-
-    }
-
-    @Override
-    public List<MySensorsBridgeConnectionEventListener> getEventListeners() {
-        return eventRegister.getEventListeners();
-    }
-
-    @Override
-    public boolean isEventListenerRegisterd(MySensorsBridgeConnectionEventListener listener) {
-        return eventRegister.isEventListenerRegisterd(listener);
-    }
-
-    @Override
-    public void removeEventListener(MySensorsBridgeConnectionEventListener listener) {
-        eventRegister.removeEventListener(listener);
     }
 
     @Override
@@ -391,35 +344,6 @@ public abstract class MySensorsBridgeConnection implements Runnable,
         }
     }
 
-    private void notifyBridgeStatusUpdate(MySensorsBridgeConnection connection, boolean connected) {
-        synchronized (eventRegister.getEventListeners()) {
-            for (MySensorsBridgeConnectionEventListener listener : eventRegister.getEventListeners()) {
-                logger.trace("Broadcasting event {} to: {}", connection.toString(), listener);
-
-                try {
-                    listener.bridgeStatusUpdate(this, connected);
-                } catch (Throwable e) {
-                    logger.error("Event broadcasting throw an exception", e);
-                }
-            }
-        }
-    }
-
-    private void notifyMessageReceived(MySensorsMessage msg) {
-        synchronized (eventRegister.getEventListeners()) {
-            for (MySensorsBridgeConnectionEventListener listener : eventRegister.getEventListeners()) {
-                logger.trace("Broadcasting event {} to: {}", msg, listener);
-
-                try {
-                    listener.messageReceived(msg);
-                } catch (Throwable e) {
-                    logger.error("Event broadcasting throw an exception", e);
-                }
-            }
-        }
-
-    }
-
     /**
      * Implements the reader (IP & serial) that receives the messages from the MySensors network.
      *
@@ -434,11 +358,14 @@ public abstract class MySensorsBridgeConnection implements Runnable,
         protected ExecutorService executor = Executors.newSingleThreadExecutor();
         protected Future<?> future = null;
 
-        protected MySensorsBridgeConnection mysCon = null;
         protected InputStream inStream = null;
         protected BufferedReader reads = null;
 
         protected boolean stopReader = false;
+
+        public MySensorsReader(InputStream inStream) {
+            this.inStream = inStream;
+        }
 
         /**
          * Starts the reader process that will receive the messages from the MySensors network.
@@ -465,14 +392,14 @@ public abstract class MySensorsBridgeConnection implements Runnable,
                     // We lost connection
                     if (line == null) {
                         logger.warn("Connection to Gateway lost!");
-                        mysCon.requestDisconnection(true);
+                        requestDisconnection(true);
                         break;
                     }
 
                     logger.debug(line);
-                    MySensorsMessage msg = MySensorsMessageParser.parse(line);
+                    MySensorsMessage msg = MySensorsMessage.parse(line);
                     if (msg != null) {
-                        notifyMessageReceived(msg);
+                        myEventRegister.notifyMessageReceived(msg);
                     }
                 } catch (Exception e) {
                     logger.error("({}) on reading from connection, message: {}", e, getClass(), e.getMessage());
@@ -527,7 +454,7 @@ public abstract class MySensorsBridgeConnection implements Runnable,
      * @author Tim Oberföll
      *
      */
-    public abstract class MySensorsWriter implements Runnable {
+    public class MySensorsWriter implements Runnable {
         protected Logger logger = LoggerFactory.getLogger(MySensorsWriter.class);
 
         protected boolean stopWriting = false; // Stop the thread that sends the messages to the MySensors network
@@ -536,12 +463,13 @@ public abstract class MySensorsBridgeConnection implements Runnable,
                                                               // a delay in between.
         protected PrintWriter outs = null;
         protected OutputStream outStream = null;
-        protected MySensorsBridgeConnection mysCon = null;
 
         protected ExecutorService executor = Executors.newSingleThreadExecutor();
         protected Future<?> future = null;
 
-        protected int sendDelay = 1000;
+        public MySensorsWriter(OutputStream outStream) {
+            this.outStream = outStream;
+        }
 
         /**
          * Start the writer Process that will poll messages from the FIFO outbound queue
@@ -555,13 +483,13 @@ public abstract class MySensorsBridgeConnection implements Runnable,
         public void run() {
             Thread.currentThread().setName(MySensorsWriter.class.getName());
             while (!stopWriting) {
-                if (!mysCon.isWriterPaused()) {
+                if (!isWriterPaused()) {
                     try {
-                        MySensorsMessage msg = mysCon.pollMySensorsOutboundQueue();
+                        MySensorsMessage msg = pollMySensorsOutboundQueue();
 
                         if (msg != null) {
                             if (msg.getNextSend() < System.currentTimeMillis()
-                                    && (lastSend + sendDelay) < System.currentTimeMillis()) {
+                                    && (lastSend + myGatewayConfig.getSendDelay()) < System.currentTimeMillis()) {
                                 // if we request an ACK we will wait for it and keep the message in the queue (at the
                                 // end)
                                 // otherwise we remove the message from the queue
@@ -571,7 +499,7 @@ public abstract class MySensorsBridgeConnection implements Runnable,
                                         msg.setNextSend(System.currentTimeMillis()
                                                 + MySensorsBindingConstants.MYSENSORS_RETRY_TIMES[msg.getRetries()
                                                         - 1]);
-                                        mysCon.addMySensorsOutboundMessage(msg);
+                                        addMySensorsOutboundMessage(msg);
                                     } else {
                                         logger.warn("NO ACK from nodeId: " + msg.getNodeId());
                                         if (msg.getOldMsg().isEmpty()) {
@@ -580,21 +508,21 @@ public abstract class MySensorsBridgeConnection implements Runnable,
                                             logger.debug("Reverting status!");
                                             msg.setMsg(msg.getOldMsg());
                                             msg.setAck(0);
-                                            notifyMessageReceived(msg);
+                                            myEventRegister.notifyMessageReceived(msg);
                                         } else if (!msg.getRevert()) {
                                             logger.debug("Not reverted due to configuration!");
                                         }
                                         continue;
                                     }
                                 }
-                                String output = MySensorsMessageParser.generateAPIString(msg);
+                                String output = MySensorsMessage.generateAPIString(msg);
                                 logger.debug("Sending to MySensors: {}", output.trim());
 
                                 sendMessage(output);
                                 lastSend = System.currentTimeMillis();
                             } else {
                                 // Is not time for send again...
-                                mysCon.addMySensorsOutboundMessage(msg);
+                                addMySensorsOutboundMessage(msg);
                             }
                         } else {
                             logger.warn("Message returned from queue is null");
@@ -652,114 +580,6 @@ public abstract class MySensorsBridgeConnection implements Runnable,
                 logger.error("Cannot close writer stream");
             }
 
-        }
-    }
-
-    /**
-     * Regulary checks the status of the link to the gateway to the MySensors network.
-     *
-     * @author Andrea Cioni
-     *
-     */
-    private class MySensorsNetworkSanityChecker implements MySensorsBridgeConnectionEventListener, Runnable {
-
-        private Logger logger = LoggerFactory.getLogger(getClass());
-
-        private static final int SHEDULE_MINUTES_DELAY = 3; // only for test will be: 3
-        private static final int MAX_ATTEMPTS_BEFORE_DISCONNECT = 3; // only for test will be: 3
-
-        private ScheduledExecutorService scheduler = null;
-        private ScheduledFuture<?> future = null;
-
-        private Integer iVersionMessageMissing = 0;
-        private boolean iVersionMessageArrived = false;
-
-        private void reset() {
-            synchronized (iVersionMessageMissing) {
-                iVersionMessageArrived = false;
-                iVersionMessageMissing = 0;
-            }
-        }
-
-        /**
-         * Starts the sanity check of the network.
-         * Tests if the connection to the bridge is still alive.
-         */
-        public void start() {
-            reset();
-
-            scheduler = Executors.newSingleThreadScheduledExecutor();
-            future = scheduler.scheduleWithFixedDelay(this, SHEDULE_MINUTES_DELAY, SHEDULE_MINUTES_DELAY,
-                    TimeUnit.MINUTES);
-
-        }
-
-        /**
-         * Stops the sanity check of the network.
-         */
-        public void stop() {
-            logger.info("Network Sanity Checker thread stopped");
-
-            if (future != null) {
-                future.cancel(true);
-                future = null;
-            }
-
-            if (scheduler != null) {
-                scheduler.shutdown();
-                scheduler.shutdownNow();
-                scheduler = null;
-            }
-
-        }
-
-        @Override
-        public void run() {
-            Thread.currentThread().setName(MySensorsNetworkSanityChecker.class.getName());
-
-            try {
-                addEventListener(this);
-
-                addMySensorsOutboundMessage(MySensorsBindingConstants.I_VERSION_MESSAGE);
-
-                Thread.sleep(3000);
-
-                synchronized (iVersionMessageMissing) {
-                    if (!iVersionMessageArrived) {
-                        logger.warn(
-                                "I_VERSION message response is not arrived. Remained attempts before disconnection {}",
-                                MAX_ATTEMPTS_BEFORE_DISCONNECT - iVersionMessageMissing);
-
-                        if ((MAX_ATTEMPTS_BEFORE_DISCONNECT - iVersionMessageMissing) <= 0) {
-                            logger.error("Retry period expired, gateway is down. Disconneting bridge...");
-
-                            requestDisconnection(true);
-
-                        } else {
-                            iVersionMessageMissing++;
-                        }
-                    } else {
-                        logger.debug("Network sanity check: PASSED");
-                        iVersionMessageMissing = 0;
-                    }
-
-                    iVersionMessageArrived = false;
-                }
-
-            } catch (InterruptedException e) {
-                logger.error("interrupted exception in network sanity thread checker");
-            } finally {
-                removeEventListener(this);
-            }
-        }
-
-        @Override
-        public void messageReceived(MySensorsMessage message) throws Throwable {
-            synchronized (iVersionMessageMissing) {
-                if (!iVersionMessageArrived) {
-                    iVersionMessageArrived = message.isIVersionMessage();
-                }
-            }
         }
     }
 

@@ -24,13 +24,10 @@ import org.eclipse.smarthome.core.types.Command;
 import org.eclipse.smarthome.core.types.RefreshType;
 import org.eclipse.smarthome.core.types.State;
 import org.openhab.binding.mysensors.config.MySensorsSensorConfiguration;
-import org.openhab.binding.mysensors.internal.event.MySensorsBridgeConnectionEventListener;
-import org.openhab.binding.mysensors.internal.event.MySensorsDeviceEventListener;
-import org.openhab.binding.mysensors.internal.protocol.MySensorsBridgeConnection;
+import org.openhab.binding.mysensors.internal.event.MySensorsGatewayEventListener;
+import org.openhab.binding.mysensors.internal.gateway.MySensorsGateway;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
-import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageParser;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
-import org.openhab.binding.mysensors.internal.sensors.MySensorsDeviceManager;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsNode;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsVariable;
 import org.slf4j.Logger;
@@ -42,8 +39,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Tim Oberföll
  */
-public class MySensorsThingHandler extends BaseThingHandler
-        implements MySensorsDeviceEventListener, MySensorsBridgeConnectionEventListener {
+public class MySensorsThingHandler extends BaseThingHandler implements MySensorsGatewayEventListener {
 
     private Logger logger = LoggerFactory.getLogger(MySensorsThingHandler.class);
 
@@ -58,13 +54,10 @@ public class MySensorsThingHandler extends BaseThingHandler
 
     private Map<Integer, String> oldMsgContent = new HashMap<Integer, String>();
 
-    private MySensorsDeviceManager deviceManager;
+    private MySensorsGateway myGateway;
 
-    private MySensorsBridgeConnection myConn;
-
-    public MySensorsThingHandler(MySensorsDeviceManager deviceManager, Thing thing) {
+    public MySensorsThingHandler(Thing thing) {
         super(thing);
-        this.deviceManager = deviceManager;
     }
 
     @Override
@@ -75,7 +68,7 @@ public class MySensorsThingHandler extends BaseThingHandler
         requestAck = configuration.requestAck;
         revertState = configuration.revertState;
 
-        myConn = getBridgeHandler().getBridgeConnection();
+        myGateway = getBridgeHandler().getMySensorsGateway();
 
         logger.debug("Configuration: node {}, chiledId: {}, revertState: {}", nodeId, childId, revertState);
 
@@ -98,6 +91,12 @@ public class MySensorsThingHandler extends BaseThingHandler
     }
 
     @Override
+    public void handleConfigurationUpdate(Map<String, Object> configurationParameters) {
+        logger.debug("Configuation update fo thing {}-{}: {}", nodeId, childId, configurationParameters);
+        super.handleConfigurationUpdate(configurationParameters);
+    }
+
+    @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
         logger.trace("Command {} received for channel uid {}", command, channelUID);
         /*
@@ -116,13 +115,12 @@ public class MySensorsThingHandler extends BaseThingHandler
         if (channelUID.getId().equals(CHANNEL_MYSENSORS_MESSAGE)) {
             if (command instanceof StringType) {
                 StringType stringTypeMessage = (StringType) command;
-                MySensorsMessage msg = MySensorsMessageParser.parse(stringTypeMessage.toString());
-                getBridgeHandler().getBridgeConnection().addMySensorsOutboundMessage(msg);
+                MySensorsMessage msg = MySensorsMessage.parse(stringTypeMessage.toString());
+                myGateway.getConnection().addMySensorsOutboundMessage(msg);
                 return;
             }
         } else {
-            MySensorsVariable var = deviceManager.getVariable(nodeId, childId,
-                    INVERSE_CHANNEL_MAP.get(channelUID.getId()));
+            MySensorsVariable var = myGateway.getVariable(nodeId, childId, INVERSE_CHANNEL_MAP.get(channelUID.getId()));
             if (var != null) {
 
                 // Update value into the MS device
@@ -142,7 +140,7 @@ public class MySensorsThingHandler extends BaseThingHandler
                 newMsg.setOldMsg(oldPayload);
                 oldMsgContent.put(subType, msgPayload);
 
-                getBridgeHandler().getBridgeConnection().addMySensorsOutboundMessage(newMsg);
+                myGateway.getConnection().addMySensorsOutboundMessage(newMsg);
 
             } else {
                 logger.warn("Variable not found, cannot handle command for thing {}", thing.getUID());
@@ -221,20 +219,15 @@ public class MySensorsThingHandler extends BaseThingHandler
         // Am I the all knowing node that receives all messages?
         if (nodeId == MYSENSORS_NODE_ID_ALL_KNOWING && childId == MYSENSORS_CHILD_ID_ALL_KNOWING) {
             updateState(CHANNEL_MYSENSORS_MESSAGE,
-                    new StringType(MySensorsMessageParser.generateAPIString(msg).replaceAll("(\\r|\\n)", "")));
+                    new StringType(MySensorsMessage.generateAPIString(msg).replaceAll("(\\r|\\n)", "")));
 
         }
     }
 
     private void registerListeners() {
-        if (!myConn.isEventListenerRegisterd(this)) {
+        if (!myGateway.getEventRegister().isEventListenerRegisterd(this)) {
             logger.debug("Event listener for node {}-{} not registered yet, registering...", nodeId, childId);
-            myConn.addEventListener(this);
-        }
-
-        if (!deviceManager.isEventListenerRegisterd(this)) {
-            logger.debug("Event listener for node {}-{} not registered yet, registering...", nodeId, childId);
-            deviceManager.addEventListener(this);
+            myGateway.getEventRegister().addEventListener(this);
         }
     }
 

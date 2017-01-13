@@ -5,9 +5,9 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package org.openhab.binding.mysensors.internal.sensors;
+package org.openhab.binding.mysensors.internal.gateway;
 
-import static org.openhab.binding.mysensors.MySensorsBindingConstants.CHANNEL_MAP;
+import static org.openhab.binding.mysensors.MySensorsBindingConstants.*;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -16,13 +16,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.openhab.binding.mysensors.internal.Pair;
-import org.openhab.binding.mysensors.internal.event.MySensorsBridgeConnectionEventListener;
-import org.openhab.binding.mysensors.internal.event.MySensorsDeviceEventListener;
-import org.openhab.binding.mysensors.internal.event.MySensorsEventObservable;
 import org.openhab.binding.mysensors.internal.event.MySensorsEventRegister;
+import org.openhab.binding.mysensors.internal.event.MySensorsGatewayEventListener;
 import org.openhab.binding.mysensors.internal.exception.NoMoreIdsException;
-import org.openhab.binding.mysensors.internal.protocol.MySensorsBridgeConnection;
+import org.openhab.binding.mysensors.internal.protocol.MySensorsAbstractConnection;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
+import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
+import org.openhab.binding.mysensors.internal.sensors.MySensorsNode;
+import org.openhab.binding.mysensors.internal.sensors.MySensorsVariable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,23 +33,49 @@ import org.slf4j.LoggerFactory;
  * @author Andrea Cioni
  *
  */
-public class MySensorsDeviceManager
-        implements MySensorsEventObservable<MySensorsDeviceEventListener>, MySensorsBridgeConnectionEventListener {
+public class MySensorsGateway implements MySensorsGatewayEventListener {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
-    private Map<Integer, MySensorsNode> nodeMap = null;
+    private Map<Integer, MySensorsNode> nodeMap;
 
-    private MySensorsEventRegister<MySensorsDeviceEventListener> eventRegister;
+    private MySensorsEventRegister myEventRegister;
 
-    public MySensorsDeviceManager() {
+    private MySensorsAbstractConnection myCon;
+
+    private MySensorsGatewayConfig myConf;
+
+    private MySensorsNetworkSanityChecker myNetSanCheck;
+
+    public MySensorsGateway(MySensorsGatewayConfig myConf) {
         nodeMap = new HashMap<>();
-        eventRegister = new MySensorsEventRegister<>();
+        this.myConf = myConf;
+        this.myEventRegister = new MySensorsEventRegister();
     }
 
-    public MySensorsDeviceManager(Map<Integer, MySensorsNode> nodeMap) {
+    public MySensorsGateway(MySensorsGatewayConfig myConf, Map<Integer, MySensorsNode> nodeMap) {
         this.nodeMap = nodeMap;
-        eventRegister = new MySensorsEventRegister<>();
+        this.myConf = myConf;
+        this.myEventRegister = new MySensorsEventRegister();
+    }
+
+    public void startup() {
+        myCon.initialize();
+        myEventRegister.addEventListener(this);
+
+        if (myConf.getEnableNetworkSanCheck()) {
+            myNetSanCheck = new MySensorsNetworkSanityChecker(this);
+        }
+    }
+
+    public void shutdown() {
+        myEventRegister.clearAllListeners();
+
+        if (myNetSanCheck != null) {
+            myNetSanCheck.stop();
+        }
+
+        myCon.destroy();
     }
 
     public MySensorsNode getNode(int nodeId) {
@@ -102,14 +129,16 @@ public class MySensorsDeviceManager
      * @param mergeIfExist if true and node is already present that two nodes will be merged in one
      */
     public void addNode(MySensorsNode node, boolean mergeIfExist) {
-        MySensorsNode exist = null;
-        if (mergeIfExist && ((exist = getNode(node.getNodeId())) != null)) {
-            logger.debug("Merging child map: {} with: {}", exist.getChildMap(), node.getChildMap());
-            exist.mergeNodeChilds(node);
-            logger.trace("Merging result is: {}", exist.getChildMap());
-        } else {
-            logger.debug("Adding device {}", node.toString());
-            addNode(node);
+        synchronized (nodeMap) {
+            MySensorsNode exist = null;
+            if (mergeIfExist && ((exist = getNode(node.getNodeId())) != null)) {
+                logger.debug("Merging child map: {} with: {}", exist.getChildMap(), node.getChildMap());
+                exist.mergeNodeChilds(node);
+                logger.trace("Merging result is: {}", exist.getChildMap());
+            } else {
+                logger.debug("Adding device {}", node.toString());
+                addNode(node);
+            }
         }
     }
 
@@ -164,102 +193,41 @@ public class MySensorsDeviceManager
             throw new NoMoreIdsException();
         }
 
-        notifyNodeIdReserved(newId);
+        getEventRegister().notifyNodeIdReserved(newId);
 
         return newId;
     }
 
     @Override
-    public void addEventListener(MySensorsDeviceEventListener listener) {
-        eventRegister.addEventListener(listener);
-
-    }
-
-    @Override
-    public void clearAllListeners() {
-        eventRegister.clearAllListeners();
-
-    }
-
-    @Override
-    public List<MySensorsDeviceEventListener> getEventListeners() {
-        return eventRegister.getEventListeners();
-    }
-
-    @Override
-    public boolean isEventListenerRegisterd(MySensorsDeviceEventListener listener) {
-        return eventRegister.isEventListenerRegisterd(listener);
-    }
-
-    @Override
-    public void removeEventListener(MySensorsDeviceEventListener listener) {
-        eventRegister.removeEventListener(listener);
-    }
-
-    @Override
     public void messageReceived(MySensorsMessage message) throws Throwable {
-        handleIncomingMessage(message);
+        if (!handleIncomingMessage(message)) {
+            handleSpecialMessageEvent(message);
+        }
     }
 
     @Override
-    public void bridgeStatusUpdate(MySensorsBridgeConnection connection, boolean connected) throws Throwable {
+    public void connectionStatusUpdate(MySensorsAbstractConnection connection, boolean connected) throws Throwable {
+        if (myNetSanCheck != null) {
+            if (connected) {
+                myNetSanCheck.start();
+            } else {
+                myNetSanCheck.stop();
+            }
+        }
+
         handleBridgeStatusUpdate(connected);
     }
 
-    private void notifyNewNodeDiscovered(MySensorsNode node) {
-        synchronized (eventRegister.getEventListeners()) {
-            for (MySensorsDeviceEventListener listener : eventRegister.getEventListeners()) {
-                logger.trace("Broadcasting event {} to: {}", node, listener);
-
-                try {
-                    listener.newNodeDiscovered(node);
-                } catch (Throwable e) {
-                    logger.error("Event broadcasting throw an exception", e);
-                }
-            }
-        }
+    public MySensorsEventRegister getEventRegister() {
+        return myEventRegister;
     }
 
-    private void notifyNodeIdReserved(Integer reserved) {
-        synchronized (eventRegister.getEventListeners()) {
-            for (MySensorsDeviceEventListener listener : eventRegister.getEventListeners()) {
-                logger.trace("Broadcasting event {} to: {}", reserved, listener);
-
-                try {
-                    listener.nodeIdReservationDone(reserved);
-                } catch (Throwable e) {
-                    logger.error("Event broadcasting throw an exception", e);
-                }
-            }
-        }
+    public MySensorsAbstractConnection getConnection() {
+        return myCon;
     }
 
-    private void notifyNodeUpdateEvent(MySensorsNode node, MySensorsChild child, MySensorsVariable variable) {
-        synchronized (eventRegister.getEventListeners()) {
-            for (MySensorsDeviceEventListener listener : eventRegister.getEventListeners()) {
-                logger.trace("Broadcasting event {} to: {}", variable, listener);
-
-                try {
-                    listener.nodeUpdateEvent(node, child, variable);
-                } catch (Throwable e) {
-                    logger.error("Event broadcasting throw an exception", e);
-                }
-            }
-        }
-    }
-
-    private void notifyNodeReachEvent(MySensorsNode node, boolean reach) {
-        synchronized (eventRegister.getEventListeners()) {
-            for (MySensorsDeviceEventListener listener : eventRegister.getEventListeners()) {
-                logger.trace("Broadcasting event {} to: {}", node, listener);
-
-                try {
-                    listener.nodeReachStatusChanged(node, reach);
-                } catch (Throwable e) {
-                    logger.error("Event broadcasting throw an exception", e);
-                }
-            }
-        }
+    public MySensorsGatewayConfig getConfiguration() {
+        return myConf;
     }
 
     private void handleBridgeStatusUpdate(boolean connected) {
@@ -267,7 +235,7 @@ public class MySensorsDeviceManager
             for (Integer i : nodeMap.keySet()) {
                 MySensorsNode node = nodeMap.get(i);
                 node.setReachable(connected);
-                notifyNodeReachEvent(node, connected);
+                getEventRegister().notifyNodeReachEvent(node, connected);
             }
         }
     }
@@ -299,7 +267,7 @@ public class MySensorsDeviceManager
                     MySensorsVariable variable = child.getVariable(msg.msgType, msg.subType);
                     if (variable != null) {
                         variable.setValue(msg);
-                        notifyNodeUpdateEvent(node, child, variable);
+                        getEventRegister().notifyNodeUpdateEvent(node, child, variable);
                         ret = true;
                     } else {
                         logger.warn("Variable {}({}) not present", msg.subType,
@@ -313,7 +281,7 @@ public class MySensorsDeviceManager
 
                 node = new MySensorsNode(msg.nodeId);
                 addNode(node);
-                notifyNewNodeDiscovered(node);
+                getEventRegister().notifyNewNodeDiscovered(node);
                 ret = true;
             }
         }
@@ -321,8 +289,75 @@ public class MySensorsDeviceManager
         return ret;
     }
 
-    private class MySensorsDeviceReachabilityChecker {
-        // TODO this class will hold the rules that determine if a node is reachable, in case of error a notification:
-        // notifyNodeReachEvent will be launched
+    private void handleSpecialMessageEvent(MySensorsMessage msg) {
+        // Do we get an ACK?
+        if (msg.getAck() == 1) {
+            logger.debug(String.format("ACK received! Node: %d, Child: %d", msg.nodeId, msg.childId));
+            myCon.removeMySensorsOutboundMessage(msg);
+        }
+
+        // Have we get a I_CONFIG message?
+        if (msg.isIConfigMessage()) {
+            answerIConfigMessage(msg);
+        }
+
+        // Have we get a I_TIME message?
+        if (msg.isITimeMessage()) {
+            answerITimeMessage(msg);
+        }
+
+        // Requesting ID
+        if (msg.isIdRequestMessage()) {
+            answerIDRequest();
+        }
+    }
+
+    /**
+     * Answer to I_TIME message for gateway time request from sensor
+     *
+     * @param msg, the incoming I_TIME message from sensor
+     */
+    private void answerITimeMessage(MySensorsMessage msg) {
+        logger.info("I_TIME request received from {}, answering...", msg.nodeId);
+
+        String time = Long.toString(System.currentTimeMillis() / 1000);
+        MySensorsMessage newMsg = new MySensorsMessage(msg.nodeId, msg.childId, MYSENSORS_MSG_TYPE_INTERNAL, 0, false,
+                MYSENSORS_SUBTYPE_I_TIME, time);
+        myCon.addMySensorsOutboundMessage(newMsg);
+
+    }
+
+    /**
+     * Answer to I_CONFIG message for imperial/metric request from sensor
+     *
+     * @param msg, the incoming I_CONFIG message from sensor
+     */
+    private void answerIConfigMessage(MySensorsMessage msg) {
+        boolean imperial = myConf.getImperial();
+        String iConfig = imperial ? "I" : "M";
+
+        logger.debug("I_CONFIG request received from {}, answering: (is imperial?){}", iConfig, imperial);
+
+        MySensorsMessage newMsg = new MySensorsMessage(msg.nodeId, msg.childId, MYSENSORS_MSG_TYPE_INTERNAL, 0, false,
+                MYSENSORS_SUBTYPE_I_CONFIG, iConfig);
+        myCon.addMySensorsOutboundMessage(newMsg);
+
+    }
+
+    /**
+     * If an ID-Request from a sensor is received the controller will send an id to the sensor
+     */
+    private void answerIDRequest() {
+        logger.info("ID Request received");
+
+        int newId = 0;
+        try {
+            newId = reserveId();
+            logger.info("New Node in the MySensors network has requested an ID. ID is: {}", newId);
+            MySensorsMessage newMsg = new MySensorsMessage(255, 255, 3, 0, false, 4, newId + "");
+            myCon.addMySensorsOutboundMessage(newMsg);
+        } catch (NoMoreIdsException e) {
+            logger.error("No more IDs available for this node, you could try cleaning cache file");
+        }
     }
 }
