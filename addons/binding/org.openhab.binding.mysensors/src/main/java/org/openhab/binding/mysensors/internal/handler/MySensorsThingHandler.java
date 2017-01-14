@@ -54,6 +54,7 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
     private int childId = 0;
     private boolean requestAck = false;
     private boolean revertState = true;
+    private boolean smartSleep = false;
 
     private DateTimeType lastUpdate = null;
 
@@ -70,7 +71,9 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
         childId = Integer.parseInt(configuration.childId);
         requestAck = configuration.requestAck;
         revertState = configuration.revertState;
-        logger.debug("Configuration: node {}, chiledId: {}, revertState: {}", nodeId, childId, revertState);
+        smartSleep = configuration.smartSleep;
+        logger.debug("Configuration: nodeId {}, chiledId: {}, requestAck: {}, revertState: {}, smartSleep: {}"
+        		, nodeId, childId, requestAck, revertState, smartSleep);
         if (!getBridgeHandler().getBridgeConnection().isEventListenerRegisterd(this)) {
             logger.debug("Event listener for node {}-{} not registered yet, registering...", nodeId, childId);
             getBridgeHandler().getBridgeConnection().addEventListener(this);
@@ -211,7 +214,9 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
         } else if (channelUID.getId().equals(CHANNEL_IR_RECEIVE)) {
             subType = MYSENSORS_SUBTYPE_V_IR_RECEIVE;
             msgPayload = command.toString();
-
+        } else if (channelUID.getId().equals(CHANNEL_ORP)) {
+        	subType = MYSENSORS_SUBTYPE_V_ORP;
+        	msgPayload = command.toString();
         } else {
             msgPayload = "";
         }
@@ -226,7 +231,11 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
         newMsg.setOldMsg(oldPayload);
         oldMsgContent.put(subType, msgPayload);
 
-        getBridgeHandler().getBridgeConnection().addMySensorsOutboundMessage(newMsg);
+        if(smartSleep) {
+        	getBridgeHandler().getBridgeConnection().addMySensorsOutboundSmartSleepMessage(newMsg);
+        } else {
+        	getBridgeHandler().getBridgeConnection().addMySensorsOutboundMessage(newMsg);
+        }
     }
 
     @Override

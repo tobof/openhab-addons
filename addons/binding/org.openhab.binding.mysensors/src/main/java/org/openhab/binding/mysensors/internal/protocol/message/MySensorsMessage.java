@@ -241,5 +241,20 @@ public class MySensorsMessage {
 
         return ret;
     }
+    
+    /**
+     * Checks if the received message is a heartbeat(response) received from a node
+     * 
+     * @return true, if it is a heartbeat
+     */
+    public boolean isHeartbeatResponseMessage() {
+    	boolean ret = false;
+    	
+    	if (subType == MYSENSORS_SUBTYPE_I_HEARTBEAT_RESPONSE && childId == MYSENSORS_CHILD_ID_RESERVED_255){
+    		ret = true;
+    	}
+    	
+    	return ret;
+    }
 
 }

@@ -11,7 +11,9 @@ import static org.openhab.binding.mysensors.MySensorsBindingConstants.*;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -48,6 +50,9 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
 
     // Blocking queue wait for message
     private BlockingQueue<MySensorsMessage> outboundMessageQueue = null;
+    
+    // Queue for SmartSleep messages
+    private Queue<MySensorsMessage> smartSleepMessageQueue = null;
 
     // Flag setted to true while connection is up
     private boolean connected = false;
@@ -85,6 +90,7 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
 
     public MySensorsBridgeConnection(MySensorsBridgeHandler bridgeHandler) {
         this.outboundMessageQueue = new LinkedBlockingQueue<MySensorsMessage>();
+        this.smartSleepMessageQueue = new LinkedList<MySensorsMessage>();
         this.bridgeHandler = bridgeHandler;
         this.updateListeners = new ArrayList<>();
         this.watchdogExecutor = Executors.newSingleThreadScheduledExecutor();
@@ -264,7 +270,25 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
                 logger.error("Interrupted message while ruuning");
             }
         }
-
+    }
+    
+    /**
+     * A message to a node that supports smartsleep is not send instantly.
+     * The message is send in response to a heartbeat received from this node.
+     * Only one message is allowed in the queue. If a new one arrives the old one
+     * gets deleted.
+     * 
+     * @param msg the message that should be added to the queue.
+     */
+    public void addMySensorsOutboundSmartSleepMessage(MySensorsMessage msg) {
+    	
+    	// Only one pending message is allowed in the queue. 
+    	removeSmartSleepMessage(msg.getNodeId(), msg.getChildId());
+    	
+    	synchronized (smartSleepMessageQueue) {
+    			smartSleepMessageQueue.add(msg);
+        }
+    	
     }
 
     /**
@@ -368,6 +392,26 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
 
         pauseWriter = false;
     }
+    
+    /**
+     * Remove all messages in the smartsleep queue for a corresponding nodeId / childId combination
+     * 
+     * @param nodeId the nodeId which messages should be deleted.
+     * @param childId the childId which messages should be deleted.
+     */
+    private void removeSmartSleepMessage(int nodeId, int childId) {
+        Iterator<MySensorsMessage> iterator = smartSleepMessageQueue.iterator();
+        if (iterator != null) {
+            while (iterator.hasNext()) {
+                MySensorsMessage msgInQueue = iterator.next();
+                if (msgInQueue.getNodeId() == nodeId && msgInQueue.getChildId() == childId) {
+                    iterator.remove();
+                } else {
+                    logger.debug("Message NOT removed for nodeId: {} and childId: {}.", nodeId, childId);
+                }
+            }
+        }
+    }
 
     /**
      * Status for the writer / message sender.
@@ -420,25 +464,30 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
     }
 
     private void handleIncomingMessageEvent(MySensorsMessage msg) {
-        // Do we get an ACK?
+        // Is this an ACK message?
         if (msg.getAck() == 1) {
             logger.debug(String.format("ACK received! Node: %d, Child: %d", msg.nodeId, msg.childId));
             removeMySensorsOutboundMessage(msg);
         }
 
-        // Have we get a I_CONFIG message?
+        // Is this an I_CONFIG message?
         if (msg.isIConfigMessage()) {
             answerIConfigMessage(msg);
         }
 
-        // Have we get a I_TIME message?
+        // Is this an I_TIME message?
         if (msg.isITimeMessage()) {
             answerITimeMessage(msg);
         }
 
-        // Have we get a I_VERSION message?
+        // Is this an I_VERSION message?
         if (msg.isIVersionMessage()) {
             handleIncomingVersionMessage(msg.msg);
+        }
+        
+        // Is this an I_HEARTBEAT_RESPONSE
+        if (msg.isHeartbeatResponseMessage()) {
+        	handleIncomingHeartbeatMessage(msg);
         }
     }
 
@@ -483,6 +532,62 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
                 MYSENSORS_SUBTYPE_I_CONFIG, iConfig);
         addMySensorsOutboundMessage(newMsg);
 
+    }
+    
+    /**
+     * If a heartbeat is received from a node the queue should be checked
+     * for pending messages for this node. If a message is pending it has to be send immediately.
+     * 
+     * @param msg The heartbeat message received from a node.
+     */
+    private void handleIncomingHeartbeatMessage(MySensorsMessage msg) {
+    	logger.debug("I_HEARTBEAT_RESPONSE received from {}.", msg.getNodeId());
+    	checkPendingSmartSleepMessage(msg.getNodeId());
+    }
+    
+    /**
+     * Checks if a message is in the smartsleep queue and adds it to the outbound queues
+     * 
+     * @param nodeId of the messages that should be send immediately
+     */
+    private void checkPendingSmartSleepMessage(int nodeId) {
+    	Iterator<MySensorsMessage> iterator = smartSleepMessageQueue.iterator();
+        if (iterator != null) {
+        	
+            while (iterator.hasNext()) {
+                MySensorsMessage msgInQueue = iterator.next();
+                if (msgInQueue.getNodeId() == nodeId) {
+                    iterator.remove();
+                    addMySensorsOutboundMessage(msgInQueue);
+                    logger.debug("Message for nodeId: {} in queue needs to be send immediately!", nodeId);
+                }
+            }
+        }
+    }
+    
+    /**
+     * Debug print of the smart sleep queue content to console
+     */
+    public void printSmartSleepQueue() {
+    	pauseWriter = true;
+    	
+        Iterator<MySensorsMessage> iterator = smartSleepMessageQueue.iterator();
+        if (iterator != null) {
+        	
+        	logger.debug("####### START SmartSleep queue #####");
+        	int i = 1;
+        	while (iterator.hasNext()) {
+                MySensorsMessage msgInQueue = iterator.next();
+                
+                logger.debug("Msg: {}, nodeId: {], childId: {}, nextSend: {}.", 
+                				i, msgInQueue.getNodeId(), msgInQueue.getChildId(), 
+                				msgInQueue.getNextSend());
+                i++;
+            }
+        	logger.debug("####### END SmartSleep queue #####");
+        }
+
+        pauseWriter = false;
     }
 
 }
