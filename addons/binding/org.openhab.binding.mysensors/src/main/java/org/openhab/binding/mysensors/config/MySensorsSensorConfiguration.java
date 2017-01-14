@@ -19,4 +19,6 @@ public class MySensorsSensorConfiguration {
     public boolean requestAck; // should a message request an ACK?
     public boolean revertState; // If no ACK was received after the defined retries, should the state of the item get
                                 // reverted?
+
+    public boolean smartSleep;
 }

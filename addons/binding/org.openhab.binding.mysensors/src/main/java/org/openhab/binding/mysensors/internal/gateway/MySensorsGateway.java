@@ -320,18 +320,18 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
     }
 
     private void handleSpecialMessageEvent(MySensorsMessage msg) {
-        // Do we get an ACK?
+        // Is this an ACK message?
         if (msg.getAck() == 1) {
             logger.debug(String.format("ACK received! Node: %d, Child: %d", msg.nodeId, msg.childId));
             myCon.removeMySensorsOutboundMessage(msg);
         }
 
-        // Have we get a I_CONFIG message?
+        // Is this an I_CONFIG message?
         if (msg.isIConfigMessage()) {
             answerIConfigMessage(msg);
         }
 
-        // Have we get a I_TIME message?
+        // Is this an I_TIME message?
         if (msg.isITimeMessage()) {
             answerITimeMessage(msg);
         }
@@ -339,6 +339,11 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
         // Requesting ID
         if (msg.isIdRequestMessage()) {
             answerIDRequest();
+        }
+
+        // Is this an I_HEARTBEAT_RESPONSE
+        if (msg.isHeartbeatResponseMessage()) {
+            handleIncomingHeartbeatMessage(msg);
         }
     }
 
@@ -391,5 +396,16 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
         } catch (NoMoreIdsException e) {
             logger.error("No more IDs available for this node, you could try cleaning cache file");
         }
+    }
+
+    /**
+     * If a heartbeat is received from a node the queue should be checked
+     * for pending messages for this node. If a message is pending it has to be send immediately.
+     *
+     * @param msg The heartbeat message received from a node.
+     */
+    private void handleIncomingHeartbeatMessage(MySensorsMessage msg) {
+        logger.debug("I_HEARTBEAT_RESPONSE received from {}.", msg.getNodeId());
+        myCon.checkPendingSmartSleepMessage(msg.getNodeId());
     }
 }

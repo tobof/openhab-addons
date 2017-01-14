@@ -38,13 +38,13 @@ public class MySensorsNode {
     public MySensorsNode(int nodeId) {
         this.nodeId = nodeId;
         this.chidldMap = new HashMap<Integer, MySensorsChild>();
-        lastUpdate = new Date(0);
+        this.lastUpdate = new Date(0);
     }
 
     public MySensorsNode(int nodeId, Map<Integer, MySensorsChild> chidldMap) {
         this.nodeId = nodeId;
         this.chidldMap = chidldMap;
-        lastUpdate = new Date(0);
+        this.lastUpdate = new Date(0);
     }
 
     public Map<Integer, MySensorsChild> getChildMap() {

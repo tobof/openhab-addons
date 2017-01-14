@@ -50,6 +50,8 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
     private boolean requestAck = false;
     private boolean revertState = true;
 
+    private boolean smartSleep = false;
+
     private DateTimeType lastUpdate = null;
 
     private Map<Integer, String> oldMsgContent = new HashMap<Integer, String>();
@@ -67,10 +69,13 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
         childId = Integer.parseInt(configuration.childId);
         requestAck = configuration.requestAck;
         revertState = configuration.revertState;
+        smartSleep = configuration.smartSleep;
 
         myGateway = getBridgeHandler().getMySensorsGateway();
 
-        logger.debug("Configuration: node {}, chiledId: {}, revertState: {}", nodeId, childId, revertState);
+        smartSleep = configuration.smartSleep;
+        logger.debug("Configuration: nodeId {}, chiledId: {}, requestAck: {}, revertState: {}, smartSleep: {}", nodeId,
+                childId, requestAck, revertState, smartSleep);
 
         registerListeners();
 
@@ -140,7 +145,11 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
                 newMsg.setOldMsg(oldPayload);
                 oldMsgContent.put(subType, msgPayload);
 
-                myGateway.getConnection().addMySensorsOutboundMessage(newMsg);
+                if (smartSleep) {
+                    myGateway.getConnection().addMySensorsOutboundSmartSleepMessage(newMsg);
+                } else {
+                    myGateway.getConnection().addMySensorsOutboundMessage(newMsg);
+                }
 
             } else {
                 logger.warn("Variable not found, cannot handle command for thing {}", thing.getUID());
