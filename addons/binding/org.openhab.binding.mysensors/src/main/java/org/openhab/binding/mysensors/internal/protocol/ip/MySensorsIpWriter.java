@@ -29,7 +29,7 @@ public class MySensorsIpWriter extends MySensorsWriter {
             outs = new PrintWriter(outStream);
         } catch (IOException e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Exception on trying while trying to open output stream: {}", e.toString());
         }
         this.sendDelay = sendDelay;
     }

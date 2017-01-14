@@ -73,7 +73,7 @@ public abstract class MySensorsWriter implements MySensorsUpdateListener, Runnab
                                             + MySensorsBindingConstants.MYSENSORS_RETRY_TIMES[msg.getRetries() - 1]);
                                     mysCon.addMySensorsOutboundMessage(msg);
                                 } else {
-                                    logger.warn("NO ACK from nodeId: " + msg.getNodeId());
+                                    logger.warn("NO ACK from nodeId: {}", msg.getNodeId());
                                     if (msg.getOldMsg().isEmpty()) {
                                         logger.debug("No old status know to revert to!");
                                     } else if (msg.getRevert()) {
