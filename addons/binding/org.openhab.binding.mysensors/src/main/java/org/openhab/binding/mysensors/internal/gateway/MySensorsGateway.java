@@ -91,7 +91,7 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
         myEventRegister.addEventListener(this);
 
         if (myConf.getEnableNetworkSanCheck()) {
-            myNetSanCheck = new MySensorsNetworkSanityChecker(this);
+            myNetSanCheck = new MySensorsNetworkSanityChecker(myCon, myEventRegister);
         }
     }
 
@@ -223,7 +223,7 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
             throw new NoMoreIdsException();
         }
 
-        getEventRegister().notifyNodeIdReserved(newId);
+        myEventRegister.notifyNodeIdReserved(newId);
 
         return newId;
     }
@@ -248,13 +248,15 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
         handleBridgeStatusUpdate(connected);
     }
 
-    public MySensorsEventRegister getEventRegister() {
-        return myEventRegister;
-    }
-
-    public MySensorsAbstractConnection getConnection() {
-        return myCon;
-    }
+    /*
+     * public MySensorsEventRegister getEventRegister() {
+     * return myEventRegister;
+     * }
+     *
+     * public MySensorsAbstractConnection getConnection() {
+     * return myCon;
+     * }
+     */
 
     public MySensorsGatewayConfig getConfiguration() {
         return myConf;
@@ -265,7 +267,7 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
             for (Integer i : nodeMap.keySet()) {
                 MySensorsNode node = nodeMap.get(i);
                 node.setReachable(connected);
-                getEventRegister().notifyNodeReachEvent(node, connected);
+                myEventRegister.notifyNodeReachEvent(node, connected);
             }
         }
     }
@@ -297,7 +299,7 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
                     MySensorsChannel variable = child.getVariable(msg.msgType, msg.subType);
                     if (variable != null) {
                         variable.setValue(msg);
-                        getEventRegister().notifyNodeUpdateEvent(node, child, variable);
+                        myEventRegister.notifyNodeUpdateEvent(node, child, variable);
                         ret = true;
                     } else {
                         logger.warn("Variable {}({}) not present", msg.subType,
@@ -311,7 +313,7 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
 
                 node = new MySensorsNode(msg.nodeId);
                 addNode(node);
-                getEventRegister().notifyNewNodeDiscovered(node);
+                myEventRegister.notifyNewNodeDiscovered(node);
                 ret = true;
             }
         }
@@ -407,5 +409,28 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
     private void handleIncomingHeartbeatMessage(MySensorsMessage msg) {
         logger.debug("I_HEARTBEAT_RESPONSE received from {}.", msg.getNodeId());
         myCon.checkPendingSmartSleepMessage(msg.getNodeId());
+    }
+
+    public void addEventListener(MySensorsGatewayEventListener listener) {
+        myEventRegister.addEventListener(listener);
+
+    }
+
+    public void removeEventListener(MySensorsGatewayEventListener listener) {
+        myEventRegister.removeEventListener(listener);
+
+    }
+
+    public boolean isEventListenerRegisterd(MySensorsGatewayEventListener listener) {
+        return myEventRegister.isEventListenerRegisterd(listener);
+    }
+
+    public void sendMessage(MySensorsMessage message) {
+        if (message.smartSleep) {
+            myCon.addMySensorsOutboundSmartSleepMessage(message);
+        } else {
+            myCon.addMySensorsOutboundMessage(message);
+        }
+
     }
 }

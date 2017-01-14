@@ -33,6 +33,7 @@ public class MySensorsMessage {
     public String oldMsg = ""; // content of the last message send to or received by the node
     public int retries = 0; // number of retries if a message is not acknowledged by the receiver
     public long nextSend = 0; // timestamp when the message should be send
+    public boolean smartSleep = false; // smartsleep message
 
     public MySensorsMessage() {
 
@@ -46,6 +47,15 @@ public class MySensorsMessage {
         this.revert = revert;
     }
 
+    public MySensorsMessage(int nodeId, int childId, int msgType, int ack, boolean revert, boolean smartSleep) {
+        this.nodeId = nodeId;
+        this.childId = childId;
+        this.msgType = msgType;
+        this.ack = ack;
+        this.revert = revert;
+        this.smartSleep = smartSleep;
+    }
+
     public MySensorsMessage(int nodeId, int childId, int msgType, int ack, boolean revert, int subType, String msg) {
         this.nodeId = nodeId;
         this.childId = childId;
@@ -54,6 +64,18 @@ public class MySensorsMessage {
         this.revert = revert;
         this.subType = subType;
         this.msg = msg;
+    }
+
+    public MySensorsMessage(int nodeId, int childId, int msgType, int ack, boolean revert, int subType, String msg,
+            boolean smartSleep) {
+        this.nodeId = nodeId;
+        this.childId = childId;
+        this.msgType = msgType;
+        this.ack = ack;
+        this.revert = revert;
+        this.subType = subType;
+        this.msg = msg;
+        this.smartSleep = smartSleep;
     }
 
     /**
@@ -254,7 +276,7 @@ public class MySensorsMessage {
 
     /**
      * Checks if the received message is a heartbeat(response) received from a node
-     * 
+     *
      * @return true, if it is a heartbeat
      */
     public boolean isHeartbeatResponseMessage() {

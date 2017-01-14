@@ -39,14 +39,14 @@ public class DiscoveryThread implements MySensorsGatewayEventListener {
      * Start the discovery process.
      */
     public void start() {
-        myGateway.getEventRegister().addEventListener(this);
+        myGateway.addEventListener(this);
     }
 
     /**
      * Stop the discovery process.
      */
     public void stop() {
-        myGateway.getEventRegister().removeEventListener(this);
+        myGateway.removeEventListener(this);
     }
 
     @Override

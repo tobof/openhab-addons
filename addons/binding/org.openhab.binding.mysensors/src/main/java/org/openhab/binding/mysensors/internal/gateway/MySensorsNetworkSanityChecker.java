@@ -6,7 +6,9 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.openhab.binding.mysensors.MySensorsBindingConstants;
+import org.openhab.binding.mysensors.internal.event.MySensorsEventRegister;
 import org.openhab.binding.mysensors.internal.event.MySensorsGatewayEventListener;
+import org.openhab.binding.mysensors.internal.protocol.MySensorsAbstractConnection;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +23,8 @@ public class MySensorsNetworkSanityChecker implements MySensorsGatewayEventListe
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
-    private MySensorsGateway myGateway;
+    private MySensorsAbstractConnection myCon;
+    private MySensorsEventRegister myEventRegister;
 
     private static final int SHEDULE_MINUTES_DELAY = 3; // only for test will be: 3
     private static final int MAX_ATTEMPTS_BEFORE_DISCONNECT = 3; // only for test will be: 3
@@ -32,8 +35,9 @@ public class MySensorsNetworkSanityChecker implements MySensorsGatewayEventListe
     private Integer iVersionMessageMissing = 0;
     private boolean iVersionMessageArrived = false;
 
-    public MySensorsNetworkSanityChecker(MySensorsGateway myGateway) {
-        this.myGateway = myGateway;
+    public MySensorsNetworkSanityChecker(MySensorsAbstractConnection myCon, MySensorsEventRegister myEventRegister) {
+        this.myCon = myCon;
+        this.myEventRegister = myEventRegister;
     }
 
     private void reset() {
@@ -84,9 +88,9 @@ public class MySensorsNetworkSanityChecker implements MySensorsGatewayEventListe
 
         try {
 
-            myGateway.getEventRegister().addEventListener(this);
+            myEventRegister.addEventListener(this);
 
-            myGateway.getConnection().addMySensorsOutboundMessage(MySensorsBindingConstants.I_VERSION_MESSAGE);
+            myCon.addMySensorsOutboundMessage(MySensorsBindingConstants.I_VERSION_MESSAGE);
 
             Thread.sleep(3000);
 
@@ -98,7 +102,7 @@ public class MySensorsNetworkSanityChecker implements MySensorsGatewayEventListe
                     if ((MAX_ATTEMPTS_BEFORE_DISCONNECT - iVersionMessageMissing) <= 0) {
                         logger.error("Retry period expired, gateway is down. Disconneting bridge...");
 
-                        myGateway.getConnection().requestDisconnection(true);
+                        myCon.requestDisconnection(true);
 
                     } else {
                         iVersionMessageMissing++;
@@ -114,7 +118,7 @@ public class MySensorsNetworkSanityChecker implements MySensorsGatewayEventListe
         } catch (InterruptedException e) {
             logger.error("interrupted exception in network sanity thread checker");
         } finally {
-            myGateway.getEventRegister().removeEventListener(this);
+            myEventRegister.removeEventListener(this);
         }
     }
 

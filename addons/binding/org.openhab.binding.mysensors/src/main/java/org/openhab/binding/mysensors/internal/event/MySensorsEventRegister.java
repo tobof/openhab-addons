@@ -112,7 +112,7 @@ public class MySensorsEventRegister extends EventRegister<MySensorsGatewayEventL
                 logger.trace("Broadcasting event {} to: {}", variable, listener);
 
                 try {
-                    listener.nodeUpdateEvent(node, child, variable);
+                    listener.channelUpdateEvent(node, child, variable);
                 } catch (Throwable e) {
                     logger.error("Event broadcasting throw an exception", e);
                 }

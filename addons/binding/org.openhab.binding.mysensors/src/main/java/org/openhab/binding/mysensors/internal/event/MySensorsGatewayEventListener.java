@@ -21,7 +21,7 @@ public interface MySensorsGatewayEventListener extends EventListener {
     default public void newNodeDiscovered(MySensorsNode node) throws Throwable {
     }
 
-    default public void nodeUpdateEvent(MySensorsNode node, MySensorsChild child, MySensorsChannel var)
+    default public void channelUpdateEvent(MySensorsNode node, MySensorsChild child, MySensorsChannel var)
             throws Throwable {
     }
 

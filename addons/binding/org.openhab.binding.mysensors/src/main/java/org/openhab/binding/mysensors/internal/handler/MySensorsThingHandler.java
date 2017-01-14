@@ -121,7 +121,7 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
             if (command instanceof StringType) {
                 StringType stringTypeMessage = (StringType) command;
                 MySensorsMessage msg = MySensorsMessage.parse(stringTypeMessage.toString());
-                myGateway.getConnection().addMySensorsOutboundMessage(msg);
+                myGateway.sendMessage(msg);
                 return;
             }
         } else {
@@ -133,7 +133,7 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
 
                 // Create the real message to send
                 MySensorsMessage newMsg = new MySensorsMessage(nodeId, childId, MYSENSORS_MSG_TYPE_SET, int_requestack,
-                        revertState);
+                        revertState, smartSleep);
 
                 newMsg.setSubType(var.getSubtypeValue());
                 newMsg.setMsg(var.getPayloadValue());
@@ -145,11 +145,7 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
                 newMsg.setOldMsg(oldPayload);
                 oldMsgContent.put(subType, msgPayload);
 
-                if (smartSleep) {
-                    myGateway.getConnection().addMySensorsOutboundSmartSleepMessage(newMsg);
-                } else {
-                    myGateway.getConnection().addMySensorsOutboundMessage(newMsg);
-                }
+                myGateway.sendMessage(newMsg);
 
             } else {
                 logger.warn("Variable not found, cannot handle command for thing {}", thing.getUID());
@@ -164,7 +160,7 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
     }
 
     @Override
-    public void nodeUpdateEvent(MySensorsNode node, MySensorsChild child, MySensorsChannel var) {
+    public void channelUpdateEvent(MySensorsNode node, MySensorsChild child, MySensorsChannel var) {
         if (node.getNodeId() == nodeId && child.getChildId() == childId) {
             handleChildUpdateEvent(var);
             updateLastUpdate();
@@ -229,9 +225,9 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
     }
 
     private void registerListeners() {
-        if (!myGateway.getEventRegister().isEventListenerRegisterd(this)) {
+        if (!myGateway.isEventListenerRegisterd(this)) {
             logger.debug("Event listener for node {}-{} not registered yet, registering...", nodeId, childId);
-            myGateway.getEventRegister().addEventListener(this);
+            myGateway.addEventListener(this);
         }
     }
 

@@ -67,7 +67,7 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
         if (myGateway.setup(openhabToMySensorsGatewayConfig(myBridgeConfiguration, getThing().getThingTypeUID()))) {
             myGateway.startup();
 
-            myGateway.getEventRegister().addEventListener(this);
+            myGateway.addEventListener(this);
 
             reloadSensors();
 
