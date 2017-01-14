@@ -49,12 +49,10 @@ public class MySensorsIpConnection extends MySensorsAbstractConnection {
 
                 ret = startReaderWriterThread(mysConReader, mysConWriter);
             } catch (UnknownHostException e) {
-                logger.error("Error while trying to connect to: " + myGatewayConfig.getIpAddress() + ":"
-                        + myGatewayConfig.getTcpPort());
-                e.printStackTrace();
+                logger.error("Error while trying to connect to: {}:{}", myGatewayConfig.getIpAddress(),
+                        myGatewayConfig.getTcpPort(), e);
             } catch (IOException e) {
-                logger.error("Error while trying to connect InputStreamReader");
-                e.printStackTrace();
+                logger.error("Error while trying to connect InputStreamReader", e);
             }
         }
 

@@ -7,6 +7,8 @@
  */
 package org.openhab.binding.mysensors.internal.sensors;
 
+import static org.openhab.binding.mysensors.MySensorsBindingConstants.*;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,17 +24,17 @@ import org.openhab.binding.mysensors.internal.Pair;
 public class MySensorsChild {
 
     private Integer childId = 0;
-    private Map<Pair<Integer>, MySensorsVariable> variableMap = null;
+    private Map<Pair<Integer>, MySensorsChannel> variableMap = null;
 
     private Date lastUpdate = null;
 
     public MySensorsChild(int childId) {
         this.childId = childId;
-        variableMap = new HashMap<Pair<Integer>, MySensorsVariable>();
+        variableMap = new HashMap<Pair<Integer>, MySensorsChannel>();
         lastUpdate = new Date(0);
     }
 
-    public MySensorsChild(int childId, Map<Pair<Integer>, MySensorsVariable> variableMap) throws NullPointerException {
+    public MySensorsChild(int childId, Map<Pair<Integer>, MySensorsChannel> variableMap) throws NullPointerException {
         this.childId = childId;
 
         if (variableMap == null) {
@@ -50,7 +52,7 @@ public class MySensorsChild {
      * @param variableNum the integer of the subtype
      * @return one MySensorsVariable if present, otherwise null
      */
-    public MySensorsVariable getVariable(int messageType, int variableNum) {
+    public MySensorsChannel getVariable(int messageType, int variableNum) {
         synchronized (variableMap) {
             return variableMap.get(new Pair<Integer>(messageType, variableNum));
         }
@@ -94,7 +96,7 @@ public class MySensorsChild {
      * @return true if passed id is valid
      */
     public static boolean isValidChildId(int id) {
-        return (id >= 0 && id < 255);
+        return (id >= MYSENSORS_CHILD_ID_RESERVED_0 && id < MYSENSORS_CHILD_ID_RESERVED_255);
     }
 
     @Override

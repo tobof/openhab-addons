@@ -27,9 +27,9 @@ import org.openhab.binding.mysensors.config.MySensorsSensorConfiguration;
 import org.openhab.binding.mysensors.internal.event.MySensorsGatewayEventListener;
 import org.openhab.binding.mysensors.internal.gateway.MySensorsGateway;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
+import org.openhab.binding.mysensors.internal.sensors.MySensorsChannel;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsNode;
-import org.openhab.binding.mysensors.internal.sensors.MySensorsVariable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -120,7 +120,7 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
                 return;
             }
         } else {
-            MySensorsVariable var = myGateway.getVariable(nodeId, childId, INVERSE_CHANNEL_MAP.get(channelUID.getId()));
+            MySensorsChannel var = myGateway.getVariable(nodeId, childId, INVERSE_CHANNEL_MAP.get(channelUID.getId()));
             if (var != null) {
 
                 // Update value into the MS device
@@ -149,18 +149,13 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
     }
 
     @Override
-    public void handleUpdate(ChannelUID channelUID, org.eclipse.smarthome.core.types.State newState) {
-        // logger.debug("handleUpdate called");
-    }
-
-    @Override
     public void messageReceived(MySensorsMessage message) throws Throwable {
         handleIncomingMessageEvent(message);
 
     }
 
     @Override
-    public void nodeUpdateEvent(MySensorsNode node, MySensorsChild child, MySensorsVariable var) {
+    public void nodeUpdateEvent(MySensorsNode node, MySensorsChild child, MySensorsChannel var) {
         if (node.getNodeId() == nodeId && child.getChildId() == childId) {
             handleChildUpdateEvent(var);
             updateLastUpdate();
@@ -202,7 +197,7 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
         return myBridgeHandler;
     }
 
-    private void handleChildUpdateEvent(MySensorsVariable var) {
+    private void handleChildUpdateEvent(MySensorsChannel var) {
         String channelName = CHANNEL_MAP.get(var.getVariableTypeAndNumber());
         State newState = var.getValue();
         logger.debug("Updating channel: {}({}) value to: {}", channelName, var.getVariableTypeAndNumber(), newState);

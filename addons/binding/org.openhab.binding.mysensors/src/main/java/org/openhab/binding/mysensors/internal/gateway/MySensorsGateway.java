@@ -20,10 +20,12 @@ import org.openhab.binding.mysensors.internal.event.MySensorsEventRegister;
 import org.openhab.binding.mysensors.internal.event.MySensorsGatewayEventListener;
 import org.openhab.binding.mysensors.internal.exception.NoMoreIdsException;
 import org.openhab.binding.mysensors.internal.protocol.MySensorsAbstractConnection;
+import org.openhab.binding.mysensors.internal.protocol.ip.MySensorsIpConnection;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
+import org.openhab.binding.mysensors.internal.protocol.serial.MySensorsSerialConnection;
+import org.openhab.binding.mysensors.internal.sensors.MySensorsChannel;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsNode;
-import org.openhab.binding.mysensors.internal.sensors.MySensorsVariable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,20 +49,45 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
 
     private MySensorsNetworkSanityChecker myNetSanCheck;
 
-    public MySensorsGateway(MySensorsGatewayConfig myConf) {
+    public MySensorsGateway() {
         nodeMap = new HashMap<>();
-        this.myConf = myConf;
         this.myEventRegister = new MySensorsEventRegister();
     }
 
-    public MySensorsGateway(MySensorsGatewayConfig myConf, Map<Integer, MySensorsNode> nodeMap) {
+    public MySensorsGateway(Map<Integer, MySensorsNode> nodeMap) {
         this.nodeMap = nodeMap;
-        this.myConf = myConf;
         this.myEventRegister = new MySensorsEventRegister();
+    }
+
+    public boolean setup(MySensorsGatewayConfig myConf) {
+        boolean ret = false;
+
+        if (myConf != null) {
+            if (myCon != null) {
+                throw new IllegalStateException("Connection is walredy instantiated");
+            }
+
+            this.myConf = myConf;
+
+            switch (myConf.getGatewayType()) {
+                case SERIAL:
+                    myCon = new MySensorsSerialConnection(myConf, myEventRegister);
+                    ret = true;
+                    break;
+                case IP:
+                    myCon = new MySensorsIpConnection(myConf, myEventRegister);
+                    ret = true;
+                    break;
+            }
+        }
+
+        return ret;
     }
 
     public void startup() {
+
         myCon.initialize();
+
         myEventRegister.addEventListener(this);
 
         if (myConf.getEnableNetworkSanCheck()) {
@@ -75,7 +102,10 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
             myNetSanCheck.stop();
         }
 
-        myCon.destroy();
+        if (myCon != null) {
+            myCon.destroy();
+            myCon = null;
+        }
     }
 
     public MySensorsNode getNode(int nodeId) {
@@ -94,12 +124,12 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
         return ret;
     }
 
-    public MySensorsVariable getVariable(int nodeId, int childId, Pair<Integer> typeSubType) {
+    public MySensorsChannel getVariable(int nodeId, int childId, Pair<Integer> typeSubType) {
         return getVariable(nodeId, childId, typeSubType.getFirst(), typeSubType.getSecond());
     }
 
-    public MySensorsVariable getVariable(int nodeId, int childId, int messageType, int varNumber) {
-        MySensorsVariable ret = null;
+    public MySensorsChannel getVariable(int nodeId, int childId, int messageType, int varNumber) {
+        MySensorsChannel ret = null;
         MySensorsChild child = getChild(nodeId, childId);
         if (child != null) {
             ret = child.getVariable(messageType, varNumber);
@@ -179,7 +209,7 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
 
         synchronized (nodeMap) {
             List<Integer> takenIds = getGivenIds();
-            while (newId < 255) {
+            while (newId < MYSENSORS_NODE_ID_RESERVED_255) {
                 if (!takenIds.contains(newId)) {
                     addNode(new MySensorsNode(newId));
                     break;
@@ -189,7 +219,7 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
             }
         }
 
-        if (newId == 255) {
+        if (newId == MYSENSORS_NODE_ID_RESERVED_255) {
             throw new NoMoreIdsException();
         }
 
@@ -264,7 +294,7 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
 
                     child.setLastUpdate(new Date());
 
-                    MySensorsVariable variable = child.getVariable(msg.msgType, msg.subType);
+                    MySensorsChannel variable = child.getVariable(msg.msgType, msg.subType);
                     if (variable != null) {
                         variable.setValue(msg);
                         getEventRegister().notifyNodeUpdateEvent(node, child, variable);
@@ -354,7 +384,9 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
         try {
             newId = reserveId();
             logger.info("New Node in the MySensors network has requested an ID. ID is: {}", newId);
-            MySensorsMessage newMsg = new MySensorsMessage(255, 255, 3, 0, false, 4, newId + "");
+            MySensorsMessage newMsg = new MySensorsMessage(MYSENSORS_NODE_ID_RESERVED_255,
+                    MYSENSORS_NODE_ID_RESERVED_255, MYSENSORS_MSG_TYPE_INTERNAL, MYSENSORS_ACK_FALSE, false, 4,
+                    newId + "");
             myCon.addMySensorsOutboundMessage(newMsg);
         } catch (NoMoreIdsException e) {
             logger.error("No more IDs available for this node, you could try cleaning cache file");

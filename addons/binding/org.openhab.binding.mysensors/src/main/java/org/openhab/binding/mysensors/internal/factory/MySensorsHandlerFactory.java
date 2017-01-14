@@ -24,7 +24,6 @@ import org.openhab.binding.mysensors.discovery.MySensorsDiscoveryService;
 import org.openhab.binding.mysensors.internal.handler.MySensorsBridgeHandler;
 import org.openhab.binding.mysensors.internal.handler.MySensorsThingHandler;
 import org.osgi.framework.ServiceRegistration;
-import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,11 +39,6 @@ public class MySensorsHandlerFactory extends BaseThingHandlerFactory {
 
     // Discovery services
     private Map<ThingUID, ServiceRegistration<?>> discoveryServiceRegs = new HashMap<>();
-
-    @Override
-    protected void activate(ComponentContext componentContext) {
-        super.activate(componentContext);
-    }
 
     @Override
     public boolean supportsThingType(ThingTypeUID thingTypeUID) {

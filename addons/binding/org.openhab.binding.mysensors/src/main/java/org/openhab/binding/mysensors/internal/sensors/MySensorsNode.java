@@ -7,6 +7,7 @@
  */
 package org.openhab.binding.mysensors.internal.sensors;
 
+import static org.openhab.binding.mysensors.MySensorsBindingConstants.*;
 import static org.openhab.binding.mysensors.internal.MySensorsUtility.mergeMap;
 
 import java.util.Date;
@@ -96,7 +97,7 @@ public class MySensorsNode {
     }
 
     public static boolean isValidNodeId(int id) {
-        return (id > 0 && id < 255);
+        return (id > MYSENSORS_NODE_ID_RESERVED_0 && id < MYSENSORS_NODE_ID_RESERVED_255);
     }
 
     public static boolean isValidNode(MySensorsNode n) {

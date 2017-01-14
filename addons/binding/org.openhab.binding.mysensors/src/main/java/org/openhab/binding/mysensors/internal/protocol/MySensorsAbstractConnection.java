@@ -10,6 +10,7 @@ package org.openhab.binding.mysensors.internal.protocol;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Iterator;
@@ -278,14 +279,12 @@ public abstract class MySensorsAbstractConnection implements Runnable, MySensors
         if (iterator != null) {
             while (iterator.hasNext()) {
                 MySensorsMessage msgInQueue = iterator.next();
-                // logger.debug("Msg in Queue: " + msgInQueue.getDebugInfo());
                 if (msgInQueue.getNodeId() == msg.getNodeId() && msgInQueue.getChildId() == msg.getChildId()
                         && msgInQueue.getMsgType() == msg.getMsgType() && msgInQueue.getSubType() == msg.getSubType()
                         && msgInQueue.getAck() == msg.getAck() && msgInQueue.getMsg().equals(msg.getMsg())) {
                     iterator.remove();
-                    // logger.debug("Message removed: " + msg.getDebugInfo());
                 } else {
-                    logger.debug("Message NOT removed: " + msg.getDebugInfo());
+                    logger.debug("Message NOT removed: {}", msg.getDebugInfo());
                 }
             }
         }
@@ -321,7 +320,7 @@ public abstract class MySensorsAbstractConnection implements Runnable, MySensors
      * @param flag true if the connection should be stopped.
      */
     public void requestDisconnection(boolean flag) {
-        logger.debug("Request disconnection flag setted to: " + flag);
+        logger.debug("Request disconnection flag setted to: {}", flag);
         requestDisconnection = flag;
     }
 
@@ -365,6 +364,7 @@ public abstract class MySensorsAbstractConnection implements Runnable, MySensors
 
         public MySensorsReader(InputStream inStream) {
             this.inStream = inStream;
+            this.reads = new BufferedReader(new InputStreamReader(inStream));
         }
 
         /**
@@ -402,7 +402,7 @@ public abstract class MySensorsAbstractConnection implements Runnable, MySensors
                         myEventRegister.notifyMessageReceived(msg);
                     }
                 } catch (Exception e) {
-                    logger.error("({}) on reading from connection, message: {}", e, getClass(), e.getMessage());
+                    logger.error("Exception on reading from connection", e);
                 }
 
             }
@@ -469,6 +469,7 @@ public abstract class MySensorsAbstractConnection implements Runnable, MySensors
 
         public MySensorsWriter(OutputStream outStream) {
             this.outStream = outStream;
+            this.outs = new PrintWriter(outStream);
         }
 
         /**
@@ -501,7 +502,7 @@ public abstract class MySensorsAbstractConnection implements Runnable, MySensors
                                                         - 1]);
                                         addMySensorsOutboundMessage(msg);
                                     } else {
-                                        logger.warn("NO ACK from nodeId: " + msg.getNodeId());
+                                        logger.warn("NO ACK from nodeId: {}", msg.getNodeId());
                                         if (msg.getOldMsg().isEmpty()) {
                                             logger.debug("No old status know to revert to!");
                                         } else if (msg.getRevert()) {

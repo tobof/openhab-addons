@@ -62,14 +62,20 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
 
         myBridgeConfiguration = getConfigAs(MySensorsBridgeConfiguration.class);
 
-        myGateway = new MySensorsGateway(
-                openhabToMySensorsGatewayConfig(myBridgeConfiguration, getThing().getThingTypeUID()), loadCacheFile());
+        myGateway = new MySensorsGateway(loadCacheFile());
 
-        myGateway.startup();
+        if (myGateway.setup(openhabToMySensorsGatewayConfig(myBridgeConfiguration, getThing().getThingTypeUID()))) {
+            myGateway.startup();
 
-        reloadSensors();
+            myGateway.getEventRegister().addEventListener(this);
 
-        logger.debug("Initialization of the MySensors bridge DONE!");
+            reloadSensors();
+
+            logger.debug("Initialization of the MySensors bridge DONE!");
+        } else {
+            logger.error("Failed to initialize MySensors bridge");
+        }
+
     }
 
     @Override
@@ -115,12 +121,32 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
             updateStatus(ThingStatus.OFFLINE);
         }
 
+        updateCacheFile();
+    }
+
+    @Override
+    public void nodeIdReservationDone(Integer reservedId) throws Throwable {
+        updateCacheFile();
+    }
+
+    @Override
+    public void newNodeDiscovered(MySensorsNode message) throws Throwable {
+        updateCacheFile();
     }
 
     @Override
     public void handleConfigurationUpdate(Map<String, Object> configurationParameters) {
         logger.debug("Configuation update for bridge: {}", configurationParameters);
         super.handleConfigurationUpdate(configurationParameters);
+    }
+
+    private void updateCacheFile() {
+        MySensorsCacheFactory cacheFactory = MySensorsCacheFactory.getCacheFactory();
+
+        List<Integer> givenIds = myGateway.getGivenIds();
+
+        cacheFactory.writeCache(MySensorsCacheFactory.GIVEN_IDS_CACHE_FILE, givenIds.toArray(new Integer[] {}),
+                Integer[].class);
     }
 
     private Map<Integer, MySensorsNode> loadCacheFile() {
@@ -154,7 +180,7 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
         }
     }
 
-    private static MySensorsGatewayConfig openhabToMySensorsGatewayConfig(MySensorsBridgeConfiguration conf,
+    private MySensorsGatewayConfig openhabToMySensorsGatewayConfig(MySensorsBridgeConfiguration conf,
             ThingTypeUID bridgeuid) {
         MySensorsGatewayConfig ret = new MySensorsGatewayConfig();
 

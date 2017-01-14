@@ -53,6 +53,10 @@ public class MySensorsBindingConstants {
     public static final int MYSENSORS_MSG_TYPE_INTERNAL = 3;
     public static final int MYSENSORS_MSG_TYPE_STREAM = 4;
 
+    // NO ACK
+    public static final int MYSENSORS_ACK_TRUE = 1;
+    public static final int MYSENSORS_ACK_FALSE = 0;
+
     // Subtypes for presentation
     public static final int MYSENSORS_SUBTYPE_S_DOOR = 0;
     public static final int MYSENSORS_SUBTYPE_S_MOTION = 1;

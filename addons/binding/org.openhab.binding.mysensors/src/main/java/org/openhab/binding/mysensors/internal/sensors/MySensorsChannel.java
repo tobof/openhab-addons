@@ -7,7 +7,7 @@ import org.openhab.binding.mysensors.internal.Pair;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
 import org.openhab.binding.mysensors.internal.sensors.type.MySensorsType;
 
-public class MySensorsVariable {
+public class MySensorsChannel {
 
     private Pair<Integer> variableTypeAndNumber;
 
@@ -15,11 +15,10 @@ public class MySensorsVariable {
 
     private MySensorsType type;
 
-    public MySensorsVariable(Pair<Integer> variableTypeAndNumber, MySensorsType type) {
+    public MySensorsChannel(Pair<Integer> variableTypeAndNumber, MySensorsType type) {
         setValue(UnDefType.UNDEF);
         setType(type);
         setVariableTypeAndNumber(variableTypeAndNumber);
-
     }
 
     public synchronized String getPayloadValue() {
@@ -91,7 +90,7 @@ public class MySensorsVariable {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        MySensorsVariable other = (MySensorsVariable) obj;
+        MySensorsChannel other = (MySensorsChannel) obj;
         if (type == null) {
             if (other.type != null) {
                 return false;
