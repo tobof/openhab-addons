@@ -300,7 +300,7 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
     public void addEventListener(MySensorsUpdateListener listener) {
         synchronized (updateListeners) {
             if (!updateListeners.contains(listener)) {
-                logger.trace("Adding listener: " + listener);
+                logger.trace("Adding listener: {}", listener);
                 updateListeners.add(listener);
             }
         }
@@ -314,7 +314,7 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
     public void removeEventListener(MySensorsUpdateListener listener) {
         synchronized (updateListeners) {
             if (updateListeners.contains(listener)) {
-                logger.trace("Removing listener: " + listener);
+                logger.trace("Removing listener: {}", listener);
                 updateListeners.remove(listener);
             }
         }
@@ -337,7 +337,7 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
     public void broadCastEvent(MySensorsStatusUpdateEvent event) {
         synchronized (updateListeners) {
             for (MySensorsUpdateListener mySensorsEventListener : updateListeners) {
-                logger.trace("Broadcasting event to: " + mySensorsEventListener);
+                logger.trace("Broadcasting event to: {}", mySensorsEventListener);
                 mySensorsEventListener.statusUpdateReceived(event);
             }
         }
@@ -356,14 +356,12 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
         if (iterator != null) {
             while (iterator.hasNext()) {
                 MySensorsMessage msgInQueue = iterator.next();
-                // logger.debug("Msg in Queue: " + msgInQueue.getDebugInfo());
                 if (msgInQueue.getNodeId() == msg.getNodeId() && msgInQueue.getChildId() == msg.getChildId()
                         && msgInQueue.getMsgType() == msg.getMsgType() && msgInQueue.getSubType() == msg.getSubType()
                         && msgInQueue.getAck() == msg.getAck() && msgInQueue.getMsg().equals(msg.getMsg())) {
                     iterator.remove();
-                    // logger.debug("Message removed: " + msg.getDebugInfo());
                 } else {
-                    logger.debug("Message NOT removed: " + msg.getDebugInfo());
+                    logger.debug("Message NOT removed: {}", msg.getDebugInfo());
                 }
             }
         }
@@ -399,7 +397,7 @@ public abstract class MySensorsBridgeConnection implements Runnable, MySensorsUp
      * @param flag true if the connection should be stopped.
      */
     public void requestDisconnection(boolean flag) {
-        logger.debug("Request disconnection flag setted to: " + flag);
+        logger.debug("Request disconnection flag setted to: {}", flag);
         requestDisconnection = flag;
     }
 

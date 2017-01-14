@@ -7,6 +7,8 @@
  */
 package org.openhab.binding.mysensors.internal.sensors;
 
+import static org.openhab.binding.mysensors.MySensorsBindingConstants.*;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -102,7 +104,7 @@ public class MySensorsDeviceManager implements MySensorsUpdateListener {
         Set<Integer> takenIds = getGivenIds();
 
         synchronized (takenIds) {
-            while (newId < 255) {
+            while (newId < MYSENSORS_NODE_ID_RESERVED_255) {
                 if (!takenIds.contains(newId)) {
                     nodeMap.put(newId, null);
                     break;
@@ -112,7 +114,7 @@ public class MySensorsDeviceManager implements MySensorsUpdateListener {
             }
         }
 
-        if (newId == 255) {
+        if (newId == MYSENSORS_NODE_ID_RESERVED_255) {
             throw new NoMoreIdsException();
         }
 
@@ -146,7 +148,7 @@ public class MySensorsDeviceManager implements MySensorsUpdateListener {
     private void checkNodeFound(MySensorsMessage msg) {
         MySensorsNode node = null;
         synchronized (nodeMap) {
-            if (msg.nodeId != 0 && msg.nodeId != 255) {
+            if (msg.nodeId != MYSENSORS_NODE_ID_RESERVED_0 && msg.nodeId != MYSENSORS_NODE_ID_RESERVED_255) {
                 if (nodeMap.containsKey(msg.nodeId) && (nodeMap.get(msg.nodeId) == null)
                         || (!nodeMap.containsKey(msg.nodeId))) {
                     logger.debug("Node {} found!", msg.getNodeId());
@@ -172,7 +174,7 @@ public class MySensorsDeviceManager implements MySensorsUpdateListener {
     @SuppressWarnings("unused")
     private void checkChildFound(MySensorsMessage msg) {
         synchronized (nodeMap) {
-            if (msg.childId != 255 && !nodeMap.containsKey(msg.childId)) {
+            if (msg.childId != MYSENSORS_NODE_ID_RESERVED_255 && !nodeMap.containsKey(msg.childId)) {
                 logger.debug("New child {} for node {} found!", msg.getChildId(), msg.getNodeId());
 
                 MySensorsChild<?> child = new MySensorsChild<Void>(msg.childId, null);
@@ -207,7 +209,9 @@ public class MySensorsDeviceManager implements MySensorsUpdateListener {
         int newId = 0;
         try {
             newId = reserveId();
-            MySensorsMessage newMsg = new MySensorsMessage(255, 255, 3, 0, false, 4, newId + "");
+            MySensorsMessage newMsg = new MySensorsMessage(MYSENSORS_NODE_ID_RESERVED_255,
+                    MYSENSORS_NODE_ID_RESERVED_255, MYSENSORS_MSG_TYPE_INTERNAL, MYSENSORS_ACK_FALSE, false, 4,
+                    newId + "");
             myCon.addMySensorsOutboundMessage(newMsg);
             logger.info("New Node in the MySensors network has requested an ID. ID is: {}", newId);
         } catch (NoMoreIdsException e) {

@@ -44,6 +44,10 @@ public class MySensorsBindingConstants {
     public static final int MYSENSORS_MSG_TYPE_INTERNAL = 3;
     public static final int MYSENSORS_MSG_TYPE_STREAM = 4;
 
+    // NO ACK
+    public static final int MYSENSORS_ACK_TRUE = 1;
+    public static final int MYSENSORS_ACK_FALSE = 0;
+
     // Subtypes for presentation
     public static final int MYSENSORS_SUBTYPE_S_DOOR = 0;
     public static final int MYSENSORS_SUBTYPE_S_MOTION = 1;
@@ -293,9 +297,7 @@ public class MySensorsBindingConstants {
      * Mapping MySensors subtypes to channels.
      */
     public final static Map<Number, String> CHANNEL_MAP = new HashMap<Number, String>() {
-        /**
-         *
-         */
+
         private static final long serialVersionUID = -7970323220036599380L;
 
         {
@@ -362,9 +364,7 @@ public class MySensorsBindingConstants {
      * Mapping MySensors internal messages to channels.
      */
     public final static Map<Number, String> CHANNEL_MAP_INTERNAL = new HashMap<Number, String>() {
-        /**
-         *
-         */
+
         private static final long serialVersionUID = 6273187523631143905L;
 
         {

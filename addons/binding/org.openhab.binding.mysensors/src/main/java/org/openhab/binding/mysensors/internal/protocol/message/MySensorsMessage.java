@@ -149,7 +149,7 @@ public class MySensorsMessage {
 
         if (childId == MYSENSORS_NODE_ID_RESERVED_0 || childId == MYSENSORS_CHILD_ID_RESERVED_255) {
             if (msgType == MYSENSORS_MSG_TYPE_INTERNAL) {
-                if (ack == 0) {
+                if (ack == MYSENSORS_ACK_FALSE) {
                     if (subType == MYSENSORS_SUBTYPE_I_CONFIG) {
                         ret = true;
                     }
@@ -168,10 +168,10 @@ public class MySensorsMessage {
     public boolean isIVersionMessage() {
         boolean ret = false;
 
-        if (nodeId == 0) {
-            if (childId == MYSENSORS_NODE_ID_RESERVED_0 || childId == MYSENSORS_CHILD_ID_RESERVED_255) {
+        if (nodeId == MYSENSORS_CHILD_ID_RESERVED_0) {
+            if (childId == MYSENSORS_CHILD_ID_RESERVED_0 || childId == MYSENSORS_CHILD_ID_RESERVED_255) {
                 if (msgType == MYSENSORS_MSG_TYPE_INTERNAL) {
-                    if (ack == 0) {
+                    if (ack == MYSENSORS_ACK_FALSE) {
                         if (subType == MYSENSORS_SUBTYPE_I_VERSION) {
                             ret = true;
                         }
@@ -191,9 +191,9 @@ public class MySensorsMessage {
     public boolean isITimeMessage() {
         boolean ret = false;
 
-        if (childId == MYSENSORS_NODE_ID_RESERVED_0 || childId == MYSENSORS_CHILD_ID_RESERVED_255) {
+        if (childId == MYSENSORS_CHILD_ID_RESERVED_0 || childId == MYSENSORS_CHILD_ID_RESERVED_255) {
             if (msgType == MYSENSORS_MSG_TYPE_INTERNAL) {
-                if (ack == 0) {
+                if (ack == MYSENSORS_ACK_FALSE) {
                     if (subType == MYSENSORS_SUBTYPE_I_TIME) {
                         ret = true;
                     }
@@ -215,7 +215,7 @@ public class MySensorsMessage {
         if (nodeId == MYSENSORS_NODE_ID_RESERVED_255) {
             if (childId == MYSENSORS_CHILD_ID_RESERVED_255) {
                 if (msgType == MYSENSORS_SUBTYPE_I_ID_REQUEST) {
-                    if (ack == 0) {
+                    if (ack == MYSENSORS_ACK_FALSE) {
                         if (subType == MYSENSORS_MSG_TYPE_INTERNAL) {
                             ret = true;
                         }

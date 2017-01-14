@@ -59,7 +59,7 @@ public class MySensorsIpConnection extends MySensorsBridgeConnection {
 
                 ret = startReaderWriterThread(mysConReader, mysConWriter);
             } catch (UnknownHostException e) {
-                logger.error("Error while trying to connect to: " + ipAddress + ":" + tcpPort);
+                logger.error("Error while trying to connect to: {}:{}", ipAddress, tcpPort);
                 e.printStackTrace();
             } catch (IOException e) {
                 logger.error("Error while trying to connect InputStreamReader");
