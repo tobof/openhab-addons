@@ -23,9 +23,9 @@ import org.openhab.binding.mysensors.internal.protocol.MySensorsAbstractConnecti
 import org.openhab.binding.mysensors.internal.protocol.ip.MySensorsIpConnection;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
 import org.openhab.binding.mysensors.internal.protocol.serial.MySensorsSerialConnection;
-import org.openhab.binding.mysensors.internal.sensors.MySensorsChannel;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsNode;
+import org.openhab.binding.mysensors.internal.sensors.MySensorsVariable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,6 +79,8 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
                     ret = true;
                     break;
             }
+        } else {
+            logger.error("Invalid configuration supplied: {}", myConf);
         }
 
         return ret;
@@ -124,12 +126,12 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
         return ret;
     }
 
-    public MySensorsChannel getVariable(int nodeId, int childId, Pair<Integer> typeSubType) {
+    public MySensorsVariable getVariable(int nodeId, int childId, Pair<Integer> typeSubType) {
         return getVariable(nodeId, childId, typeSubType.getFirst(), typeSubType.getSecond());
     }
 
-    public MySensorsChannel getVariable(int nodeId, int childId, int messageType, int varNumber) {
-        MySensorsChannel ret = null;
+    public MySensorsVariable getVariable(int nodeId, int childId, int messageType, int varNumber) {
+        MySensorsVariable ret = null;
         MySensorsChild child = getChild(nodeId, childId);
         if (child != null) {
             ret = child.getVariable(messageType, varNumber);
@@ -228,6 +230,29 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
         return newId;
     }
 
+    public void addEventListener(MySensorsGatewayEventListener listener) {
+        myEventRegister.addEventListener(listener);
+
+    }
+
+    public void removeEventListener(MySensorsGatewayEventListener listener) {
+        myEventRegister.removeEventListener(listener);
+
+    }
+
+    public boolean isEventListenerRegisterd(MySensorsGatewayEventListener listener) {
+        return myEventRegister.isEventListenerRegisterd(listener);
+    }
+
+    public void sendMessage(MySensorsMessage message) {
+        if (message.smartSleep) {
+            myCon.addMySensorsOutboundSmartSleepMessage(message);
+        } else {
+            myCon.addMySensorsOutboundMessage(message);
+        }
+
+    }
+
     @Override
     public void messageReceived(MySensorsMessage message) throws Throwable {
         if (!handleIncomingMessage(message)) {
@@ -296,9 +321,10 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
 
                     child.setLastUpdate(new Date());
 
-                    MySensorsChannel variable = child.getVariable(msg.msgType, msg.subType);
+                    MySensorsVariable variable = child.getVariable(msg.msgType, msg.subType);
                     if (variable != null) {
                         variable.setValue(msg);
+                        variable.setLastUpdate(new Date());
                         myEventRegister.notifyNodeUpdateEvent(node, child, variable);
                         ret = true;
                     } else {
@@ -310,6 +336,9 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
                 }
             } else {
                 logger.debug("Node {} not present, send new node discovered event", msg.nodeId);
+
+                // TODO Detect if message is Presentation, if yes create not only the node but all the hierarchy
+                // associated
 
                 node = new MySensorsNode(msg.nodeId);
                 addNode(node);
@@ -411,26 +440,4 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
         myCon.checkPendingSmartSleepMessage(msg.getNodeId());
     }
 
-    public void addEventListener(MySensorsGatewayEventListener listener) {
-        myEventRegister.addEventListener(listener);
-
-    }
-
-    public void removeEventListener(MySensorsGatewayEventListener listener) {
-        myEventRegister.removeEventListener(listener);
-
-    }
-
-    public boolean isEventListenerRegisterd(MySensorsGatewayEventListener listener) {
-        return myEventRegister.isEventListenerRegisterd(listener);
-    }
-
-    public void sendMessage(MySensorsMessage message) {
-        if (message.smartSleep) {
-            myCon.addMySensorsOutboundSmartSleepMessage(message);
-        } else {
-            myCon.addMySensorsOutboundMessage(message);
-        }
-
-    }
 }

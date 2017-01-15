@@ -5,7 +5,7 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package org.openhab.binding.mysensors.internal.handler;
+package org.openhab.binding.mysensors.handler;
 
 import static org.openhab.binding.mysensors.MySensorsBindingConstants.*;
 
@@ -23,13 +23,15 @@ import org.eclipse.smarthome.core.thing.binding.BaseThingHandler;
 import org.eclipse.smarthome.core.types.Command;
 import org.eclipse.smarthome.core.types.RefreshType;
 import org.eclipse.smarthome.core.types.State;
+import org.openhab.binding.mysensors.adapter.MySensorsTypeAdapter;
 import org.openhab.binding.mysensors.config.MySensorsSensorConfiguration;
+import org.openhab.binding.mysensors.internal.Pair;
 import org.openhab.binding.mysensors.internal.event.MySensorsGatewayEventListener;
 import org.openhab.binding.mysensors.internal.gateway.MySensorsGateway;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
-import org.openhab.binding.mysensors.internal.sensors.MySensorsChannel;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsNode;
+import org.openhab.binding.mysensors.internal.sensors.MySensorsVariable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -125,18 +127,18 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
                 return;
             }
         } else {
-            MySensorsChannel var = myGateway.getVariable(nodeId, childId, INVERSE_CHANNEL_MAP.get(channelUID.getId()));
+            MySensorsVariable var = myGateway.getVariable(nodeId, childId, INVERSE_CHANNEL_MAP.get(channelUID.getId()));
             if (var != null) {
 
                 // Update value into the MS device
-                var.setValue(command);
+                var.setValue(loadAdapterForChannel(channelUID.getId()).fromCommand(command));
 
                 // Create the real message to send
                 MySensorsMessage newMsg = new MySensorsMessage(nodeId, childId, MYSENSORS_MSG_TYPE_SET, int_requestack,
                         revertState, smartSleep);
 
-                newMsg.setSubType(var.getSubtypeValue());
-                newMsg.setMsg(var.getPayloadValue());
+                newMsg.setSubType(var.getType());
+                newMsg.setMsg(var.getValue());
 
                 String oldPayload = oldMsgContent.get(subType);
                 if (oldPayload == null) {
@@ -160,7 +162,7 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
     }
 
     @Override
-    public void channelUpdateEvent(MySensorsNode node, MySensorsChild child, MySensorsChannel var) {
+    public void channelUpdateEvent(MySensorsNode node, MySensorsChild child, MySensorsVariable var) {
         if (node.getNodeId() == nodeId && child.getChildId() == childId) {
             handleChildUpdateEvent(var);
             updateLastUpdate();
@@ -202,11 +204,21 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
         return myBridgeHandler;
     }
 
-    private void handleChildUpdateEvent(MySensorsChannel var) {
-        String channelName = CHANNEL_MAP.get(var.getVariableTypeAndNumber());
-        State newState = var.getValue();
-        logger.debug("Updating channel: {}({}) value to: {}", channelName, var.getVariableTypeAndNumber(), newState);
+    private void handleChildUpdateEvent(MySensorsVariable var) {
+        Pair<Integer> commandAndType = Pair.of(var.getCommand(), var.getType());
+        String channelName = CHANNEL_MAP.get(commandAndType);
+        State newState = loadAdapterForChannel(channelName).stateFromChannel(var);
+        logger.debug("Updating channel: {}({}) value to: {}", channelName, commandAndType, newState);
         updateState(channelName, newState);
+
+    }
+
+    private MySensorsTypeAdapter loadAdapterForChannel(String channelName) {
+        try {
+            return TYPE_MAP.get(channelName).newInstance();
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     /**

@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.openhab.binding.mysensors.internal.protocol.MySensorsAbstractConnection;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
-import org.openhab.binding.mysensors.internal.sensors.MySensorsChannel;
+import org.openhab.binding.mysensors.internal.sensors.MySensorsVariable;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsNode;
 import org.slf4j.Logger;
@@ -106,7 +106,7 @@ public class MySensorsEventRegister extends EventRegister<MySensorsGatewayEventL
         }
     }
 
-    public void notifyNodeUpdateEvent(MySensorsNode node, MySensorsChild child, MySensorsChannel variable) {
+    public void notifyNodeUpdateEvent(MySensorsNode node, MySensorsChild child, MySensorsVariable variable) {
         synchronized (eventRegister.getEventListeners()) {
             for (MySensorsGatewayEventListener listener : eventRegister.getEventListeners()) {
                 logger.trace("Broadcasting event {} to: {}", variable, listener);

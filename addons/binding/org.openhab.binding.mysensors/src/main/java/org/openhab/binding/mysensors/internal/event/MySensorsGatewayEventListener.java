@@ -4,9 +4,9 @@ import java.util.EventListener;
 
 import org.openhab.binding.mysensors.internal.protocol.MySensorsAbstractConnection;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
+import org.openhab.binding.mysensors.internal.sensors.MySensorsVariable;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsNode;
-import org.openhab.binding.mysensors.internal.sensors.MySensorsChannel;
 
 /**
  * Handler that implement this interface receive update events from the MySensors network.
@@ -21,7 +21,7 @@ public interface MySensorsGatewayEventListener extends EventListener {
     default public void newNodeDiscovered(MySensorsNode node) throws Throwable {
     }
 
-    default public void channelUpdateEvent(MySensorsNode node, MySensorsChild child, MySensorsChannel var)
+    default public void channelUpdateEvent(MySensorsNode node, MySensorsChild child, MySensorsVariable var)
             throws Throwable {
     }
 

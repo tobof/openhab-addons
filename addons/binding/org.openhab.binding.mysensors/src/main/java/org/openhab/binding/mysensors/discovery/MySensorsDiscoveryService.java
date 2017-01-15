@@ -17,7 +17,7 @@ import org.eclipse.smarthome.config.discovery.DiscoveryResult;
 import org.eclipse.smarthome.config.discovery.DiscoveryResultBuilder;
 import org.eclipse.smarthome.core.thing.ThingTypeUID;
 import org.eclipse.smarthome.core.thing.ThingUID;
-import org.openhab.binding.mysensors.internal.handler.MySensorsBridgeHandler;
+import org.openhab.binding.mysensors.handler.MySensorsBridgeHandler;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

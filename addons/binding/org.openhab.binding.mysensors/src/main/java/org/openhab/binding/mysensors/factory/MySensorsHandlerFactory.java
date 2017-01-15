@@ -5,7 +5,7 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package org.openhab.binding.mysensors.internal.factory;
+package org.openhab.binding.mysensors.factory;
 
 import static org.openhab.binding.mysensors.MySensorsBindingConstants.*;
 
@@ -21,8 +21,8 @@ import org.eclipse.smarthome.core.thing.ThingUID;
 import org.eclipse.smarthome.core.thing.binding.BaseThingHandlerFactory;
 import org.eclipse.smarthome.core.thing.binding.ThingHandler;
 import org.openhab.binding.mysensors.discovery.MySensorsDiscoveryService;
-import org.openhab.binding.mysensors.internal.handler.MySensorsBridgeHandler;
-import org.openhab.binding.mysensors.internal.handler.MySensorsThingHandler;
+import org.openhab.binding.mysensors.handler.MySensorsBridgeHandler;
+import org.openhab.binding.mysensors.handler.MySensorsThingHandler;
 import org.osgi.framework.ServiceRegistration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

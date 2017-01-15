@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.openhab.binding.mysensors.internal.factory.MySensorsCacheFactory;
+import org.openhab.binding.mysensors.factory.MySensorsCacheFactory;
 
 import com.google.gson.reflect.TypeToken;
 

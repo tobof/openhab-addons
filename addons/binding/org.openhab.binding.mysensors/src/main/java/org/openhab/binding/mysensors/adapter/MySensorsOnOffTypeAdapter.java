@@ -1,10 +1,10 @@
-package org.openhab.binding.mysensors.internal.sensors.type;
+package org.openhab.binding.mysensors.adapter;
 
 import org.eclipse.smarthome.core.library.types.OnOffType;
 import org.eclipse.smarthome.core.types.Command;
 import org.eclipse.smarthome.core.types.State;
 
-public class MySensorsOnOffType implements MySensorsType {
+public class MySensorsOnOffTypeAdapter implements MySensorsTypeAdapter {
 
     @Override
     public State fromString(String s) {
@@ -18,28 +18,17 @@ public class MySensorsOnOffType implements MySensorsType {
     }
 
     @Override
-    public State fromCommand(Command value) {
+    public String fromCommand(Command value) {
         if (value instanceof OnOffType) {
             if (value == OnOffType.OFF) {
-                return OnOffType.OFF;
+                return "0";
             } else if (value == OnOffType.ON) {
-                return OnOffType.ON;
+                return "1";
             } else {
                 throw new IllegalArgumentException("Passed command is not On/Off");
             }
         } else {
             throw new IllegalArgumentException("Passed command: " + value + " is not an OnOff command");
-        }
-    }
-
-    @Override
-    public String toPayloadString(State state) {
-        if (state == OnOffType.OFF) {
-            return "0";
-        } else if (state == OnOffType.ON) {
-            return "1";
-        } else {
-            throw new IllegalArgumentException("State: " + state + ", could not be converted to string");
         }
     }
 

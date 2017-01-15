@@ -1,10 +1,10 @@
-package org.openhab.binding.mysensors.internal.sensors.type;
+package org.openhab.binding.mysensors.adapter;
 
 import org.eclipse.smarthome.core.library.types.DecimalType;
 import org.eclipse.smarthome.core.library.types.PercentType;
 import org.eclipse.smarthome.core.types.State;
 
-public class MySensorsPercentType extends DecimalType implements MySensorsType {
+public class MySensorsPercentTypeAdapter extends DecimalType implements MySensorsTypeAdapter {
     /**
      *
      */

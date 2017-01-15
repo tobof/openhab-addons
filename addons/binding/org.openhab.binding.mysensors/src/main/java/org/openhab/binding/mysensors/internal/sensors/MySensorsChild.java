@@ -16,7 +16,7 @@ import java.util.Map;
 import org.openhab.binding.mysensors.internal.Pair;
 
 /**
- * Every thing/node may have one ore more childs in the MySensors context.
+ * Every thing/node may have one ore more children in the MySensors context.
  *
  * @author Andrea Cioni
  *
@@ -24,17 +24,17 @@ import org.openhab.binding.mysensors.internal.Pair;
 public class MySensorsChild {
 
     private Integer childId = 0;
-    private Map<Pair<Integer>, MySensorsChannel> variableMap = null;
+    private Map<Pair<Integer>, MySensorsVariable> variableMap = null;
 
     private Date lastUpdate = null;
 
     public MySensorsChild(int childId) {
         this.childId = childId;
-        variableMap = new HashMap<Pair<Integer>, MySensorsChannel>();
+        variableMap = new HashMap<Pair<Integer>, MySensorsVariable>();
         lastUpdate = new Date(0);
     }
 
-    public MySensorsChild(int childId, Map<Pair<Integer>, MySensorsChannel> variableMap) throws NullPointerException {
+    public MySensorsChild(int childId, Map<Pair<Integer>, MySensorsVariable> variableMap) throws NullPointerException {
         this.childId = childId;
 
         if (variableMap == null) {
@@ -52,7 +52,7 @@ public class MySensorsChild {
      * @param variableNum the integer of the subtype
      * @return one MySensorsVariable if present, otherwise null
      */
-    public MySensorsChannel getVariable(int messageType, int variableNum) {
+    public MySensorsVariable getVariable(int messageType, int variableNum) {
         synchronized (variableMap) {
             return variableMap.get(new Pair<Integer>(messageType, variableNum));
         }
