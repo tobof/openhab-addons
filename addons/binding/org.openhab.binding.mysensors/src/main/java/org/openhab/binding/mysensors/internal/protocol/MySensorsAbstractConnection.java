@@ -438,7 +438,7 @@ public abstract class MySensorsAbstractConnection implements Runnable, MySensors
      * @author Tim Oberföll
      *
      */
-    public class MySensorsReader implements Runnable {
+    protected class MySensorsReader implements Runnable {
 
         protected Logger logger = LoggerFactory.getLogger(MySensorsReader.class);
 
@@ -542,7 +542,7 @@ public abstract class MySensorsAbstractConnection implements Runnable, MySensors
      * @author Tim Oberföll
      *
      */
-    public class MySensorsWriter implements Runnable {
+    protected class MySensorsWriter implements Runnable {
         protected Logger logger = LoggerFactory.getLogger(MySensorsWriter.class);
 
         protected boolean stopWriting = false; // Stop the thread that sends the messages to the MySensors network
