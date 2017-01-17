@@ -7,7 +7,7 @@ import org.openhab.binding.mysensors.internal.sensors.MySensorsVariable;
 public interface MySensorsTypeAdapter {
 
     default public State stateFromChannel(MySensorsVariable value) {
-        return fromString(value.getValue());
+        return fromString(value.reqValue());
     }
 
     public State fromString(String string);

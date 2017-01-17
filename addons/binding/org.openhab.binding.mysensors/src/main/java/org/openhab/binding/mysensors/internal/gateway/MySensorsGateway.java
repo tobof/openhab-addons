@@ -7,7 +7,7 @@
  */
 package org.openhab.binding.mysensors.internal.gateway;
 
-import static org.openhab.binding.mysensors.MySensorsBindingConstants.*;
+import static org.openhab.binding.mysensors.MySensorsBindingConstants.CHANNEL_MAP;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -211,7 +211,7 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
 
         synchronized (nodeMap) {
             List<Integer> takenIds = getGivenIds();
-            while (newId < MYSENSORS_NODE_ID_RESERVED_255) {
+            while (newId < MySensorsNode.MYSENSORS_NODE_ID_RESERVED_255) {
                 if (!takenIds.contains(newId)) {
                     addNode(new MySensorsNode(newId));
                     break;
@@ -221,7 +221,7 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
             }
         }
 
-        if (newId == MYSENSORS_NODE_ID_RESERVED_255) {
+        if (newId == MySensorsNode.MYSENSORS_NODE_ID_RESERVED_255) {
             throw new NoMoreIdsException();
         }
 
@@ -387,8 +387,9 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
         logger.info("I_TIME request received from {}, answering...", msg.nodeId);
 
         String time = Long.toString(System.currentTimeMillis() / 1000);
-        MySensorsMessage newMsg = new MySensorsMessage(msg.nodeId, msg.childId, MYSENSORS_MSG_TYPE_INTERNAL, 0, false,
-                MYSENSORS_SUBTYPE_I_TIME, time);
+        MySensorsMessage newMsg = new MySensorsMessage(msg.nodeId, msg.childId,
+                MySensorsMessage.MYSENSORS_MSG_TYPE_INTERNAL, 0, false, MySensorsMessage.MYSENSORS_SUBTYPE_I_TIME,
+                time);
         myCon.addMySensorsOutboundMessage(newMsg);
 
     }
@@ -404,8 +405,9 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
 
         logger.debug("I_CONFIG request received from {}, answering: (is imperial?){}", iConfig, imperial);
 
-        MySensorsMessage newMsg = new MySensorsMessage(msg.nodeId, msg.childId, MYSENSORS_MSG_TYPE_INTERNAL, 0, false,
-                MYSENSORS_SUBTYPE_I_CONFIG, iConfig);
+        MySensorsMessage newMsg = new MySensorsMessage(msg.nodeId, msg.childId,
+                MySensorsMessage.MYSENSORS_MSG_TYPE_INTERNAL, 0, false, MySensorsMessage.MYSENSORS_SUBTYPE_I_CONFIG,
+                iConfig);
         myCon.addMySensorsOutboundMessage(newMsg);
 
     }
@@ -420,9 +422,9 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
         try {
             newId = reserveId();
             logger.info("New Node in the MySensors network has requested an ID. ID is: {}", newId);
-            MySensorsMessage newMsg = new MySensorsMessage(MYSENSORS_NODE_ID_RESERVED_255,
-                    MYSENSORS_NODE_ID_RESERVED_255, MYSENSORS_MSG_TYPE_INTERNAL, MYSENSORS_ACK_FALSE, false, 4,
-                    newId + "");
+            MySensorsMessage newMsg = new MySensorsMessage(MySensorsNode.MYSENSORS_NODE_ID_RESERVED_255,
+                    MySensorsChild.MYSENSORS_CHILD_ID_RESERVED_255, MySensorsMessage.MYSENSORS_MSG_TYPE_INTERNAL,
+                    MySensorsMessage.MYSENSORS_ACK_FALSE, false, 4, newId + "");
             myCon.addMySensorsOutboundMessage(newMsg);
         } catch (NoMoreIdsException e) {
             logger.error("No more IDs available for this node, you could try cleaning cache file");

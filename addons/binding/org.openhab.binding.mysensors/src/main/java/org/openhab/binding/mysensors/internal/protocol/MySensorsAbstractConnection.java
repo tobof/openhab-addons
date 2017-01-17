@@ -42,6 +42,13 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class MySensorsAbstractConnection implements Runnable, MySensorsGatewayEventListener {
 
+    // How often and at which times should the binding retry to send a message if requestAck is true?
+    public static final int MYSENSORS_NUMBER_OF_RETRIES = 5;
+    public static final int[] MYSENSORS_RETRY_TIMES = { 0, 100, 500, 1000, 2000 };
+
+    // How long should a Smartsleep message be left in the queue?
+    public static final int MYSENSORS_SMARTSLEEP_TIMEOUT = 216000; // 6 hours
+
     protected Logger logger = LoggerFactory.getLogger(getClass());
 
     // Connector will check for connection status every CONNECTOR_INTERVAL_CHECK seconds
@@ -390,7 +397,7 @@ public abstract class MySensorsAbstractConnection implements Runnable, MySensors
     }
 
     /**
-     * Debug print of the smart sleep queue content to console
+     * Debug print of the smart sleep queue content to logs
      */
     public void printSmartSleepQueue() {
         pauseWriter = true;
@@ -584,10 +591,9 @@ public abstract class MySensorsAbstractConnection implements Runnable, MySensors
                                 // otherwise we remove the message from the queue
                                 if (msg.getAck() == 1) {
                                     msg.setRetries(msg.getRetries() + 1);
-                                    if (!(msg.getRetries() > MySensorsBindingConstants.MYSENSORS_NUMBER_OF_RETRIES)) {
+                                    if (!(msg.getRetries() > MYSENSORS_NUMBER_OF_RETRIES)) {
                                         msg.setNextSend(System.currentTimeMillis()
-                                                + MySensorsBindingConstants.MYSENSORS_RETRY_TIMES[msg.getRetries()
-                                                        - 1]);
+                                                + MYSENSORS_RETRY_TIMES[msg.getRetries() - 1]);
                                         addMySensorsOutboundMessage(msg);
                                     } else {
                                         logger.warn("NO ACK from nodeId: {}", msg.getNodeId());

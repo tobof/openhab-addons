@@ -7,8 +7,8 @@
  */
 package org.openhab.binding.mysensors.internal.protocol.message;
 
-import static org.openhab.binding.mysensors.MySensorsBindingConstants.*;
-
+import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
+import org.openhab.binding.mysensors.internal.sensors.MySensorsNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,7 +19,143 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class MySensorsMessage {
-    public static String GATEWAY_STARTUP_NOTIFICATION = "Gateway startup complete.";
+
+    // Message types of the MySensors network
+    public static final int MYSENSORS_MSG_TYPE_PRESENTATION = 0;
+    public static final int MYSENSORS_MSG_TYPE_SET = 1;
+    public static final int MYSENSORS_MSG_TYPE_REQ = 2;
+    public static final int MYSENSORS_MSG_TYPE_INTERNAL = 3;
+    public static final int MYSENSORS_MSG_TYPE_STREAM = 4;
+
+    // NO ACK
+    public static final int MYSENSORS_ACK_TRUE = 1;
+    public static final int MYSENSORS_ACK_FALSE = 0;
+
+    // Subtypes for presentation
+    public static final int MYSENSORS_SUBTYPE_S_DOOR = 0;
+    public static final int MYSENSORS_SUBTYPE_S_MOTION = 1;
+    public static final int MYSENSORS_SUBTYPE_S_SMOKE = 2;
+    public static final int MYSENSORS_SUBTYPE_S_LIGHT = 3;
+    public static final int MYSENSORS_SUBTYPE_S_DIMMER = 4;
+    public static final int MYSENSORS_SUBTYPE_S_COVER = 5;
+    public static final int MYSENSORS_SUBTYPE_S_TEMP = 6;
+    public static final int MYSENSORS_SUBTYPE_S_HUM = 7;
+    public static final int MYSENSORS_SUBTYPE_S_BARO = 8;
+    public static final int MYSENSORS_SUBTYPE_S_WIND = 9;
+    public static final int MYSENSORS_SUBTYPE_S_RAIN = 10;
+    public static final int MYSENSORS_SUBTYPE_S_UV = 11;
+    public static final int MYSENSORS_SUBTYPE_S_WEIGHT = 12;
+    public static final int MYSENSORS_SUBTYPE_S_POWER = 13;
+    public static final int MYSENSORS_SUBTYPE_S_HEATER = 14;
+    public static final int MYSENSORS_SUBTYPE_S_DISTANCE = 15;
+    public static final int MYSENSORS_SUBTYPE_S_LIGHT_LEVEL = 16;
+    public static final int MYSENSORS_SUBTYPE_S_LOCK = 19;
+    public static final int MYSENSORS_SUBTYPE_S_IR = 20;
+    public static final int MYSENSORS_SUBTYPE_S_WATER = 21;
+    public static final int MYSENSORS_SUBTYPE_S_AIR_QUALITY = 22;
+    public static final int MYSENSORS_SUBTYPE_S_CUSTOM = 23;
+    public static final int MYSENSORS_SUBTYPE_S_RGB_LIGHT = 26;
+    public static final int MYSENSORS_SUBTYPE_S_RGBW_LIGHT = 27;
+    public static final int MYSENSORS_SUBTYPE_S_HVAC = 29;
+    public static final int MYSENSORS_SUBTYPE_S_MULTIMETER = 30;
+    public static final int MYSENSORS_SUBTYPE_S_SPRINKLER = 31;
+    public static final int MYSENSORS_SUBTYPE_S_WATER_LEAK = 32;
+    public static final int MYSENSORS_SUBTYPE_S_SOUND = 33;
+    public static final int MYSENSORS_SUBTYPE_S_VIBRATION = 34;
+    public static final int MYSENSORS_SUBTYPE_S_MOISTURE = 35;
+    public static final int MYSENSORS_SUBTYPE_S_INFO = 36;
+    public static final int MYSENSORS_SUBTYPE_S_GAS = 37;
+    public static final int MYSENSORS_SUBTYPE_S_GPS = 38;
+    public static final int MYSENSORS_SUBTYPE_S_WATER_QUALITY = 39;
+
+    // Subtypes for set, req
+    public static final int MYSENSORS_SUBTYPE_V_TEMP = 0;
+    public static final int MYSENSORS_SUBTYPE_V_HUM = 1;
+    public static final int MYSENSORS_SUBTYPE_V_STATUS = 2;
+    public static final int MYSENSORS_SUBTYPE_V_PERCENTAGE = 3;
+    public static final int MYSENSORS_SUBTYPE_V_PRESSURE = 4;
+    public static final int MYSENSORS_SUBTYPE_V_FORECAST = 5;
+    public static final int MYSENSORS_SUBTYPE_V_RAIN = 6;
+    public static final int MYSENSORS_SUBTYPE_V_RAINRATE = 7;
+    public static final int MYSENSORS_SUBTYPE_V_WIND = 8;
+    public static final int MYSENSORS_SUBTYPE_V_GUST = 9;
+    public static final int MYSENSORS_SUBTYPE_V_DIRECTION = 10;
+    public static final int MYSENSORS_SUBTYPE_V_UV = 11;
+    public static final int MYSENSORS_SUBTYPE_V_WEIGHT = 12;
+    public static final int MYSENSORS_SUBTYPE_V_DISTANCE = 13;
+    public static final int MYSENSORS_SUBTYPE_V_IMPEDANCE = 14;
+    public static final int MYSENSORS_SUBTYPE_V_ARMED = 15;
+    public static final int MYSENSORS_SUBTYPE_V_TRIPPED = 16;
+    public static final int MYSENSORS_SUBTYPE_V_WATT = 17;
+    public static final int MYSENSORS_SUBTYPE_V_KWH = 18;
+    public static final int MYSENSORS_SUBTYPE_V_SCENE_ON = 19;
+    public static final int MYSENSORS_SUBTYPE_V_SCENE_OFF = 20;
+    public static final int MYSENSORS_SUBTYPE_V_HVAC_FLOW_STATE = 21;
+    public static final int MYSENSORS_SUBTYPE_V_HVAC_SPEED = 22;
+    public static final int MYSENSORS_SUBTYPE_V_LIGHT_LEVEL = 23;
+    public static final int MYSENSORS_SUBTYPE_V_VAR1 = 24;
+    public static final int MYSENSORS_SUBTYPE_V_VAR2 = 25;
+    public static final int MYSENSORS_SUBTYPE_V_VAR3 = 26;
+    public static final int MYSENSORS_SUBTYPE_V_VAR4 = 27;
+    public static final int MYSENSORS_SUBTYPE_V_VAR5 = 28;
+    public static final int MYSENSORS_SUBTYPE_V_UP = 29;
+    public static final int MYSENSORS_SUBTYPE_V_DOWN = 30;
+    public static final int MYSENSORS_SUBTYPE_V_STOP = 31;
+    public static final int MYSENSORS_SUBTYPE_V_IR_SEND = 32;
+    public static final int MYSENSORS_SUBTYPE_V_IR_RECEIVE = 33;
+    public static final int MYSENSORS_SUBTYPE_V_FLOW = 34;
+    public static final int MYSENSORS_SUBTYPE_V_VOLUME = 35;
+    public static final int MYSENSORS_SUBTYPE_V_LOCK_STATUS = 36;
+    public static final int MYSENSORS_SUBTYPE_V_LEVEL = 37;
+    public static final int MYSENSORS_SUBTYPE_V_VOLTAGE = 38;
+    public static final int MYSENSORS_SUBTYPE_V_CURRENT = 39;
+    public static final int MYSENSORS_SUBTYPE_V_RGB = 40;
+    public static final int MYSENSORS_SUBTYPE_V_RGBW = 41;
+    public static final int MYSENSORS_SUBTYPE_V_ID = 42;
+    public static final int MYSENSORS_SUBTYPE_V_UNIT_PREFIX = 43;
+    public static final int MYSENSORS_SUBTYPE_V_HVAC_SETPOINT_COOL = 44;
+    public static final int MYSENSORS_SUBTYPE_V_HVAC_SETPOINT_HEAT = 45;
+    public static final int MYSENSORS_SUBTYPE_V_HVAC_FLOW_MODE = 46;
+    public static final int MYSENSORS_SUBTYPE_V_TEXT = 47;
+    public static final int MYSENSORS_SUBTYPE_V_CUSTOM = 48;
+    public static final int MYSENSORS_SUBTYPE_V_POSITION = 49;
+    public static final int MYSENSORS_SUBTYPE_V_IR_RECORD = 50;
+    public static final int MYSENSORS_SUBTYPE_V_PH = 51;
+    public static final int MYSENSORS_SUBTYPE_V_ORP = 52;
+    public static final int MYSENSORS_SUBTYPE_V_EC = 53;
+    public static final int MYSENSORS_SUBTYPE_V_VAR = 54;
+    public static final int MYSENSORS_SUBTYPE_V_VA = 55;
+    public static final int MYSENSORS_SUBTYPE_V_POWER_FACTOR = 56;
+
+    public static final int MYSENSORS_SUBTYPE_I_BATTERY_LEVEL = 0;
+    public static final int MYSENSORS_SUBTYPE_I_TIME = 1;
+    public static final int MYSENSORS_SUBTYPE_I_VERSION = 2;
+    public static final int MYSENSORS_SUBTYPE_I_ID_REQUEST = 3;
+    public static final int MYSENSORS_SUBTYPE_I_ID_RESPONSE = 4;
+    public static final int MYSENSORS_SUBTYPE_I_INCLUSION_MODE = 5;
+    public static final int MYSENSORS_SUBTYPE_I_CONFIG = 6;
+    public static final int MYSENSORS_SUBTYPE_I_FIND_PARENT = 7;
+    public static final int MYSENSORS_SUBTYPE_I_FIND_PARENT_RESPONSE = 8;
+    public static final int MYSENSORS_SUBTYPE_I_LOG_MESSAGE = 9;
+    public static final int MYSENSORS_SUBTYPE_I_CHILDREN = 10;
+    public static final int MYSENSORS_SUBTYPE_I_SKETCH_NAME = 11;
+    public static final int MYSENSORS_SUBTYPE_I_SKETCH_VERSION = 12;
+    public static final int MYSENSORS_SUBTYPE_I_REBOOT = 13;
+    public static final int MYSENSORS_SUBTYPE_I_GATEWAY_READY = 14;
+    public static final int MYSENSORS_SUBTYPE_I_REQUEST_SIGNING = 15;
+    public static final int MYSENSORS_SUBTYPE_I_GET_NONCE = 16;
+    public static final int MYSENSORS_SUBTYPE_I_GET_NONCE_RESONSE = 17;
+    public static final int MYSENSORS_SUBTYPE_I_HEARTBEAT_REQUEST = 18;
+    public static final int MYSENSORS_SUBTYPE_I_PRESENTATION = 19;
+    public static final int MYSENSORS_SUBTYPE_I_DISCOVER = 20;
+    public static final int MYSENSORS_SUBTYPE_I_DISCOVER_RESPONSE = 21;
+    public static final int MYSENSORS_SUBTYPE_I_HEARTBEAT_RESPONSE = 22;
+    public static final int MYSENSORS_SUBTYPE_I_LOCKED = 23;
+    public static final int MYSENSORS_SUBTYPE_I_PING = 24;
+    public static final int MYSENSORS_SUBTYPE_I_PONG = 25;
+    public static final int MYSENSORS_SUBTYPE_I_REGISTRATION_REQUEST = 26;
+    public static final int MYSENSORS_SUBTYPE_I_REGISTRATION_RESPONSE = 27;
+    public static final int MYSENSORS_SUBTYPE_I_DEBUG = 28;
 
     private Logger logger = LoggerFactory.getLogger(MySensorsMessage.class);
 
@@ -177,9 +313,10 @@ public class MySensorsMessage {
     public boolean isIConfigMessage() {
         boolean ret = false;
 
-        if (childId == MYSENSORS_NODE_ID_RESERVED_0 || childId == MYSENSORS_CHILD_ID_RESERVED_255) {
+        if (childId == MySensorsChild.MYSENSORS_CHILD_ID_RESERVED_0
+                || childId == MySensorsChild.MYSENSORS_CHILD_ID_RESERVED_255) {
             if (msgType == MYSENSORS_MSG_TYPE_INTERNAL) {
-                if (ack == 0) {
+                if (ack == MYSENSORS_ACK_FALSE) {
                     if (subType == MYSENSORS_SUBTYPE_I_CONFIG) {
                         ret = true;
                     }
@@ -198,10 +335,11 @@ public class MySensorsMessage {
     public boolean isIVersionMessage() {
         boolean ret = false;
 
-        if (nodeId == 0) {
-            if (childId == MYSENSORS_NODE_ID_RESERVED_0 || childId == MYSENSORS_CHILD_ID_RESERVED_255) {
+        if (nodeId == MySensorsNode.MYSENSORS_NODE_ID_RESERVED_0) {
+            if (childId == MySensorsChild.MYSENSORS_CHILD_ID_RESERVED_0
+                    || childId == MySensorsChild.MYSENSORS_CHILD_ID_RESERVED_255) {
                 if (msgType == MYSENSORS_MSG_TYPE_INTERNAL) {
-                    if (ack == 0) {
+                    if (ack == MYSENSORS_ACK_FALSE) {
                         if (subType == MYSENSORS_SUBTYPE_I_VERSION) {
                             ret = true;
                         }
@@ -221,7 +359,8 @@ public class MySensorsMessage {
     public boolean isITimeMessage() {
         boolean ret = false;
 
-        if (childId == MYSENSORS_NODE_ID_RESERVED_0 || childId == MYSENSORS_CHILD_ID_RESERVED_255) {
+        if (childId == MySensorsChild.MYSENSORS_CHILD_ID_RESERVED_0
+                || childId == MySensorsChild.MYSENSORS_CHILD_ID_RESERVED_255) {
             if (msgType == MYSENSORS_MSG_TYPE_INTERNAL) {
                 if (ack == MYSENSORS_ACK_FALSE) {
                     if (subType == MYSENSORS_SUBTYPE_I_TIME) {
@@ -242,8 +381,8 @@ public class MySensorsMessage {
     public boolean isIdRequestMessage() {
         boolean ret = false;
 
-        if (nodeId == MYSENSORS_NODE_ID_RESERVED_255) {
-            if (childId == MYSENSORS_CHILD_ID_RESERVED_255) {
+        if (nodeId == MySensorsNode.MYSENSORS_NODE_ID_RESERVED_255) {
+            if (childId == MySensorsChild.MYSENSORS_CHILD_ID_RESERVED_255) {
                 if (msgType == MYSENSORS_SUBTYPE_I_ID_REQUEST) {
                     if (ack == MYSENSORS_ACK_FALSE) {
                         if (subType == MYSENSORS_MSG_TYPE_INTERNAL) {
@@ -280,13 +419,8 @@ public class MySensorsMessage {
      * @return true, if it is a heartbeat
      */
     public boolean isHeartbeatResponseMessage() {
-        boolean ret = false;
-
-        if (subType == MYSENSORS_SUBTYPE_I_HEARTBEAT_RESPONSE && childId == MYSENSORS_CHILD_ID_RESERVED_255) {
-            ret = true;
-        }
-
-        return ret;
+        return (subType == MYSENSORS_SUBTYPE_I_HEARTBEAT_RESPONSE
+                && childId == MySensorsChild.MYSENSORS_CHILD_ID_RESERVED_255);
     }
 
     /**

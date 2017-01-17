@@ -7,13 +7,18 @@
  */
 package org.openhab.binding.mysensors.internal.sensors;
 
-import static org.openhab.binding.mysensors.MySensorsBindingConstants.*;
-
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.openhab.binding.mysensors.internal.Pair;
+import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariable_V_VAR1;
+import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariable_V_VAR2;
+import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariable_V_VAR3;
+import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariable_V_VAR4;
+import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariable_V_VAR5;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Every thing/node may have one ore more children in the MySensors context.
@@ -23,26 +28,38 @@ import org.openhab.binding.mysensors.internal.Pair;
  */
 public class MySensorsChild {
 
+    // Reserved ids
+    public static final int MYSENSORS_CHILD_ID_RESERVED_0 = 0;
+    public static final int MYSENSORS_CHILD_ID_RESERVED_255 = 255;
+
+    protected Logger logger = LoggerFactory.getLogger(getClass());
+
     private Integer childId = 0;
-    private Map<Pair<Integer>, MySensorsVariable> variableMap = null;
+    private Map<Integer, MySensorsVariable> variableMap = null;
 
     private Date lastUpdate = null;
 
     public MySensorsChild(int childId) {
         this.childId = childId;
-        variableMap = new HashMap<Pair<Integer>, MySensorsVariable>();
+        variableMap = new HashMap<Integer, MySensorsVariable>();
         lastUpdate = new Date(0);
+        addCommonVariables();
     }
 
-    public MySensorsChild(int childId, Map<Pair<Integer>, MySensorsVariable> variableMap) throws NullPointerException {
-        this.childId = childId;
+    public void addVariable(MySensorsVariable var) throws NullPointerException {
 
-        if (variableMap == null) {
-            throw new NullPointerException("Passed varialble map in costructor is null");
+        if (var == null) {
+            throw new NullPointerException("Cannot add a null variable");
         }
 
-        this.variableMap = variableMap;
-        lastUpdate = new Date(0);
+        synchronized (variableMap) {
+            if (variableMap.containsKey(var.getType())) {
+                logger.warn("Overwrite variable");
+            }
+
+            variableMap.put(var.getType(), var);
+
+        }
     }
 
     /**
@@ -97,6 +114,14 @@ public class MySensorsChild {
      */
     public static boolean isValidChildId(int id) {
         return (id >= MYSENSORS_CHILD_ID_RESERVED_0 && id < MYSENSORS_CHILD_ID_RESERVED_255);
+    }
+
+    private void addCommonVariables() {
+        addVariable(new MySensorsVariable_V_VAR1());
+        addVariable(new MySensorsVariable_V_VAR2());
+        addVariable(new MySensorsVariable_V_VAR3());
+        addVariable(new MySensorsVariable_V_VAR4());
+        addVariable(new MySensorsVariable_V_VAR5());
     }
 
     @Override

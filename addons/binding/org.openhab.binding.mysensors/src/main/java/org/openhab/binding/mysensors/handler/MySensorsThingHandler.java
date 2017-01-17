@@ -25,7 +25,6 @@ import org.eclipse.smarthome.core.types.RefreshType;
 import org.eclipse.smarthome.core.types.State;
 import org.openhab.binding.mysensors.adapter.MySensorsTypeAdapter;
 import org.openhab.binding.mysensors.config.MySensorsSensorConfiguration;
-import org.openhab.binding.mysensors.internal.Pair;
 import org.openhab.binding.mysensors.internal.event.MySensorsGatewayEventListener;
 import org.openhab.binding.mysensors.internal.gateway.MySensorsGateway;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
@@ -134,11 +133,11 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
                 var.setValue(loadAdapterForChannel(channelUID.getId()).fromCommand(command));
 
                 // Create the real message to send
-                MySensorsMessage newMsg = new MySensorsMessage(nodeId, childId, MYSENSORS_MSG_TYPE_SET, int_requestack,
-                        revertState, smartSleep);
+                MySensorsMessage newMsg = new MySensorsMessage(nodeId, childId, MySensorsMessage.MYSENSORS_MSG_TYPE_SET,
+                        int_requestack, revertState, smartSleep);
 
                 newMsg.setSubType(var.getType());
-                newMsg.setMsg(var.getValue());
+                newMsg.setMsg(var.reqValue());
 
                 String oldPayload = oldMsgContent.get(subType);
                 if (oldPayload == null) {
@@ -205,10 +204,9 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
     }
 
     private void handleChildUpdateEvent(MySensorsVariable var) {
-        Pair<Integer> commandAndType = Pair.of(var.getCommand(), var.getType());
-        String channelName = CHANNEL_MAP.get(commandAndType);
+        String channelName = CHANNEL_MAP.get(var.getType());
         State newState = loadAdapterForChannel(channelName).stateFromChannel(var);
-        logger.debug("Updating channel: {}({}) value to: {}", channelName, commandAndType, newState);
+        logger.debug("Updating channel: {}({}) value to: {}", channelName, var.getType(), newState);
         updateState(channelName, newState);
 
     }

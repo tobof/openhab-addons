@@ -5,9 +5,9 @@ import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariable
 import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariable_V_LEVEL;
 import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariable_V_TRIPPED;
 
-public class MySensorsChild_S_SOUND extends MySensorsChild {
+public class MySensorsChild_S_MOISTURE extends MySensorsChild {
 
-    public MySensorsChild_S_SOUND(int childId) {
+    public MySensorsChild_S_MOISTURE(int childId) {
         super(childId);
         addVariable(new MySensorsVariable_V_LEVEL());
         addVariable(new MySensorsVariable_V_TRIPPED());

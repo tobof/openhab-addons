@@ -7,7 +7,6 @@
  */
 package org.openhab.binding.mysensors.internal.sensors;
 
-import static org.openhab.binding.mysensors.MySensorsBindingConstants.*;
 import static org.openhab.binding.mysensors.internal.MySensorsUtility.mergeMap;
 
 import java.util.Date;
@@ -25,7 +24,11 @@ import java.util.Map;
  */
 public class MySensorsNode {
 
-    private Integer nodeId = null;
+    // Reserved ids
+    public static final int MYSENSORS_NODE_ID_RESERVED_0 = 0;
+    public static final int MYSENSORS_NODE_ID_RESERVED_255 = 255;
+
+    private int nodeId;
 
     private boolean reachable = true;
 
@@ -111,7 +114,7 @@ public class MySensorsNode {
         result = prime * result + batteryPercent;
         result = prime * result + ((chidldMap == null) ? 0 : chidldMap.hashCode());
         result = prime * result + ((lastUpdate == null) ? 0 : lastUpdate.hashCode());
-        result = prime * result + ((nodeId == null) ? 0 : nodeId.hashCode());
+        result = prime * result + nodeId;
         result = prime * result + (reachable ? 1231 : 1237);
         return result;
     }
@@ -145,11 +148,7 @@ public class MySensorsNode {
         } else if (!lastUpdate.equals(other.lastUpdate)) {
             return false;
         }
-        if (nodeId == null) {
-            if (other.nodeId != null) {
-                return false;
-            }
-        } else if (!nodeId.equals(other.nodeId)) {
+        if (nodeId != other.nodeId) {
             return false;
         }
         if (reachable != other.reachable) {

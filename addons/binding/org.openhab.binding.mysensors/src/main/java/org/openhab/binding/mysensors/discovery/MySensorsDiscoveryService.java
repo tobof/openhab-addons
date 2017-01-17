@@ -78,7 +78,7 @@ public class MySensorsDiscoveryService extends AbstractDiscoveryService {
     public void newDevicePresented(MySensorsMessage msg) {
 
         // Representation Message?
-        if (msg.getMsgType() == MYSENSORS_MSG_TYPE_PRESENTATION) {
+        if (msg.getMsgType() == MySensorsMessage.MYSENSORS_MSG_TYPE_PRESENTATION) {
             logger.debug("Representation Message received");
 
             // uid must not contains dots
