@@ -611,6 +611,7 @@
 
 		<channels>
 			<channel id="light-level" typeId="light-level-channel" />
+			<channel id="level" typeId="level-channel" />
 			<channel id="battery" typeId="battery-channel" />
 			<channel id="lastupdate" typeId="lastupdate-channel"/>
 		</channels>
