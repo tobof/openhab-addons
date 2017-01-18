@@ -49,130 +49,133 @@ public class MySensorsBindingConstants {
     public static final int MYSENSORS_ACK_FALSE = 0;
 
     // Subtypes for presentation
-    public static final int MYSENSORS_SUBTYPE_S_DOOR = 0;
-    public static final int MYSENSORS_SUBTYPE_S_MOTION = 1;
-    public static final int MYSENSORS_SUBTYPE_S_SMOKE = 2;
-    public static final int MYSENSORS_SUBTYPE_S_LIGHT = 3;
-    public static final int MYSENSORS_SUBTYPE_S_DIMMER = 4;
-    public static final int MYSENSORS_SUBTYPE_S_COVER = 5;
-    public static final int MYSENSORS_SUBTYPE_S_TEMP = 6;
-    public static final int MYSENSORS_SUBTYPE_S_HUM = 7;
-    public static final int MYSENSORS_SUBTYPE_S_BARO = 8;
-    public static final int MYSENSORS_SUBTYPE_S_WIND = 9;
-    public static final int MYSENSORS_SUBTYPE_S_RAIN = 10;
-    public static final int MYSENSORS_SUBTYPE_S_UV = 11;
-    public static final int MYSENSORS_SUBTYPE_S_WEIGHT = 12;
-    public static final int MYSENSORS_SUBTYPE_S_POWER = 13;
-    public static final int MYSENSORS_SUBTYPE_S_HEATER = 14;
-    public static final int MYSENSORS_SUBTYPE_S_DISTANCE = 15;
-    public static final int MYSENSORS_SUBTYPE_S_LIGHT_LEVEL = 16;
-    public static final int MYSENSORS_SUBTYPE_S_LOCK = 19;
-    public static final int MYSENSORS_SUBTYPE_S_IR = 20;
-    public static final int MYSENSORS_SUBTYPE_S_WATER = 21;
-    public static final int MYSENSORS_SUBTYPE_S_AIR_QUALITY = 22;
-    public static final int MYSENSORS_SUBTYPE_S_CUSTOM = 23;
-    public static final int MYSENSORS_SUBTYPE_S_RGB_LIGHT = 26;
-    public static final int MYSENSORS_SUBTYPE_S_RGBW_LIGHT = 27;
-    public static final int MYSENSORS_SUBTYPE_S_HVAC = 29;
-    public static final int MYSENSORS_SUBTYPE_S_MULTIMETER = 30;
-    public static final int MYSENSORS_SUBTYPE_S_SPRINKLER = 31;
-    public static final int MYSENSORS_SUBTYPE_S_WATER_LEAK = 32;
-    public static final int MYSENSORS_SUBTYPE_S_SOUND = 33;
-    public static final int MYSENSORS_SUBTYPE_S_VIBRATION = 34;
-    public static final int MYSENSORS_SUBTYPE_S_MOISTURE = 35;
-    public static final int MYSENSORS_SUBTYPE_S_INFO = 36;
-    public static final int MYSENSORS_SUBTYPE_S_GAS = 37;
-    public static final int MYSENSORS_SUBTYPE_S_GPS = 38;
-    public static final int MYSENSORS_SUBTYPE_S_WATER_QUALITY = 39;
+    public static final int MYSENSORS_SUBTYPE_S_DOOR 				= 0;
+    public static final int MYSENSORS_SUBTYPE_S_MOTION 				= 1;
+    public static final int MYSENSORS_SUBTYPE_S_SMOKE 				= 2;
+    public static final int MYSENSORS_SUBTYPE_S_LIGHT 				= 3;
+    public static final int MYSENSORS_SUBTYPE_S_DIMMER 				= 4;
+    public static final int MYSENSORS_SUBTYPE_S_COVER 				= 5;
+    public static final int MYSENSORS_SUBTYPE_S_TEMP 				= 6;
+    public static final int MYSENSORS_SUBTYPE_S_HUM 				= 7;
+    public static final int MYSENSORS_SUBTYPE_S_BARO 				= 8;
+    public static final int MYSENSORS_SUBTYPE_S_WIND 				= 9;
+    public static final int MYSENSORS_SUBTYPE_S_RAIN 				= 10;
+    public static final int MYSENSORS_SUBTYPE_S_UV 					= 11;
+    public static final int MYSENSORS_SUBTYPE_S_WEIGHT 				= 12;
+    public static final int MYSENSORS_SUBTYPE_S_POWER 				= 13;
+    public static final int MYSENSORS_SUBTYPE_S_HEATER 				= 14;
+    public static final int MYSENSORS_SUBTYPE_S_DISTANCE 			= 15;
+    public static final int MYSENSORS_SUBTYPE_S_LIGHT_LEVEL 		= 16;
+    public static final int MYSENSORS_SUBTYPE_S_LOCK 				= 19;
+    public static final int MYSENSORS_SUBTYPE_S_IR 					= 20;
+    public static final int MYSENSORS_SUBTYPE_S_WATER 				= 21;
+    public static final int MYSENSORS_SUBTYPE_S_AIR_QUALITY 		= 22;
+    public static final int MYSENSORS_SUBTYPE_S_CUSTOM 				= 23;
+    public static final int MYSENSORS_SUBTYPE_S_DUST 				= 24;
+    public static final int MYSENSORS_SUBTYPE_S_SCENE_CONTROLLER 	= 25;
+    public static final int MYSENSORS_SUBTYPE_S_RGB_LIGHT 			= 26;
+    public static final int MYSENSORS_SUBTYPE_S_RGBW_LIGHT 			= 27;
+    public static final int MYSENSORS_SUBTYPE_S_COLOR_SENSOR		= 28;
+    public static final int MYSENSORS_SUBTYPE_S_HVAC 				= 29;
+    public static final int MYSENSORS_SUBTYPE_S_MULTIMETER 			= 30;
+    public static final int MYSENSORS_SUBTYPE_S_SPRINKLER 			= 31;
+    public static final int MYSENSORS_SUBTYPE_S_WATER_LEAK 			= 32;
+    public static final int MYSENSORS_SUBTYPE_S_SOUND 				= 33;
+    public static final int MYSENSORS_SUBTYPE_S_VIBRATION 			= 34;
+    public static final int MYSENSORS_SUBTYPE_S_MOISTURE 			= 35;
+    public static final int MYSENSORS_SUBTYPE_S_INFO 				= 36;
+    public static final int MYSENSORS_SUBTYPE_S_GAS 				= 37;
+    public static final int MYSENSORS_SUBTYPE_S_GPS 				= 38;
+    public static final int MYSENSORS_SUBTYPE_S_WATER_QUALITY 		= 39;
 
     // Subtypes for set, req
-    public static final int MYSENSORS_SUBTYPE_V_TEMP = 0;
-    public static final int MYSENSORS_SUBTYPE_V_HUM = 1;
-    public static final int MYSENSORS_SUBTYPE_V_STATUS = 2;
-    public static final int MYSENSORS_SUBTYPE_V_PERCENTAGE = 3;
-    public static final int MYSENSORS_SUBTYPE_V_PRESSURE = 4;
-    public static final int MYSENSORS_SUBTYPE_V_FORECAST = 5;
-    public static final int MYSENSORS_SUBTYPE_V_RAIN = 6;
-    public static final int MYSENSORS_SUBTYPE_V_RAINRATE = 7;
-    public static final int MYSENSORS_SUBTYPE_V_WIND = 8;
-    public static final int MYSENSORS_SUBTYPE_V_GUST = 9;
-    public static final int MYSENSORS_SUBTYPE_V_DIRECTION = 10;
-    public static final int MYSENSORS_SUBTYPE_V_UV = 11;
-    public static final int MYSENSORS_SUBTYPE_V_WEIGHT = 12;
-    public static final int MYSENSORS_SUBTYPE_V_DISTANCE = 13;
-    public static final int MYSENSORS_SUBTYPE_V_IMPEDANCE = 14;
-    public static final int MYSENSORS_SUBTYPE_V_ARMED = 15;
-    public static final int MYSENSORS_SUBTYPE_V_TRIPPED = 16;
-    public static final int MYSENSORS_SUBTYPE_V_WATT = 17;
-    public static final int MYSENSORS_SUBTYPE_V_KWH = 18;
-    public static final int MYSENSORS_SUBTYPE_V_SCENE_ON = 19;
-    public static final int MYSENSORS_SUBTYPE_V_SCENE_OFF = 20;
-    public static final int MYSENSORS_SUBTYPE_V_HVAC_FLOW_STATE = 21;
-    public static final int MYSENSORS_SUBTYPE_V_HVAC_SPEED = 22;
-    public static final int MYSENSORS_SUBTYPE_V_LIGHT_LEVEL = 23;
-    public static final int MYSENSORS_SUBTYPE_V_VAR1 = 24;
-    public static final int MYSENSORS_SUBTYPE_V_VAR2 = 25;
-    public static final int MYSENSORS_SUBTYPE_V_VAR3 = 26;
-    public static final int MYSENSORS_SUBTYPE_V_VAR4 = 27;
-    public static final int MYSENSORS_SUBTYPE_V_VAR5 = 28;
-    public static final int MYSENSORS_SUBTYPE_V_UP = 29;
-    public static final int MYSENSORS_SUBTYPE_V_DOWN = 30;
-    public static final int MYSENSORS_SUBTYPE_V_STOP = 31;
-    public static final int MYSENSORS_SUBTYPE_V_IR_SEND = 32;
-    public static final int MYSENSORS_SUBTYPE_V_IR_RECEIVE = 33;
-    public static final int MYSENSORS_SUBTYPE_V_FLOW = 34;
-    public static final int MYSENSORS_SUBTYPE_V_VOLUME = 35;
-    public static final int MYSENSORS_SUBTYPE_V_LOCK_STATUS = 36;
-    public static final int MYSENSORS_SUBTYPE_V_LEVEL = 37;
-    public static final int MYSENSORS_SUBTYPE_V_VOLTAGE = 38;
-    public static final int MYSENSORS_SUBTYPE_V_CURRENT = 39;
-    public static final int MYSENSORS_SUBTYPE_V_RGB = 40;
-    public static final int MYSENSORS_SUBTYPE_V_RGBW = 41;
-    public static final int MYSENSORS_SUBTYPE_V_ID = 42;
-    public static final int MYSENSORS_SUBTYPE_V_UNIT_PREFIX = 43;
-    public static final int MYSENSORS_SUBTYPE_V_HVAC_SETPOINT_COOL = 44;
-    public static final int MYSENSORS_SUBTYPE_V_HVAC_SETPOINT_HEAT = 45;
-    public static final int MYSENSORS_SUBTYPE_V_HVAC_FLOW_MODE = 46;
-    public static final int MYSENSORS_SUBTYPE_V_TEXT = 47;
-    public static final int MYSENSORS_SUBTYPE_V_CUSTOM = 48;
-    public static final int MYSENSORS_SUBTYPE_V_POSITION = 49;
-    public static final int MYSENSORS_SUBTYPE_V_IR_RECORD = 50;
-    public static final int MYSENSORS_SUBTYPE_V_PH = 51;
-    public static final int MYSENSORS_SUBTYPE_V_ORP = 52;
-    public static final int MYSENSORS_SUBTYPE_V_EC = 53;
-    public static final int MYSENSORS_SUBTYPE_V_VAR = 54;
-    public static final int MYSENSORS_SUBTYPE_V_VA = 55;
-    public static final int MYSENSORS_SUBTYPE_V_POWER_FACTOR = 56;
+    public static final int MYSENSORS_SUBTYPE_V_TEMP 				= 0;
+    public static final int MYSENSORS_SUBTYPE_V_HUM 				= 1;
+    public static final int MYSENSORS_SUBTYPE_V_STATUS 				= 2;
+    public static final int MYSENSORS_SUBTYPE_V_PERCENTAGE 			= 3;
+    public static final int MYSENSORS_SUBTYPE_V_PRESSURE 			= 4;
+    public static final int MYSENSORS_SUBTYPE_V_FORECAST 			= 5;
+    public static final int MYSENSORS_SUBTYPE_V_RAIN 				= 6;
+    public static final int MYSENSORS_SUBTYPE_V_RAINRATE 			= 7;
+    public static final int MYSENSORS_SUBTYPE_V_WIND 				= 8;
+    public static final int MYSENSORS_SUBTYPE_V_GUST 				= 9;
+    public static final int MYSENSORS_SUBTYPE_V_DIRECTION 			= 10;
+    public static final int MYSENSORS_SUBTYPE_V_UV 					= 11;
+    public static final int MYSENSORS_SUBTYPE_V_WEIGHT 				= 12;
+    public static final int MYSENSORS_SUBTYPE_V_DISTANCE 			= 13;
+    public static final int MYSENSORS_SUBTYPE_V_IMPEDANCE 			= 14;
+    public static final int MYSENSORS_SUBTYPE_V_ARMED 				= 15;
+    public static final int MYSENSORS_SUBTYPE_V_TRIPPED 			= 16;
+    public static final int MYSENSORS_SUBTYPE_V_WATT 				= 17;
+    public static final int MYSENSORS_SUBTYPE_V_KWH 				= 18;
+    public static final int MYSENSORS_SUBTYPE_V_SCENE_ON 			= 19;
+    public static final int MYSENSORS_SUBTYPE_V_SCENE_OFF 			= 20;
+    public static final int MYSENSORS_SUBTYPE_V_HVAC_FLOW_STATE 	= 21;
+    public static final int MYSENSORS_SUBTYPE_V_HVAC_SPEED 			= 22;
+    public static final int MYSENSORS_SUBTYPE_V_LIGHT_LEVEL 		= 23;
+    public static final int MYSENSORS_SUBTYPE_V_VAR1 				= 24;
+    public static final int MYSENSORS_SUBTYPE_V_VAR2 				= 25;
+    public static final int MYSENSORS_SUBTYPE_V_VAR3 				= 26;
+    public static final int MYSENSORS_SUBTYPE_V_VAR4 				= 27;
+    public static final int MYSENSORS_SUBTYPE_V_VAR5 				= 28;
+    public static final int MYSENSORS_SUBTYPE_V_UP 					= 29;
+    public static final int MYSENSORS_SUBTYPE_V_DOWN 				= 30;
+    public static final int MYSENSORS_SUBTYPE_V_STOP 				= 31;
+    public static final int MYSENSORS_SUBTYPE_V_IR_SEND 			= 32;
+    public static final int MYSENSORS_SUBTYPE_V_IR_RECEIVE 			= 33;
+    public static final int MYSENSORS_SUBTYPE_V_FLOW 				= 34;
+    public static final int MYSENSORS_SUBTYPE_V_VOLUME 				= 35;
+    public static final int MYSENSORS_SUBTYPE_V_LOCK_STATUS 		= 36;
+    public static final int MYSENSORS_SUBTYPE_V_LEVEL 				= 37;
+    public static final int MYSENSORS_SUBTYPE_V_VOLTAGE 			= 38;
+    public static final int MYSENSORS_SUBTYPE_V_CURRENT 			= 39;
+    public static final int MYSENSORS_SUBTYPE_V_RGB 				= 40;
+    public static final int MYSENSORS_SUBTYPE_V_RGBW 				= 41;
+    public static final int MYSENSORS_SUBTYPE_V_ID 					= 42;
+    public static final int MYSENSORS_SUBTYPE_V_UNIT_PREFIX 		= 43;
+    public static final int MYSENSORS_SUBTYPE_V_HVAC_SETPOINT_COOL 	= 44;
+    public static final int MYSENSORS_SUBTYPE_V_HVAC_SETPOINT_HEAT 	= 45;
+    public static final int MYSENSORS_SUBTYPE_V_HVAC_FLOW_MODE 		= 46;
+    public static final int MYSENSORS_SUBTYPE_V_TEXT 				= 47;
+    public static final int MYSENSORS_SUBTYPE_V_CUSTOM 				= 48;
+    public static final int MYSENSORS_SUBTYPE_V_POSITION 			= 49;
+    public static final int MYSENSORS_SUBTYPE_V_IR_RECORD 			= 50;
+    public static final int MYSENSORS_SUBTYPE_V_PH 					= 51;
+    public static final int MYSENSORS_SUBTYPE_V_ORP 				= 52;
+    public static final int MYSENSORS_SUBTYPE_V_EC 					= 53;
+    public static final int MYSENSORS_SUBTYPE_V_VAR 				= 54;
+    public static final int MYSENSORS_SUBTYPE_V_VA 					= 55;
+    public static final int MYSENSORS_SUBTYPE_V_POWER_FACTOR 		= 56;
 
-    public static final int MYSENSORS_SUBTYPE_I_BATTERY_LEVEL = 0;
-    public static final int MYSENSORS_SUBTYPE_I_TIME = 1;
-    public static final int MYSENSORS_SUBTYPE_I_VERSION = 2;
-    public static final int MYSENSORS_SUBTYPE_I_ID_REQUEST = 3;
-    public static final int MYSENSORS_SUBTYPE_I_ID_RESPONSE = 4;
-    public static final int MYSENSORS_SUBTYPE_I_INCLUSION_MODE = 5;
-    public static final int MYSENSORS_SUBTYPE_I_CONFIG = 6;
-    public static final int MYSENSORS_SUBTYPE_I_FIND_PARENT = 7;
-    public static final int MYSENSORS_SUBTYPE_I_FIND_PARENT_RESPONSE = 8;
-    public static final int MYSENSORS_SUBTYPE_I_LOG_MESSAGE = 9;
-    public static final int MYSENSORS_SUBTYPE_I_CHILDREN = 10;
-    public static final int MYSENSORS_SUBTYPE_I_SKETCH_NAME = 11;
-    public static final int MYSENSORS_SUBTYPE_I_SKETCH_VERSION = 12;
-    public static final int MYSENSORS_SUBTYPE_I_REBOOT = 13;
-    public static final int MYSENSORS_SUBTYPE_I_GATEWAY_READY = 14;
-    public static final int MYSENSORS_SUBTYPE_I_REQUEST_SIGNING = 15;
-    public static final int MYSENSORS_SUBTYPE_I_GET_NONCE = 16;
-    public static final int MYSENSORS_SUBTYPE_I_GET_NONCE_RESONSE = 17;
-    public static final int MYSENSORS_SUBTYPE_I_HEARTBEAT_REQUEST = 18;
-    public static final int MYSENSORS_SUBTYPE_I_PRESENTATION = 19;
-    public static final int MYSENSORS_SUBTYPE_I_DISCOVER = 20;
-    public static final int MYSENSORS_SUBTYPE_I_DISCOVER_RESPONSE = 21;
-    public static final int MYSENSORS_SUBTYPE_I_HEARTBEAT_RESPONSE = 22;
-    public static final int MYSENSORS_SUBTYPE_I_LOCKED = 23;
-    public static final int MYSENSORS_SUBTYPE_I_PING = 24;
-    public static final int MYSENSORS_SUBTYPE_I_PONG = 25;
-    public static final int MYSENSORS_SUBTYPE_I_REGISTRATION_REQUEST = 26;
-    public static final int MYSENSORS_SUBTYPE_I_REGISTRATION_RESPONSE = 27;
-    public static final int MYSENSORS_SUBTYPE_I_DEBUG = 28;
+    public static final int MYSENSORS_SUBTYPE_I_BATTERY_LEVEL 			= 0;
+    public static final int MYSENSORS_SUBTYPE_I_TIME 					= 1;
+    public static final int MYSENSORS_SUBTYPE_I_VERSION 				= 2;
+    public static final int MYSENSORS_SUBTYPE_I_ID_REQUEST 				= 3;
+    public static final int MYSENSORS_SUBTYPE_I_ID_RESPONSE 			= 4;
+    public static final int MYSENSORS_SUBTYPE_I_INCLUSION_MODE 			= 5;
+    public static final int MYSENSORS_SUBTYPE_I_CONFIG 					= 6;
+    public static final int MYSENSORS_SUBTYPE_I_FIND_PARENT 			= 7;
+    public static final int MYSENSORS_SUBTYPE_I_FIND_PARENT_RESPONSE 	= 8;
+    public static final int MYSENSORS_SUBTYPE_I_LOG_MESSAGE 			= 9;
+    public static final int MYSENSORS_SUBTYPE_I_CHILDREN 				= 10;
+    public static final int MYSENSORS_SUBTYPE_I_SKETCH_NAME 			= 11;
+    public static final int MYSENSORS_SUBTYPE_I_SKETCH_VERSION 			= 12;
+    public static final int MYSENSORS_SUBTYPE_I_REBOOT 					= 13;
+    public static final int MYSENSORS_SUBTYPE_I_GATEWAY_READY 			= 14;
+    public static final int MYSENSORS_SUBTYPE_I_REQUEST_SIGNING 		= 15;
+    public static final int MYSENSORS_SUBTYPE_I_GET_NONCE 				= 16;
+    public static final int MYSENSORS_SUBTYPE_I_GET_NONCE_RESONSE 		= 17;
+    public static final int MYSENSORS_SUBTYPE_I_HEARTBEAT_REQUEST 		= 18;
+    public static final int MYSENSORS_SUBTYPE_I_PRESENTATION 			= 19;
+    public static final int MYSENSORS_SUBTYPE_I_DISCOVER 				= 20;
+    public static final int MYSENSORS_SUBTYPE_I_DISCOVER_RESPONSE 		= 21;
+    public static final int MYSENSORS_SUBTYPE_I_HEARTBEAT_RESPONSE 		= 22;
+    public static final int MYSENSORS_SUBTYPE_I_LOCKED 					= 23;
+    public static final int MYSENSORS_SUBTYPE_I_PING 					= 24;
+    public static final int MYSENSORS_SUBTYPE_I_PONG 					= 25;
+    public static final int MYSENSORS_SUBTYPE_I_REGISTRATION_REQUEST 	= 26;
+    public static final int MYSENSORS_SUBTYPE_I_REGISTRATION_RESPONSE 	= 27;
+    public static final int MYSENSORS_SUBTYPE_I_DEBUG 					= 28;
 
     // How often and at which times should the binding retry to send a message if requestAck is true?
     public static final int MYSENSORS_NUMBER_OF_RETRIES = 5;
@@ -226,6 +229,8 @@ public class MySensorsBindingConstants {
     public final static ThingTypeUID THING_TYPE_IR_SEND = new ThingTypeUID(BINDING_ID, "irSend");
     public final static ThingTypeUID THING_TYPE_IR_RECEIVE = new ThingTypeUID(BINDING_ID, "irReceive");
     public final static ThingTypeUID THING_TYPE_AIR_QUALITY = new ThingTypeUID(BINDING_ID, "airQuality");
+    public final static ThingTypeUID THING_TYPE_DUST = new ThingTypeUID(BINDING_ID, "dust");
+    public final static ThingTypeUID THING_TYPE_COLOR_SENSOR = new ThingTypeUID(BINDING_ID, "colorSensor");
 
     // List of bridges
     public final static ThingTypeUID THING_TYPE_BRIDGE_SER = new ThingTypeUID(BINDING_ID, "bridge-ser");
@@ -288,7 +293,6 @@ public class MySensorsBindingConstants {
     public final static String CHANNEL_IR_RECEIVE = "irReceive";
     public final static String CHANNEL_MYSENSORS_MESSAGE = "mySensorsMessage";
     public final static String CHANNEL_LAST_UPDATE = "lastupdate";
-    public final static String CHANNEL_CO2_LEVEL = "co2-level";
 
     // Wait time Arduino reset
     public final static int RESET_TIME = 3000;
@@ -342,7 +346,6 @@ public class MySensorsBindingConstants {
             put(MYSENSORS_SUBTYPE_V_VOLUME, CHANNEL_VOLUME);
             put(MYSENSORS_SUBTYPE_V_LOCK_STATUS, CHANNEL_LOCK_STATUS);
             put(MYSENSORS_SUBTYPE_V_LEVEL, CHANNEL_LEVEL);
-            put(MYSENSORS_SUBTYPE_V_LEVEL, CHANNEL_CO2_LEVEL);
             put(MYSENSORS_SUBTYPE_V_RGB, CHANNEL_RGB);
             put(MYSENSORS_SUBTYPE_V_RGBW, CHANNEL_RGBW);
             put(MYSENSORS_SUBTYPE_V_ID, CHANNEL_ID);
@@ -383,7 +386,8 @@ public class MySensorsBindingConstants {
             THING_TYPE_RAIN, THING_TYPE_UV, THING_TYPE_WEIGHT, THING_TYPE_DISTANCE, THING_TYPE_LIGHT_LEVEL,
             THING_TYPE_HVAC, THING_TYPE_WATER, THING_TYPE_CUSTOM, THING_TYPE_LOCK, THING_TYPE_SOUND,
             THING_TYPE_RGB_LIGHT, THING_TYPE_RGBW_LIGHT, THING_TYPE_WATER_QUALITY, THING_TYPE_MYSENSORS_MESSAGE,
-            THING_TYPE_TEXT, THING_TYPE_IR_SEND, THING_TYPE_IR_RECEIVE, THING_TYPE_AIR_QUALITY);
+            THING_TYPE_TEXT, THING_TYPE_IR_SEND, THING_TYPE_IR_RECEIVE, THING_TYPE_AIR_QUALITY, THING_TYPE_DUST,
+            THING_TYPE_COLOR_SENSOR);
     /** Supported bridges */
     public final static Set<ThingTypeUID> SUPPORTED_BRIDGE_THING_TYPES_UIDS = ImmutableSet.of(THING_TYPE_BRIDGE_SER,
             THING_TYPE_BRIDGE_ETH);
@@ -395,6 +399,8 @@ public class MySensorsBindingConstants {
             THING_TYPE_RAIN, THING_TYPE_UV, THING_TYPE_WEIGHT, THING_TYPE_DISTANCE, THING_TYPE_LIGHT_LEVEL,
             THING_TYPE_HVAC, THING_TYPE_WATER, THING_TYPE_CUSTOM, THING_TYPE_LOCK, THING_TYPE_SOUND,
             THING_TYPE_RGB_LIGHT, THING_TYPE_RGBW_LIGHT, THING_TYPE_WATER_QUALITY, THING_TYPE_MYSENSORS_MESSAGE,
-            THING_TYPE_TEXT, THING_TYPE_IR_SEND, THING_TYPE_IR_RECEIVE, THING_TYPE_AIR_QUALITY, THING_TYPE_BRIDGE_SER,
+            THING_TYPE_TEXT, THING_TYPE_IR_SEND, THING_TYPE_IR_RECEIVE, THING_TYPE_AIR_QUALITY, THING_TYPE_DUST,
+            THING_TYPE_COLOR_SENSOR,
+            THING_TYPE_BRIDGE_SER,
             THING_TYPE_BRIDGE_ETH);
 }
