@@ -1274,7 +1274,7 @@
 		<state readOnly="true"></state>
 	</channel-type>
 	<channel-type id="armed-channel">
-		<item-type>Contact</item-type>
+		<item-type>Switch</item-type>
 		<label>Armed Status</label>
 		<description>Armed Status</description>
 		<state readOnly="true"></state>

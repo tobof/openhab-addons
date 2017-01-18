@@ -302,7 +302,8 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
                         String channel = CHANNEL_MAP.get(msg.getSubType());
 
                         switch (channel) {
-                            case CHANNEL_STATUS:
+                        	case CHANNEL_ARMED:
+                        	case CHANNEL_STATUS:
                                 if (msg.getMsg().equals("1")) {
                                     updateState(channel, OnOffType.ON);
                                 } else if (msg.getMsg().equals("0")) {
@@ -310,7 +311,6 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
                                 }
                                 break;
 
-                            case CHANNEL_ARMED:
                             case CHANNEL_TRIPPED:
                             case CHANNEL_LOCK_STATUS:
                                 if (msg.getMsg().equals("1")) {

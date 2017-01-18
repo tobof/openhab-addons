@@ -57,13 +57,13 @@ echo "172;1;1;0;0;27" > $serialPort
 #echo "111;112;1;0;32;ABCDEFGHIJKL" > $serialPort
 
 #### Represent door
-#echo "172;4;0;0;0;1.4.1" > $serialPort
+echo "172;4;0;0;0;1.4.1" > $serialPort
 
 # Set Tripped status
-#echo "172;4;1;0;16;1" > $serialPort
+echo "172;4;1;0;16;1" > $serialPort
 
 # Set Armed status
-#echo "172;4;1;0;15;1" > $serialPort
+echo "172;4;1;0;15;1" > $serialPort
 
 #### Represent motion
 #echo "174;0;0;0;1;2.0.1" > $serialPort
@@ -196,13 +196,13 @@ echo "172;1;1;0;0;27" > $serialPort
 echo "172;3;3;0;22;1" > $serialPort
 
 # Representation of a S_COLOR_SENSOR
-echo "1;0;0;0;28;2.1.0" > $serialPort
+#echo "1;0;0;0;28;2.1.0" > $serialPort
 
 # set rgb
-echo "1;0;1;0;40;ff00ff" > $serialPort
+#echo "1;0;1;0;40;ff00ff" > $serialPort
 
 # Representation of a S_DUST
-echo "1;1;0;0;24;2.1.0" > $serialPort
+#echo "1;1;0;0;24;2.1.0" > $serialPort
 
 # set dust level
-echo "1;1;1;0;37;66" > $serialPort
+#echo "1;1;1;0;37;66" > $serialPort
