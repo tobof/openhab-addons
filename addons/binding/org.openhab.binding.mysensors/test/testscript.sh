@@ -51,10 +51,10 @@ echo "172;1;1;0;0;27" > $serialPort
 echo "123;123;1;0;47;ipsumlorum" > $serialPort
 
 # Set V_IR_RECEIVE
-#echo "111;111;1;0;33;FADEXXFE" > $serialPort
+echo "111;111;1;0;33;FADEXXFE" > $serialPort
 
 # Set V_IR_SEND
-#echo "111;112;1;0;32;ABCDEFGHIJKL" > $serialPort
+echo "111;112;1;0;32;ABCDEFGHIJKL" > $serialPort
 
 #### Represent door
 echo "172;4;0;0;0;1.4.1" > $serialPort
@@ -75,22 +75,22 @@ echo "174;0;1;0;16;1" > $serialPort
 echo "174;0;1;0;15;0" > $serialPort
 
 #### Represent smoke
-#echo "172;6;0;0;2;1.4.1" > $serialPort
+echo "172;6;0;0;2;1.4.1" > $serialPort
 
 # Set Tripped status
-#echo "172;6;1;0;16;1" > $serialPort
+echo "172;6;1;0;16;1" > $serialPort
 
 #### Represent Dimmer
-#echo "172;7;0;0;4;1.4.1" > $serialPort
+echo "172;7;0;0;4;1.4.1" > $serialPort
 
 # Set dimmer status
 echo "172;7;1;0;3;49" > $serialPort
 
 # Set dimmer status
-#echo "172;7;1;0;2;1" > $serialPort
+echo "172;7;1;0;2;1" > $serialPort
 
 #### Represent Cover
-#echo "172;8;0;0;5;1.4.1" > $serialPort
+echo "172;8;0;0;5;1.4.1" > $serialPort
 
 # Set cover status UP(29) == 1, DOWN(30) == 1
 echo "172;8;1;0;29;1" > $serialPort
@@ -100,91 +100,91 @@ echo "172;8;1;0;30;1" > $serialPort
 
 
 #### Represent wind
-#echo "172;9;0;0;9;1.4.1" > $serialPort
+echo "172;9;0;0;9;1.4.1" > $serialPort
 
 # Set wind speed
-#echo "172;9;1;0;8;4.9" > $serialPort
+echo "172;9;1;0;8;4.9" > $serialPort
 
 # Set wind gust
-#echo "172;9;1;0;9;11.8" > $serialPort
+echo "172;9;1;0;9;11.8" > $serialPort
 
 
 #### Represent rain
-#echo "172;10;0;0;10;1.4.1" > $serialPort
+echo "172;10;0;0;10;1.4.1" > $serialPort
 
 # Set rain
-#echo "172;10;1;0;6;19.7" > $serialPort
+echo "172;10;1;0;6;19.7" > $serialPort
 
 # Set rain rate
-#echo "172;10;1;0;7;114" > $serialPort
+echo "172;10;1;0;7;114" > $serialPort
 
 
 #### Represent UV
-#echo "172;11;0;0;11;1.4.1" > $serialPort
+echo "172;11;0;0;11;1.4.1" > $serialPort
 
 # Set rain
-#echo "172;11;1;0;11;8.15" > $serialPort
+echo "172;11;1;0;11;8.15" > $serialPort
 
 #### Represent WEIGHT
-#echo "172;12;0;0;12;1.4.1" > $serialPort
+echo "172;12;0;0;12;1.4.1" > $serialPort
 
 # Set weight
-#echo "172;12;1;0;12;1982.12" > $serialPort
+echo "172;12;1;0;12;1982.12" > $serialPort
 
 # Set impedance
-#echo "172;12;1;0;14;1000000" > $serialPort
+echo "172;12;1;0;14;1000000" > $serialPort
 
 #### Represent DISTANCE
-#echo "172;13;0;0;15;1.4.1" > $serialPort
+echo "172;13;0;0;15;1.4.1" > $serialPort
 
 # Set DISTANCE
-#echo "172;13;1;0;13;1543.98" > $serialPort
+echo "172;13;1;0;13;1543.98" > $serialPort
 
 #### Represent LIGHT_LEVEL
-#echo "172;14;0;0;16;1.4.1" > $serialPort
+echo "172;14;0;0;16;1.4.1" > $serialPort
 
 # Set LIGHT_LEVEL
-#echo "172;14;1;0;23;1543.98" > $serialPort
+echo "172;14;1;0;23;1543.98" > $serialPort
 
 # Set watt status
-#echo "172;7;1;0;17;0815" > $serialPort
+echo "172;7;1;0;17;0815" > $serialPort
 
-#echo "172;0;1;0;1;38.6" > $serialPort
-#echo "172;1;1;0;0;27.2" > $serialPort
-#echo "172;2;1;0;38;8.4" > $serialPort
+echo "172;0;1;0;1;38.6" > $serialPort
+echo "172;1;1;0;0;27.2" > $serialPort
+echo "172;2;1;0;38;8.4" > $serialPort
 
 
 # Representation of a S_POWER Sensor
-#echo "3;1;0;0;13;1.4.1" > $serialPort
+echo "3;1;0;0;13;1.4.1" > $serialPort
 
 # S_POWER Sensor
-#echo "3;1;1;0;17;2810" > $serialPort # the current power consumption (Watt)
-#echo "3;1;1;0;18;106.2550" > $serialPort # the overall power usage since sensor boot (KWH)
+echo "3;1;1;0;17;2810" > $serialPort # the current power consumption (Watt)
+echo "3;1;1;0;18;106.2550" > $serialPort # the overall power usage since sensor boot (KWH)
 
 # Representation of a S_BARO
-#echo "6;3;0;0;8;1.4.1" > $serialPort
+echo "6;3;0;0;8;1.4.1" > $serialPort
 
 # Barometer forecast V_BARO
-#echo "6;3;1;0;5;stable" > $serialPort
+echo "6;3;1;0;5;stable" > $serialPort
 
 # Barometer pressure V_PRESSURE
-#echo "6;3;1;0;4;1.2" > $serialPort
+echo "6;3;1;0;4;1.2" > $serialPort
 
 # Representation of S_MULTIMETER Sensor
-#echo "12;3;0;0;30;1.5.0" > $serialPort
+echo "12;3;0;0;30;1.5.0" > $serialPort
 
 # set volt
-#echo "12;3;1;0;38;5678" > $serialPort
+echo "12;3;1;0;38;5678" > $serialPort
 
 # set current
-#echo "12;3;1;0;39;1234" > $serialPort
+echo "12;3;1;0;39;1234" > $serialPort
 
 # set impedance
-#echo "12;3;1;0;14;1000000" > $serialPort
+echo "12;3;1;0;14;1000000" > $serialPort
 
 #get time
-#echo "172;255;3;0;1;0" > $serialPort # I_TIME
+echo "172;255;3;0;1;0" > $serialPort # I_TIME
 
 # INTERNAL
 # batteryLevel
-#echo "12;255;3;0;0;100" > $serialPort
+echo "12;255;3;0;0;100" > $serialPort

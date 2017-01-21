@@ -12,7 +12,6 @@ import java.util.Arrays;
 import java.util.Enumeration;
 
 import org.apache.commons.lang.StringUtils;
-import org.openhab.binding.mysensors.MySensorsBindingConstants;
 import org.openhab.binding.mysensors.internal.event.MySensorsEventRegister;
 import org.openhab.binding.mysensors.internal.gateway.MySensorsGatewayConfig;
 import org.openhab.binding.mysensors.internal.protocol.MySensorsAbstractConnection;
@@ -53,8 +52,8 @@ public class MySensorsSerialConnection extends MySensorsAbstractConnection {
 
             try {
                 logger.debug("Waiting {} seconds to allow correct reset trigger on serial connection opening",
-                        MySensorsBindingConstants.RESET_TIME / 1000);
-                Thread.sleep(MySensorsBindingConstants.RESET_TIME);
+                        RESET_TIME / 1000);
+                Thread.sleep(RESET_TIME);
             } catch (InterruptedException e) {
                 logger.error("Interrupted reset time wait");
             }

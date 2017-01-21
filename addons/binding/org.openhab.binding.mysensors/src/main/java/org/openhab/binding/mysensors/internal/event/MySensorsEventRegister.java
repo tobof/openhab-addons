@@ -4,9 +4,9 @@ import java.util.List;
 
 import org.openhab.binding.mysensors.internal.protocol.MySensorsAbstractConnection;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
-import org.openhab.binding.mysensors.internal.sensors.MySensorsVariable;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsNode;
+import org.openhab.binding.mysensors.internal.sensors.MySensorsVariable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,7 +16,8 @@ public class MySensorsEventRegister extends EventRegister<MySensorsGatewayEventL
 
     private EventRegister<MySensorsGatewayEventListener> eventRegister;
 
-    // TODO send update only if necessary (e.g.: status update true->false, false->true)
+    // TODO #1 send update only if necessary (e.g.: status update true->false, false->true
+    // TODO #2 asynchronous message notify
 
     public MySensorsEventRegister() {
         eventRegister = new EventRegister<>();
@@ -106,13 +107,14 @@ public class MySensorsEventRegister extends EventRegister<MySensorsGatewayEventL
         }
     }
 
-    public void notifyNodeUpdateEvent(MySensorsNode node, MySensorsChild child, MySensorsVariable variable) {
+    public void notifyNodeUpdateEvent(MySensorsNode node, MySensorsChild child, MySensorsVariable variable,
+            boolean isRevert) {
         synchronized (eventRegister.getEventListeners()) {
             for (MySensorsGatewayEventListener listener : eventRegister.getEventListeners()) {
                 logger.trace("Broadcasting event {} to: {}", variable, listener);
 
                 try {
-                    listener.channelUpdateEvent(node, child, variable);
+                    listener.channelUpdateEvent(node, child, variable, isRevert);
                 } catch (Throwable e) {
                     logger.error("Event broadcasting throw an exception", e);
                 }
@@ -132,6 +134,21 @@ public class MySensorsEventRegister extends EventRegister<MySensorsGatewayEventL
                 }
             }
         }
+    }
+
+    public void notifyAckNotReceived(MySensorsMessage msg) {
+        synchronized (eventRegister.getEventListeners()) {
+            for (MySensorsGatewayEventListener listener : eventRegister.getEventListeners()) {
+                logger.trace("Broadcasting event {} to: {}", msg, listener);
+
+                try {
+                    listener.ackNotReceived(msg);
+                } catch (Throwable e) {
+                    logger.error("Event broadcasting throw an exception", e);
+                }
+            }
+        }
+
     }
 
 }

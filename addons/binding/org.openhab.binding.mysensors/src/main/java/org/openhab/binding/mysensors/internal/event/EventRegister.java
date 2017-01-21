@@ -8,6 +8,13 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Event register generic class
+ *
+ * @author Andrea Cioni
+ *
+ * @param <T> the EventListener to register
+ */
 public class EventRegister<T extends EventListener> implements MySensorsEventObservable<T> {
 
     private Logger logger = LoggerFactory.getLogger(getClass());

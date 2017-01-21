@@ -15,9 +15,10 @@ import java.util.Map;
 
 /**
  * Characteristics of a thing/node are stored here:
- * - List of childs
+ * - List of children
  * - Last update (DateTime) from the node
  * - is the child reachable?
+ * - battery percent (if available)
  *
  * @author Andrea Cioni
  *
@@ -28,7 +29,7 @@ public class MySensorsNode {
     public static final int MYSENSORS_NODE_ID_RESERVED_0 = 0;
     public static final int MYSENSORS_NODE_ID_RESERVED_255 = 255;
 
-    private int nodeId;
+    private final int nodeId;
 
     private boolean reachable = true;
 
@@ -39,14 +40,11 @@ public class MySensorsNode {
     private int batteryPercent = 0;
 
     public MySensorsNode(int nodeId) {
+        if (!isValidNodeId(nodeId)) {
+            throw new IllegalArgumentException("Invalid node id supplied: " + nodeId);
+        }
         this.nodeId = nodeId;
         this.chidldMap = new HashMap<Integer, MySensorsChild>();
-        this.lastUpdate = new Date(0);
-    }
-
-    public MySensorsNode(int nodeId, Map<Integer, MySensorsChild> chidldMap) {
-        this.nodeId = nodeId;
-        this.chidldMap = chidldMap;
         this.lastUpdate = new Date(0);
     }
 

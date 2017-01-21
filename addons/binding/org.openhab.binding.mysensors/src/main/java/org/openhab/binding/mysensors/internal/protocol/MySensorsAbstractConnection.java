@@ -24,9 +24,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import org.openhab.binding.mysensors.MySensorsBindingConstants;
 import org.openhab.binding.mysensors.internal.event.MySensorsEventRegister;
-import org.openhab.binding.mysensors.internal.event.MySensorsGatewayEventListener;
 import org.openhab.binding.mysensors.internal.gateway.MySensorsGatewayConfig;
 import org.openhab.binding.mysensors.internal.gateway.MySensorsNetworkSanityChecker;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
@@ -40,11 +38,14 @@ import org.slf4j.LoggerFactory;
  * @author Andrea Cioni
  *
  */
-public abstract class MySensorsAbstractConnection implements Runnable, MySensorsGatewayEventListener {
+public abstract class MySensorsAbstractConnection implements Runnable {
 
     // How often and at which times should the binding retry to send a message if requestAck is true?
     public static final int MYSENSORS_NUMBER_OF_RETRIES = 5;
     public static final int[] MYSENSORS_RETRY_TIMES = { 0, 100, 500, 1000, 2000 };
+
+    // Wait time Arduino reset
+    public final static int RESET_TIME = 3000;
 
     // How long should a Smartsleep message be left in the queue?
     public static final int MYSENSORS_SMARTSLEEP_TIMEOUT = 216000; // 6 hours
@@ -53,6 +54,11 @@ public abstract class MySensorsAbstractConnection implements Runnable, MySensors
 
     // Connector will check for connection status every CONNECTOR_INTERVAL_CHECK seconds
     public static final int CONNECTOR_INTERVAL_CHECK = 10;
+
+    // Used to insert value in oldMsgContent
+    private static final int OLD_MESSAGE_CUSTOM_HASH[] = { MySensorsMessage.MYSENSORS_MSG_PART_NODE,
+            MySensorsMessage.MYSENSORS_MSG_PART_CHILD, MySensorsMessage.MYSENSORS_MSG_PART_TYPE,
+            MySensorsMessage.MYSENSORS_MSG_PART_SUBTYPE };
 
     // ??
     private boolean pauseWriter = false;
@@ -139,7 +145,7 @@ public abstract class MySensorsAbstractConnection implements Runnable, MySensors
             }
 
         } else {
-            logger.debug("Bridge is connected, connection skipped");
+            logger.trace("Bridge is connected, connection skipped");
         }
 
     }
@@ -211,13 +217,11 @@ public abstract class MySensorsAbstractConnection implements Runnable, MySensors
         writer.startWriter();
 
         if (!skipStartupCheck) {
-            myEventRegister.addEventListener(this);
-
             try {
                 int i = 0;
                 synchronized (this) {
                     while (!iVersionResponse && i < 5) {
-                        addMySensorsOutboundMessage(MySensorsBindingConstants.I_VERSION_MESSAGE);
+                        addMySensorsOutboundMessage(MySensorsMessage.I_VERSION_MESSAGE);
                         waitingObj = this;
                         waitingObj.wait(1000);
                         i++;
@@ -225,8 +229,6 @@ public abstract class MySensorsAbstractConnection implements Runnable, MySensors
                 }
             } catch (Exception e) {
                 logger.error("Exception on waiting for I_VERSION message", e);
-            } finally {
-                myEventRegister.removeEventListener(this);
             }
         } else {
             logger.warn("Skipping I_VERSION connection test, not recommended...");
@@ -243,11 +245,18 @@ public abstract class MySensorsAbstractConnection implements Runnable, MySensors
 
     /**
      * Add a message to the outbound queue. The message will be send automatically. FIFO queue.
+     * This method also has the task to populate oldMessage (and keep track thought oldMsgContent map) field on
+     * MySensorsMessage
      *
      * @param msg The message that should be send.
      */
     public void addMySensorsOutboundMessage(MySensorsMessage msg) {
-        addMySensorsOutboundMessage(msg, 1);
+
+        if (msg.isSmartSleep()) {
+            addMySensorsOutboundSmartSleepMessage(msg);
+        } else {
+            addMySensorsOutboundMessage(msg, 1);
+        }
     }
 
     /**
@@ -277,7 +286,7 @@ public abstract class MySensorsAbstractConnection implements Runnable, MySensors
      *
      * @param msg the message that should be added to the queue.
      */
-    public void addMySensorsOutboundSmartSleepMessage(MySensorsMessage msg) {
+    private void addMySensorsOutboundSmartSleepMessage(MySensorsMessage msg) {
 
         // Only one pending message is allowed in the queue.
         removeSmartSleepMessage(msg.getNodeId(), msg.getChildId());
@@ -419,14 +428,6 @@ public abstract class MySensorsAbstractConnection implements Runnable, MySensors
         pauseWriter = false;
     }
 
-    @Override
-    public void messageReceived(MySensorsMessage msg) throws Throwable {
-        // Have we get a I_VERSION message?
-        if (msg.isIVersionMessage()) {
-            iVersionMessageReceived(msg.msg);
-        }
-    }
-
     private void iVersionMessageReceived(String msg) {
         if (waitingObj != null) {
             logger.debug("Good,Gateway is up and running! (Ver:{})", msg);
@@ -438,6 +439,11 @@ public abstract class MySensorsAbstractConnection implements Runnable, MySensors
         }
     }
 
+    private void handleAckReceived(MySensorsMessage msg) {
+        logger.debug(String.format("ACK received! Node: %d, Child: %d", msg.getNodeId(), msg.getChildId()));
+        removeMySensorsOutboundMessage(msg);
+    }
+
     /**
      * Implements the reader (IP & serial) that receives the messages from the MySensors network.
      *
@@ -447,15 +453,15 @@ public abstract class MySensorsAbstractConnection implements Runnable, MySensors
      */
     protected class MySensorsReader implements Runnable {
 
-        protected Logger logger = LoggerFactory.getLogger(MySensorsReader.class);
+        private Logger logger = LoggerFactory.getLogger(MySensorsReader.class);
 
-        protected ExecutorService executor = Executors.newSingleThreadExecutor();
-        protected Future<?> future = null;
+        private ExecutorService executor = Executors.newSingleThreadExecutor();
+        private Future<?> future = null;
 
-        protected InputStream inStream = null;
-        protected BufferedReader reads = null;
+        private InputStream inStream = null;
+        private BufferedReader reads = null;
 
-        protected boolean stopReader = false;
+        private boolean stopReader = false;
 
         public MySensorsReader(InputStream inStream) {
             this.inStream = inStream;
@@ -494,6 +500,16 @@ public abstract class MySensorsAbstractConnection implements Runnable, MySensors
                     logger.debug(line);
                     MySensorsMessage msg = MySensorsMessage.parse(line);
                     if (msg != null) {
+                        // Have we get a I_VERSION message?
+                        if (msg.isIVersionMessage()) {
+                            iVersionMessageReceived(msg.getMsg());
+                        }
+
+                        // Is this an ACK message?
+                        if (msg.getAck() == 1) {
+                            handleAckReceived(msg);
+                        }
+
                         myEventRegister.notifyMessageReceived(msg);
                     }
                 } catch (Exception e) {
@@ -550,17 +566,17 @@ public abstract class MySensorsAbstractConnection implements Runnable, MySensors
      *
      */
     protected class MySensorsWriter implements Runnable {
-        protected Logger logger = LoggerFactory.getLogger(MySensorsWriter.class);
+        private Logger logger = LoggerFactory.getLogger(MySensorsWriter.class);
 
-        protected boolean stopWriting = false; // Stop the thread that sends the messages to the MySensors network
-        protected long lastSend = System.currentTimeMillis(); // date when the last message was sent. Messages are send
-                                                              // with
-                                                              // a delay in between.
-        protected PrintWriter outs = null;
-        protected OutputStream outStream = null;
+        private boolean stopWriting = false; // Stop the thread that sends the messages to the MySensors network
+        private long lastSend = System.currentTimeMillis(); // date when the last message was sent. Messages are send
+                                                            // with
+                                                            // a delay in between.
+        private PrintWriter outs = null;
+        private OutputStream outStream = null;
 
-        protected ExecutorService executor = Executors.newSingleThreadExecutor();
-        protected Future<?> future = null;
+        private ExecutorService executor = Executors.newSingleThreadExecutor();
+        private Future<?> future = null;
 
         public MySensorsWriter(OutputStream outStream) {
             this.outStream = outStream;
@@ -597,16 +613,19 @@ public abstract class MySensorsAbstractConnection implements Runnable, MySensors
                                         addMySensorsOutboundMessage(msg);
                                     } else {
                                         logger.warn("NO ACK from nodeId: {}", msg.getNodeId());
-                                        if (msg.getOldMsg().isEmpty()) {
-                                            logger.debug("No old status know to revert to!");
-                                        } else if (msg.getRevert()) {
-                                            logger.debug("Reverting status!");
-                                            msg.setMsg(msg.getOldMsg());
-                                            msg.setAck(0);
-                                            myEventRegister.notifyMessageReceived(msg);
-                                        } else if (!msg.getRevert()) {
-                                            logger.debug("Not reverted due to configuration!");
-                                        }
+                                        /*
+                                         * if (msg.getOldMsg().isEmpty() || msg.getOldMsg() == null) {
+                                         * logger.warn("No old status know to revert to!");
+                                         * } else if (msg.getRevert()) {
+                                         * logger.debug("Reverting status!");
+                                         * msg.setMsg(msg.getOldMsg());
+                                         * msg.setAck(0);
+                                         *
+                                         * } else if (!msg.getRevert()) {
+                                         * logger.debug("Not reverted due to configuration!");
+                                         * }
+                                         */
+                                        myEventRegister.notifyAckNotReceived(msg);
                                         continue;
                                     }
                                 }

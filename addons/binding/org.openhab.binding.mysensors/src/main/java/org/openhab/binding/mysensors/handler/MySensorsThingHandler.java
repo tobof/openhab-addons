@@ -9,7 +9,7 @@ package org.openhab.binding.mysensors.handler;
 
 import static org.openhab.binding.mysensors.MySensorsBindingConstants.*;
 
-import java.util.HashMap;
+import java.text.SimpleDateFormat;
 import java.util.Map;
 
 import org.eclipse.smarthome.core.library.types.DateTimeType;
@@ -55,7 +55,7 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
 
     private DateTimeType lastUpdate = null;
 
-    private Map<Integer, String> oldMsgContent = new HashMap<Integer, String>();
+    // private Map<Integer, String> oldMsgContent = new HashMap<Integer, String>();
 
     private MySensorsGateway myGateway;
 
@@ -114,7 +114,6 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
         }
 
         String msgPayload = "";
-        int subType = 0;
         int int_requestack = requestAck ? 1 : 0;
 
         // just forward the message in case it is received via this channel. This is special!
@@ -126,31 +125,32 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
                 return;
             }
         } else {
-            MySensorsVariable var = myGateway.getVariable(nodeId, childId, INVERSE_CHANNEL_MAP.get(channelUID.getId()));
-            if (var != null) {
+            MySensorsTypeAdapter adapter = loadAdapterForChannel(channelUID.getId());
 
-                // Update value into the MS device
-                var.setValue(loadAdapterForChannel(channelUID.getId()).fromCommand(command));
+            if (adapter != null) {
+                MySensorsVariable var = myGateway.getVariable(nodeId, childId,
+                        adapter.typeFromChannelCommand(channelUID.getId(), command));
 
-                // Create the real message to send
-                MySensorsMessage newMsg = new MySensorsMessage(nodeId, childId, MySensorsMessage.MYSENSORS_MSG_TYPE_SET,
-                        int_requestack, revertState, smartSleep);
+                if (var != null) {
 
-                newMsg.setSubType(var.getType());
-                newMsg.setMsg(var.reqValue());
+                    int subType = var.getType();
 
-                String oldPayload = oldMsgContent.get(subType);
-                if (oldPayload == null) {
-                    oldPayload = "";
+                    // Create the real message to send
+                    MySensorsMessage newMsg = new MySensorsMessage(nodeId, childId,
+                            MySensorsMessage.MYSENSORS_MSG_TYPE_SET, int_requestack, revertState, smartSleep);
+
+                    newMsg.setSubType(subType);
+                    newMsg.setMsg(adapter.fromCommand(command));
+
+                    myGateway.sendMessage(newMsg);
+
+                } else {
+                    logger.warn("Variable not found, cannot handle command for thing {}", thing.getUID());
                 }
-                newMsg.setOldMsg(oldPayload);
-                oldMsgContent.put(subType, msgPayload);
-
-                myGateway.sendMessage(newMsg);
-
             } else {
-                logger.warn("Variable not found, cannot handle command for thing {}", thing.getUID());
+                logger.error("Type adapter not found for {}", channelUID.getId());
             }
+
         }
     }
 
@@ -161,10 +161,10 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
     }
 
     @Override
-    public void channelUpdateEvent(MySensorsNode node, MySensorsChild child, MySensorsVariable var) {
+    public void channelUpdateEvent(MySensorsNode node, MySensorsChild child, MySensorsVariable var, boolean isRevert) {
         if (node.getNodeId() == nodeId && child.getChildId() == childId) {
             handleChildUpdateEvent(var);
-            updateLastUpdate();
+            updateLastUpdate(child, isRevert);
         }
     }
 
@@ -179,13 +179,20 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
      * For every thing there is a lastUpdate channel in which the date/time is stored
      * a message was received from this thing.
      */
-    private void updateLastUpdate() {
+    private void updateLastUpdate(MySensorsChild child, boolean isRevert) {
         // Don't always fire last update channel, do it only after a minute by
-        if (lastUpdate == null || (System.currentTimeMillis() > (lastUpdate.getCalendar().getTimeInMillis() + 60000))) {
-            DateTimeType dt = new DateTimeType();
+        if (lastUpdate == null || (System.currentTimeMillis() > (lastUpdate.getCalendar().getTimeInMillis() + 60000))
+                || revertState) {
+            DateTimeType dt = new DateTimeType(
+                    new SimpleDateFormat(DateTimeType.DATE_PATTERN).format(child.getLastUpdate()));
             lastUpdate = dt;
             updateState(CHANNEL_LAST_UPDATE, dt);
-            logger.debug("Setting last update for node/child {}/{} to {}", nodeId, childId, dt.toString());
+            if (!isRevert) {
+                logger.debug("Setting last update for node/child {}/{} to {}", nodeId, childId, dt.toString());
+            } else {
+                logger.warn("Setting last update for node/child {}/{} BACK (due to revert) to {}", nodeId, childId,
+                        dt.toString());
+            }
         }
     }
 
@@ -212,11 +219,7 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
     }
 
     private MySensorsTypeAdapter loadAdapterForChannel(String channelName) {
-        try {
-            return TYPE_MAP.get(channelName).newInstance();
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
-        }
+        return TYPE_MAP.get(channelName);
     }
 
     /**

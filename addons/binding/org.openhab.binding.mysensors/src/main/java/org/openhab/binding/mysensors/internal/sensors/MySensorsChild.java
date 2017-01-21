@@ -7,11 +7,53 @@
  */
 package org.openhab.binding.mysensors.internal.sensors;
 
+import static org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage.*;
+
+import java.lang.reflect.Constructor;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.openhab.binding.mysensors.internal.Pair;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_AIR_QUALITY;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_ARDUINO_NODE;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_ARDUINO_REPEATER_NODE;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_BARO;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_BINARY;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_COLOR_SENSOR;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_COVER;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_CUSTOM;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_DIMMER;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_DISTANCE;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_DOOR;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_DUST;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_GAS;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_GPS;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_HEATER;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_HUM;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_HVAC;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_INFO;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_IR;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_LIGHT_LEVEL;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_LOCK;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_MOISTURE;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_MOTION;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_MULTIMETER;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_POWER;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_RAIN;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_RGBW_LIGHT;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_RGB_LIGHT;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_SCENE_CONTROLLER;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_SMOKE;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_SOUND;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_SPRINKLER;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_TEMP;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_UV;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_VIBRATION;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_WATER;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_WATER_LEAK;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_WATER_QUALITY;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_WEIGHT;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_WIND;
 import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariable_V_VAR1;
 import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariable_V_VAR2;
 import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariable_V_VAR3;
@@ -34,12 +76,74 @@ public class MySensorsChild {
 
     protected Logger logger = LoggerFactory.getLogger(getClass());
 
-    private Integer childId = 0;
+    /**
+     * Used to build child from presentation code
+     */
+    public final static Map<Integer, Class<? extends MySensorsChild>> PRESENTATION_TO_CHILD_CLASS = new HashMap<Integer, Class<? extends MySensorsChild>>() {
+
+        /**
+         *
+         */
+        private static final long serialVersionUID = -3479184996747993491L;
+
+        {
+            put(MYSENSORS_SUBTYPE_S_DOOR, MySensorsChild_S_DOOR.class);
+            put(MYSENSORS_SUBTYPE_S_MOTION, MySensorsChild_S_MOTION.class);
+            put(MYSENSORS_SUBTYPE_S_SMOKE, MySensorsChild_S_SMOKE.class);
+            put(MYSENSORS_SUBTYPE_S_LIGHT, MySensorsChild_S_BINARY.class); // BINARY=LIGHT
+            put(MYSENSORS_SUBTYPE_S_BINARY, MySensorsChild_S_BINARY.class);
+            put(MYSENSORS_SUBTYPE_S_DIMMER, MySensorsChild_S_DIMMER.class);
+            put(MYSENSORS_SUBTYPE_S_COVER, MySensorsChild_S_COVER.class);
+            put(MYSENSORS_SUBTYPE_S_TEMP, MySensorsChild_S_TEMP.class);
+            put(MYSENSORS_SUBTYPE_S_HUM, MySensorsChild_S_HUM.class);
+            put(MYSENSORS_SUBTYPE_S_BARO, MySensorsChild_S_BARO.class);
+            put(MYSENSORS_SUBTYPE_S_WIND, MySensorsChild_S_WIND.class);
+            put(MYSENSORS_SUBTYPE_S_RAIN, MySensorsChild_S_RAIN.class);
+            put(MYSENSORS_SUBTYPE_S_UV, MySensorsChild_S_UV.class);
+            put(MYSENSORS_SUBTYPE_S_WEIGHT, MySensorsChild_S_WEIGHT.class);
+            put(MYSENSORS_SUBTYPE_S_POWER, MySensorsChild_S_POWER.class);
+            put(MYSENSORS_SUBTYPE_S_HEATER, MySensorsChild_S_HEATER.class);
+            put(MYSENSORS_SUBTYPE_S_DISTANCE, MySensorsChild_S_DISTANCE.class);
+            put(MYSENSORS_SUBTYPE_S_LIGHT_LEVEL, MySensorsChild_S_LIGHT_LEVEL.class);
+            put(MYSENSORS_SUBTYPE_S_LOCK, MySensorsChild_S_LOCK.class);
+            put(MYSENSORS_SUBTYPE_S_IR, MySensorsChild_S_IR.class);
+            put(MYSENSORS_SUBTYPE_S_WATER, MySensorsChild_S_WATER.class);
+            put(MYSENSORS_SUBTYPE_S_AIR_QUALITY, MySensorsChild_S_AIR_QUALITY.class);
+            put(MYSENSORS_SUBTYPE_S_CUSTOM, MySensorsChild_S_CUSTOM.class);
+            put(MYSENSORS_SUBTYPE_S_RGB_LIGHT, MySensorsChild_S_RGB_LIGHT.class);
+            put(MYSENSORS_SUBTYPE_S_RGBW_LIGHT, MySensorsChild_S_RGBW_LIGHT.class);
+            put(MYSENSORS_SUBTYPE_S_HVAC, MySensorsChild_S_HVAC.class);
+            put(MYSENSORS_SUBTYPE_S_MULTIMETER, MySensorsChild_S_MULTIMETER.class);
+            put(MYSENSORS_SUBTYPE_S_SPRINKLER, MySensorsChild_S_SPRINKLER.class);
+            put(MYSENSORS_SUBTYPE_S_WATER_LEAK, MySensorsChild_S_WATER_LEAK.class);
+            put(MYSENSORS_SUBTYPE_S_SOUND, MySensorsChild_S_SOUND.class);
+            put(MYSENSORS_SUBTYPE_S_VIBRATION, MySensorsChild_S_VIBRATION.class);
+            put(MYSENSORS_SUBTYPE_S_MOISTURE, MySensorsChild_S_MOISTURE.class);
+            put(MYSENSORS_SUBTYPE_S_INFO, MySensorsChild_S_INFO.class);
+            put(MYSENSORS_SUBTYPE_S_GAS, MySensorsChild_S_GAS.class);
+            put(MYSENSORS_SUBTYPE_S_GPS, MySensorsChild_S_GPS.class);
+            put(MYSENSORS_SUBTYPE_S_WATER_QUALITY, MySensorsChild_S_WATER_QUALITY.class);
+            put(MYSENSORS_SUBTYPE_S_SCENE_CONTROLLER, MySensorsChild_S_SCENE_CONTROLLER.class);
+            put(MYSENSORS_SUBTYPE_S_DUST, MySensorsChild_S_DUST.class);
+            put(MYSENSORS_SUBTYPE_S_COLOR_SENSOR, MySensorsChild_S_COLOR_SENSOR.class);
+            put(MYSENSORS_SUBTYPE_S_ARDUINO_REPEATER_NODE, MySensorsChild_S_ARDUINO_REPEATER_NODE.class);
+            put(MYSENSORS_SUBTYPE_S_ARDUINO_NODE, MySensorsChild_S_ARDUINO_NODE.class);
+        }
+
+    };
+
+    private final int childId;
+
     private Map<Integer, MySensorsVariable> variableMap = null;
 
     private Date lastUpdate = null;
 
+    private int presentationCode;
+
     public MySensorsChild(int childId) {
+        if (!isValidChildId(childId)) {
+            throw new IllegalArgumentException("Invalid child id supplied: " + childId);
+        }
         this.childId = childId;
         variableMap = new HashMap<Integer, MySensorsVariable>();
         lastUpdate = new Date(0);
@@ -54,7 +158,7 @@ public class MySensorsChild {
 
         synchronized (variableMap) {
             if (variableMap.containsKey(var.getType())) {
-                logger.warn("Overwrite variable");
+                logger.warn("Overwrite variable: " + var.getType());
             }
 
             variableMap.put(var.getType(), var);
@@ -65,13 +169,12 @@ public class MySensorsChild {
     /**
      * Get MySensorsVariable of this child
      *
-     * @param messageType the integer of message type
-     * @param variableNum the integer of the subtype
+     * @param type the integer of the subtype
      * @return one MySensorsVariable if present, otherwise null
      */
-    public MySensorsVariable getVariable(int messageType, int variableNum) {
+    public MySensorsVariable getVariable(int type) {
         synchronized (variableMap) {
-            return variableMap.get(new Pair<Integer>(messageType, variableNum));
+            return variableMap.get(type);
         }
     }
 
@@ -106,6 +209,14 @@ public class MySensorsChild {
         }
     }
 
+    public int getPresentationCode() {
+        return presentationCode;
+    }
+
+    public void setPresentationCode(int presentationCode) {
+        this.presentationCode = presentationCode;
+    }
+
     /**
      * Static method to ensure if one id belongs to a valid range
      *
@@ -122,6 +233,27 @@ public class MySensorsChild {
         addVariable(new MySensorsVariable_V_VAR3());
         addVariable(new MySensorsVariable_V_VAR4());
         addVariable(new MySensorsVariable_V_VAR5());
+    }
+
+    public static MySensorsChild fromPresentation(int presentationCode, int childId) {
+        MySensorsChild ret;
+
+        if (PRESENTATION_TO_CHILD_CLASS.containsKey(presentationCode)) {
+            try {
+                Class<? extends MySensorsChild> cls = PRESENTATION_TO_CHILD_CLASS.get(presentationCode);
+                Constructor<? extends MySensorsChild> constr = cls.getConstructor(int.class);
+                ret = constr.newInstance(childId);
+            } catch (Exception e) {
+                LoggerFactory.getLogger(MySensorsChild.class).error("Reflection has failed presentation {}, childId:",
+                        presentationCode, childId, e);
+                ret = null;
+            }
+        } else {
+            throw new IllegalArgumentException(
+                    "Presentation code (" + presentationCode + ") or child id not valid (" + childId + ")");
+        }
+
+        return ret;
     }
 
     @Override

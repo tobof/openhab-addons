@@ -5,7 +5,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import org.openhab.binding.mysensors.MySensorsBindingConstants;
 import org.openhab.binding.mysensors.internal.event.MySensorsEventRegister;
 import org.openhab.binding.mysensors.internal.event.MySensorsGatewayEventListener;
 import org.openhab.binding.mysensors.internal.protocol.MySensorsAbstractConnection;
@@ -90,7 +89,7 @@ public class MySensorsNetworkSanityChecker implements MySensorsGatewayEventListe
 
             myEventRegister.addEventListener(this);
 
-            myCon.addMySensorsOutboundMessage(MySensorsBindingConstants.I_VERSION_MESSAGE);
+            myCon.addMySensorsOutboundMessage(MySensorsMessage.I_VERSION_MESSAGE);
 
             Thread.sleep(3000);
 

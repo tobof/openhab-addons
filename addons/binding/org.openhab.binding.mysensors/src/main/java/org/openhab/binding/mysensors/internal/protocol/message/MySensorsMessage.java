@@ -20,6 +20,14 @@ import org.slf4j.LoggerFactory;
  */
 public class MySensorsMessage {
 
+    // Message parts
+    public static final int MYSENSORS_MSG_PART_NODE = 0;
+    public static final int MYSENSORS_MSG_PART_CHILD = 1;
+    public static final int MYSENSORS_MSG_PART_TYPE = 2;
+    public static final int MYSENSORS_MSG_PART_ACK = 3;
+    public static final int MYSENSORS_MSG_PART_SUBTYPE = 4;
+    public static final int MYSENSORS_MSG_PART_PAYLOAD = 5;
+
     // Message types of the MySensors network
     public static final int MYSENSORS_MSG_TYPE_PRESENTATION = 0;
     public static final int MYSENSORS_MSG_TYPE_SET = 1;
@@ -36,6 +44,7 @@ public class MySensorsMessage {
     public static final int MYSENSORS_SUBTYPE_S_MOTION = 1;
     public static final int MYSENSORS_SUBTYPE_S_SMOKE = 2;
     public static final int MYSENSORS_SUBTYPE_S_LIGHT = 3;
+    public static final int MYSENSORS_SUBTYPE_S_BINARY = 3; // Old S_LIGHT in MS API < 2.1
     public static final int MYSENSORS_SUBTYPE_S_DIMMER = 4;
     public static final int MYSENSORS_SUBTYPE_S_COVER = 5;
     public static final int MYSENSORS_SUBTYPE_S_TEMP = 6;
@@ -67,6 +76,11 @@ public class MySensorsMessage {
     public static final int MYSENSORS_SUBTYPE_S_GAS = 37;
     public static final int MYSENSORS_SUBTYPE_S_GPS = 38;
     public static final int MYSENSORS_SUBTYPE_S_WATER_QUALITY = 39;
+    public static final int MYSENSORS_SUBTYPE_S_SCENE_CONTROLLER = 25;
+    public static final int MYSENSORS_SUBTYPE_S_DUST = 24;
+    public static final int MYSENSORS_SUBTYPE_S_COLOR_SENSOR = 28;
+    public static final int MYSENSORS_SUBTYPE_S_ARDUINO_REPEATER_NODE = 18;
+    public static final int MYSENSORS_SUBTYPE_S_ARDUINO_NODE = 17;
 
     // Subtypes for set, req
     public static final int MYSENSORS_SUBTYPE_V_TEMP = 0;
@@ -157,61 +171,65 @@ public class MySensorsMessage {
     public static final int MYSENSORS_SUBTYPE_I_REGISTRATION_RESPONSE = 27;
     public static final int MYSENSORS_SUBTYPE_I_DEBUG = 28;
 
+    // I version message for startup check
+    public static final MySensorsMessage I_VERSION_MESSAGE = new MySensorsMessage(
+            MySensorsNode.MYSENSORS_NODE_ID_RESERVED_0, MySensorsChild.MYSENSORS_CHILD_ID_RESERVED_0,
+            MYSENSORS_MSG_TYPE_INTERNAL, MYSENSORS_ACK_FALSE, false, MYSENSORS_SUBTYPE_I_VERSION, "");
+
     private Logger logger = LoggerFactory.getLogger(MySensorsMessage.class);
 
-    public int nodeId = 0; // id of the node in the MySensors network
-    public int childId = 0; // id of the child of the node (more than one possible)
-    public int msgType = 0; // type of message: request, internal, presentation ...
-    public int ack = 0; // is an acknoledgement requested?
-    public boolean revert = true; // revert status if no ack was received from the node
-    public int subType = 0; // like: humidity, temperature, light ...
-    public String msg = ""; // content of the message
-    public String oldMsg = ""; // content of the last message send to or received by the node
-    public int retries = 0; // number of retries if a message is not acknowledged by the receiver
-    public long nextSend = 0; // timestamp when the message should be send
-    public boolean smartSleep = false; // smartsleep message
+    private int nodeId = 0; // id of the node in the MySensors network
+    private int childId = 0; // id of the child of the node (more than one possible)
+    private int msgType = 0; // type of message: request, internal, presentation ...
+    private int ack = 0; // is an acknoledgement requested?
+    private boolean revert = true; // revert status if no ack was received from the node
+    private int subType = 0; // like: humidity, temperature, light ...
+    private String msg = ""; // content of the message
+    private int retries = 0; // number of retries if a message is not acknowledged by the receiver
+    private long nextSend = 0; // timestamp when the message should be send
+    private boolean smartSleep = false; // smartsleep message
 
     public MySensorsMessage() {
 
     }
 
     public MySensorsMessage(int nodeId, int childId, int msgType, int ack, boolean revert) {
-        this.nodeId = nodeId;
-        this.childId = childId;
-        this.msgType = msgType;
-        this.ack = ack;
-        this.revert = revert;
+        setNodeId(nodeId);
+        setChildId(childId);
+        setMsgType(msgType);
+        setAck(ack);
+        setRevert(revert);
     }
 
     public MySensorsMessage(int nodeId, int childId, int msgType, int ack, boolean revert, boolean smartSleep) {
-        this.nodeId = nodeId;
-        this.childId = childId;
-        this.msgType = msgType;
-        this.ack = ack;
-        this.revert = revert;
-        this.smartSleep = smartSleep;
+        setNodeId(nodeId);
+        setChildId(childId);
+        setMsgType(msgType);
+        setAck(ack);
+        setRevert(revert);
+        setSmartSleep(smartSleep);
     }
 
     public MySensorsMessage(int nodeId, int childId, int msgType, int ack, boolean revert, int subType, String msg) {
-        this.nodeId = nodeId;
-        this.childId = childId;
-        this.msgType = msgType;
-        this.ack = ack;
-        this.revert = revert;
-        this.subType = subType;
-        this.msg = msg;
+        setNodeId(nodeId);
+        setChildId(childId);
+        setMsgType(msgType);
+        setAck(ack);
+        setRevert(revert);
+        setSubType(subType);
+        setMsg(msg);
     }
 
     public MySensorsMessage(int nodeId, int childId, int msgType, int ack, boolean revert, int subType, String msg,
             boolean smartSleep) {
-        this.nodeId = nodeId;
-        this.childId = childId;
-        this.msgType = msgType;
-        this.ack = ack;
-        this.revert = revert;
-        this.subType = subType;
-        this.msg = msg;
-        this.smartSleep = smartSleep;
+        setNodeId(nodeId);
+        setChildId(childId);
+        setMsgType(msgType);
+        setAck(ack);
+        setRevert(revert);
+        setSubType(subType);
+        setMsg(msg);
+        setSmartSleep(smartSleep);
     }
 
     /**
@@ -261,8 +279,17 @@ public class MySensorsMessage {
         return revert;
     }
 
+    public void setRevert(boolean revert) {
+        this.revert = revert;
+    }
+
     public void setAck(int ack) {
-        this.ack = ack;
+        if (getMsgType() == MYSENSORS_MSG_TYPE_SET || ack == MYSENSORS_ACK_FALSE) {
+            this.ack = ack;
+        } else {
+            throw new IllegalArgumentException(
+                    "Could not set ack field in message with command/type equals to: " + MYSENSORS_MSG_TYPE_SET);
+        }
     }
 
     public int getSubType() {
@@ -275,6 +302,14 @@ public class MySensorsMessage {
 
     public String getMsg() {
         return msg;
+    }
+
+    public void setSmartSleep(boolean smartSleep) {
+        this.smartSleep = smartSleep;
+    }
+
+    public boolean isSmartSleep() {
+        return smartSleep;
     }
 
     public void setMsg(String msg) {
@@ -295,14 +330,6 @@ public class MySensorsMessage {
 
     public void setNextSend(long nextSend) {
         this.nextSend = nextSend;
-    }
-
-    public String getOldMsg() {
-        return oldMsg;
-    }
-
-    public void setOldMsg(String oldMsg) {
-        this.oldMsg = oldMsg;
     }
 
     /**
@@ -409,6 +436,14 @@ public class MySensorsMessage {
         return msgType == MYSENSORS_MSG_TYPE_REQ || msgType == MYSENSORS_MSG_TYPE_SET;
     }
 
+    public boolean isReqMessage() {
+        return msgType == MYSENSORS_MSG_TYPE_REQ;
+    }
+
+    public boolean isSetMessage() {
+        return msgType == MYSENSORS_MSG_TYPE_SET;
+    }
+
     public boolean isInternalMessage() {
         return msgType == MYSENSORS_MSG_TYPE_INTERNAL;
     }
@@ -424,6 +459,48 @@ public class MySensorsMessage {
     }
 
     /**
+     * Generate a custom hash by message parts passed as vararg
+     * Usage example: customHashCode(MYSENSORS_MSG_PAYLOAD_PART, MYSENSORS_MSG_SUBTYPE_PART);
+     *
+     * @param messagePart one or mode valid message part, use MYSENSORS_MSG_*_PART definition
+     *
+     * @return the hash code
+     */
+    public int customHashCode(int... messageParts) {
+
+        final int prime = 101;
+
+        int result = 1;
+        for (int i = 0; i < messageParts.length; i++) {
+            switch (messageParts[i]) {
+                case MYSENSORS_MSG_PART_PAYLOAD:
+                    result = prime * result + ((msg == null) ? 0 : msg.hashCode());
+                    break;
+                case MYSENSORS_MSG_PART_SUBTYPE:
+                    result = prime * result + subType;
+                    break;
+                case MYSENSORS_MSG_PART_ACK:
+                    result = prime * result + ack;
+                    break;
+                case MYSENSORS_MSG_PART_TYPE:
+                    result = prime * result + msgType;
+                    break;
+                case MYSENSORS_MSG_PART_CHILD:
+                    result = prime * result + childId;
+                    break;
+                case MYSENSORS_MSG_PART_NODE:
+                    result = prime * result + nodeId;
+                    break;
+                default:
+                    throw new IllegalArgumentException("Messsage part must be in [0,5] interval");
+            }
+
+        }
+
+        return result;
+    }
+
+    /**
      * @param line Input is a String containing the message received from the MySensors network
      * @return Returns the content of the message as a MySensorsMessage
      */
@@ -433,13 +510,13 @@ public class MySensorsMessage {
 
             MySensorsMessage mysensorsmessage = new MySensorsMessage();
 
-            int nodeId = Integer.parseInt(splitMessage[0]);
+            int nodeId = Integer.parseInt(splitMessage[MYSENSORS_MSG_PART_NODE]);
 
             mysensorsmessage.setNodeId(nodeId);
-            mysensorsmessage.setChildId(Integer.parseInt(splitMessage[1]));
-            mysensorsmessage.setMsgType(Integer.parseInt(splitMessage[2]));
-            mysensorsmessage.setAck(Integer.parseInt(splitMessage[3]));
-            mysensorsmessage.setSubType(Integer.parseInt(splitMessage[4]));
+            mysensorsmessage.setChildId(Integer.parseInt(splitMessage[MYSENSORS_MSG_PART_CHILD]));
+            mysensorsmessage.setMsgType(Integer.parseInt(splitMessage[MYSENSORS_MSG_PART_TYPE]));
+            mysensorsmessage.setAck(Integer.parseInt(splitMessage[MYSENSORS_MSG_PART_ACK]));
+            mysensorsmessage.setSubType(Integer.parseInt(splitMessage[MYSENSORS_MSG_PART_SUBTYPE]));
             if (splitMessage.length == 6) {
                 String msg = splitMessage[5].replaceAll("\\r|\\n", "").trim();
                 mysensorsmessage.setMsg(msg);
@@ -482,7 +559,6 @@ public class MySensorsMessage {
         result = prime * result + msgType;
         result = prime * result + (int) (nextSend ^ (nextSend >>> 32));
         result = prime * result + nodeId;
-        result = prime * result + ((oldMsg == null) ? 0 : oldMsg.hashCode());
         result = prime * result + retries;
         result = prime * result + (revert ? 1231 : 1237);
         result = prime * result + subType;
@@ -521,13 +597,6 @@ public class MySensorsMessage {
             return false;
         }
         if (nodeId != other.nodeId) {
-            return false;
-        }
-        if (oldMsg == null) {
-            if (other.oldMsg != null) {
-                return false;
-            }
-        } else if (!oldMsg.equals(other.oldMsg)) {
             return false;
         }
         if (retries != other.retries) {

@@ -3,6 +3,13 @@ package org.openhab.binding.mysensors.internal.event;
 import java.util.EventListener;
 import java.util.List;
 
+/**
+ * Generic interface for an EventListener register
+ *
+ * @author Andrea Cioni
+ *
+ * @param <T> the EventListener to register
+ */
 public interface MySensorsEventObservable<T extends EventListener> {
 
     public boolean isEventListenerRegisterd(T listener);

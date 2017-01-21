@@ -6,7 +6,7 @@ import org.openhab.binding.mysensors.internal.sensors.MySensorsVariable;
 public class MySensorsVariable_V_VAR3 extends MySensorsVariable {
 
     public MySensorsVariable_V_VAR3() {
-        super(MySensorsMessage.MYSENSORS_SUBTYPE_V_VAR4);
+        super(MySensorsMessage.MYSENSORS_SUBTYPE_V_VAR3);
     }
 
 }
