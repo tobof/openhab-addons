@@ -17,7 +17,7 @@ public interface MySensorsTypeAdapter {
         return command.toString();
     }
 
-    default int typeFromChannelCommand(String channel, Command command) {
-        return MySensorsBindingConstants.INVERSE_CHANNEL_MAP.get(command);
+    default Integer typeFromChannelCommand(String channel, Command command) {
+        return MySensorsBindingConstants.INVERSE_CHANNEL_MAP.get(channel);
     }
 }

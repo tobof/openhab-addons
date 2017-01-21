@@ -52,6 +52,7 @@ public interface MySensorsGatewayEventListener extends EventListener {
 
     /**
      * Procedure to notify new message from MySensorsNetwork.
+     * Internally, MySensorsGateway, handle this event and update channel state if message is sent to a known node.
      */
     default public void messageReceived(MySensorsMessage message) throws Throwable {
     }
@@ -64,6 +65,10 @@ public interface MySensorsGatewayEventListener extends EventListener {
 
     }
 
+    /**
+     * Triggered when one message, that request ack, hasn't received any confirmation.
+     * Internally, MySensorsGateway, handle this event and restore channel state.
+     */
     default public void ackNotReceived(MySensorsMessage msg) throws Throwable {
 
     }

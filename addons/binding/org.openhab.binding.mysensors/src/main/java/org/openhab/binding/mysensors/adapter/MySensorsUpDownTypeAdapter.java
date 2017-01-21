@@ -10,7 +10,7 @@ import org.openhab.binding.mysensors.internal.sensors.MySensorsVariable;
 public class MySensorsUpDownTypeAdapter implements MySensorsTypeAdapter {
 
     @Override
-    public int typeFromChannelCommand(String channel, Command command) {
+    public Integer typeFromChannelCommand(String channel, Command command) {
         if (channel.equals(MySensorsBindingConstants.CHANNEL_COVER)) {
             if (command.equals(UpDownType.UP)) {
                 return MySensorsMessage.MYSENSORS_SUBTYPE_V_UP;

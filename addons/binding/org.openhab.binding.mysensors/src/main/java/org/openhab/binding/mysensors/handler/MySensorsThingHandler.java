@@ -113,7 +113,6 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
             return;
         }
 
-        String msgPayload = "";
         int int_requestack = requestAck ? 1 : 0;
 
         // just forward the message in case it is received via this channel. This is special!
@@ -125,28 +124,41 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
                 return;
             }
         } else {
-            MySensorsTypeAdapter adapter = loadAdapterForChannel(channelUID.getId());
+            MySensorsTypeAdapter adapter = loadAdapterForChannelType(channelUID.getId());
+
+            logger.trace("Adapter {} found for type {}", adapter.getClass().getSimpleName(), channelUID.getId());
 
             if (adapter != null) {
-                MySensorsVariable var = myGateway.getVariable(nodeId, childId,
-                        adapter.typeFromChannelCommand(channelUID.getId(), command));
+                Integer type = adapter.typeFromChannelCommand(channelUID.getId(), command);
 
-                if (var != null) {
+                if (type != null) {
+                    logger.trace("Type for channel: {}, command: {} of thing {} is: {}", thing.getUID(), command,
+                            thing.getUID(), type);
 
-                    int subType = var.getType();
+                    MySensorsVariable var = myGateway.getVariable(nodeId, childId, type);
 
-                    // Create the real message to send
-                    MySensorsMessage newMsg = new MySensorsMessage(nodeId, childId,
-                            MySensorsMessage.MYSENSORS_MSG_TYPE_SET, int_requestack, revertState, smartSleep);
+                    if (var != null) {
 
-                    newMsg.setSubType(subType);
-                    newMsg.setMsg(adapter.fromCommand(command));
+                        int subType = var.getType();
 
-                    myGateway.sendMessage(newMsg);
+                        // Create the real message to send
+                        MySensorsMessage newMsg = new MySensorsMessage(nodeId, childId,
+                                MySensorsMessage.MYSENSORS_MSG_TYPE_SET, int_requestack, revertState, smartSleep);
 
+                        newMsg.setSubType(subType);
+                        newMsg.setMsg(adapter.fromCommand(command));
+
+                        myGateway.sendMessage(newMsg);
+
+                    } else {
+                        logger.warn("Variable not found, cannot handle command for thing {} of type {}", thing.getUID(),
+                                channelUID.getId());
+                    }
                 } else {
-                    logger.warn("Variable not found, cannot handle command for thing {}", thing.getUID());
+                    logger.error("Could not get type of variable for channel: {}, command: {} of thing {}",
+                            thing.getUID(), command, thing.getUID());
                 }
+
             } else {
                 logger.error("Type adapter not found for {}", channelUID.getId());
             }
@@ -212,13 +224,13 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
 
     private void handleChildUpdateEvent(MySensorsVariable var) {
         String channelName = CHANNEL_MAP.get(var.getType());
-        State newState = loadAdapterForChannel(channelName).stateFromChannel(var);
+        State newState = loadAdapterForChannelType(channelName).stateFromChannel(var);
         logger.debug("Updating channel: {}({}) value to: {}", channelName, var.getType(), newState);
         updateState(channelName, newState);
 
     }
 
-    private MySensorsTypeAdapter loadAdapterForChannel(String channelName) {
+    private MySensorsTypeAdapter loadAdapterForChannelType(String channelName) {
         return TYPE_MAP.get(channelName);
     }
 
