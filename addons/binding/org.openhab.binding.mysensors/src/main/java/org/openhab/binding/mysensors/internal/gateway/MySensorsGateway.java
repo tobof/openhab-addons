@@ -353,12 +353,16 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
                             logger.trace("Variable {}({}) found in child, post-update value: {}",
                                     variable.getClass().getSimpleName(), variable.getType(), variable.getValue());
                             variable.setLastUpdate(new Date());
+
                             myEventRegister.notifyNodeUpdateEvent(node, child, variable, false);
                         } else {
                             logger.debug("Request received!");
                             msg.setMsgType(MySensorsMessage.MYSENSORS_MSG_TYPE_SET);
                             msg.setMsg(variable.getValue() != null ? variable.getValue() : "");
-                            sendMessage(msg);
+
+                            // Do not use sendMessage method (it set the value to the channel again), just send it over
+                            // connection
+                            myCon.addMySensorsOutboundMessage(msg);
                         }
 
                         ret = true;

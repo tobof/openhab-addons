@@ -1,5 +1,6 @@
 package org.openhab.binding.mysensors.adapter;
 
+import org.eclipse.smarthome.core.library.types.StopMoveType;
 import org.eclipse.smarthome.core.library.types.UpDownType;
 import org.eclipse.smarthome.core.types.Command;
 import org.eclipse.smarthome.core.types.State;
@@ -37,7 +38,17 @@ public class MySensorsUpDownTypeAdapter implements MySensorsTypeAdapter {
 
     @Override
     public String fromCommand(Command state) {
-        return "";
+        if (state instanceof UpDownType) {
+            if (state == UpDownType.DOWN || state == UpDownType.UP) {
+                return "1";
+            } else {
+                throw new IllegalStateException("Invalid UpDown state: " + state);
+            }
+        } else if (state instanceof StopMoveType) {
+            return "0";
+        } else {
+            throw new IllegalStateException("UpDown command is the only one command allowed by this adapter");
+        }
     }
 
     @Override
