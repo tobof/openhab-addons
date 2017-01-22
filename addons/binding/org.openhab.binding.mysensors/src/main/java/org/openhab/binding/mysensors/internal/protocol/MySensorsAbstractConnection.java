@@ -40,6 +40,9 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class MySensorsAbstractConnection implements Runnable {
 
+    // Used by the reader to request a disconnection if there are too much exception
+    private static final int ERROR_COUNT_REQ_DISCONNECT = 5;
+
     // How often and at which times should the binding retry to send a message if requestAck is true?
     public static final int MYSENSORS_NUMBER_OF_RETRIES = 5;
     public static final int[] MYSENSORS_RETRY_TIMES = { 0, 100, 500, 1000, 2000 };
@@ -54,11 +57,6 @@ public abstract class MySensorsAbstractConnection implements Runnable {
 
     // Connector will check for connection status every CONNECTOR_INTERVAL_CHECK seconds
     public static final int CONNECTOR_INTERVAL_CHECK = 10;
-
-    // Used to insert value in oldMsgContent
-    private static final int OLD_MESSAGE_CUSTOM_HASH[] = { MySensorsMessage.MYSENSORS_MSG_PART_NODE,
-            MySensorsMessage.MYSENSORS_MSG_PART_CHILD, MySensorsMessage.MYSENSORS_MSG_PART_TYPE,
-            MySensorsMessage.MYSENSORS_MSG_PART_SUBTYPE };
 
     // ??
     private boolean pauseWriter = false;
@@ -452,7 +450,6 @@ public abstract class MySensorsAbstractConnection implements Runnable {
      *
      */
     protected class MySensorsReader implements Runnable {
-
         private Logger logger = LoggerFactory.getLogger(MySensorsReader.class);
 
         private ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -463,7 +460,10 @@ public abstract class MySensorsAbstractConnection implements Runnable {
 
         private boolean stopReader = false;
 
+        private int readErrorCount = 0;
+
         public MySensorsReader(InputStream inStream) {
+            this.readErrorCount = 0;
             this.inStream = inStream;
             this.reads = new BufferedReader(new InputStreamReader(inStream));
         }
@@ -514,6 +514,13 @@ public abstract class MySensorsAbstractConnection implements Runnable {
                     }
                 } catch (Exception e) {
                     logger.error("Exception on reading from connection", e);
+
+                    if (readErrorCount < ERROR_COUNT_REQ_DISCONNECT) {
+                        readErrorCount++;
+                    } else {
+                        readErrorCount = 0;
+                        requestDisconnection(true);
+                    }
                 }
 
             }

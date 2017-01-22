@@ -217,6 +217,14 @@ public class MySensorsChild {
         this.presentationCode = presentationCode;
     }
 
+    private void addCommonVariables() {
+        addVariable(new MySensorsVariable_V_VAR1());
+        addVariable(new MySensorsVariable_V_VAR2());
+        addVariable(new MySensorsVariable_V_VAR3());
+        addVariable(new MySensorsVariable_V_VAR4());
+        addVariable(new MySensorsVariable_V_VAR5());
+    }
+
     /**
      * Static method to ensure if one id belongs to a valid range
      *
@@ -225,14 +233,6 @@ public class MySensorsChild {
      */
     public static boolean isValidChildId(int id) {
         return (id >= MYSENSORS_CHILD_ID_RESERVED_0 && id < MYSENSORS_CHILD_ID_RESERVED_255);
-    }
-
-    private void addCommonVariables() {
-        addVariable(new MySensorsVariable_V_VAR1());
-        addVariable(new MySensorsVariable_V_VAR2());
-        addVariable(new MySensorsVariable_V_VAR3());
-        addVariable(new MySensorsVariable_V_VAR4());
-        addVariable(new MySensorsVariable_V_VAR5());
     }
 
     public static MySensorsChild fromPresentation(int presentationCode, int childId) {

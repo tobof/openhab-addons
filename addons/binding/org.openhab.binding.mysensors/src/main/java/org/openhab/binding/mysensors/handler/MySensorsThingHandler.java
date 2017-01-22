@@ -73,6 +73,7 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
         smartSleep = configuration.smartSleep;
 
         myGateway = getBridgeHandler().getMySensorsGateway();
+        addIntoGateway(getThing());
 
         smartSleep = configuration.smartSleep;
         logger.debug("Configuration: nodeId {}, chiledId: {}, requestAck: {}, revertState: {}, smartSleep: {}", nodeId,
@@ -254,6 +255,45 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
             logger.debug("Event listener for node {}-{} not registered yet, registering...", nodeId, childId);
             myGateway.addEventListener(this);
         }
+    }
+
+    private void addIntoGateway(Thing thing) {
+        MySensorsNode node = generateNodeFromThing(thing);
+        if (node != null) {
+            myGateway.addNode(node, true);
+        } else {
+            logger.error("Failed to build sensor for thing: {}", thing.getUID());
+        }
+    }
+
+    private MySensorsNode generateNodeFromThing(Thing t) {
+        MySensorsNode ret = null;
+        Integer nodeId = -1, childId = -1, pres = -1;
+        try {
+            nodeId = Integer.parseInt(t.getConfiguration().as(MySensorsSensorConfiguration.class).nodeId);
+            childId = Integer.parseInt(t.getConfiguration().as(MySensorsSensorConfiguration.class).childId);
+            pres = INVERSE_THING_UID_MAP.get(t.getThingTypeUID());
+
+            if (pres != null) {
+                logger.trace("Building sensors from thing: {}, node: {}, child: {}, presentation: {}", t.getUID(),
+                        nodeId, childId, pres);
+
+                MySensorsChild child = MySensorsChild.fromPresentation(pres, childId);
+                if (child != null) {
+                    ret = new MySensorsNode(nodeId);
+                    ret.addChild(child);
+                }
+            } else {
+                logger.error("Error on building sensors from thing: {}, node: {}, child: {}, presentation: {}",
+                        t.getUID(), nodeId, childId, pres);
+            }
+
+        } catch (Exception e) {
+            logger.error("Failing on create node/child for thing {}", thing.getUID(), e);
+        }
+
+        return ret;
+
     }
 
     @Override

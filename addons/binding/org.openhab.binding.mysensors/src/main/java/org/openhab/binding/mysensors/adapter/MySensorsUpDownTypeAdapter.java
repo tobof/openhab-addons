@@ -17,8 +17,15 @@ public class MySensorsUpDownTypeAdapter implements MySensorsTypeAdapter {
                 return MySensorsMessage.MYSENSORS_SUBTYPE_V_UP;
             } else if (command.equals(UpDownType.DOWN)) {
                 return MySensorsMessage.MYSENSORS_SUBTYPE_V_DOWN;
+            } else if (command instanceof StopMoveType) {
+                if (command.equals(StopMoveType.STOP)) {
+                    return MySensorsMessage.MYSENSORS_SUBTYPE_V_STOP;
+                } else {
+                    throw new IllegalArgumentException("Invalid command of type StopMoveType");
+                }
             } else {
                 throw new IllegalArgumentException("Invalid command (" + command + ") passed to UpDown adapter");
+
             }
         } else {
             throw new IllegalArgumentException("Invalid channel(" + channel + ") passed to UpDown adapter");
@@ -32,7 +39,7 @@ public class MySensorsUpDownTypeAdapter implements MySensorsTypeAdapter {
         } else if (value.getType() == MySensorsMessage.MYSENSORS_SUBTYPE_V_UP) {
             return UpDownType.UP;
         } else {
-            throw new IllegalArgumentException("");
+            throw new IllegalArgumentException("Variable " + value.getType() + " is not up/down");
         }
     }
 
@@ -45,9 +52,10 @@ public class MySensorsUpDownTypeAdapter implements MySensorsTypeAdapter {
                 throw new IllegalStateException("Invalid UpDown state: " + state);
             }
         } else if (state instanceof StopMoveType) {
-            return "0";
+            return "1";
         } else {
-            throw new IllegalStateException("UpDown command is the only one command allowed by this adapter");
+            throw new IllegalStateException("UpDown command is the only one command allowed by this adapter, passed: "
+                    + state + "(" + (state != null ? state.getClass() : "") + ")");
         }
     }
 

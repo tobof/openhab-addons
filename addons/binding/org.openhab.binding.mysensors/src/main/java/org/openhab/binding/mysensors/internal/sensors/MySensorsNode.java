@@ -91,7 +91,7 @@ public class MySensorsNode {
         }
     }
 
-    public void mergeNodeChilds(MySensorsNode node) {
+    public void mergeNodeChildren(MySensorsNode node) {
         synchronized (chidldMap) {
             mergeMap(chidldMap, node.chidldMap);
         }

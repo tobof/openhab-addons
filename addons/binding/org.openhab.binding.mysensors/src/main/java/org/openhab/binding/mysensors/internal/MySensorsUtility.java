@@ -54,4 +54,8 @@ public class MySensorsUtility {
     public static <K, V> void mergeMap(Map<K, V> map1, Map<K, V> map2) throws NullPointerException {
         map1.putAll(map2);
     }
+
+    public static <K, V> boolean containsSameKey(Map<K, V> map1, Map<K, V> map2) throws NullPointerException {
+        return map1.keySet().equals(map2.keySet());
+    }
 }

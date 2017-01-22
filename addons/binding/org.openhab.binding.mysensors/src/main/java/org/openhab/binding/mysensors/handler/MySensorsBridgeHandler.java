@@ -16,20 +16,17 @@ import java.util.Map;
 
 import org.eclipse.smarthome.core.thing.Bridge;
 import org.eclipse.smarthome.core.thing.ChannelUID;
-import org.eclipse.smarthome.core.thing.Thing;
 import org.eclipse.smarthome.core.thing.ThingStatus;
 import org.eclipse.smarthome.core.thing.ThingTypeUID;
 import org.eclipse.smarthome.core.thing.binding.BaseBridgeHandler;
 import org.eclipse.smarthome.core.types.Command;
 import org.openhab.binding.mysensors.config.MySensorsBridgeConfiguration;
-import org.openhab.binding.mysensors.config.MySensorsSensorConfiguration;
 import org.openhab.binding.mysensors.factory.MySensorsCacheFactory;
 import org.openhab.binding.mysensors.internal.event.MySensorsGatewayEventListener;
 import org.openhab.binding.mysensors.internal.gateway.MySensorsGateway;
 import org.openhab.binding.mysensors.internal.gateway.MySensorsGatewayConfig;
 import org.openhab.binding.mysensors.internal.gateway.MySensorsGatewayType;
 import org.openhab.binding.mysensors.internal.protocol.MySensorsAbstractConnection;
-import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,7 +67,7 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
 
             myGateway.addEventListener(this);
 
-            reloadSensors();
+            // reloadSensors();
 
             logger.debug("Initialization of the MySensors bridge DONE!");
         } else {
@@ -165,53 +162,6 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
         }
 
         return nodes;
-    }
-
-    private void addIntoGateway(Thing thing) {
-        MySensorsNode node = generateNodeFromThing(thing);
-        if (node != null) {
-            myGateway.addNode(node, true);
-        } else {
-            logger.error("Failed to build sensor for thing: {}", thing.getUID());
-        }
-    }
-
-    private MySensorsNode generateNodeFromThing(Thing t) {
-        MySensorsNode ret = null;
-        Integer nodeId = -1, childId = -1, pres = -1;
-        try {
-            nodeId = Integer.parseInt(t.getConfiguration().as(MySensorsSensorConfiguration.class).nodeId);
-            childId = Integer.parseInt(t.getConfiguration().as(MySensorsSensorConfiguration.class).childId);
-            pres = INVERSE_THING_UID_MAP.get(t.getThingTypeUID());
-
-            if (pres != null) {
-                logger.trace("Building sensors from thing: {}, node: {}, child: {}, presentation: {}", t.getUID(),
-                        nodeId, childId, pres);
-
-                MySensorsChild child = MySensorsChild.fromPresentation(pres, childId);
-                if (child != null) {
-                    ret = new MySensorsNode(nodeId);
-                    ret.addChild(child);
-                }
-            } else {
-                logger.error("Error on building sensors from thing: {}, node: {}, child: {}, presentation: {}");
-            }
-
-        } catch (Exception e) {
-            logger.error("Failing on create node/child for thing {}", thing.getUID(), e);
-        }
-
-        return ret;
-
-    }
-
-    private void reloadSensors() {
-        for (Thing t : thingRegistry.getAll()) {
-            if (!THING_TYPE_BRIDGE_SER.equals(t.getThingTypeUID())
-                    && !THING_TYPE_BRIDGE_ETH.equals(t.getThingTypeUID())) {
-                addIntoGateway(t);
-            }
-        }
     }
 
     private MySensorsGatewayConfig openhabToMySensorsGatewayConfig(MySensorsBridgeConfiguration conf,

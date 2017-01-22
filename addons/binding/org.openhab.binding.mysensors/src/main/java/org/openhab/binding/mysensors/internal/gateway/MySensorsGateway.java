@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.openhab.binding.mysensors.internal.MySensorsUtility;
 import org.openhab.binding.mysensors.internal.event.MySensorsEventRegister;
 import org.openhab.binding.mysensors.internal.event.MySensorsGatewayEventListener;
 import org.openhab.binding.mysensors.internal.exception.NoMoreIdsException;
@@ -158,9 +159,10 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
     public void addNode(MySensorsNode node, boolean mergeIfExist) {
         synchronized (nodeMap) {
             MySensorsNode exist = null;
-            if (mergeIfExist && ((exist = getNode(node.getNodeId())) != null)) {
+            if (mergeIfExist && ((exist = getNode(node.getNodeId())) != null)
+                    && !MySensorsUtility.containsSameKey(node.getChildMap(), exist.getChildMap())) {
                 logger.debug("Merging child map: {} with: {}", exist.getChildMap(), node.getChildMap());
-                exist.mergeNodeChilds(node);
+                exist.mergeNodeChildren(node);
                 logger.trace("Merging result is: {}", exist.getChildMap());
             } else {
                 logger.debug("Adding device {}", node.toString());
@@ -356,13 +358,19 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
 
                             myEventRegister.notifyNodeUpdateEvent(node, child, variable, false);
                         } else {
-                            logger.debug("Request received!");
-                            msg.setMsgType(MySensorsMessage.MYSENSORS_MSG_TYPE_SET);
-                            msg.setMsg(variable.getValue() != null ? variable.getValue() : "");
+                            String value = variable.getValue();
+                            if (value != null) {
+                                logger.debug("Request received!");
+                                msg.setMsgType(MySensorsMessage.MYSENSORS_MSG_TYPE_SET);
+                                msg.setMsg(value);
 
-                            // Do not use sendMessage method (it set the value to the channel again), just send it over
-                            // connection
-                            myCon.addMySensorsOutboundMessage(msg);
+                                // Do not use sendMessage method (it set the value to the channel again), just send it
+                                // over
+                                // connection
+                                myCon.addMySensorsOutboundMessage(msg);
+                            } else {
+                                logger.warn("Request received, but variable state is not yet defined");
+                            }
                         }
 
                         ret = true;
