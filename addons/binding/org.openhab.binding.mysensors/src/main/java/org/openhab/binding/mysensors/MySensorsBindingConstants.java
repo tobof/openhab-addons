@@ -15,13 +15,13 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.smarthome.core.thing.ThingTypeUID;
-import org.openhab.binding.mysensors.adapter.MySensorsDecimalTypeAdapter;
-import org.openhab.binding.mysensors.adapter.MySensorsOnOffTypeAdapter;
-import org.openhab.binding.mysensors.adapter.MySensorsOpenCloseTypeAdapter;
-import org.openhab.binding.mysensors.adapter.MySensorsPercentTypeAdapter;
-import org.openhab.binding.mysensors.adapter.MySensorsStringTypeAdapter;
-import org.openhab.binding.mysensors.adapter.MySensorsTypeAdapter;
-import org.openhab.binding.mysensors.adapter.MySensorsUpDownTypeAdapter;
+import org.openhab.binding.mysensors.adapter.MySensorsDecimalTypeConverter;
+import org.openhab.binding.mysensors.adapter.MySensorsOnOffTypeConverter;
+import org.openhab.binding.mysensors.adapter.MySensorsOpenCloseTypeConverter;
+import org.openhab.binding.mysensors.adapter.MySensorsPercentTypeConverter;
+import org.openhab.binding.mysensors.adapter.MySensorsStringTypeConverter;
+import org.openhab.binding.mysensors.adapter.MySensorsTypeConverter;
+import org.openhab.binding.mysensors.adapter.MySensorsUpDownTypeConverter;
 import org.openhab.binding.mysensors.internal.MySensorsUtility;
 
 import com.google.common.collect.ImmutableSet;
@@ -228,17 +228,17 @@ public class MySensorsBindingConstants {
     /**
      * Converters will be used to map values from OH to/from MySensors Variables
      */
-    public static final MySensorsDecimalTypeAdapter DECIMAL_TYPE_CONVERTER = new MySensorsDecimalTypeAdapter();
-    public static final MySensorsPercentTypeAdapter PERCENT_TYPE_CONVERTER = new MySensorsPercentTypeAdapter();
-    public static final MySensorsOnOffTypeAdapter ONOFF_TYPE_CONVERTER = new MySensorsOnOffTypeAdapter();
-    public static final MySensorsOpenCloseTypeAdapter OPENCLOSE_TYPE_CONVERTER = new MySensorsOpenCloseTypeAdapter();
-    public static final MySensorsUpDownTypeAdapter UPDOWN_TYPE_CONVERTER = new MySensorsUpDownTypeAdapter();
-    public static final MySensorsStringTypeAdapter STRING_TYPE_CONVERTER = new MySensorsStringTypeAdapter();
+    public static final MySensorsDecimalTypeConverter DECIMAL_TYPE_CONVERTER = new MySensorsDecimalTypeConverter();
+    public static final MySensorsPercentTypeConverter PERCENT_TYPE_CONVERTER = new MySensorsPercentTypeConverter();
+    public static final MySensorsOnOffTypeConverter ONOFF_TYPE_CONVERTER = new MySensorsOnOffTypeConverter();
+    public static final MySensorsOpenCloseTypeConverter OPENCLOSE_TYPE_CONVERTER = new MySensorsOpenCloseTypeConverter();
+    public static final MySensorsUpDownTypeConverter UPDOWN_TYPE_CONVERTER = new MySensorsUpDownTypeConverter();
+    public static final MySensorsStringTypeConverter STRING_TYPE_CONVERTER = new MySensorsStringTypeConverter();
 
     /**
      * Mappings between ChannelUID and class that represents the type of the channel
      */
-    public final static Map<String, MySensorsTypeAdapter> TYPE_MAP = new HashMap<String, MySensorsTypeAdapter>() {
+    public final static Map<String, MySensorsTypeConverter> TYPE_MAP = new HashMap<String, MySensorsTypeConverter>() {
 
         /**
          *

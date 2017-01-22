@@ -23,7 +23,7 @@ import org.eclipse.smarthome.core.thing.binding.BaseThingHandler;
 import org.eclipse.smarthome.core.types.Command;
 import org.eclipse.smarthome.core.types.RefreshType;
 import org.eclipse.smarthome.core.types.State;
-import org.openhab.binding.mysensors.adapter.MySensorsTypeAdapter;
+import org.openhab.binding.mysensors.adapter.MySensorsTypeConverter;
 import org.openhab.binding.mysensors.config.MySensorsSensorConfiguration;
 import org.openhab.binding.mysensors.internal.event.MySensorsGatewayEventListener;
 import org.openhab.binding.mysensors.internal.gateway.MySensorsGateway;
@@ -125,7 +125,7 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
                 return;
             }
         } else {
-            MySensorsTypeAdapter adapter = loadAdapterForChannelType(channelUID.getId());
+            MySensorsTypeConverter adapter = loadAdapterForChannelType(channelUID.getId());
 
             logger.trace("Adapter {} found for type {}", adapter.getClass().getSimpleName(), channelUID.getId());
 
@@ -231,7 +231,7 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
 
     }
 
-    private MySensorsTypeAdapter loadAdapterForChannelType(String channelName) {
+    private MySensorsTypeConverter loadAdapterForChannelType(String channelName) {
         return TYPE_MAP.get(channelName);
     }
 

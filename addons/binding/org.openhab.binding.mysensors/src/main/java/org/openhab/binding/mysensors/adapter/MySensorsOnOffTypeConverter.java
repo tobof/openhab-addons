@@ -4,7 +4,7 @@ import org.eclipse.smarthome.core.library.types.OnOffType;
 import org.eclipse.smarthome.core.types.Command;
 import org.eclipse.smarthome.core.types.State;
 
-public class MySensorsOnOffTypeAdapter implements MySensorsTypeAdapter {
+public class MySensorsOnOffTypeConverter implements MySensorsTypeConverter {
 
     @Override
     public State fromString(String s) {

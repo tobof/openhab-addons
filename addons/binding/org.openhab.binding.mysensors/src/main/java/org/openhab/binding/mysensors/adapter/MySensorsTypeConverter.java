@@ -5,8 +5,14 @@ import org.eclipse.smarthome.core.types.State;
 import org.openhab.binding.mysensors.MySensorsBindingConstants;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsVariable;
 
-public interface MySensorsTypeAdapter {
+public interface MySensorsTypeConverter {
 
+    /**
+     * Convert a value from MySensors variable to OH state
+     * 
+     * @param value non-null that should be converted
+     * @return
+     */
     default public State stateFromChannel(MySensorsVariable value) {
         return fromString(value.getValue());
     }

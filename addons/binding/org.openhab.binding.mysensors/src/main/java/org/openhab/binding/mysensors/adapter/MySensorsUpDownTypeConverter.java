@@ -8,7 +8,7 @@ import org.openhab.binding.mysensors.MySensorsBindingConstants;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsVariable;
 
-public class MySensorsUpDownTypeAdapter implements MySensorsTypeAdapter {
+public class MySensorsUpDownTypeConverter implements MySensorsTypeConverter {
 
     @Override
     public Integer typeFromChannelCommand(String channel, Command command) {

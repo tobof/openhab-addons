@@ -3,7 +3,7 @@ package org.openhab.binding.mysensors.adapter;
 import org.eclipse.smarthome.core.library.types.StringType;
 import org.eclipse.smarthome.core.types.State;
 
-public class MySensorsStringTypeAdapter implements MySensorsTypeAdapter {
+public class MySensorsStringTypeConverter implements MySensorsTypeConverter {
 
     @Override
     public State fromString(String s) {

@@ -5,7 +5,7 @@ import org.eclipse.smarthome.core.library.types.OpenClosedType;
 import org.eclipse.smarthome.core.types.Command;
 import org.eclipse.smarthome.core.types.State;
 
-public class MySensorsOpenCloseTypeAdapter implements MySensorsTypeAdapter {
+public class MySensorsOpenCloseTypeConverter implements MySensorsTypeConverter {
     @Override
     public State fromString(String s) {
         if ("0".equals(s)) {
