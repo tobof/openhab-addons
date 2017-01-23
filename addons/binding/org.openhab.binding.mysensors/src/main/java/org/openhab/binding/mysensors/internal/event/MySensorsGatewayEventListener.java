@@ -35,11 +35,14 @@ public interface MySensorsGatewayEventListener extends EventListener {
 
     /**
      * When a message of type SET has processed correctly (node/child/variable found in gateway)
-     * the new value is sent to every observer. The @isRevert parameter is set to true to indicate that
-     * channel update was triggered by the
+     * the new value is sent to every observer. The @updateType parameter could be set to:
+     * -REVERT to indicate that channel update was triggered after unsuccessful message sending when ACK=1
+     * -UPDATE when incoming/outgoing message is received/sent to update state of a variable
+     * -BATTERY indicate that a battery update message was received for a node ( @child and @variable are null in this
+     * case)
      */
-    default public void channelUpdateEvent(MySensorsNode node, MySensorsChild child, MySensorsVariable var,
-            boolean isRevert) throws Throwable {
+    default public void sensorUpdateEvent(MySensorsNode node, MySensorsChild child, MySensorsVariable var,
+            MySensorsNodeUpdateEventType updateType) throws Throwable {
     }
 
     /**

@@ -15,13 +15,13 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.smarthome.core.thing.ThingTypeUID;
-import org.openhab.binding.mysensors.adapter.MySensorsDecimalTypeConverter;
-import org.openhab.binding.mysensors.adapter.MySensorsOnOffTypeConverter;
-import org.openhab.binding.mysensors.adapter.MySensorsOpenCloseTypeConverter;
-import org.openhab.binding.mysensors.adapter.MySensorsPercentTypeConverter;
-import org.openhab.binding.mysensors.adapter.MySensorsStringTypeConverter;
-import org.openhab.binding.mysensors.adapter.MySensorsTypeConverter;
-import org.openhab.binding.mysensors.adapter.MySensorsUpDownTypeConverter;
+import org.openhab.binding.mysensors.converter.MySensorsDecimalTypeConverter;
+import org.openhab.binding.mysensors.converter.MySensorsOnOffTypeConverter;
+import org.openhab.binding.mysensors.converter.MySensorsOpenCloseTypeConverter;
+import org.openhab.binding.mysensors.converter.MySensorsPercentTypeConverter;
+import org.openhab.binding.mysensors.converter.MySensorsStringTypeConverter;
+import org.openhab.binding.mysensors.converter.MySensorsTypeConverter;
+import org.openhab.binding.mysensors.converter.MySensorsUpDownTypeConverter;
 import org.openhab.binding.mysensors.internal.MySensorsUtility;
 
 import com.google.common.collect.ImmutableSet;

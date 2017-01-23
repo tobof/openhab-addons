@@ -1,4 +1,4 @@
-package org.openhab.binding.mysensors.adapter;
+package org.openhab.binding.mysensors.converter;
 
 import org.eclipse.smarthome.core.library.types.StringType;
 import org.eclipse.smarthome.core.types.State;

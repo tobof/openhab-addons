@@ -79,6 +79,10 @@ public class MySensorsNode {
         return batteryPercent;
     }
 
+    public void setBatteryPercent(int batteryPercent) {
+        this.batteryPercent = batteryPercent;
+    }
+
     public Date getLastUpdate() {
         synchronized (this.lastUpdate) {
             return lastUpdate;

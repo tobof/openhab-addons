@@ -108,13 +108,13 @@ public class MySensorsEventRegister extends EventRegister<MySensorsGatewayEventL
     }
 
     public void notifyNodeUpdateEvent(MySensorsNode node, MySensorsChild child, MySensorsVariable variable,
-            boolean isRevert) {
+            MySensorsNodeUpdateEventType eventType) {
         synchronized (eventRegister.getEventListeners()) {
             for (MySensorsGatewayEventListener listener : eventRegister.getEventListeners()) {
-                logger.trace("Broadcasting event {} to: {}", variable, listener);
+                logger.trace("Broadcasting event {} to: {}", (variable != null ? variable : node), listener);
 
                 try {
-                    listener.channelUpdateEvent(node, child, variable, isRevert);
+                    listener.sensorUpdateEvent(node, child, variable, eventType);
                 } catch (Throwable e) {
                     logger.error("Event broadcasting throw an exception", e);
                 }

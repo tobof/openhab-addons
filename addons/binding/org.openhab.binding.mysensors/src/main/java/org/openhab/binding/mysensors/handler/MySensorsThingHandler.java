@@ -23,9 +23,10 @@ import org.eclipse.smarthome.core.thing.binding.BaseThingHandler;
 import org.eclipse.smarthome.core.types.Command;
 import org.eclipse.smarthome.core.types.RefreshType;
 import org.eclipse.smarthome.core.types.State;
-import org.openhab.binding.mysensors.adapter.MySensorsTypeConverter;
 import org.openhab.binding.mysensors.config.MySensorsSensorConfiguration;
+import org.openhab.binding.mysensors.converter.MySensorsTypeConverter;
 import org.openhab.binding.mysensors.internal.event.MySensorsGatewayEventListener;
+import org.openhab.binding.mysensors.internal.event.MySensorsNodeUpdateEventType;
 import org.openhab.binding.mysensors.internal.gateway.MySensorsGateway;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
@@ -174,11 +175,23 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
     }
 
     @Override
-    public void channelUpdateEvent(MySensorsNode node, MySensorsChild child, MySensorsVariable var, boolean isRevert) {
-        if (node.getNodeId() == nodeId && child.getChildId() == childId) {
-            handleChildUpdateEvent(var);
-            updateLastUpdate(child, isRevert);
+    public void sensorUpdateEvent(MySensorsNode node, MySensorsChild child, MySensorsVariable var,
+            MySensorsNodeUpdateEventType eventType) {
+        switch (eventType) {
+            case UPDATE:
+            case REVERT:
+                if ((node.getNodeId() == nodeId) && (child.getChildId() == childId)) {
+                    handleChildUpdateEvent(var);
+                    updateLastUpdate(node, eventType == MySensorsNodeUpdateEventType.REVERT);
+                }
+                break;
+            case BATTERY:
+                if (node.getNodeId() == nodeId) {
+                    updateLastUpdate(node, eventType == MySensorsNodeUpdateEventType.REVERT);
+                }
+                break;
         }
+
     }
 
     @Override
@@ -192,12 +205,12 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
      * For every thing there is a lastUpdate channel in which the date/time is stored
      * a message was received from this thing.
      */
-    private void updateLastUpdate(MySensorsChild child, boolean isRevert) {
+    private void updateLastUpdate(MySensorsNode node, boolean isRevert) {
         // Don't always fire last update channel, do it only after a minute by
         if (lastUpdate == null || (System.currentTimeMillis() > (lastUpdate.getCalendar().getTimeInMillis() + 60000))
                 || revertState) {
             DateTimeType dt = new DateTimeType(
-                    new SimpleDateFormat(DateTimeType.DATE_PATTERN).format(child.getLastUpdate()));
+                    new SimpleDateFormat(DateTimeType.DATE_PATTERN).format(node.getLastUpdate()));
             lastUpdate = dt;
             updateState(CHANNEL_LAST_UPDATE, dt);
             if (!isRevert) {
