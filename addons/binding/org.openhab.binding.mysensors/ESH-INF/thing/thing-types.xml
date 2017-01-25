@@ -960,39 +960,7 @@
         </config-description>
     </thing-type>
     
-    <thing-type id="irSend">
-        <supported-bridge-type-refs>
-            <bridge-type-ref id="bridge-ser" />
-            <bridge-type-ref id="bridge-eth" />
-        </supported-bridge-type-refs>
-
-        <label>IR Send</label>
-        <description>Send IR codes</description>
-
-        <channels>
-            <channel id="irSend" typeId="irSend-channel" />
-            <channel id="lastupdate" typeId="lastupdate-channel"/>
-        </channels>
-
-        <config-description>
-            <parameter name="nodeId" type="text" required="true">
-                <context>NodeId</context>
-                <label>NodeId</label>
-                <description>The ID of the node in the MySensors network
-                </description>
-                <default>999</default>
-            </parameter>
-            <parameter name="childId" type="text" required="true">
-                <context>ChildId</context>
-                <label>ChildId</label>
-                <description>The ID of the child of a node in the MySensors network
-                </description>
-                <default>999</default>
-            </parameter>
-        </config-description>
-    </thing-type>
-    
-    <thing-type id="irReceive">
+    <thing-type id="ir">
         <supported-bridge-type-refs>
             <bridge-type-ref id="bridge-ser" />
             <bridge-type-ref id="bridge-eth" />
@@ -1002,6 +970,7 @@
         <description>Receive IR codes</description>
 
         <channels>
+            <channel id="irSend" typeId="irSend-channel" />
             <channel id="irReceive" typeId="irReceive-channel" />
             <channel id="lastupdate" typeId="lastupdate-channel"/>
         </channels>
