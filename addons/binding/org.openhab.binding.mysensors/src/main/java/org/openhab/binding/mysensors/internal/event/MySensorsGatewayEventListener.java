@@ -10,8 +10,8 @@ import org.openhab.binding.mysensors.internal.sensors.MySensorsVariable;
 
 /**
  * Class that implement (and register) this interface receive update events from the MySensors network.
- * Default (Java8) was added to allow the class that will implement this interface, to choose
- * only the method in which is interested.
+ * Default (Java8) added to allow the class that will implement this interface, to choose
+ * only the method in which is interested (not best practice, but help code reading).
  *
  * @author Tim Oberföll
  * @author Andrea Cioni
@@ -28,15 +28,16 @@ public interface MySensorsGatewayEventListener extends EventListener {
 
     /**
      * Triggered when new node ID is discovered in the network
-     * A new ,empty, device is created before this method is triggered
+     * A new ,empty, device is created before this method is triggered. Only if presentation message received, and so a
+     * description for a child is available, @child is not null.
      */
-    default public void newNodeDiscovered(MySensorsNode node) throws Throwable {
+    default public void newNodeDiscovered(MySensorsNode node, MySensorsChild child) throws Throwable {
     }
 
     /**
      * When a message of type SET has processed correctly (node/child/variable found in gateway)
      * the new value is sent to every observer. The @updateType parameter could be set to:
-     * -REVERT to indicate that channel update was triggered after unsuccessful message sending when ACK=1
+     * -REVERT to indicate that channel update was triggered after unsuccessful message sending (when ACK=1)
      * -UPDATE when incoming/outgoing message is received/sent to update state of a variable
      * -BATTERY indicate that a battery update message was received for a node ( @child and @variable are null in this
      * case)
@@ -65,7 +66,6 @@ public interface MySensorsGatewayEventListener extends EventListener {
      */
     default public void connectionStatusUpdate(MySensorsAbstractConnection connection, boolean connected)
             throws Throwable {
-
     }
 
     /**
@@ -73,6 +73,5 @@ public interface MySensorsGatewayEventListener extends EventListener {
      * Internally, MySensorsGateway, handle this event and restore channel state.
      */
     default public void ackNotReceived(MySensorsMessage msg) throws Throwable {
-
     }
 }

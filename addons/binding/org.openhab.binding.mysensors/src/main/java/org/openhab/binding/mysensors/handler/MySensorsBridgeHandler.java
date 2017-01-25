@@ -11,9 +11,11 @@ import static org.openhab.binding.mysensors.MySensorsBindingConstants.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.smarthome.config.discovery.DiscoveryService;
 import org.eclipse.smarthome.core.thing.Bridge;
 import org.eclipse.smarthome.core.thing.ChannelUID;
 import org.eclipse.smarthome.core.thing.ThingStatus;
@@ -21,13 +23,16 @@ import org.eclipse.smarthome.core.thing.ThingTypeUID;
 import org.eclipse.smarthome.core.thing.binding.BaseBridgeHandler;
 import org.eclipse.smarthome.core.types.Command;
 import org.openhab.binding.mysensors.config.MySensorsBridgeConfiguration;
+import org.openhab.binding.mysensors.discovery.MySensorsDiscoveryService;
 import org.openhab.binding.mysensors.factory.MySensorsCacheFactory;
 import org.openhab.binding.mysensors.internal.event.MySensorsGatewayEventListener;
 import org.openhab.binding.mysensors.internal.gateway.MySensorsGateway;
 import org.openhab.binding.mysensors.internal.gateway.MySensorsGatewayConfig;
 import org.openhab.binding.mysensors.internal.gateway.MySensorsGatewayType;
 import org.openhab.binding.mysensors.internal.protocol.MySensorsAbstractConnection;
+import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsNode;
+import org.osgi.framework.ServiceRegistration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,6 +55,12 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
     // Configuration from thing file
     private MySensorsBridgeConfiguration myBridgeConfiguration;
 
+    // Service discovery registration
+    private ServiceRegistration<?> discoveryServiceRegistration;
+
+    // Discovery service
+    private MySensorsDiscoveryService discoveryService;
+
     public MySensorsBridgeHandler(Bridge bridge) {
         super(bridge);
     }
@@ -67,6 +78,7 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
 
             myGateway.addEventListener(this);
 
+            registerDeviceDiscoveryService();
             // reloadSensors();
 
             logger.debug("Initialization of the MySensors bridge DONE!");
@@ -79,6 +91,8 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
     @Override
     public void dispose() {
         logger.debug("Disposing of the MySensors bridge");
+
+        unregisterDeviceDiscoveryService();
 
         if (myGateway != null) {
             myGateway.shutdown();
@@ -128,7 +142,7 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
     }
 
     @Override
-    public void newNodeDiscovered(MySensorsNode message) throws Throwable {
+    public void newNodeDiscovered(MySensorsNode node, MySensorsChild child) throws Throwable {
         updateCacheFile();
     }
 
@@ -186,6 +200,29 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
         ret.setSkipStartupCheck(conf.skipStartupCheck);
 
         return ret;
+    }
+
+    private void registerDeviceDiscoveryService() {
+        if (bundleContext != null) {
+            logger.trace("Registering MySensorsDiscoveryService for bridge '{}'", getThing().getUID().getId());
+            discoveryService = new MySensorsDiscoveryService(this);
+            discoveryServiceRegistration = bundleContext.registerService(DiscoveryService.class.getName(),
+                    discoveryService, new Hashtable<String, Object>());
+            discoveryService.activate();
+        }
+    }
+
+    private void unregisterDeviceDiscoveryService() {
+        if (discoveryServiceRegistration != null && bundleContext != null) {
+            logger.trace("Unregistering MySensorsDiscoveryService for bridge '{}'", getThing().getUID().getId());
+            MySensorsDiscoveryService service = (MySensorsDiscoveryService) bundleContext
+                    .getService(discoveryServiceRegistration.getReference());
+            service.deactivate();
+
+            discoveryServiceRegistration.unregister();
+            discoveryServiceRegistration = null;
+            discoveryService = null;
+        }
     }
 
     @Override

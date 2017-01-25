@@ -18,7 +18,9 @@ import org.eclipse.smarthome.config.discovery.DiscoveryResultBuilder;
 import org.eclipse.smarthome.core.thing.ThingTypeUID;
 import org.eclipse.smarthome.core.thing.ThingUID;
 import org.openhab.binding.mysensors.handler.MySensorsBridgeHandler;
-import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
+import org.openhab.binding.mysensors.internal.event.MySensorsGatewayEventListener;
+import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
+import org.openhab.binding.mysensors.internal.sensors.MySensorsNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,13 +30,11 @@ import org.slf4j.LoggerFactory;
  * @author Tim Oberföll
  *
  */
-public class MySensorsDiscoveryService extends AbstractDiscoveryService {
+public class MySensorsDiscoveryService extends AbstractDiscoveryService implements MySensorsGatewayEventListener {
 
     private Logger logger = LoggerFactory.getLogger(MySensorsDiscoveryService.class);
 
     private MySensorsBridgeHandler bridgeHandler = null;
-
-    private DiscoveryThread discoThread = null;
 
     public MySensorsDiscoveryService(MySensorsBridgeHandler bridgeHandler) {
         super(SUPPORTED_THING_TYPES_UIDS, 3000, false);
@@ -43,30 +43,21 @@ public class MySensorsDiscoveryService extends AbstractDiscoveryService {
 
     @Override
     protected void startScan() {
-        if (discoThread == null) {
-            discoThread = new DiscoveryThread(bridgeHandler.getMySensorsGateway(), this);
-        }
-        discoThread.start();
+        bridgeHandler.getMySensorsGateway().addEventListener(this);
     }
 
     public void activate() {
-        // TODO should be removed?
+        startScan();
     }
 
     @Override
     public void deactivate() {
-        if (discoThread == null) {
-            discoThread = new DiscoveryThread(bridgeHandler.getMySensorsGateway(), this);
-        }
-        discoThread.stop();
+        stopScan();
     }
 
     @Override
     protected void stopScan() {
-        if (discoThread == null) {
-            discoThread = new DiscoveryThread(bridgeHandler.getMySensorsGateway(), this);
-        }
-        discoThread.stop();
+        bridgeHandler.getMySensorsGateway().addEventListener(this);
     }
 
     /**
@@ -75,34 +66,35 @@ public class MySensorsDiscoveryService extends AbstractDiscoveryService {
      *
      * @param msg MySensors message received from the bridge / gateway.
      */
-    public void newDevicePresented(MySensorsMessage msg) {
+    public void newDevicePresented(MySensorsNode node, MySensorsChild child) {
 
-        // Representation Message?
-        if (msg.getMsgType() == MySensorsMessage.MYSENSORS_MSG_TYPE_PRESENTATION) {
-            logger.debug("Representation Message received");
+        // uid must not contains dots
+        ThingTypeUID thingUid = THING_UID_MAP.get(child.getPresentationCode());
 
-            // uid must not contains dots
-            ThingTypeUID thingUid = THING_UID_MAP.get(msg.getSubType());
+        if (thingUid != null) {
+            logger.debug("Preparing new thing for inbox: {}", thingUid);
 
-            if (thingUid != null) {
-                logger.debug("Preparing new thing for inbox: {}", thingUid);
+            ThingUID uid = new ThingUID(thingUid, bridgeHandler.getThing().getUID(),
+                    thingUid.getId().toLowerCase() + "_" + node.getNodeId() + "_" + child.getChildId());
 
-                ThingUID uid = new ThingUID(thingUid, bridgeHandler.getThing().getUID(),
-                        thingUid.getId().toLowerCase() + "_" + msg.getNodeId() + "_" + msg.getChildId());
+            Map<String, Object> properties = new HashMap<>(2);
+            properties.put(PARAMETER_NODEID, "" + node.getNodeId());
+            properties.put(PARAMETER_CHILDID, "" + child.getChildId());
+            DiscoveryResult result = DiscoveryResultBuilder.create(uid).withProperties(properties)
+                    .withLabel("MySensors Device (" + node.getNodeId() + ";" + child.getChildId() + ")")
+                    .withBridge(bridgeHandler.getThing().getUID()).build();
+            thingDiscovered(result);
 
-                Map<String, Object> properties = new HashMap<>(2);
-                properties.put(PARAMETER_NODEID, "" + msg.getNodeId());
-                properties.put(PARAMETER_CHILDID, "" + msg.getChildId());
-                DiscoveryResult result = DiscoveryResultBuilder.create(uid).withProperties(properties)
-                        .withLabel("MySensors Device (" + msg.getNodeId() + ";" + msg.getChildId() + ")")
-                        .withBridge(bridgeHandler.getThing().getUID()).build();
-                thingDiscovered(result);
-
-                logger.debug("Discovered device submitted");
-            } else {
-                logger.warn("Cannot automatic discover thing from message: {}", msg);
-            }
+            logger.debug("Discovered device submitted");
+        } else {
+            logger.warn("Cannot automatic discover thing node: {}, child: {} please insert it manually",
+                    node.getNodeId(), child.getChildId());
         }
+    }
+
+    @Override
+    public void newNodeDiscovered(MySensorsNode node, MySensorsChild child) throws Throwable {
+        newDevicePresented(node, child);
     }
 
 }

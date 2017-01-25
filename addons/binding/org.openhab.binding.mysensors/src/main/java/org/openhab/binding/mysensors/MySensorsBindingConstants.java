@@ -344,6 +344,9 @@ public class MySensorsBindingConstants {
             put(MYSENSORS_SUBTYPE_S_RGBW_LIGHT, THING_TYPE_RGBW_LIGHT);
             put(MYSENSORS_SUBTYPE_S_WATER_QUALITY, THING_TYPE_WATER_QUALITY);
             put(MYSENSORS_SUBTYPE_S_INFO, THING_TYPE_TEXT);
+            // put(MYSENSORS_SUBTYPE_S_IR,??);
+            // put(MYSENSORS_SUBTYPE_V_IR_RECEIVE,??);
+            put(MYSENSORS_SUBTYPE_S_AIR_QUALITY, THING_TYPE_AIR_QUALITY);
         }
 
     };

@@ -79,13 +79,13 @@ public class MySensorsEventRegister extends EventRegister<MySensorsGatewayEventL
 
     }
 
-    public void notifyNewNodeDiscovered(MySensorsNode node) {
+    public void notifyNewNodeDiscovered(MySensorsNode node, MySensorsChild child) {
         synchronized (eventRegister.getEventListeners()) {
             for (MySensorsGatewayEventListener listener : eventRegister.getEventListeners()) {
                 logger.trace("Broadcasting event {} to: {}", node, listener);
 
                 try {
-                    listener.newNodeDiscovered(node);
+                    listener.newNodeDiscovered(node, child);
                 } catch (Throwable e) {
                     logger.error("Event broadcasting throw an exception", e);
                 }

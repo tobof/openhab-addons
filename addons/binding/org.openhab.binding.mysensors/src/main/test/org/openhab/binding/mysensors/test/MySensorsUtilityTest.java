@@ -12,6 +12,48 @@ import org.openhab.binding.mysensors.internal.sensors.MySensorsNode;
 public class MySensorsUtilityTest {
 
     @Test
+    public void testSameKey() {
+        Map<Integer, Object> m1 = new HashMap<>();
+        Map<Integer, Object> m2 = new HashMap<>();
+
+        m1.put(1, new Object());
+        m1.put(2, new Object());
+        m1.put(3, new Object());
+
+        m2.put(4, new Object());
+        m2.put(6, new Object());
+        m2.put(7, new Object());
+
+        assertEquals(false, MySensorsUtility.containsSameKey(m1, m2));
+
+        m1.clear();
+        m2.clear();
+
+        m1.put(1, new Object());
+        m1.put(232, new Object());
+        m1.put(569, new Object());
+
+        m2.put(1, new Object());
+        m2.put(232, new Object());
+        m2.put(569, new Object());
+
+        assertEquals(true, MySensorsUtility.containsSameKey(m1, m2));
+
+        m1.clear();
+        m2.clear();
+
+        m1.put(569, new Object());
+        m1.put(1, new Object());
+        m1.put(232, new Object());
+
+        m2.put(232, new Object());
+        m2.put(1, new Object());
+        m2.put(569, new Object());
+
+        assertEquals(true, MySensorsUtility.containsSameKey(m1, m2));
+    }
+
+    @Test
     public void testMergeMap() {
         Map<Integer, MySensorsNode> m1 = new HashMap<>();
         Map<Integer, MySensorsNode> m2 = new HashMap<>();

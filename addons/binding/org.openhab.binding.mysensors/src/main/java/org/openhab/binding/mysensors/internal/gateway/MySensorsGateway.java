@@ -138,7 +138,7 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
     }
 
     /**
-     * Simple method that add node to DeviceManager (only if node is not present previously).
+     * Simple method that add node to gateway (only if node is not present previously).
      *
      * @param node the node to add
      */
@@ -152,7 +152,7 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
     }
 
     /**
-     * Add node to device manager
+     * Add node to gateway
      *
      * @param node the node to add
      * @param mergeIfExist if true and node is already present that two nodes will be merged in one
@@ -265,7 +265,7 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
                 && msg.isSetReqMessage()) {
             MySensorsNode node = getNode(msg.getNodeId());
             if (node != null) {
-                logger.debug("Node {} found in device manager", msg.getNodeId());
+                logger.debug("Node {} found in gateway", msg.getNodeId());
 
                 MySensorsChild child = node.getChild(msg.getChildId());
                 if (child != null) {
@@ -334,79 +334,175 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
      */
     private boolean handleIncomingOutgoingMessage(MySensorsMessage msg) throws Throwable {
         boolean ret = false;
-        if ((MySensorsNode.isValidNodeId(msg.getNodeId()) && MySensorsChild.isValidChildId(msg.getChildId())
-                && msg.isSetReqMessage()) || (msg.isInternalMessage())) {
-            MySensorsNode node = getNode(msg.getNodeId());
-            if (node != null) {
-                logger.debug("Node {} found in device manager", msg.getNodeId());
 
-                node.setLastUpdate(new Date());
-                if (msg.isInternalMessage() && msg.getSubType() == MySensorsMessage.MYSENSORS_SUBTYPE_I_BATTERY_LEVEL) {
+        if (MySensorsNode.isValidNodeId(msg.getNodeId()) && MySensorsChild.isValidChildId(msg.getChildId())
+                && msg.isSetReqMessage()) {
+
+            updateLastUpdateFromMessage(msg);
+
+            switch (msg.getMsgType()) {
+                case MySensorsMessage.MYSENSORS_MSG_TYPE_INTERNAL:
+                    ret = handleInternalMessage(msg);
+                    break;
+                case MySensorsMessage.MYSENSORS_MSG_TYPE_REQ:
+                case MySensorsMessage.MYSENSORS_MSG_TYPE_SET:
+                    ret = handleSetReqMessage(msg);
+                    break;
+                case MySensorsMessage.MYSENSORS_MSG_TYPE_PRESENTATION:
+                    ret = handlePresentationMessage(msg);
+                    break;
+            }
+
+            if (!ret) {
+                ret = isNewDevice(msg);
+            }
+
+        }
+
+        return ret;
+    }
+
+    private boolean isNewDevice(MySensorsMessage msg) {
+        boolean ret = false;
+        MySensorsNode node = getNode(msg.getNodeId());
+
+        if (node == null) {
+            logger.debug("Node {} not present, send new node discovered event", msg.getNodeId());
+
+            node = new MySensorsNode(msg.getNodeId());
+            addNode(node);
+            myEventRegister.notifyNewNodeDiscovered(node, null);
+            ret = true;
+        }
+
+        return ret;
+    }
+
+    private boolean handlePresentationMessage(MySensorsMessage msg) {
+        boolean ret = false;
+
+        MySensorsNode node = getNode(msg.getNodeId());
+
+        MySensorsChild child = getChild(msg.getNodeId(), msg.getChildId());
+
+        logger.debug("Presentation Message received");
+
+        if (child == null) {
+
+            if (node == null) {
+                node = new MySensorsNode(msg.getNodeId());
+            }
+
+            node.addChild(MySensorsChild.fromPresentation(msg.getMsgType(), msg.getChildId()));
+
+            addNode(node);
+
+            myEventRegister.notifyNewNodeDiscovered(node, child);
+            ret = true;
+        } else {
+            logger.warn("Presented child is alredy present in gateway");
+        }
+
+        return ret;
+    }
+
+    private boolean handleSetReqMessage(MySensorsMessage msg) {
+        boolean ret = false;
+
+        MySensorsNode node = getNode(msg.getNodeId());
+        if (node != null) {
+            logger.debug("Node {} found in gateway", msg.getNodeId());
+
+            MySensorsChild child = node.getChild(msg.getChildId());
+            if (child != null) {
+                logger.debug("Child {} found in node {}", msg.getChildId(), msg.getNodeId());
+
+                MySensorsVariable variable = child.getVariable(msg.getSubType());
+                if (variable != null) {
+
+                    if (msg.isSetMessage()) {
+                        logger.trace("Variable {}({}) found in child, pre-update value: {}",
+                                variable.getClass().getSimpleName(), variable.getType(), variable.getValue());
+                        variable.setValue(msg);
+                        logger.trace("Variable {}({}) found in child, post-update value: {}",
+                                variable.getClass().getSimpleName(), variable.getType(), variable.getValue());
+
+                        myEventRegister.notifyNodeUpdateEvent(node, child, variable,
+                                MySensorsNodeUpdateEventType.UPDATE);
+                    } else {
+                        String value = variable.getValue();
+                        if (value != null) {
+                            logger.debug("Request received!");
+                            msg.setMsgType(MySensorsMessage.MYSENSORS_MSG_TYPE_SET);
+                            msg.setMsg(value);
+
+                            /*
+                             * Do not use sendMessage method (it set the value to the channel again),
+                             * just send it over connection
+                             */
+                            myCon.addMySensorsOutboundMessage(msg);
+                        } else {
+                            logger.warn("Request received, but variable state is not yet defined");
+                        }
+                    }
+
+                    ret = true;
+                } else {
+                    logger.warn("Variable {} not present", msg.getSubType());
+                }
+            } else {
+                logger.debug("Child {} not present into node {}", msg.getChildId(), msg.getNodeId());
+            }
+
+        }
+
+        return ret;
+
+    }
+
+    private boolean handleInternalMessage(MySensorsMessage msg) {
+        boolean ret = false;
+        MySensorsNode node = getNode(msg.getNodeId());
+        if (node != null) {
+            switch (msg.getSubType()) {
+                case MySensorsMessage.MYSENSORS_SUBTYPE_I_BATTERY_LEVEL:
                     logger.trace("Battery percent for node {} update to: {}%", node.getNodeId(),
                             node.getBatteryPercent());
                     node.setBatteryPercent(Integer.parseInt(msg.getMsg()));
                     myEventRegister.notifyNodeUpdateEvent(node, null, null, MySensorsNodeUpdateEventType.BATTERY);
                     ret = true;
-                } else {
-                    MySensorsChild child = node.getChild(msg.getChildId());
-                    if (child != null) {
-                        logger.debug("Child {} found in node {}", msg.getChildId(), msg.getNodeId());
-
-                        child.setLastUpdate(new Date());
-
-                        MySensorsVariable variable = child.getVariable(msg.getSubType());
-                        if (variable != null) {
-
-                            if (msg.isSetMessage()) {
-                                logger.trace("Variable {}({}) found in child, pre-update value: {}",
-                                        variable.getClass().getSimpleName(), variable.getType(), variable.getValue());
-                                variable.setValue(msg);
-                                logger.trace("Variable {}({}) found in child, post-update value: {}",
-                                        variable.getClass().getSimpleName(), variable.getType(), variable.getValue());
-                                variable.setLastUpdate(new Date());
-
-                                myEventRegister.notifyNodeUpdateEvent(node, child, variable,
-                                        MySensorsNodeUpdateEventType.UPDATE);
-                            } else {
-                                String value = variable.getValue();
-                                if (value != null) {
-                                    logger.debug("Request received!");
-                                    msg.setMsgType(MySensorsMessage.MYSENSORS_MSG_TYPE_SET);
-                                    msg.setMsg(value);
-
-                                    /*
-                                     * Do not use sendMessage method (it set the value to the channel again),
-                                     * just send it over connection
-                                     */
-                                    myCon.addMySensorsOutboundMessage(msg);
-                                } else {
-                                    logger.warn("Request received, but variable state is not yet defined");
-                                }
-                            }
-
-                            ret = true;
-                        } else {
-                            logger.warn("Variable {} not present", msg.getSubType());
-                        }
-                    } else {
-                        logger.debug("Child {} not present into node {}", msg.getChildId(), msg.getNodeId());
-                    }
-                }
-
-            } else {
-                logger.debug("Node {} not present, send new node discovered event", msg.getNodeId());
-
-                node = new MySensorsNode(msg.getNodeId());
-                addNode(node);
-                myEventRegister.notifyNewNodeDiscovered(node);
-                ret = true;
+                    break;
             }
-        } else if (msg.isPresentationMessage()) {
-            // TODO Detect if message is Presentation, if yes create not only the node but all the hierarchy
-            // associated
+
         }
 
         return ret;
+
+    }
+
+    private void updateLastUpdateFromMessage(MySensorsMessage msg) {
+        Date now = new Date();
+
+        if (msg != null) {
+            MySensorsNode node = getNode(msg.getNodeId());
+
+            if (node != null) {
+
+                node.setLastUpdate(now);
+
+                MySensorsChild child = getChild(msg.getNodeId(), msg.getChildId());
+
+                if (child != null) {
+                    child.setLastUpdate(now);
+
+                    MySensorsVariable var = getVariable(msg.getNodeId(), msg.getChildId(), msg.getSubType());
+
+                    if (var != null) {
+                        var.setLastUpdate(now);
+                    }
+                }
+            }
+        }
     }
 
     private void handleSpecialMessageEvent(MySensorsMessage msg) {
