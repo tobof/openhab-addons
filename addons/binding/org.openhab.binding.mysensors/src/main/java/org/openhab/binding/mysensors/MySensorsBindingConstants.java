@@ -84,6 +84,8 @@ public class MySensorsBindingConstants {
     public final static ThingTypeUID THING_TYPE_TEXT = new ThingTypeUID(BINDING_ID, "text");
     public final static ThingTypeUID THING_TYPE_IR = new ThingTypeUID(BINDING_ID, "ir");
     public final static ThingTypeUID THING_TYPE_AIR_QUALITY = new ThingTypeUID(BINDING_ID, "airQuality");
+    public final static ThingTypeUID THING_TYPE_DUST = new ThingTypeUID(BINDING_ID, "dust");
+    public final static ThingTypeUID THING_TYPE_COLOR_SENSOR = new ThingTypeUID(BINDING_ID, "colorSensor");
 
     // List of bridges
     public final static ThingTypeUID THING_TYPE_BRIDGE_SER = new ThingTypeUID(BINDING_ID, "bridge-ser");
@@ -144,7 +146,6 @@ public class MySensorsBindingConstants {
     public final static String CHANNEL_POWER_FACTOR = "power-factor";
     public final static String CHANNEL_IR_SEND = "irSend";
     public final static String CHANNEL_IR_RECEIVE = "irReceive";
-    public final static String CHANNEL_CO2_LEVEL = "co2-level";
 
     // Extra channel names for non-standard MySensors channels
     public final static String CHANNEL_MYSENSORS_MESSAGE = "mySensorsMessage";
@@ -198,7 +199,6 @@ public class MySensorsBindingConstants {
             put(MYSENSORS_SUBTYPE_V_VOLUME, CHANNEL_VOLUME);
             put(MYSENSORS_SUBTYPE_V_LOCK_STATUS, CHANNEL_LOCK_STATUS);
             put(MYSENSORS_SUBTYPE_V_LEVEL, CHANNEL_LEVEL);
-            put(MYSENSORS_SUBTYPE_V_LEVEL, CHANNEL_CO2_LEVEL); // FIXME
             put(MYSENSORS_SUBTYPE_V_RGB, CHANNEL_RGB);
             put(MYSENSORS_SUBTYPE_V_RGBW, CHANNEL_RGBW);
             put(MYSENSORS_SUBTYPE_V_ID, CHANNEL_ID);
@@ -253,7 +253,7 @@ public class MySensorsBindingConstants {
             put(CHANNEL_PRESSURE, DECIMAL_TYPE_CONVERTER);
             put(CHANNEL_BARO, STRING_TYPE_CONVERTER);
             put(CHANNEL_TRIPPED, OPENCLOSE_TYPE_CONVERTER);
-            put(CHANNEL_ARMED, OPENCLOSE_TYPE_CONVERTER);
+            put(CHANNEL_ARMED, ONOFF_TYPE_CONVERTER);
             put(CHANNEL_DIMMER, PERCENT_TYPE_CONVERTER);
             put(CHANNEL_COVER, UPDOWN_TYPE_CONVERTER);
             put(CHANNEL_COVER, UPDOWN_TYPE_CONVERTER); // !
@@ -282,9 +282,8 @@ public class MySensorsBindingConstants {
             put(CHANNEL_VOLUME, DECIMAL_TYPE_CONVERTER);
             put(CHANNEL_LOCK_STATUS, OPENCLOSE_TYPE_CONVERTER);
             put(CHANNEL_LEVEL, DECIMAL_TYPE_CONVERTER);
-            put(CHANNEL_CO2_LEVEL, DECIMAL_TYPE_CONVERTER); // FIXME
-            put(CHANNEL_RGB, DECIMAL_TYPE_CONVERTER);
-            put(CHANNEL_RGBW, DECIMAL_TYPE_CONVERTER);
+            put(CHANNEL_RGB, STRING_TYPE_CONVERTER);
+            put(CHANNEL_RGBW, STRING_TYPE_CONVERTER);
             put(CHANNEL_ID, DECIMAL_TYPE_CONVERTER);
             put(CHANNEL_UNIT_PREFIX, DECIMAL_TYPE_CONVERTER);
             put(CHANNEL_TEXT, STRING_TYPE_CONVERTER);
@@ -345,6 +344,8 @@ public class MySensorsBindingConstants {
             put(MYSENSORS_SUBTYPE_S_INFO, THING_TYPE_TEXT);
             put(MYSENSORS_SUBTYPE_S_IR, THING_TYPE_IR);
             put(MYSENSORS_SUBTYPE_S_AIR_QUALITY, THING_TYPE_AIR_QUALITY);
+            put(MYSENSORS_SUBTYPE_S_DUST, THING_TYPE_DUST);
+            put(MYSENSORS_SUBTYPE_S_COLOR_SENSOR, THING_TYPE_COLOR_SENSOR);
         }
 
     };
@@ -362,7 +363,7 @@ public class MySensorsBindingConstants {
             THING_TYPE_RAIN, THING_TYPE_UV, THING_TYPE_WEIGHT, THING_TYPE_DISTANCE, THING_TYPE_LIGHT_LEVEL,
             THING_TYPE_HVAC, THING_TYPE_WATER, THING_TYPE_CUSTOM, THING_TYPE_LOCK, THING_TYPE_SOUND,
             THING_TYPE_RGB_LIGHT, THING_TYPE_RGBW_LIGHT, THING_TYPE_WATER_QUALITY, THING_TYPE_MYSENSORS_MESSAGE,
-            THING_TYPE_TEXT, THING_TYPE_IR, THING_TYPE_AIR_QUALITY);
+            THING_TYPE_TEXT, THING_TYPE_IR, THING_TYPE_AIR_QUALITY, THING_TYPE_DUST, THING_TYPE_COLOR_SENSOR);
     /** Supported bridges */
     public final static Set<ThingTypeUID> SUPPORTED_BRIDGE_THING_TYPES_UIDS = ImmutableSet.of(THING_TYPE_BRIDGE_SER,
             THING_TYPE_BRIDGE_ETH);
@@ -374,5 +375,6 @@ public class MySensorsBindingConstants {
             THING_TYPE_RAIN, THING_TYPE_UV, THING_TYPE_WEIGHT, THING_TYPE_DISTANCE, THING_TYPE_LIGHT_LEVEL,
             THING_TYPE_HVAC, THING_TYPE_WATER, THING_TYPE_CUSTOM, THING_TYPE_LOCK, THING_TYPE_SOUND,
             THING_TYPE_RGB_LIGHT, THING_TYPE_RGBW_LIGHT, THING_TYPE_WATER_QUALITY, THING_TYPE_MYSENSORS_MESSAGE,
-            THING_TYPE_TEXT, THING_TYPE_IR, THING_TYPE_AIR_QUALITY, THING_TYPE_BRIDGE_SER, THING_TYPE_BRIDGE_ETH);
+            THING_TYPE_TEXT, THING_TYPE_IR, THING_TYPE_AIR_QUALITY, THING_TYPE_DUST, THING_TYPE_COLOR_SENSOR,
+            THING_TYPE_BRIDGE_SER, THING_TYPE_BRIDGE_ETH);
 }

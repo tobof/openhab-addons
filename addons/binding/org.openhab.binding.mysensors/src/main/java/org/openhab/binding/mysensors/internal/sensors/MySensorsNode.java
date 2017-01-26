@@ -13,6 +13,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.openhab.binding.mysensors.internal.exception.MergeException;
+
 /**
  * Characteristics of a thing/node are stored here:
  * - List of children
@@ -95,9 +97,20 @@ public class MySensorsNode {
         }
     }
 
-    public void mergeNodeChildren(MySensorsNode node) {
+    /**
+     * Merge to child map into one.
+     *
+     * @param node
+     */
+    public void mergeNodeChildren(MySensorsNode node) throws MergeException {
         synchronized (chidldMap) {
-            mergeMap(chidldMap, node.chidldMap);
+            try {
+                mergeMap(chidldMap, node.chidldMap, false);
+            } catch (Exception e) {
+                throw new MergeException("Merging child map of node " + this.nodeId + " and " + node.nodeId
+                        + " failed. Cause" + e.getMessage() + " (" + e.getClass().getSimpleName() + ")");
+            }
+
         }
     }
 

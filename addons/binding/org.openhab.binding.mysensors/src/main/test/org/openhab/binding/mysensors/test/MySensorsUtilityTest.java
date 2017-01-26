@@ -65,7 +65,7 @@ public class MySensorsUtilityTest {
         m2.put(6, new MySensorsNode(6));
         m2.put(7, new MySensorsNode(7));
 
-        MySensorsUtility.mergeMap(m1, m2);
+        MySensorsUtility.mergeMap(m1, m2, true);
 
         assertEquals(5, m1.size());
 
@@ -74,6 +74,21 @@ public class MySensorsUtilityTest {
         assertEquals(4, m1.get(4).getNodeId());
         assertEquals(6, m1.get(6).getNodeId());
         assertEquals(7, m1.get(7).getNodeId());
+
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testExceptionMergeMap() {
+        Map<Integer, MySensorsNode> m1 = new HashMap<>();
+        Map<Integer, MySensorsNode> m2 = new HashMap<>();
+
+        m1.put(1, new MySensorsNode(1));
+        m1.put(2, new MySensorsNode(2));
+
+        m2.put(2, new MySensorsNode(4));
+        m2.put(3, new MySensorsNode(6));
+
+        MySensorsUtility.mergeMap(m1, m2, false);
 
     }
 

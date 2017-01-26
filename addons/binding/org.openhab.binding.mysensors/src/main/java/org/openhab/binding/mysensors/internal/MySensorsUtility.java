@@ -49,10 +49,22 @@ public class MySensorsUtility {
      *
      * @param map1 the destination map, will be the merged map.
      * @param map2 the map that will be merged into map1
+     *
      * @throws NullPointerException
+     * @throws IllegalArgumentException if allowOverwrite is true and a duplicate is found for a key
      */
-    public static <K, V> void mergeMap(Map<K, V> map1, Map<K, V> map2) throws NullPointerException {
+    public static <K, V> void mergeMap(Map<K, V> map1, Map<K, V> map2, boolean allowOverwrite)
+            throws NullPointerException, IllegalArgumentException {
+        if (!allowOverwrite) {
+            map1.keySet().forEach((a) -> {
+                if (map2.containsKey(a)) {
+                    throw new IllegalArgumentException("Same key found in map: " + a);
+                }
+            });
+        }
+
         map1.putAll(map2);
+
     }
 
     public static <K, V> boolean containsSameKey(Map<K, V> map1, Map<K, V> map2) throws NullPointerException {

@@ -13,10 +13,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.openhab.binding.mysensors.internal.MySensorsUtility;
 import org.openhab.binding.mysensors.internal.event.MySensorsEventRegister;
 import org.openhab.binding.mysensors.internal.event.MySensorsGatewayEventListener;
 import org.openhab.binding.mysensors.internal.event.MySensorsNodeUpdateEventType;
+import org.openhab.binding.mysensors.internal.exception.MergeException;
 import org.openhab.binding.mysensors.internal.exception.NoMoreIdsException;
 import org.openhab.binding.mysensors.internal.protocol.MySensorsAbstractConnection;
 import org.openhab.binding.mysensors.internal.protocol.ip.MySensorsIpConnection;
@@ -160,10 +160,14 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
     public void addNode(MySensorsNode node, boolean mergeIfExist) {
         synchronized (nodeMap) {
             MySensorsNode exist = null;
-            if (mergeIfExist && ((exist = getNode(node.getNodeId())) != null)
-                    && !MySensorsUtility.containsSameKey(node.getChildMap(), exist.getChildMap())) {
+            if (mergeIfExist && ((exist = getNode(node.getNodeId())) != null)) {
                 logger.debug("Merging child map: {} with: {}", exist.getChildMap(), node.getChildMap());
-                exist.mergeNodeChildren(node);
+                try {
+                    exist.mergeNodeChildren(node);
+                } catch (MergeException e) {
+                    logger.error("Exception caught when merging node", e);
+                    return;
+                }
                 logger.trace("Merging result is: {}", exist.getChildMap());
             } else {
                 logger.debug("Adding device {}", node.toString());
