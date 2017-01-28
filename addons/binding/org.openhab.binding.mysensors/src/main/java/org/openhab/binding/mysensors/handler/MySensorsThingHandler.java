@@ -43,7 +43,7 @@ import org.slf4j.LoggerFactory;
  */
 public class MySensorsThingHandler extends BaseThingHandler implements MySensorsGatewayEventListener {
 
-    private Logger logger = LoggerFactory.getLogger(MySensorsThingHandler.class);
+    private Logger logger = LoggerFactory.getLogger(getClass());
 
     private MySensorsSensorConfiguration configuration = null;
 
@@ -54,9 +54,9 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
 
     private boolean smartSleep = false;
 
-    private DateTimeType lastUpdate = null;
+    private int expectUpdateTimeout = -1;
 
-    // private Map<Integer, String> oldMsgContent = new HashMap<Integer, String>();
+    private DateTimeType lastUpdate = null;
 
     private MySensorsGateway myGateway;
 
@@ -72,13 +72,14 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
         requestAck = configuration.requestAck;
         revertState = configuration.revertState;
         smartSleep = configuration.smartSleep;
+        expectUpdateTimeout = configuration.expectUpdateTimeout;
 
         myGateway = getBridgeHandler().getMySensorsGateway();
-        addIntoGateway(getThing());
+        addIntoGateway(getThing(), configuration);
 
-        smartSleep = configuration.smartSleep;
-        logger.debug("Configuration: nodeId {}, chiledId: {}, requestAck: {}, revertState: {}, smartSleep: {}", nodeId,
-                childId, requestAck, revertState, smartSleep);
+        logger.debug(
+                "Configuration: nodeId {}, chiledId: {}, requestAck: {}, revertState: {}, smartSleep: {}, expectUpdateTimeout: {}",
+                nodeId, childId, requestAck, revertState, smartSleep, expectUpdateTimeout);
 
         registerListeners();
 
@@ -270,8 +271,8 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
         }
     }
 
-    private void addIntoGateway(Thing thing) {
-        MySensorsNode node = generateNodeFromThing(thing);
+    private void addIntoGateway(Thing thing, MySensorsSensorConfiguration configuration) {
+        MySensorsNode node = generateNodeFromThing(thing, configuration);
         if (node != null) {
             myGateway.addNode(node, true);
         } else {
@@ -279,7 +280,7 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
         }
     }
 
-    private MySensorsNode generateNodeFromThing(Thing t) {
+    private MySensorsNode generateNodeFromThing(Thing t, MySensorsSensorConfiguration configuration) {
         MySensorsNode ret = null;
         Integer nodeId = -1, childId = -1, pres = -1;
         try {

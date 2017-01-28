@@ -38,10 +38,10 @@
 				<default>false</default>
 			</parameter>
 			<parameter name="enableNetworkSanCheck" type="boolean" required="false">
-                <label>Disable network sanity check</label>
-                <description>Network sanity check periodically unsure that gateway is up and running</description>
-                <default>false</default>
-            </parameter>
+				<label>Disable network sanity check</label>
+				<description>Network sanity check periodically unsure that gateway is up and running</description>
+				<default>false</default>
+			</parameter>
 		</config-description>
 
 	</bridge-type>
@@ -79,10 +79,10 @@
 				<default>false</default>
 			</parameter>
 			<parameter name="enableNetworkSanCheck" type="boolean" required="false">
-                <label>Disable network sanity check</label>
-                <description>Network sanity check periodically unsure that gateway is up and running</description>
-                <default>false</default>
-            </parameter>
+				<label>Disable network sanity check</label>
+				<description>Network sanity check periodically unsure that gateway is up and running</description>
+				<default>false</default>
+			</parameter>
 		</config-description>
 
 	</bridge-type>
@@ -101,7 +101,7 @@
 		<channels>
 			<channel id="hum" typeId="hum-channel" />
 			<channel id="battery" typeId="battery-channel" />
-			<channel id="lastupdate" typeId="lastupdate-channel"/>
+			<channel id="lastupdate" typeId="lastupdate-channel" />
 			<channel id="custom" typeId="var1-channel" />
 		</channels>
 
@@ -117,6 +117,11 @@
 				<label>ChildId</label>
 				<description>The ID of the child of a node in the MySensors network
 				</description>
+			</parameter>
+			<parameter name="expectUpdateTimeout" type="integer" required="false">
+				<label>Expected Commucation Timeout</label>
+				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
+				<default>-1</default>
 			</parameter>
 		</config-description>
 
@@ -134,7 +139,7 @@
 		<channels>
 			<channel id="temp" typeId="temp-channel" />
 			<channel id="battery" typeId="battery-channel" />
-			<channel id="lastupdate" typeId="lastupdate-channel"/>
+			<channel id="lastupdate" typeId="lastupdate-channel" />
 			<channel id="custom" typeId="var1-channel" />
 		</channels>
 
@@ -148,6 +153,11 @@
 				<label>ChildId</label>
 				<description>The ID of the child of a node in the MySensors network
 				</description>
+			</parameter>
+			<parameter name="expectUpdateTimeout" type="integer" required="false">
+				<label>Expected Commucation Timeout</label>
+				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
+				<default>-1</default>
 			</parameter>
 		</config-description>
 
@@ -167,7 +177,7 @@
 			<channel id="current" typeId="current-channel" />
 			<channel id="impedance" typeId="impedance-channel" />
 			<channel id="battery" typeId="battery-channel" />
-			<channel id="lastupdate" typeId="lastupdate-channel"/>
+			<channel id="lastupdate" typeId="lastupdate-channel" />
 		</channels>
 
 		<config-description>
@@ -180,6 +190,11 @@
 				<label>ChildId</label>
 				<description>The ID of the child of a node in the MySensors network
 				</description>
+			</parameter>
+			<parameter name="expectUpdateTimeout" type="integer" required="false">
+				<label>Expected Commucation Timeout</label>
+				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
+				<default>-1</default>
 			</parameter>
 		</config-description>
 	</thing-type>
@@ -196,7 +211,7 @@
 		<channels>
 			<channel id="status" typeId="status-channel" />
 			<channel id="battery" typeId="battery-channel" />
-			<channel id="lastupdate" typeId="lastupdate-channel"/>
+			<channel id="lastupdate" typeId="lastupdate-channel" />
 		</channels>
 
 		<config-description>
@@ -209,6 +224,11 @@
 				<label>ChildId</label>
 				<description>The ID of the child of a node in the MySensors network
 				</description>
+			</parameter>
+			<parameter name="expectUpdateTimeout" type="integer" required="false">
+				<label>Expected Commucation Timeout</label>
+				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
+				<default>-1</default>
 			</parameter>
 			<parameter name="requestAck" type="boolean" required="false">
 				<label>Request ACK</label>
@@ -236,7 +256,7 @@
 			<channel id="watt" typeId="watt-channel" />
 			<channel id="kwh" typeId="kwh-channel" />
 			<channel id="battery" typeId="battery-channel" />
-			<channel id="lastupdate" typeId="lastupdate-channel"/>
+			<channel id="lastupdate" typeId="lastupdate-channel" />
 		</channels>
 
 		<config-description>
@@ -249,6 +269,11 @@
 				<label>ChildId-watt</label>
 				<description>The ID of the first child, displaying watt, of a node in the MySensors network
 				</description>
+			</parameter>
+			<parameter name="expectUpdateTimeout" type="integer" required="false">
+				<label>Expected Commucation Timeout</label>
+				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
+				<default>-1</default>
 			</parameter>
 		</config-description>
 	</thing-type>
@@ -266,7 +291,7 @@
 			<channel id="baro" typeId="baro-channel" />
 			<channel id="pressure" typeId="pressure-channel" />
 			<channel id="battery" typeId="battery-channel" />
-			<channel id="lastupdate" typeId="lastupdate-channel"/>
+			<channel id="lastupdate" typeId="lastupdate-channel" />
 		</channels>
 
 		<config-description>
@@ -279,6 +304,11 @@
 				<label>ChildId</label>
 				<description>The ID of the child of a node in the MySensors network
 				</description>
+			</parameter>
+			<parameter name="expectUpdateTimeout" type="integer" required="false">
+				<label>Expected Commucation Timeout</label>
+				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
+				<default>-1</default>
 			</parameter>
 		</config-description>
 	</thing-type>
@@ -296,7 +326,7 @@
 			<channel id="tripped" typeId="tripped-channel" />
 			<channel id="armed" typeId="armed-channel" />
 			<channel id="battery" typeId="battery-channel" />
-			<channel id="lastupdate" typeId="lastupdate-channel"/>
+			<channel id="lastupdate" typeId="lastupdate-channel" />
 		</channels>
 
 		<config-description>
@@ -309,6 +339,11 @@
 				<label>ChildId</label>
 				<description>The ID of the child of a node in the MySensors network
 				</description>
+			</parameter>
+			<parameter name="expectUpdateTimeout" type="integer" required="false">
+				<label>Expected Commucation Timeout</label>
+				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
+				<default>-1</default>
 			</parameter>
 		</config-description>
 	</thing-type>
@@ -326,7 +361,7 @@
 			<channel id="tripped" typeId="tripped-channel" />
 			<channel id="armed" typeId="armed-channel" />
 			<channel id="battery" typeId="battery-channel" />
-			<channel id="lastupdate" typeId="lastupdate-channel"/>
+			<channel id="lastupdate" typeId="lastupdate-channel" />
 		</channels>
 
 		<config-description>
@@ -339,6 +374,11 @@
 				<label>ChildId</label>
 				<description>The ID of the child of a node in the MySensors network
 				</description>
+			</parameter>
+			<parameter name="expectUpdateTimeout" type="integer" required="false">
+				<label>Expected Commucation Timeout</label>
+				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
+				<default>-1</default>
 			</parameter>
 		</config-description>
 	</thing-type>
@@ -355,7 +395,7 @@
 		<channels>
 			<channel id="tripped" typeId="tripped-channel" />
 			<channel id="battery" typeId="battery-channel" />
-			<channel id="lastupdate" typeId="lastupdate-channel"/>
+			<channel id="lastupdate" typeId="lastupdate-channel" />
 		</channels>
 
 		<config-description>
@@ -368,6 +408,11 @@
 				<label>ChildId</label>
 				<description>The ID of the child of a node in the MySensors network
 				</description>
+			</parameter>
+			<parameter name="expectUpdateTimeout" type="integer" required="false">
+				<label>Expected Commucation Timeout</label>
+				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
+				<default>-1</default>
 			</parameter>
 		</config-description>
 	</thing-type>
@@ -385,7 +430,7 @@
 			<channel id="dimmer" typeId="dimmer-channel" />
 			<channel id="watt" typeId="watt-channel" />
 			<channel id="battery" typeId="battery-channel" />
-			<channel id="lastupdate" typeId="lastupdate-channel"/>
+			<channel id="lastupdate" typeId="lastupdate-channel" />
 		</channels>
 
 		<config-description>
@@ -398,6 +443,11 @@
 				<label>ChildId</label>
 				<description>The ID of the child of a node in the MySensors network
 				</description>
+			</parameter>
+			<parameter name="expectUpdateTimeout" type="integer" required="false">
+				<label>Expected Commucation Timeout</label>
+				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
+				<default>-1</default>
 			</parameter>
 		</config-description>
 	</thing-type>
@@ -414,7 +464,7 @@
 		<channels>
 			<channel id="cover" typeId="cover-channel" />
 			<channel id="battery" typeId="battery-channel" />
-			<channel id="lastupdate" typeId="lastupdate-channel"/>
+			<channel id="lastupdate" typeId="lastupdate-channel" />
 		</channels>
 
 		<config-description>
@@ -427,6 +477,11 @@
 				<label>ChildId</label>
 				<description>The ID of the child of a node in the MySensors network
 				</description>
+			</parameter>
+			<parameter name="expectUpdateTimeout" type="integer" required="false">
+				<label>Expected Commucation Timeout</label>
+				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
+				<default>-1</default>
 			</parameter>
 		</config-description>
 	</thing-type>
@@ -444,7 +499,7 @@
 			<channel id="wind" typeId="wind-channel" />
 			<channel id="gust" typeId="gust-channel" />
 			<channel id="battery" typeId="battery-channel" />
-			<channel id="lastupdate" typeId="lastupdate-channel"/>
+			<channel id="lastupdate" typeId="lastupdate-channel" />
 		</channels>
 
 		<config-description>
@@ -457,6 +512,11 @@
 				<label>ChildId</label>
 				<description>The ID of the child of a node in the MySensors network
 				</description>
+			</parameter>
+			<parameter name="expectUpdateTimeout" type="integer" required="false">
+				<label>Expected Commucation Timeout</label>
+				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
+				<default>-1</default>
 			</parameter>
 		</config-description>
 	</thing-type>
@@ -474,7 +534,7 @@
 			<channel id="rain" typeId="rain-channel" />
 			<channel id="rainrate" typeId="rainrate-channel" />
 			<channel id="battery" typeId="battery-channel" />
-			<channel id="lastupdate" typeId="lastupdate-channel"/>
+			<channel id="lastupdate" typeId="lastupdate-channel" />
 		</channels>
 
 		<config-description>
@@ -487,6 +547,11 @@
 				<label>ChildId</label>
 				<description>The ID of the child of a node in the MySensors network
 				</description>
+			</parameter>
+			<parameter name="expectUpdateTimeout" type="integer" required="false">
+				<label>Expected Commucation Timeout</label>
+				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
+				<default>-1</default>
 			</parameter>
 		</config-description>
 	</thing-type>
@@ -503,7 +568,7 @@
 		<channels>
 			<channel id="uv" typeId="uv-channel" />
 			<channel id="battery" typeId="battery-channel" />
-			<channel id="lastupdate" typeId="lastupdate-channel"/>
+			<channel id="lastupdate" typeId="lastupdate-channel" />
 		</channels>
 
 		<config-description>
@@ -516,6 +581,11 @@
 				<label>ChildId</label>
 				<description>The ID of the child of a node in the MySensors network
 				</description>
+			</parameter>
+			<parameter name="expectUpdateTimeout" type="integer" required="false">
+				<label>Expected Commucation Timeout</label>
+				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
+				<default>-1</default>
 			</parameter>
 		</config-description>
 	</thing-type>
@@ -533,7 +603,7 @@
 			<channel id="weight" typeId="weight-channel" />
 			<channel id="impedance" typeId="impedance-channel" />
 			<channel id="battery" typeId="battery-channel" />
-			<channel id="lastupdate" typeId="lastupdate-channel"/>
+			<channel id="lastupdate" typeId="lastupdate-channel" />
 		</channels>
 
 		<config-description>
@@ -546,6 +616,11 @@
 				<label>ChildId</label>
 				<description>The ID of the child of a node in the MySensors network
 				</description>
+			</parameter>
+			<parameter name="expectUpdateTimeout" type="integer" required="false">
+				<label>Expected Commucation Timeout</label>
+				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
+				<default>-1</default>
 			</parameter>
 		</config-description>
 	</thing-type>
@@ -562,7 +637,7 @@
 		<channels>
 			<channel id="distance" typeId="distance-channel" />
 			<channel id="battery" typeId="battery-channel" />
-			<channel id="lastupdate" typeId="lastupdate-channel"/>
+			<channel id="lastupdate" typeId="lastupdate-channel" />
 		</channels>
 
 		<config-description>
@@ -575,6 +650,11 @@
 				<label>ChildId</label>
 				<description>The ID of the child of a node in the MySensors network
 				</description>
+			</parameter>
+			<parameter name="expectUpdateTimeout" type="integer" required="false">
+				<label>Expected Commucation Timeout</label>
+				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
+				<default>-1</default>
 			</parameter>
 		</config-description>
 	</thing-type>
@@ -591,7 +671,7 @@
 		<channels>
 			<channel id="light-level" typeId="light-level-channel" />
 			<channel id="battery" typeId="battery-channel" />
-			<channel id="lastupdate" typeId="lastupdate-channel"/>
+			<channel id="lastupdate" typeId="lastupdate-channel" />
 		</channels>
 
 		<config-description>
@@ -604,6 +684,11 @@
 				<label>ChildId</label>
 				<description>The ID of the child of a node in the MySensors network
 				</description>
+			</parameter>
+			<parameter name="expectUpdateTimeout" type="integer" required="false">
+				<label>Expected Commucation Timeout</label>
+				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
+				<default>-1</default>
 			</parameter>
 			<parameter name="requestAck" type="boolean" required="false">
 				<label>Request ACK</label>
@@ -640,7 +725,7 @@
 			<channel id="var4" typeId="var4-channel" />
 			<channel id="var5" typeId="var5-channel" />
 			<channel id="battery" typeId="battery-channel" />
-			<channel id="lastupdate" typeId="lastupdate-channel"/>
+			<channel id="lastupdate" typeId="lastupdate-channel" />
 		</channels>
 
 		<config-description>
@@ -653,6 +738,11 @@
 				<label>ChildId</label>
 				<description>The ID of the child of a node in the MySensors network
                 </description>
+			</parameter>
+			<parameter name="expectUpdateTimeout" type="integer" required="false">
+				<label>Expected Commucation Timeout</label>
+				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
+				<default>-1</default>
 			</parameter>
 		</config-description>
 	</thing-type>
@@ -671,7 +761,7 @@
 			<channel id="volume" typeId="volume-channel" />
 			<channel id="var1" typeId="var1-channel" />
 			<channel id="battery" typeId="battery-channel" />
-			<channel id="lastupdate" typeId="lastupdate-channel"/>
+			<channel id="lastupdate" typeId="lastupdate-channel" />
 		</channels>
 
 		<config-description>
@@ -684,6 +774,11 @@
 				<label>ChildId</label>
 				<description>The ID of the child of a node in the MySensors network
                 </description>
+			</parameter>
+			<parameter name="expectUpdateTimeout" type="integer" required="false">
+				<label>Expected Commucation Timeout</label>
+				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
+				<default>-1</default>
 			</parameter>
 		</config-description>
 	</thing-type>
@@ -703,7 +798,7 @@
 			<channel id="var3" typeId="var3-channel" />
 			<channel id="var4" typeId="var4-channel" />
 			<channel id="var5" typeId="var5-channel" />
-            <channel id="lastupdate" typeId="lastupdate-channel"/>
+			<channel id="lastupdate" typeId="lastupdate-channel" />
 		</channels>
 
 		<config-description>
@@ -717,6 +812,11 @@
 				<description>The ID of the child of a node in the MySensors network
                 </description>
 			</parameter>
+			<parameter name="expectUpdateTimeout" type="integer" required="false">
+				<label>Expected Commucation Timeout</label>
+				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
+				<default>-1</default>
+			</parameter>
 			<parameter name="requestAck" type="boolean" required="false">
 				<label>Request ACK</label>
 				<description>Request ACK from Actuator</description>
@@ -729,7 +829,7 @@
 			</parameter>
 		</config-description>
 	</thing-type>
-	
+
 	<thing-type id="lock">
 		<supported-bridge-type-refs>
 			<bridge-type-ref id="bridge-ser" />
@@ -742,7 +842,7 @@
 		<channels>
 			<channel id="lock" typeId="lock-channel" />
 			<channel id="battery" typeId="battery-channel" />
-			<channel id="lastupdate" typeId="lastupdate-channel"/>
+			<channel id="lastupdate" typeId="lastupdate-channel" />
 		</channels>
 
 		<config-description>
@@ -758,9 +858,14 @@
 				<description>The ID of the child of a node in the MySensors network
 				</description>
 			</parameter>
+			<parameter name="expectUpdateTimeout" type="integer" required="false">
+				<label>Expected Commucation Timeout</label>
+				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
+				<default>-1</default>
+			</parameter>
 		</config-description>
 	</thing-type>
-	
+
 	<thing-type id="sound">
 		<supported-bridge-type-refs>
 			<bridge-type-ref id="bridge-ser" />
@@ -775,7 +880,7 @@
 			<channel id="armed" typeId="armed-channel" />
 			<channel id="level" typeId="level-channel" />
 			<channel id="battery" typeId="battery-channel" />
-			<channel id="lastupdate" typeId="lastupdate-channel"/>
+			<channel id="lastupdate" typeId="lastupdate-channel" />
 		</channels>
 
 		<config-description>
@@ -791,9 +896,14 @@
 				<description>The ID of the child of a node in the MySensors network
 				</description>
 			</parameter>
+			<parameter name="expectUpdateTimeout" type="integer" required="false">
+				<label>Expected Commucation Timeout</label>
+				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
+				<default>-1</default>
+			</parameter>
 		</config-description>
 	</thing-type>
-	
+
 	<thing-type id="rgbLight">
 		<supported-bridge-type-refs>
 			<bridge-type-ref id="bridge-ser" />
@@ -809,7 +919,7 @@
 			<channel id="var2" typeId="var2-channel" />
 			<channel id="var3" typeId="var3-channel" />
 			<channel id="battery" typeId="battery-channel" />
-			<channel id="lastupdate" typeId="lastupdate-channel"/>
+			<channel id="lastupdate" typeId="lastupdate-channel" />
 		</channels>
 
 		<config-description>
@@ -825,9 +935,14 @@
 				<description>The ID of the child of a node in the MySensors network
 				</description>
 			</parameter>
+			<parameter name="expectUpdateTimeout" type="integer" required="false">
+				<label>Expected Commucation Timeout</label>
+				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
+				<default>-1</default>
+			</parameter>
 		</config-description>
 	</thing-type>
-	
+
 	<thing-type id="rgbwLight">
 		<supported-bridge-type-refs>
 			<bridge-type-ref id="bridge-ser" />
@@ -844,7 +959,7 @@
 			<channel id="var3" typeId="var3-channel" />
 			<channel id="var4" typeId="var4-channel" />
 			<channel id="battery" typeId="battery-channel" />
-			<channel id="lastupdate" typeId="lastupdate-channel"/>
+			<channel id="lastupdate" typeId="lastupdate-channel" />
 		</channels>
 
 		<config-description>
@@ -860,9 +975,14 @@
 				<description>The ID of the child of a node in the MySensors network
 				</description>
 			</parameter>
+			<parameter name="expectUpdateTimeout" type="integer" required="false">
+				<label>Expected Commucation Timeout</label>
+				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
+				<default>-1</default>
+			</parameter>
 		</config-description>
 	</thing-type>
-	
+
 	<thing-type id="waterQuality">
 		<supported-bridge-type-refs>
 			<bridge-type-ref id="bridge-ser" />
@@ -878,7 +998,7 @@
 			<channel id="orp" typeId="orp-channel" />
 			<channel id="ec" typeId="ec-channel" />
 			<channel id="battery" typeId="battery-channel" />
-			<channel id="lastupdate" typeId="lastupdate-channel"/>
+			<channel id="lastupdate" typeId="lastupdate-channel" />
 		</channels>
 
 		<config-description>
@@ -894,191 +1014,226 @@
 				<description>The ID of the child of a node in the MySensors network
 				</description>
 			</parameter>
+			<parameter name="expectUpdateTimeout" type="integer" required="false">
+				<label>Expected Commucation Timeout</label>
+				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
+				<default>-1</default>
+			</parameter>
 		</config-description>
 	</thing-type>
 	<thing-type id="mysensorsMessage">
-        <supported-bridge-type-refs>
-            <bridge-type-ref id="bridge-ser" />
-            <bridge-type-ref id="bridge-eth" />
-        </supported-bridge-type-refs>
+		<supported-bridge-type-refs>
+			<bridge-type-ref id="bridge-ser" />
+			<bridge-type-ref id="bridge-eth" />
+		</supported-bridge-type-refs>
 
-        <label>MySensors Message</label>
-        <description>Shows the complete MySensors Message</description>
+		<label>MySensors Message</label>
+		<description>Shows the complete MySensors Message</description>
 
-        <channels>
-            <channel id="mySensorsMessage" typeId="mySensorsMessage-channel" />
-            <channel id="lastupdate" typeId="lastupdate-channel"/>
-        </channels>
+		<channels>
+			<channel id="mySensorsMessage" typeId="mySensorsMessage-channel" />
+			<channel id="lastupdate" typeId="lastupdate-channel" />
+		</channels>
 
-        <config-description>
-            <parameter name="nodeId" type="text" required="true">
-                <context>NodeId</context>
-                <label>NodeId</label>
-                <description>The ID of the node in the MySensors network
+		<config-description>
+			<parameter name="nodeId" type="text" required="true">
+				<context>NodeId</context>
+				<label>NodeId</label>
+				<description>The ID of the node in the MySensors network
                 </description>
-                <default>999</default>
-            </parameter>
-            <parameter name="childId" type="text" required="true">
-                <context>ChildId</context>
-                <label>ChildId</label>
-                <description>The ID of the child of a node in the MySensors network
+				<default>999</default>
+			</parameter>
+			<parameter name="childId" type="text" required="true">
+				<context>ChildId</context>
+				<label>ChildId</label>
+				<description>The ID of the child of a node in the MySensors network
                 </description>
-                <default>999</default>
-            </parameter>
-        </config-description>
-    </thing-type>
-    
-    <thing-type id="text">
-        <supported-bridge-type-refs>
-            <bridge-type-ref id="bridge-ser" />
-            <bridge-type-ref id="bridge-eth" />
-        </supported-bridge-type-refs>
+				<default>999</default>
+			</parameter>
+			<parameter name="expectUpdateTimeout" type="integer" required="false">
+				<label>Expected Commucation Timeout</label>
+				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
+				<default>-1</default>
+			</parameter>
+		</config-description>
+	</thing-type>
 
-        <label>Text</label>
-        <description>V_TEXT</description>
+	<thing-type id="text">
+		<supported-bridge-type-refs>
+			<bridge-type-ref id="bridge-ser" />
+			<bridge-type-ref id="bridge-eth" />
+		</supported-bridge-type-refs>
 
-        <channels>
-            <channel id="text" typeId="text-channel" />
-            <channel id="lastupdate" typeId="lastupdate-channel"/>
-        </channels>
+		<label>Text</label>
+		<description>V_TEXT</description>
 
-        <config-description>
-            <parameter name="nodeId" type="text" required="true">
-                <context>NodeId</context>
-                <label>NodeId</label>
-                <description>The ID of the node in the MySensors network
+		<channels>
+			<channel id="text" typeId="text-channel" />
+			<channel id="lastupdate" typeId="lastupdate-channel" />
+		</channels>
+
+		<config-description>
+			<parameter name="nodeId" type="text" required="true">
+				<context>NodeId</context>
+				<label>NodeId</label>
+				<description>The ID of the node in the MySensors network
                 </description>
-                <default>999</default>
-            </parameter>
-            <parameter name="childId" type="text" required="true">
-                <context>ChildId</context>
-                <label>ChildId</label>
-                <description>The ID of the child of a node in the MySensors network
+				<default>999</default>
+			</parameter>
+			<parameter name="childId" type="text" required="true">
+				<context>ChildId</context>
+				<label>ChildId</label>
+				<description>The ID of the child of a node in the MySensors network
                 </description>
-                <default>999</default>
-            </parameter>
-        </config-description>
-    </thing-type>
-    
-    <thing-type id="ir">
-        <supported-bridge-type-refs>
-            <bridge-type-ref id="bridge-ser" />
-            <bridge-type-ref id="bridge-eth" />
-        </supported-bridge-type-refs>
+				<default>999</default>
+			</parameter>
+			<parameter name="expectUpdateTimeout" type="integer" required="false">
+				<label>Expected Commucation Timeout</label>
+				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
+				<default>-1</default>
+			</parameter>
+		</config-description>
+	</thing-type>
 
-        <label>IR Receive</label>
-        <description>Receive IR codes</description>
+	<thing-type id="ir">
+		<supported-bridge-type-refs>
+			<bridge-type-ref id="bridge-ser" />
+			<bridge-type-ref id="bridge-eth" />
+		</supported-bridge-type-refs>
 
-        <channels>
-            <channel id="irSend" typeId="irSend-channel" />
-            <channel id="irReceive" typeId="irReceive-channel" />
-            <channel id="lastupdate" typeId="lastupdate-channel"/>
-        </channels>
+		<label>IR Receive</label>
+		<description>Receive IR codes</description>
 
-        <config-description>
-            <parameter name="nodeId" type="text" required="true">
-                <context>NodeId</context>
-                <label>NodeId</label>
-                <description>The ID of the node in the MySensors network
+		<channels>
+			<channel id="irSend" typeId="irSend-channel" />
+			<channel id="irReceive" typeId="irReceive-channel" />
+			<channel id="lastupdate" typeId="lastupdate-channel" />
+		</channels>
+
+		<config-description>
+			<parameter name="nodeId" type="text" required="true">
+				<context>NodeId</context>
+				<label>NodeId</label>
+				<description>The ID of the node in the MySensors network
                 </description>
-                <default>999</default>
-            </parameter>
-            <parameter name="childId" type="text" required="true">
-                <context>ChildId</context>
-                <label>ChildId</label>
-                <description>The ID of the child of a node in the MySensors network
+				<default>999</default>
+			</parameter>
+			<parameter name="childId" type="text" required="true">
+				<context>ChildId</context>
+				<label>ChildId</label>
+				<description>The ID of the child of a node in the MySensors network
                 </description>
-                <default>999</default>
-            </parameter>
-        </config-description>
-    </thing-type>
-	
-    <thing-type id="airQuality">
-        <supported-bridge-type-refs>
-            <bridge-type-ref id="bridge-ser" />
-            <bridge-type-ref id="bridge-eth" />
-        </supported-bridge-type-refs>
+				<default>999</default>
+			</parameter>
+			<parameter name="expectUpdateTimeout" type="integer" required="false">
+				<label>Expected Commucation Timeout</label>
+				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
+				<default>-1</default>
+			</parameter>
+		</config-description>
+	</thing-type>
 
-        <label>Air Quality Meter</label>
-        <description>Air Quality Meter</description>
+	<thing-type id="airQuality">
+		<supported-bridge-type-refs>
+			<bridge-type-ref id="bridge-ser" />
+			<bridge-type-ref id="bridge-eth" />
+		</supported-bridge-type-refs>
 
-        <channels>
-            <channel id="level" typeId="level-channel" />
-            <channel id="battery" typeId="battery-channel" />
-            <channel id="lastupdate" typeId="lastupdate-channel"/>
-        </channels>
+		<label>Air Quality Meter</label>
+		<description>Air Quality Meter</description>
 
-        <config-description>
-            <parameter name="nodeId" type="text" required="true">
-                <label>NodeId</label>
-                <description>The ID of the node in the MySensors network
+		<channels>
+			<channel id="level" typeId="level-channel" />
+			<channel id="battery" typeId="battery-channel" />
+			<channel id="lastupdate" typeId="lastupdate-channel" />
+		</channels>
+
+		<config-description>
+			<parameter name="nodeId" type="text" required="true">
+				<label>NodeId</label>
+				<description>The ID of the node in the MySensors network
                 </description>
-            </parameter>
-            <parameter name="childId" type="text" required="true">
-            <label>ChildId</label>
-                <description>The ID of the child of a node in the MySensors network
+			</parameter>
+			<parameter name="childId" type="text" required="true">
+				<label>ChildId</label>
+				<description>The ID of the child of a node in the MySensors network
                 </description>
-            </parameter>
-        </config-description>
-    </thing-type>
-    
-    <thing-type id="dust">
-        <supported-bridge-type-refs>
-            <bridge-type-ref id="bridge-ser" />
-            <bridge-type-ref id="bridge-eth" />
-        </supported-bridge-type-refs>
+			</parameter>
+			<parameter name="expectUpdateTimeout" type="integer" required="false">
+				<label>Expected Commucation Timeout</label>
+				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
+				<default>-1</default>
+			</parameter>
+		</config-description>
+	</thing-type>
 
-        <label>Dust Meter</label>
-        <description>Dust Meter</description>
+	<thing-type id="dust">
+		<supported-bridge-type-refs>
+			<bridge-type-ref id="bridge-ser" />
+			<bridge-type-ref id="bridge-eth" />
+		</supported-bridge-type-refs>
 
-        <channels>
-            <channel id="level" typeId="level-channel" />
-            <channel id="battery" typeId="battery-channel" />
-            <channel id="lastupdate" typeId="lastupdate-channel"/>
-        </channels>
+		<label>Dust Meter</label>
+		<description>Dust Meter</description>
 
-        <config-description>
-            <parameter name="nodeId" type="text" required="true">
-                <label>NodeId</label>
-                <description>The ID of the node in the MySensors network
+		<channels>
+			<channel id="level" typeId="level-channel" />
+			<channel id="battery" typeId="battery-channel" />
+			<channel id="lastupdate" typeId="lastupdate-channel" />
+		</channels>
+
+		<config-description>
+			<parameter name="nodeId" type="text" required="true">
+				<label>NodeId</label>
+				<description>The ID of the node in the MySensors network
                 </description>
-            </parameter>
-            <parameter name="childId" type="text" required="true">
-            <label>ChildId</label>
-                <description>The ID of the child of a node in the MySensors network
+			</parameter>
+			<parameter name="childId" type="text" required="true">
+				<label>ChildId</label>
+				<description>The ID of the child of a node in the MySensors network
                 </description>
-            </parameter>
-        </config-description>
-    </thing-type>
-    
-    <thing-type id="colorSensor">
-        <supported-bridge-type-refs>
-            <bridge-type-ref id="bridge-ser" />
-            <bridge-type-ref id="bridge-eth" />
-        </supported-bridge-type-refs>
+			</parameter>
+			<parameter name="expectUpdateTimeout" type="integer" required="false">
+				<label>Expected Commucation Timeout</label>
+				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
+				<default>-1</default>
+			</parameter>
+		</config-description>
+	</thing-type>
 
-        <label>Color Sensor</label>
-        <description>Color Sensor</description>
+	<thing-type id="colorSensor">
+		<supported-bridge-type-refs>
+			<bridge-type-ref id="bridge-ser" />
+			<bridge-type-ref id="bridge-eth" />
+		</supported-bridge-type-refs>
 
-        <channels>
-            <channel id="rgb" typeId="rgb-channel" />
-            <channel id="battery" typeId="battery-channel" />
-            <channel id="lastupdate" typeId="lastupdate-channel"/>
-        </channels>
+		<label>Color Sensor</label>
+		<description>Color Sensor</description>
 
-        <config-description>
-            <parameter name="nodeId" type="text" required="true">
-                <label>NodeId</label>
-                <description>The ID of the node in the MySensors network
+		<channels>
+			<channel id="rgb" typeId="rgb-channel" />
+			<channel id="battery" typeId="battery-channel" />
+			<channel id="lastupdate" typeId="lastupdate-channel" />
+		</channels>
+
+		<config-description>
+			<parameter name="nodeId" type="text" required="true">
+				<label>NodeId</label>
+				<description>The ID of the node in the MySensors network
                 </description>
-            </parameter>
-            <parameter name="childId" type="text" required="true">
-            <label>ChildId</label>
-                <description>The ID of the child of a node in the MySensors network
+			</parameter>
+			<parameter name="childId" type="text" required="true">
+				<label>ChildId</label>
+				<description>The ID of the child of a node in the MySensors network
                 </description>
-            </parameter>
-        </config-description>
-    </thing-type>
+			</parameter>
+			<parameter name="expectUpdateTimeout" type="integer" required="false">
+				<label>Expected Commucation Timeout</label>
+				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
+				<default>-1</default>
+			</parameter>
+		</config-description>
+	</thing-type>
 
 	<!-- CHANNELS -->
 
@@ -1231,11 +1386,11 @@
 		<state pattern="%d %%" readOnly="true"></state>
 	</channel-type>
 	<channel-type id="lastupdate-channel">
-        <item-type>DateTime</item-type>
-        <label>Last Update</label>
-        <description>MySensors Last Update</description>
-        <state readOnly="true"></state>
-    </channel-type>
+		<item-type>DateTime</item-type>
+		<label>Last Update</label>
+		<description>MySensors Last Update</description>
+		<state readOnly="true"></state>
+	</channel-type>
 	<channel-type id="hvac-setPoint-heat-channel">
 		<item-type>Number</item-type>
 		<label>Set point heat</label>
@@ -1337,33 +1492,33 @@
 		<state readOnly="false"></state>
 	</channel-type>
 	<channel-type id="mysensorsMessage-channel">
-        <item-type>String</item-type>
-        <label>MySensors Message</label>
-        <description>MySensors Message Channel</description>
-        <state readOnly="false"></state>
-    </channel-type>
-    <channel-type id="text-channel">
-        <item-type>String</item-type>
-        <label>Text</label>
-        <description>MySensors Text Channel</description>
-        <category>Variable</category>
-    </channel-type>
-    <channel-type id="irSend-channel">
-        <item-type>String</item-type>
-        <label>Text</label>
-        <description>MySensors IR Send Channel</description>
-        <category>Variable</category>
-    </channel-type>
-    <channel-type id="irReceive-channel">
-        <item-type>String</item-type>
-        <label>Text</label>
-        <description>MySensors IR Receive Channel</description>
-        <category>Variable</category>
-    </channel-type>
-    <channel-type id="rgb-channel">
-        <item-type>String</item-type>
-        <label>Text</label>
-        <description>MySensors RGB Channel</description>
-        <category>Variable</category>
-</channel-type>
+		<item-type>String</item-type>
+		<label>MySensors Message</label>
+		<description>MySensors Message Channel</description>
+		<state readOnly="false"></state>
+	</channel-type>
+	<channel-type id="text-channel">
+		<item-type>String</item-type>
+		<label>Text</label>
+		<description>MySensors Text Channel</description>
+		<category>Variable</category>
+	</channel-type>
+	<channel-type id="irSend-channel">
+		<item-type>String</item-type>
+		<label>Text</label>
+		<description>MySensors IR Send Channel</description>
+		<category>Variable</category>
+	</channel-type>
+	<channel-type id="irReceive-channel">
+		<item-type>String</item-type>
+		<label>Text</label>
+		<description>MySensors IR Receive Channel</description>
+		<category>Variable</category>
+	</channel-type>
+	<channel-type id="rgb-channel">
+		<item-type>String</item-type>
+		<label>Text</label>
+		<description>MySensors RGB Channel</description>
+		<category>Variable</category>
+	</channel-type>
 </thing:thing-descriptions>

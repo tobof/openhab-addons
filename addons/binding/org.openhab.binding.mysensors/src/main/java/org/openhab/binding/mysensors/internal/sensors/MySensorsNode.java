@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.openhab.binding.mysensors.internal.exception.MergeException;
+import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
 
 /**
  * Characteristics of a thing/node are stored here:
@@ -112,6 +113,12 @@ public class MySensorsNode {
             }
 
         }
+    }
+
+    public MySensorsMessage updateVariableState(int childId, int type, String state) {
+        MySensorsMessage msg = null;
+        // TODO
+        return msg;
     }
 
     public static boolean isValidNodeId(int id) {

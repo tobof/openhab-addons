@@ -22,19 +22,22 @@ public class MySensorsNetworkSanityChecker implements MySensorsGatewayEventListe
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
-    private MySensorsAbstractConnection myCon;
     private MySensorsEventRegister myEventRegister;
+    private MySensorsAbstractConnection myCon;
+    private MySensorsGateway myGateway;
 
     private static final int SHEDULE_MINUTES_DELAY = 3; // only for test will be: 3
     private static final int MAX_ATTEMPTS_BEFORE_DISCONNECT = 3; // only for test will be: 3
 
     private ScheduledExecutorService scheduler = null;
-    private ScheduledFuture<?> future = null;
+    private ScheduledFuture<?> futureSanityChk = null;
 
     private Integer iVersionMessageMissing = 0;
     private boolean iVersionMessageArrived = false;
 
-    public MySensorsNetworkSanityChecker(MySensorsAbstractConnection myCon, MySensorsEventRegister myEventRegister) {
+    public MySensorsNetworkSanityChecker(MySensorsGateway myGateway, MySensorsEventRegister myEventRegister,
+            MySensorsAbstractConnection myCon) {
+        this.myGateway = myGateway;
         this.myCon = myCon;
         this.myEventRegister = myEventRegister;
     }
@@ -53,9 +56,9 @@ public class MySensorsNetworkSanityChecker implements MySensorsGatewayEventListe
     public void start() {
         reset();
 
-        if (future == null && scheduler == null) {
+        if (futureSanityChk == null && scheduler == null) {
             scheduler = Executors.newSingleThreadScheduledExecutor();
-            future = scheduler.scheduleWithFixedDelay(this, SHEDULE_MINUTES_DELAY, SHEDULE_MINUTES_DELAY,
+            futureSanityChk = scheduler.scheduleWithFixedDelay(this, SHEDULE_MINUTES_DELAY, SHEDULE_MINUTES_DELAY,
                     TimeUnit.MINUTES);
         } else {
             logger.warn("Network Sanity Checker is alredy running");
@@ -68,9 +71,9 @@ public class MySensorsNetworkSanityChecker implements MySensorsGatewayEventListe
     public void stop() {
         logger.info("Network Sanity Checker thread stopped");
 
-        if (future != null) {
-            future.cancel(true);
-            future = null;
+        if (futureSanityChk != null) {
+            futureSanityChk.cancel(true);
+            futureSanityChk = null;
         }
 
         if (scheduler != null) {
@@ -89,35 +92,45 @@ public class MySensorsNetworkSanityChecker implements MySensorsGatewayEventListe
 
             myEventRegister.addEventListener(this);
 
-            myCon.addMySensorsOutboundMessage(MySensorsMessage.I_VERSION_MESSAGE);
+            checkConnectionStatus();
 
-            Thread.sleep(3000);
+            checkNodeStatus();
 
-            synchronized (iVersionMessageMissing) {
-                if (!iVersionMessageArrived) {
-                    logger.warn("I_VERSION message response is not arrived. Remained attempts before disconnection {}",
-                            MAX_ATTEMPTS_BEFORE_DISCONNECT - iVersionMessageMissing);
-
-                    if ((MAX_ATTEMPTS_BEFORE_DISCONNECT - iVersionMessageMissing) <= 0) {
-                        logger.error("Retry period expired, gateway is down. Disconneting bridge...");
-
-                        myCon.requestDisconnection(true);
-
-                    } else {
-                        iVersionMessageMissing++;
-                    }
-                } else {
-                    logger.debug("Network sanity check: PASSED");
-                    iVersionMessageMissing = 0;
-                }
-
-                iVersionMessageArrived = false;
-            }
-
-        } catch (InterruptedException e) {
-            logger.error("interrupted exception in network sanity thread checker");
+        } catch (Exception e) {
+            logger.error("Exception in network sanity thread checker", e);
         } finally {
             myEventRegister.removeEventListener(this);
+        }
+    }
+
+    private void checkNodeStatus() {
+        // TODO
+    }
+
+    private void checkConnectionStatus() throws InterruptedException {
+        myGateway.sendMessage(MySensorsMessage.I_VERSION_MESSAGE);
+
+        Thread.sleep(3000);
+
+        synchronized (iVersionMessageMissing) {
+            if (!iVersionMessageArrived) {
+                logger.warn("I_VERSION message response is not arrived. Remained attempts before disconnection {}",
+                        MAX_ATTEMPTS_BEFORE_DISCONNECT - iVersionMessageMissing);
+
+                if ((MAX_ATTEMPTS_BEFORE_DISCONNECT - iVersionMessageMissing) <= 0) {
+                    logger.error("Retry period expired, gateway is down. Disconneting bridge...");
+
+                    myCon.requestDisconnection(true);
+
+                } else {
+                    iVersionMessageMissing++;
+                }
+            } else {
+                logger.debug("Network sanity check: PASSED");
+                iVersionMessageMissing = 0;
+            }
+
+            iVersionMessageArrived = false;
         }
     }
 

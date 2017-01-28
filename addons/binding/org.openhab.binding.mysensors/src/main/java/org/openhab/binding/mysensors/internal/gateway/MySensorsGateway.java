@@ -94,7 +94,7 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
         myEventRegister.addEventListener(this);
 
         if (myConf.getEnableNetworkSanCheck()) {
-            myNetSanCheck = new MySensorsNetworkSanityChecker(myCon, myEventRegister);
+            myNetSanCheck = new MySensorsNetworkSanityChecker(this, myEventRegister, myCon);
         }
     }
 
@@ -135,6 +135,28 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
         }
 
         return ret;
+    }
+
+    /**
+     * Update variable state. This method <b>not</b> send new updated value to network, use sendMessage for it.
+     *
+     * @param nodeId node id of sensor
+     * @param childId child id of sensor
+     * @param type type of variable to update
+     * @param state new state
+     *
+     * @return a message that should be sent to update variable to desired state
+     */
+    public MySensorsMessage setVariableState(int nodeId, int childId, int type, String state) {
+        MySensorsNode node = getNode(nodeId);
+        MySensorsMessage msg = null;
+
+        if (node != null) {
+            msg = node.updateVariableState(childId, type, state);
+        }
+
+        return msg;
+
     }
 
     /**
@@ -344,6 +366,8 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
 
             updateLastUpdateFromMessage(msg);
 
+            updateReachable(msg);
+
             switch (msg.getMsgType()) {
                 case MySensorsMessage.MYSENSORS_MSG_TYPE_INTERNAL:
                     ret = handleInternalMessage(msg);
@@ -364,6 +388,15 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
         }
 
         return ret;
+    }
+
+    private void updateReachable(MySensorsMessage msg) {
+        MySensorsNode node = getNode(msg.getNodeId());
+        if (node != null && !node.isReachable()) {
+            logger.debug("Node {} becomes available again!", node.getNodeId());
+            myEventRegister.notifyNodeReachEvent(node, true);
+        }
+
     }
 
     private boolean isNewDevice(MySensorsMessage msg) {

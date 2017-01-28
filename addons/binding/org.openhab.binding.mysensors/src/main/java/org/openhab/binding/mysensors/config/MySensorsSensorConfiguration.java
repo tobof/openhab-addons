@@ -21,4 +21,6 @@ public class MySensorsSensorConfiguration {
                                 // reverted?
 
     public boolean smartSleep;
+
+    public int expectUpdateTimeout;
 }
