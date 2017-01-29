@@ -61,7 +61,7 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
     }
 
     /**
-     * Build up the gateway fallowing given configuration parameters. Gateway will not start after this method returns.
+     * Build up the gateway following given configuration parameters. Gateway will not start after this method returns.
      * Use startup to do that
      *
      * @param myConf a valid instance of {@link MySensorsGatewayConfig}
@@ -73,7 +73,7 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
 
         if (myConf != null) {
             if (myCon != null) {
-                throw new IllegalStateException("Connection is walredy instantiated");
+                throw new IllegalStateException("Connection is alredy instantiated");
             }
 
             this.myConf = myConf;
