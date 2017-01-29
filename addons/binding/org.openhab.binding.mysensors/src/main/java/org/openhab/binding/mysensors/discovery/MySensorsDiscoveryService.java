@@ -38,12 +38,13 @@ public class MySensorsDiscoveryService extends AbstractDiscoveryService implemen
     private MySensorsBridgeHandler bridgeHandler = null;
 
     public MySensorsDiscoveryService(MySensorsBridgeHandler bridgeHandler) {
-        super(SUPPORTED_THING_TYPES_UIDS, 3000, false);
+        super(SUPPORTED_THING_TYPES_UIDS, 0, true);
         this.bridgeHandler = bridgeHandler;
     }
 
     @Override
     protected void startScan() {
+        logger.debug("Starting MySensors discovery scan");
         bridgeHandler.getMySensorsGateway().addEventListener(this);
     }
 
@@ -58,7 +59,8 @@ public class MySensorsDiscoveryService extends AbstractDiscoveryService implemen
 
     @Override
     protected void stopScan() {
-        bridgeHandler.getMySensorsGateway().addEventListener(this);
+        logger.debug("Stopping MySensors discovery scan");
+        bridgeHandler.getMySensorsGateway().removeEventListener(this);
     }
 
     /**

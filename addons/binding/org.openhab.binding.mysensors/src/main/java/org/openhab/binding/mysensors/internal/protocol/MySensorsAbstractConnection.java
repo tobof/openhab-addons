@@ -513,6 +513,8 @@ public abstract class MySensorsAbstractConnection implements Runnable {
 
                         myEventRegister.notifyMessageReceived(msg);
                     }
+                } catch (InterruptedException e) {
+                    logger.warn("Interrupted MySensorsReader");
                 } catch (Exception e) {
                     logger.error("Exception on reading from connection", e);
 
@@ -650,6 +652,8 @@ public abstract class MySensorsAbstractConnection implements Runnable {
                             logger.warn("Message returned from queue is null");
                         }
 
+                    } catch (InterruptedException e) {
+                        logger.warn("Interrupted MySensorsWriter");
                     } catch (Exception e) {
                         logger.error("({}) on writing to connection, message: {}", e, getClass(), e.getMessage());
                     }

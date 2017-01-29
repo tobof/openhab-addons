@@ -430,8 +430,7 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
     private boolean handleIncomingOutgoingMessage(MySensorsMessage msg) throws Throwable {
         boolean ret = false;
 
-        if (MySensorsNode.isValidNodeId(msg.getNodeId()) && MySensorsChild.isValidChildId(msg.getChildId())
-                && msg.isSetReqMessage()) {
+        if (MySensorsNode.isValidNodeId(msg.getNodeId()) && MySensorsChild.isValidChildId(msg.getChildId())) {
 
             updateLastUpdateFromMessage(msg);
 
@@ -485,7 +484,7 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
     }
 
     private boolean handlePresentationMessage(MySensorsMessage msg) {
-        boolean ret = false;
+        boolean ret = false, insertNode = false;
 
         MySensorsNode node = getNode(msg.getNodeId());
 
@@ -497,11 +496,15 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
 
             if (node == null) {
                 node = new MySensorsNode(msg.getNodeId());
+                insertNode = true;
             }
 
-            node.addChild(MySensorsChild.fromPresentation(msg.getMsgType(), msg.getChildId()));
+            child = MySensorsChild.fromPresentation(msg.getSubType(), msg.getChildId());
+            node.addChild(child);
 
-            addNode(node);
+            if (insertNode) {
+                addNode(node);
+            }
 
             myEventRegister.notifyNewNodeDiscovered(node, child);
             ret = true;

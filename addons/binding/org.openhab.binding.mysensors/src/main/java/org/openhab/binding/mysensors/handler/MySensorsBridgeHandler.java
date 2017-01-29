@@ -214,11 +214,10 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
     }
 
     private void unregisterDeviceDiscoveryService() {
-        if (discoveryServiceRegistration != null && bundleContext != null) {
+        if (discoveryServiceRegistration != null && discoveryService != null) {
             logger.trace("Unregistering MySensorsDiscoveryService for bridge '{}'", getThing().getUID().getId());
-            MySensorsDiscoveryService service = (MySensorsDiscoveryService) bundleContext
-                    .getService(discoveryServiceRegistration.getReference());
-            service.deactivate();
+
+            discoveryService.deactivate();
 
             discoveryServiceRegistration.unregister();
             discoveryServiceRegistration = null;
