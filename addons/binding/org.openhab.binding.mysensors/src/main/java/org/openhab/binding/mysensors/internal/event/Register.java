@@ -10,8 +10,15 @@ import java.util.List;
  *
  * @param <T> the EventListener to register
  */
-public interface MySensorsEventObservable<T extends EventListener> {
+public interface Register<T extends EventListener> {
 
+    /**
+     * Check if a given listener is already registered
+     *
+     * @param listener to be checked
+     *
+     * @return true if listener is already registered
+     */
     public boolean isEventListenerRegisterd(T listener);
 
     /**
@@ -19,9 +26,22 @@ public interface MySensorsEventObservable<T extends EventListener> {
      */
     public void addEventListener(T listener);
 
+    /**
+     * Remove a listener
+     *
+     * @param listener the one to be removed
+     */
     public void removeEventListener(T listener);
 
+    /**
+     * Remove all listeners
+     */
     public void clearAllListeners();
 
+    /**
+     * Get a list of all the registerd listener
+     *
+     * @return
+     */
     public List<T> getEventListeners();
 }

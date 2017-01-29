@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
  *
  * @param <T> the EventListener to register
  */
-public class EventRegister<T extends EventListener> implements MySensorsEventObservable<T> {
+public class EventRegister<T extends EventListener> implements Register<T> {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 

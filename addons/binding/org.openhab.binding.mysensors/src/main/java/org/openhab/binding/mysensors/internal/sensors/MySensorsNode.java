@@ -55,43 +55,92 @@ public class MySensorsNode {
         return chidldMap;
     }
 
+    /**
+     * Get node ID
+     *
+     * @return the ID of this node
+     */
     public int getNodeId() {
         return nodeId;
     }
 
+    /**
+     * Add a child not null child to child to this node
+     *
+     * @param child to add
+     */
     public void addChild(MySensorsChild child) {
+        if (child == null) {
+            throw new IllegalArgumentException("Null child could't be add");
+        }
+
         synchronized (chidldMap) {
             chidldMap.put(child.getChildId(), child);
         }
     }
 
+    /**
+     * Get a child from a node
+     *
+     * @param childId the id of the child to get from this node
+     * @return
+     */
     public MySensorsChild getChild(int childId) {
         return chidldMap.get(childId);
     }
 
+    /**
+     * Set node reachable status.
+     *
+     * @param reachable (true=yes,false=no)
+     */
     public void setReachable(boolean reachable) {
         this.reachable = reachable;
-
     }
 
+    /**
+     * Check if this node is reachable
+     *
+     * @return true if this node is reachable
+     */
     public boolean isReachable() {
         return reachable;
     }
 
+    /**
+     * Get battery percent of this node
+     *
+     * @return the battery percent
+     */
     public int getBatteryPercent() {
         return batteryPercent;
     }
 
+    /**
+     * Set battery percent
+     *
+     * @param batteryPercent that will be set
+     */
     public void setBatteryPercent(int batteryPercent) {
         this.batteryPercent = batteryPercent;
     }
 
+    /**
+     * Get last update
+     *
+     * @return the last update, 1970-01-01 00:00 means no update received
+     */
     public Date getLastUpdate() {
         synchronized (this.lastUpdate) {
             return lastUpdate;
         }
     }
 
+    /**
+     * Set last update
+     *
+     * @param lastUpdate
+     */
     public void setLastUpdate(Date lastUpdate) {
         synchronized (this.lastUpdate) {
             this.lastUpdate = lastUpdate;
@@ -102,8 +151,15 @@ public class MySensorsNode {
      * Merge to child map into one.
      *
      * @param node
+     *
+     * @throws MergeException if try to merge to node with same child/children
      */
     public void mergeNodeChildren(MySensorsNode node) throws MergeException {
+
+        if (node == null) {
+            throw new IllegalArgumentException("Null node can't be merged");
+        }
+
         synchronized (chidldMap) {
             try {
                 mergeMap(chidldMap, node.chidldMap, false);
@@ -115,12 +171,28 @@ public class MySensorsNode {
         }
     }
 
+    /**
+     * Generate message from a state. This method doesn't update variable itself.
+     *
+     * @param childId
+     * @param type
+     * @param state
+     *
+     * @return a message ready to be sent
+     */
     public MySensorsMessage updateVariableState(int childId, int type, String state) {
         MySensorsMessage msg = null;
         // TODO
         return msg;
     }
 
+    /**
+     * Check if an integer is a valid node ID
+     *
+     * @param ID to test
+     *
+     * @return true if ID is valid
+     */
     public static boolean isValidNodeId(int id) {
         return (id > MYSENSORS_NODE_ID_RESERVED_0 && id < MYSENSORS_NODE_ID_RESERVED_255);
     }

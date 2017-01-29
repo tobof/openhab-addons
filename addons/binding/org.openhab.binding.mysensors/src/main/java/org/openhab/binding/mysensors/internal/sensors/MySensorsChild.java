@@ -63,12 +63,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Every thing/node may have one ore more children in the MySensors context.
+ * Every node may have one ore more children in the MySensors context.
+ * Instance of this class could be obtained easy if presentation code is know (use static method fromPresentation).
  *
  * @author Andrea Cioni
  *
  */
-public class MySensorsChild {
+public abstract class MySensorsChild {
 
     // Reserved ids
     public static final int MYSENSORS_CHILD_ID_RESERVED_0 = 0;
@@ -150,6 +151,13 @@ public class MySensorsChild {
         addCommonVariables();
     }
 
+    /**
+     * Add a variable to a child
+     *
+     * @param var the non-null variable to add to this child
+     *
+     * @throws NullPointerException if var is null
+     */
     public void addVariable(MySensorsVariable var) throws NullPointerException {
 
         if (var == null) {
@@ -235,6 +243,14 @@ public class MySensorsChild {
         return (id >= MYSENSORS_CHILD_ID_RESERVED_0 && id < MYSENSORS_CHILD_ID_RESERVED_255);
     }
 
+    /**
+     * Generate an instance of MySensorsChild from a presentation code.
+     *
+     * @param presentationCode presentation code in a presentation message
+     * @param childId the id to set to the generated child
+     *
+     * @return an instance of a child
+     */
     public static MySensorsChild fromPresentation(int presentationCode, int childId) {
         MySensorsChild ret;
 
@@ -254,6 +270,36 @@ public class MySensorsChild {
         }
 
         return ret;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + childId;
+        result = prime * result + presentationCode;
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        MySensorsChild other = (MySensorsChild) obj;
+        if (childId != other.childId) {
+            return false;
+        }
+        if (presentationCode != other.presentationCode) {
+            return false;
+        }
+        return true;
     }
 
     @Override

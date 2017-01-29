@@ -10,13 +10,17 @@ import org.openhab.binding.mysensors.internal.sensors.MySensorsVariable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * @author Andrea Cioni
+ *
+ */
 public class MySensorsEventRegister extends EventRegister<MySensorsGatewayEventListener> {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
     private EventRegister<MySensorsGatewayEventListener> eventRegister;
 
-    // TODO #1 send update only if necessary (e.g.: status update true->false, false->true
+    // TODO #1 send update only if necessary (e.g.: status update true->false, false->true)
     // TODO #2 asynchronous message notify
 
     public MySensorsEventRegister() {

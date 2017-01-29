@@ -60,6 +60,14 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
         this.myEventRegister = new MySensorsEventRegister();
     }
 
+    /**
+     * Build up the gateway fallowing given configuration parameters. Gateway will not start after this method returns.
+     * Use startup to do that
+     *
+     * @param myConf a valid instance of {@link MySensorsGatewayConfig}
+     *
+     * @return true if setup done correctly
+     */
     public boolean setup(MySensorsGatewayConfig myConf) {
         boolean ret = false;
 
@@ -87,6 +95,9 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
         return ret;
     }
 
+    /**
+     * Startup the gateway
+     */
     public void startup() {
 
         myCon.initialize();
@@ -98,6 +109,9 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
         }
     }
 
+    /**
+     * Shutdown the gateway
+     */
     public void shutdown() {
         myEventRegister.clearAllListeners();
 
@@ -111,12 +125,27 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
         }
     }
 
+    /**
+     * Get node from the gatway
+     *
+     * @param nodeId the node to retrieve
+     *
+     * @return node if exist or null instead
+     */
     public MySensorsNode getNode(int nodeId) {
         synchronized (nodeMap) {
             return nodeMap.get(nodeId);
         }
     }
 
+    /**
+     * Get a child from a node
+     *
+     * @param nodeId the node of the searched child
+     * @param childId the child of a node
+     *
+     * @return child if exist or null instead
+     */
     public MySensorsChild getChild(int nodeId, int childId) {
         MySensorsChild ret = null;
         MySensorsNode node = getNode(nodeId);
@@ -127,6 +156,17 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
         return ret;
     }
 
+    /**
+     * Get a variable from a child in a node
+     *
+     * @param nodeId the node of the variable
+     *
+     * @param childId the child of the variable
+     *
+     * @param type the variable type (see sub-type of SET/REQ message in API documentation)
+     *
+     * @return variable if exist or null instead
+     */
     public MySensorsVariable getVariable(int nodeId, int childId, int type) {
         MySensorsVariable ret = null;
         MySensorsChild child = getChild(nodeId, childId);
@@ -254,21 +294,50 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
         return newId;
     }
 
+    /**
+     * Add a {@link MySensorsGatewayEventListener} event listener to this gateway
+     *
+     * @param listener
+     */
     public void addEventListener(MySensorsGatewayEventListener listener) {
         myEventRegister.addEventListener(listener);
 
     }
 
+    /**
+     *
+     * Remove a {@link MySensorsGatewayEventListener} event listener from this gateway
+     *
+     * @param listener
+     */
     public void removeEventListener(MySensorsGatewayEventListener listener) {
         myEventRegister.removeEventListener(listener);
 
     }
 
+    /**
+     * Check if a {@link MySensorsGatewayEventListener} is already registered
+     *
+     * @param listener
+     *
+     * @return true if listener is already registered
+     */
     public boolean isEventListenerRegisterd(MySensorsGatewayEventListener listener) {
         return myEventRegister.isEventListenerRegisterd(listener);
     }
 
+    /**
+     * Send a message through this gateway. If message is of type SET will update variable state of a node/child,
+     * this will trigger the update event on the {@link MySensorsEventRegister}
+     *
+     * @param message to send
+     */
     public void sendMessage(MySensorsMessage message) {
+
+        if (message == null) {
+            throw new IllegalArgumentException("Null message could not be sent over the network");
+        }
+
         try {
             handleIncomingOutgoingMessage(message);
         } catch (Throwable e) {

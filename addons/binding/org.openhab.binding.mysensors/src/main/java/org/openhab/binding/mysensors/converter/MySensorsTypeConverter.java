@@ -5,24 +5,54 @@ import org.eclipse.smarthome.core.types.State;
 import org.openhab.binding.mysensors.MySensorsBindingConstants;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsVariable;
 
+/**
+ * Converter to adapt state of OpenHab to MySensors and vice versa
+ *
+ * @author Andrea Cioni
+ *
+ */
 public interface MySensorsTypeConverter {
 
     /**
      * Convert a value from MySensors variable to OH state
-     * 
+     *
      * @param value non-null that should be converted
-     * @return
+     *
+     * @return the state from a variable
      */
     default public State stateFromChannel(MySensorsVariable value) {
         return fromString(value.getValue());
     }
 
+    /**
+     * Given a payload string, build an OpenHab state
+     *
+     * @param string the payload to process
+     *
+     * @return an equivalent state for OpenHab
+     */
     public State fromString(String string);
 
+    /**
+     * Get a string from an OpenHab command.
+     *
+     * @param command, the command from OpenHab environment
+     *
+     * @return the payload string
+     */
     default public String fromCommand(Command command) {
         return command.toString();
     }
 
+    /**
+     * Sometimes payload is not sufficient to build a message for MySensors (see S_COVER: V_UP,V_DOWN,V_STOP).
+     * In most cases default implementation is enough.
+     *
+     * @param channel of the thing that receive an update
+     * @param command the command received
+     *
+     * @return the variable number
+     */
     default Integer typeFromChannelCommand(String channel, Command command) {
         return MySensorsBindingConstants.INVERSE_CHANNEL_MAP.get(channel);
     }
