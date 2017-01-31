@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-import org.openhab.binding.mysensors.internal.handler.MySensorsBridgeHandler;
+import org.openhab.binding.mysensors.handler.MySensorsBridgeHandler;
 import org.openhab.binding.mysensors.internal.protocol.MySensorsBridgeConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -14,7 +14,7 @@ import java.util.Enumeration;
 
 import org.apache.commons.lang.StringUtils;
 import org.openhab.binding.mysensors.MySensorsBindingConstants;
-import org.openhab.binding.mysensors.internal.handler.MySensorsBridgeHandler;
+import org.openhab.binding.mysensors.handler.MySensorsBridgeHandler;
 import org.openhab.binding.mysensors.internal.protocol.MySensorsBridgeConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
