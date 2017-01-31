@@ -3,13 +3,15 @@ Bundle-ManifestVersion: 2
 Bundle-Name: MySensors Binding
 Bundle-SymbolicName: org.openhab.binding.mysensors;singleton:=true
 Bundle-Vendor: openHAB
-Bundle-Version: 2.0.0.qualifier
+Bundle-Version: 2.1.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ClassPath: .
 Import-Package: 
  com.google.common.base,
  com.google.common.collect,
  com.google.gson,
+ com.google.gson.stream,
+ com.google.gson.reflect,
  org.apache.commons.lang,
  org.eclipse.smarthome.config.core,
  org.eclipse.smarthome.config.discovery,
@@ -24,10 +26,9 @@ Import-Package:
  org.osgi.framework,
  org.osgi.service.cm,
  org.osgi.service.component,
- org.slf4j
+ org.slf4j,
+ gnu.io
 Service-Component: OSGI-INF/*.xml
 Export-Package: org.openhab.binding.mysensors,
  org.openhab.binding.mysensors.handler
-Require-Bundle: org.eclipse.smarthome.core,
- com.neuronrobotics.nrjavaserial,
- com.google.gson
+Require-Bundle: org.eclipse.smarthome.core
