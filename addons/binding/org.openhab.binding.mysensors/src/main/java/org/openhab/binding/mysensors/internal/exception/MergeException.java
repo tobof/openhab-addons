@@ -8,7 +8,7 @@
  */
 package org.openhab.binding.mysensors.internal.exception;
 
-public class MergeException extends Exception {
+public class MergeException extends RuntimeException {
 
     /**
      *

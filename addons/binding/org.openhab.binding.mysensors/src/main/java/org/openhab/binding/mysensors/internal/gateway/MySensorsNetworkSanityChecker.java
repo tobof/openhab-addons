@@ -34,8 +34,11 @@ public class MySensorsNetworkSanityChecker implements MySensorsGatewayEventListe
     private MySensorsAbstractConnection myCon;
     private MySensorsGateway myGateway;
 
-    private static final int SHEDULE_MINUTES_DELAY = 3; // only for test will be: 3
-    private static final int MAX_ATTEMPTS_BEFORE_DISCONNECT = 3; // only for test will be: 3
+    private final int scheduleMinuteDelay;
+    private final int maxAttemptsBeforeDisconnecting;
+
+    private final boolean sendHeartbeat;
+    private final int maxAttemptsBeforeDisconnectingNodes;
 
     private ScheduledExecutorService scheduler = null;
     private ScheduledFuture<?> futureSanityChk = null;
@@ -48,6 +51,10 @@ public class MySensorsNetworkSanityChecker implements MySensorsGatewayEventListe
         this.myGateway = myGateway;
         this.myCon = myCon;
         this.myEventRegister = myEventRegister;
+        this.scheduleMinuteDelay = myGateway.getConfiguration().getSanityCheckerInterval();
+        this.maxAttemptsBeforeDisconnecting = myGateway.getConfiguration().getSanCheckConnectionFailAttempts();
+        this.sendHeartbeat = myGateway.getConfiguration().getSanCheckSendHeartbeat();
+        this.maxAttemptsBeforeDisconnectingNodes = myGateway.getConfiguration().getSanCheckSendHeartbeatFailAttempts();
     }
 
     private void reset() {
@@ -66,7 +73,7 @@ public class MySensorsNetworkSanityChecker implements MySensorsGatewayEventListe
 
         if (futureSanityChk == null && scheduler == null) {
             scheduler = Executors.newSingleThreadScheduledExecutor();
-            futureSanityChk = scheduler.scheduleWithFixedDelay(this, SHEDULE_MINUTES_DELAY, SHEDULE_MINUTES_DELAY,
+            futureSanityChk = scheduler.scheduleWithFixedDelay(this, scheduleMinuteDelay, scheduleMinuteDelay,
                     TimeUnit.MINUTES);
         } else {
             logger.warn("Network Sanity Checker is alredy running");
@@ -123,9 +130,9 @@ public class MySensorsNetworkSanityChecker implements MySensorsGatewayEventListe
         synchronized (iVersionMessageMissing) {
             if (!iVersionMessageArrived) {
                 logger.warn("I_VERSION message response is not arrived. Remained attempts before disconnection {}",
-                        MAX_ATTEMPTS_BEFORE_DISCONNECT - iVersionMessageMissing);
+                        maxAttemptsBeforeDisconnecting - iVersionMessageMissing);
 
-                if ((MAX_ATTEMPTS_BEFORE_DISCONNECT - iVersionMessageMissing) <= 0) {
+                if ((maxAttemptsBeforeDisconnecting - iVersionMessageMissing) <= 0) {
                     logger.error("Retry period expired, gateway is down. Disconneting bridge...");
 
                     myCon.requestDisconnection(true);

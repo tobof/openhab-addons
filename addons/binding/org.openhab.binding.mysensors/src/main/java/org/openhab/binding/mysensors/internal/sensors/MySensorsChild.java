@@ -279,6 +279,7 @@ public abstract class MySensorsChild {
         int result = 1;
         result = prime * result + childId;
         result = prime * result + presentationCode;
+        result = prime * result + ((variableMap == null) ? 0 : variableMap.hashCode());
         return result;
     }
 
@@ -298,6 +299,13 @@ public abstract class MySensorsChild {
             return false;
         }
         if (presentationCode != other.presentationCode) {
+            return false;
+        }
+        if (variableMap == null) {
+            if (other.variableMap != null) {
+                return false;
+            }
+        } else if (!variableMap.equals(other.variableMap)) {
             return false;
         }
         return true;

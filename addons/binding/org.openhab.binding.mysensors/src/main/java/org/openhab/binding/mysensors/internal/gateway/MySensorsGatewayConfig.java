@@ -17,6 +17,10 @@ public class MySensorsGatewayConfig {
     private Boolean imperial; // should nodes send imperial or metric values?
     private Boolean skipStartupCheck; // should the startup check of the bridge at boot skipped?
     private Boolean enableNetworkSanCheck; // network sanity check enabled?
+    private Integer sanityCheckerInterval; // determines interval to start NetworkSanityCheck
+    private Integer sanCheckConnectionFailAttempts; // connection will wait this number of attempts before disconnecting
+    private boolean sanCheckSendHeartbeat; // network sanity checker will also send heartbeats to all known nodes
+    private Integer sanCheckSendHeartbeatFailAttempts; // disconnect nodes that fail to answer to heartbeat request
 
     // Serial
     private String serialPort; // serial port the gateway is attached to
@@ -96,6 +100,38 @@ public class MySensorsGatewayConfig {
 
     public void setEnableNetworkSanCheck(Boolean enableNetworkSanCheck) {
         this.enableNetworkSanCheck = enableNetworkSanCheck;
+    }
+
+    public Integer getSanityCheckerInterval() {
+        return sanityCheckerInterval;
+    }
+
+    public void setSanityCheckerInterval(Integer sanityCheckerInterval) {
+        this.sanityCheckerInterval = sanityCheckerInterval;
+    }
+
+    public Integer getSanCheckConnectionFailAttempts() {
+        return sanCheckConnectionFailAttempts;
+    }
+
+    public void setSanCheckConnectionFailAttempts(Integer sanCheckConnectionFailAttempts) {
+        this.sanCheckConnectionFailAttempts = sanCheckConnectionFailAttempts;
+    }
+
+    public boolean getSanCheckSendHeartbeat() {
+        return sanCheckSendHeartbeat;
+    }
+
+    public void setSanCheckSendHeartbeat(boolean sanCheckSendHeartbeat) {
+        this.sanCheckSendHeartbeat = sanCheckSendHeartbeat;
+    }
+
+    public Integer getSanCheckSendHeartbeatFailAttempts() {
+        return sanCheckSendHeartbeatFailAttempts;
+    }
+
+    public void setSanCheckSendHeartbeatFailAttempts(Integer sanCheckSendHeartbeatFailAttempts) {
+        this.sanCheckSendHeartbeatFailAttempts = sanCheckSendHeartbeatFailAttempts;
     }
 
 }

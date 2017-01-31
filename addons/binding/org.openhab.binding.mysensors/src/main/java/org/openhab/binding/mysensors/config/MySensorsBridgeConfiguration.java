@@ -23,4 +23,8 @@ public class MySensorsBridgeConfiguration {
     public Boolean imperial; // should nodes send imperial or metric values?
     public Boolean skipStartupCheck; // should the startup check of the bridge at boot skipped?
     public Boolean enableNetworkSanCheck; // network sanity check enabled?
+    public Integer sanityCheckerInterval; // determines interval to start NetworkSanityCheck
+    public Integer sanCheckConnectionFailAttempts; // connection will wait this number of attempts before disconnecting
+    public boolean sanCheckSendHeartbeat; // network sanity checker will also send heartbeats to all known nodes
+    public Integer sanCheckSendHeartbeatFailAttempts; // disconnect nodes that fail to answer to heartbeat request
 }

@@ -199,6 +199,10 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
         ret.setEnableNetworkSanCheck(conf.enableNetworkSanCheck);
         ret.setImperial(conf.imperial);
         ret.setSkipStartupCheck(conf.skipStartupCheck);
+        ret.setSanityCheckerInterval(conf.sanityCheckerInterval);
+        ret.setSanCheckConnectionFailAttempts(conf.sanCheckConnectionFailAttempts);
+        ret.setSanCheckSendHeartbeat(conf.sanCheckSendHeartbeat);
+        ret.setSanCheckSendHeartbeatFailAttempts(conf.sanCheckSendHeartbeatFailAttempts);
 
         return ret;
     }

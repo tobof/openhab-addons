@@ -15,18 +15,21 @@
 				<description>The serial port the MySensors Gateway is connected to
 				</description>
 			</parameter>
-			<parameter name="sendDelay" type="integer" required="false" min="1" max="1000">
-				<label>Send Delay</label>
-				<description>The delay between messages send to the gateway 
-				</description>
-				<default>100</default>
-			</parameter>
 			<parameter name="baudRate" type="integer" required="false" min="300" max="250000">
-				<label>Baudrate</label>
-				<description>Baudrate for serial port
+                <label>Baudrate</label>
+                <description>Baudrate for serial port
                 </description>
-				<default>115200</default>
-			</parameter>
+                <default>115200</default>
+            </parameter>
+			
+			<!-- COMMON PARAMS STARTS HERE -->
+			
+			<parameter name="sendDelay" type="integer" required="false" min="1" max="1000">
+                <label>Send Delay</label>
+                <description>The delay between messages send to the gateway 
+                </description>
+                <default>100</default>
+            </parameter>
 			<parameter name="skipStartupCheck" type="boolean" required="false">
 				<label>Skip startup connection check</label>
 				<description>Allow the user to bypass the I_VERSION check on startup</description>
@@ -42,6 +45,29 @@
 				<description>Network sanity check periodically unsure that gateway is up and running</description>
 				<default>false</default>
 			</parameter>
+			<parameter name="sanityCheckerInterval" type="integer" required="false">
+                <label>Interval to launch network sanity check</label>
+                <description>Network sanity check periodically unsure that gateway is up and running</description>
+                <default>3</default>
+            </parameter>
+            <parameter name="sanCheckConnectionFailAttempts" type="integer" required="false">
+                <label>Attempts before disconnecting the bridge</label>
+                <description>When gateway not respond, you could configure how many retry, sanity check, will do</description>
+                <default>3</default>
+            </parameter>
+            <parameter name="sanCheckSendHeartbeat" type="boolean" required="false">
+                <label>Send heartbeat to all nodes when network sanity checker run</label>
+                <description>When network sanity checker run, send heartbeat to all nodes</description>
+                <default>false</default>
+            </parameter>
+            <parameter name="sanCheckSendHeartbeatFailAttempts" type="integer" required="false">
+                <label>Attempts before disconnecting nodes</label>
+                <description>When nodes not respond to heartbeat, you could configure how many retry, sanity check, will do before disconnecting them</description>
+                <default>10</default>
+            </parameter>
+            
+            <!-- COMMON PARAMS ENDS HERE -->
+            
 		</config-description>
 
 	</bridge-type>
@@ -62,6 +88,9 @@
 				</description>
 				<default>5003</default>
 			</parameter>
+			
+			<!-- COMMON PARAMS STARTS HERE -->
+			
 			<parameter name="sendDelay" type="integer" required="false" min="1" max="1000">
 				<label>Send Delay</label>
 				<description>The delay between messages send to the gateway 
@@ -83,6 +112,29 @@
 				<description>Network sanity check periodically unsure that gateway is up and running</description>
 				<default>false</default>
 			</parameter>
+			<parameter name="sanityCheckerInterval" type="integer" required="false">
+                <label>Interval to launch network sanity check</label>
+                <description>Network sanity check periodically unsure that gateway is up and running</description>
+                <default>3</default>
+            </parameter>
+            <parameter name="sanCheckConnectionFailAttempts" type="integer" required="false">
+                <label>Attempts before disconnecting the bridge</label>
+                <description>When gateway not respond, you could configure how many retry, sanity check, will do before disconnecting it</description>
+                <default>3</default>
+            </parameter>
+            <parameter name="sanCheckSendHeartbeat" type="boolean" required="false">
+                <label>Send heartbeat to all nodes when network sanity checker run</label>
+                <description>When network sanity checker run, send heartbeat to all nodes</description>
+                <default>false</default>
+            </parameter>
+            <parameter name="sanCheckSendHeartbeatFailAttempts" type="integer" required="false">
+                <label>Attempts before disconnecting nodes</label>
+                <description>When nodes not respond to heartbeat, you could configure how many retry, sanity check, will do before disconnecting them</description>
+                <default>10</default>
+            </parameter>
+            
+            <!-- COMMON PARAMS ENDS HERE -->
+            
 		</config-description>
 
 	</bridge-type>
@@ -119,7 +171,7 @@
 				</description>
 			</parameter>
 			<parameter name="expectUpdateTimeout" type="integer" required="false">
-				<label>Expected Commucation Timeout</label>
+				<label>Expected Communication Timeout</label>
 				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
 				<default>-1</default>
 			</parameter>
@@ -155,7 +207,7 @@
 				</description>
 			</parameter>
 			<parameter name="expectUpdateTimeout" type="integer" required="false">
-				<label>Expected Commucation Timeout</label>
+				<label>Expected Communication Timeout</label>
 				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
 				<default>-1</default>
 			</parameter>
@@ -192,7 +244,7 @@
 				</description>
 			</parameter>
 			<parameter name="expectUpdateTimeout" type="integer" required="false">
-				<label>Expected Commucation Timeout</label>
+				<label>Expected Communication Timeout</label>
 				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
 				<default>-1</default>
 			</parameter>
@@ -226,7 +278,7 @@
 				</description>
 			</parameter>
 			<parameter name="expectUpdateTimeout" type="integer" required="false">
-				<label>Expected Commucation Timeout</label>
+				<label>Expected Communication Timeout</label>
 				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
 				<default>-1</default>
 			</parameter>
@@ -271,7 +323,7 @@
 				</description>
 			</parameter>
 			<parameter name="expectUpdateTimeout" type="integer" required="false">
-				<label>Expected Commucation Timeout</label>
+				<label>Expected Communication Timeout</label>
 				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
 				<default>-1</default>
 			</parameter>
@@ -306,7 +358,7 @@
 				</description>
 			</parameter>
 			<parameter name="expectUpdateTimeout" type="integer" required="false">
-				<label>Expected Commucation Timeout</label>
+				<label>Expected Communication Timeout</label>
 				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
 				<default>-1</default>
 			</parameter>
@@ -341,7 +393,7 @@
 				</description>
 			</parameter>
 			<parameter name="expectUpdateTimeout" type="integer" required="false">
-				<label>Expected Commucation Timeout</label>
+				<label>Expected Communication Timeout</label>
 				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
 				<default>-1</default>
 			</parameter>
@@ -376,7 +428,7 @@
 				</description>
 			</parameter>
 			<parameter name="expectUpdateTimeout" type="integer" required="false">
-				<label>Expected Commucation Timeout</label>
+				<label>Expected Communication Timeout</label>
 				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
 				<default>-1</default>
 			</parameter>
@@ -410,7 +462,7 @@
 				</description>
 			</parameter>
 			<parameter name="expectUpdateTimeout" type="integer" required="false">
-				<label>Expected Commucation Timeout</label>
+				<label>Expected Communication Timeout</label>
 				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
 				<default>-1</default>
 			</parameter>
@@ -445,7 +497,7 @@
 				</description>
 			</parameter>
 			<parameter name="expectUpdateTimeout" type="integer" required="false">
-				<label>Expected Commucation Timeout</label>
+				<label>Expected Communication Timeout</label>
 				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
 				<default>-1</default>
 			</parameter>
@@ -479,7 +531,7 @@
 				</description>
 			</parameter>
 			<parameter name="expectUpdateTimeout" type="integer" required="false">
-				<label>Expected Commucation Timeout</label>
+				<label>Expected Communication Timeout</label>
 				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
 				<default>-1</default>
 			</parameter>
@@ -514,7 +566,7 @@
 				</description>
 			</parameter>
 			<parameter name="expectUpdateTimeout" type="integer" required="false">
-				<label>Expected Commucation Timeout</label>
+				<label>Expected Communication Timeout</label>
 				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
 				<default>-1</default>
 			</parameter>
@@ -549,7 +601,7 @@
 				</description>
 			</parameter>
 			<parameter name="expectUpdateTimeout" type="integer" required="false">
-				<label>Expected Commucation Timeout</label>
+				<label>Expected Communication Timeout</label>
 				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
 				<default>-1</default>
 			</parameter>
@@ -583,7 +635,7 @@
 				</description>
 			</parameter>
 			<parameter name="expectUpdateTimeout" type="integer" required="false">
-				<label>Expected Commucation Timeout</label>
+				<label>Expected Communication Timeout</label>
 				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
 				<default>-1</default>
 			</parameter>
@@ -618,7 +670,7 @@
 				</description>
 			</parameter>
 			<parameter name="expectUpdateTimeout" type="integer" required="false">
-				<label>Expected Commucation Timeout</label>
+				<label>Expected Communication Timeout</label>
 				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
 				<default>-1</default>
 			</parameter>
@@ -652,7 +704,7 @@
 				</description>
 			</parameter>
 			<parameter name="expectUpdateTimeout" type="integer" required="false">
-				<label>Expected Commucation Timeout</label>
+				<label>Expected Communication Timeout</label>
 				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
 				<default>-1</default>
 			</parameter>
@@ -686,7 +738,7 @@
 				</description>
 			</parameter>
 			<parameter name="expectUpdateTimeout" type="integer" required="false">
-				<label>Expected Commucation Timeout</label>
+				<label>Expected Communication Timeout</label>
 				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
 				<default>-1</default>
 			</parameter>
@@ -740,7 +792,7 @@
                 </description>
 			</parameter>
 			<parameter name="expectUpdateTimeout" type="integer" required="false">
-				<label>Expected Commucation Timeout</label>
+				<label>Expected Communication Timeout</label>
 				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
 				<default>-1</default>
 			</parameter>
@@ -776,7 +828,7 @@
                 </description>
 			</parameter>
 			<parameter name="expectUpdateTimeout" type="integer" required="false">
-				<label>Expected Commucation Timeout</label>
+				<label>Expected Communication Timeout</label>
 				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
 				<default>-1</default>
 			</parameter>
@@ -813,7 +865,7 @@
                 </description>
 			</parameter>
 			<parameter name="expectUpdateTimeout" type="integer" required="false">
-				<label>Expected Commucation Timeout</label>
+				<label>Expected Communication Timeout</label>
 				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
 				<default>-1</default>
 			</parameter>
@@ -859,7 +911,7 @@
 				</description>
 			</parameter>
 			<parameter name="expectUpdateTimeout" type="integer" required="false">
-				<label>Expected Commucation Timeout</label>
+				<label>Expected Communication Timeout</label>
 				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
 				<default>-1</default>
 			</parameter>
@@ -897,7 +949,7 @@
 				</description>
 			</parameter>
 			<parameter name="expectUpdateTimeout" type="integer" required="false">
-				<label>Expected Commucation Timeout</label>
+				<label>Expected Communication Timeout</label>
 				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
 				<default>-1</default>
 			</parameter>
@@ -936,7 +988,7 @@
 				</description>
 			</parameter>
 			<parameter name="expectUpdateTimeout" type="integer" required="false">
-				<label>Expected Commucation Timeout</label>
+				<label>Expected Communication Timeout</label>
 				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
 				<default>-1</default>
 			</parameter>
@@ -976,7 +1028,7 @@
 				</description>
 			</parameter>
 			<parameter name="expectUpdateTimeout" type="integer" required="false">
-				<label>Expected Commucation Timeout</label>
+				<label>Expected Communication Timeout</label>
 				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
 				<default>-1</default>
 			</parameter>
@@ -1015,7 +1067,7 @@
 				</description>
 			</parameter>
 			<parameter name="expectUpdateTimeout" type="integer" required="false">
-				<label>Expected Commucation Timeout</label>
+				<label>Expected Communication Timeout</label>
 				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
 				<default>-1</default>
 			</parameter>
@@ -1051,7 +1103,7 @@
 				<default>999</default>
 			</parameter>
 			<parameter name="expectUpdateTimeout" type="integer" required="false">
-				<label>Expected Commucation Timeout</label>
+				<label>Expected Communication Timeout</label>
 				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
 				<default>-1</default>
 			</parameter>
@@ -1088,7 +1140,7 @@
 				<default>999</default>
 			</parameter>
 			<parameter name="expectUpdateTimeout" type="integer" required="false">
-				<label>Expected Commucation Timeout</label>
+				<label>Expected Communication Timeout</label>
 				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
 				<default>-1</default>
 			</parameter>
@@ -1126,7 +1178,7 @@
 				<default>999</default>
 			</parameter>
 			<parameter name="expectUpdateTimeout" type="integer" required="false">
-				<label>Expected Commucation Timeout</label>
+				<label>Expected Communication Timeout</label>
 				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
 				<default>-1</default>
 			</parameter>
@@ -1160,7 +1212,7 @@
                 </description>
 			</parameter>
 			<parameter name="expectUpdateTimeout" type="integer" required="false">
-				<label>Expected Commucation Timeout</label>
+				<label>Expected Communication Timeout</label>
 				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
 				<default>-1</default>
 			</parameter>
@@ -1194,7 +1246,7 @@
                 </description>
 			</parameter>
 			<parameter name="expectUpdateTimeout" type="integer" required="false">
-				<label>Expected Commucation Timeout</label>
+				<label>Expected Communication Timeout</label>
 				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
 				<default>-1</default>
 			</parameter>
@@ -1228,7 +1280,7 @@
                 </description>
 			</parameter>
 			<parameter name="expectUpdateTimeout" type="integer" required="false">
-				<label>Expected Commucation Timeout</label>
+				<label>Expected Communication Timeout</label>
 				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
 				<default>-1</default>
 			</parameter>

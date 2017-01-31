@@ -1,5 +1,6 @@
 /**
- * Copyright (c) 2014-2016 openHAB UG (haftungsbeschraenkt) and others.
+ * Copyright (c) 2014-2016 by the respective copyright holders.
+ *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.openhab.binding.mysensors.internal.MySensorsUtility;
 import org.openhab.binding.mysensors.internal.event.MySensorsEventRegister;
 import org.openhab.binding.mysensors.internal.event.MySensorsGatewayEventListener;
 import org.openhab.binding.mysensors.internal.event.MySensorsNodeUpdateEventType;
@@ -201,6 +203,7 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
 
     /**
      * Simple method that add node to gateway (only if node is not present previously).
+     * This function never fail.
      *
      * @param node the node to add
      */
@@ -218,24 +221,34 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
      *
      * @param node the node to add
      * @param mergeIfExist if true and node is already present that two nodes will be merged in one
+     *
+     * @return true if node added successfully
+     *
+     * @throws MergeException if mergeIfExist is true and nodes has common child/children
      */
-    public void addNode(MySensorsNode node, boolean mergeIfExist) {
+    public boolean addNode(MySensorsNode node, boolean mergeIfExist) throws MergeException {
+        boolean ret = false;
+
         synchronized (nodeMap) {
             MySensorsNode exist = null;
             if (mergeIfExist && ((exist = getNode(node.getNodeId())) != null)) {
-                logger.debug("Merging child map: {} with: {}", exist.getChildMap(), node.getChildMap());
-                try {
+                if (!MySensorsUtility.containsSameKey(node.getChildMap(), exist.getChildMap())) {
+                    logger.debug("Merging child map: {} with: {}", exist.getChildMap(), node.getChildMap());
                     exist.mergeNodeChildren(node);
-                } catch (MergeException e) {
-                    logger.error("Exception caught when merging node", e);
-                    return;
+                    ret = true;
+                } else {
+                    logger.debug("Merge is not necessary, same child in both nodes");
                 }
+
                 logger.trace("Merging result is: {}", exist.getChildMap());
             } else {
                 logger.debug("Adding device {}", node.toString());
                 addNode(node);
+                ret = true;
             }
         }
+
+        return ret;
     }
 
     /**
@@ -243,8 +256,12 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
      *
      * @param nodeId the id of the node to add the child
      * @param child the child to add
+     *
+     * @return true if node is present and child was added successfully
      */
-    public void addChild(int nodeId, MySensorsChild child) throws IllegalArgumentException {
+    public boolean addChild(int nodeId, MySensorsChild child) {
+        boolean ret = false;
+
         synchronized (nodeMap) {
             MySensorsNode node = nodeMap.get(nodeId);
             if (node != null) {
@@ -253,6 +270,8 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
                 logger.warn("Node {} not found in map", nodeId);
             }
         }
+
+        return ret;
     }
 
     /**
