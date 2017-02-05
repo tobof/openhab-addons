@@ -14,7 +14,10 @@ import java.lang.reflect.Constructor;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
+import org.openhab.binding.mysensors.internal.Mergeable;
+import org.openhab.binding.mysensors.internal.exception.MergeException;
 import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_AIR_QUALITY;
 import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_ARDUINO_NODE;
 import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_ARDUINO_REPEATER_NODE;
@@ -70,7 +73,7 @@ import org.slf4j.LoggerFactory;
  * @author Andrea Cioni
  *
  */
-public abstract class MySensorsChild {
+public abstract class MySensorsChild implements Mergeable {
 
     // Reserved ids
     public static final int MYSENSORS_CHILD_ID_RESERVED_0 = 0;
@@ -136,6 +139,8 @@ public abstract class MySensorsChild {
 
     private final int childId;
 
+    private Optional<MySensorsChildConfig> childConfig;
+
     private Map<Integer, MySensorsVariable> variableMap = null;
 
     private Date lastUpdate = null;
@@ -149,6 +154,23 @@ public abstract class MySensorsChild {
         this.childId = childId;
         variableMap = new HashMap<Integer, MySensorsVariable>();
         lastUpdate = new Date(0);
+        childConfig = Optional.empty();
+        addCommonVariables();
+    }
+
+    public MySensorsChild(int childId, MySensorsChildConfig config) {
+        if (!isValidChildId(childId)) {
+            throw new IllegalArgumentException("Invalid child id supplied: " + childId);
+        }
+
+        if (config == null) {
+            throw new IllegalArgumentException("Invalid config supplied for child: " + childId);
+        }
+
+        this.childId = childId;
+        variableMap = new HashMap<Integer, MySensorsVariable>();
+        lastUpdate = new Date(0);
+        childConfig = Optional.of(config);
         addCommonVariables();
     }
 
@@ -226,6 +248,31 @@ public abstract class MySensorsChild {
         this.presentationCode = presentationCode;
     }
 
+    public Optional<MySensorsChildConfig> getChildConfig() {
+        return childConfig;
+    }
+
+    public void setChildConfig(MySensorsChildConfig childConfig) {
+        this.childConfig = Optional.of(childConfig);
+    }
+
+    @Override
+    public void merge(Object o) throws MergeException {
+        if (o == null || !(o instanceof MySensorsChild)) {
+            throw new MergeException("Invalid object to merge");
+        }
+
+        MySensorsChild child = (MySensorsChild) o;
+
+        // Merge configurations
+        if (child.childConfig.isPresent() && !childConfig.isPresent()) {
+            childConfig = child.childConfig;
+        } else if (child.childConfig.isPresent() && childConfig.isPresent()) {
+            childConfig.get().merge(child.childConfig);
+        }
+
+    }
+
     private void addCommonVariables() {
         addVariable(new MySensorsVariable_V_VAR1());
         addVariable(new MySensorsVariable_V_VAR2());
@@ -261,8 +308,8 @@ public abstract class MySensorsChild {
                 Constructor<? extends MySensorsChild> constr = cls.getConstructor(int.class);
                 ret = constr.newInstance(childId);
             } catch (Exception e) {
-                LoggerFactory.getLogger(MySensorsChild.class).error("Reflection has failed presentation {}, childId:",
-                        presentationCode, childId, e);
+                LoggerFactory.getLogger(MySensorsChild.class)
+                        .error("Reflection has failed for presentation {}, childId:", presentationCode, childId, e);
                 ret = null;
             }
         } else {

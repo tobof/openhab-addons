@@ -14,7 +14,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.openhab.binding.mysensors.internal.MySensorsUtility;
 import org.openhab.binding.mysensors.internal.event.MySensorsEventRegister;
 import org.openhab.binding.mysensors.internal.event.MySensorsGatewayEventListener;
 import org.openhab.binding.mysensors.internal.event.MySensorsNodeUpdateEventType;
@@ -232,13 +231,10 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
         synchronized (nodeMap) {
             MySensorsNode exist = null;
             if (mergeIfExist && ((exist = getNode(node.getNodeId())) != null)) {
-                if (!MySensorsUtility.containsSameKey(node.getChildMap(), exist.getChildMap())) {
-                    logger.debug("Merging child map: {} with: {}", exist.getChildMap(), node.getChildMap());
-                    exist.mergeNodeChildren(node);
-                    ret = true;
-                } else {
-                    logger.debug("Merge is not necessary, same child in both nodes");
-                }
+                logger.debug("Merging child map: {} with: {}", exist.getChildMap(), node.getChildMap());
+
+                exist.merge(node);
+                ret = true;
 
                 logger.trace("Merging result is: {}", exist.getChildMap());
             } else {
@@ -480,7 +476,7 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
     private void updateReachable(MySensorsMessage msg) {
         MySensorsNode node = getNode(msg.getNodeId());
         if (node != null && !node.isReachable()) {
-            logger.debug("Node {} becomes available again!", node.getNodeId());
+            logger.debug("Node {} available again!", node.getNodeId());
             myEventRegister.notifyNodeReachEvent(node, true);
         }
 

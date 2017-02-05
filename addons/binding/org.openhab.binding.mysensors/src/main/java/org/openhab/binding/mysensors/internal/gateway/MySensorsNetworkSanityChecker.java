@@ -8,6 +8,9 @@
  */
 package org.openhab.binding.mysensors.internal.gateway;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -17,6 +20,9 @@ import org.openhab.binding.mysensors.internal.event.MySensorsEventRegister;
 import org.openhab.binding.mysensors.internal.event.MySensorsGatewayEventListener;
 import org.openhab.binding.mysensors.internal.protocol.MySensorsAbstractConnection;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
+import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
+import org.openhab.binding.mysensors.internal.sensors.MySensorsNode;
+import org.openhab.binding.mysensors.internal.sensors.MySensorsNodeConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +35,8 @@ import org.slf4j.LoggerFactory;
 public class MySensorsNetworkSanityChecker implements MySensorsGatewayEventListener, Runnable {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
+
+    private static final int SEND_DELAY = 3000;
 
     private MySensorsEventRegister myEventRegister;
     private MySensorsAbstractConnection myCon;
@@ -46,6 +54,8 @@ public class MySensorsNetworkSanityChecker implements MySensorsGatewayEventListe
     private Integer iVersionMessageMissing = 0;
     private boolean iVersionMessageArrived = false;
 
+    private Map<Integer, Integer> missingHearbeatsMap = null;
+
     public MySensorsNetworkSanityChecker(MySensorsGateway myGateway, MySensorsEventRegister myEventRegister,
             MySensorsAbstractConnection myCon) {
         this.myGateway = myGateway;
@@ -55,13 +65,6 @@ public class MySensorsNetworkSanityChecker implements MySensorsGatewayEventListe
         this.maxAttemptsBeforeDisconnecting = myGateway.getConfiguration().getSanCheckConnectionFailAttempts();
         this.sendHeartbeat = myGateway.getConfiguration().getSanCheckSendHeartbeat();
         this.maxAttemptsBeforeDisconnectingNodes = myGateway.getConfiguration().getSanCheckSendHeartbeatFailAttempts();
-    }
-
-    private void reset() {
-        synchronized (iVersionMessageMissing) {
-            iVersionMessageArrived = false;
-            iVersionMessageMissing = 0;
-        }
     }
 
     /**
@@ -107,9 +110,17 @@ public class MySensorsNetworkSanityChecker implements MySensorsGatewayEventListe
 
             myEventRegister.addEventListener(this);
 
-            checkConnectionStatus();
+            if (checkConnectionStatus()) { // Connection is ok, let's go on with some other check
 
-            checkNodeStatus();
+                if (sendHeartbeat) {
+                    sendHeartbeatRequest();
+                    Thread.sleep(SEND_DELAY);
+                    checkHeartbeatsResponse();
+                }
+
+                checkExpectedUpdate();
+
+            }
 
         } catch (Exception e) {
             logger.error("Exception in network sanity thread checker", e);
@@ -118,14 +129,81 @@ public class MySensorsNetworkSanityChecker implements MySensorsGatewayEventListe
         }
     }
 
-    private void checkNodeStatus() {
-        // TODO
+    private void checkExpectedUpdate() {
+        for (Integer nodeId : myGateway.getGivenIds()) {
+            MySensorsNode node = myGateway.getNode(nodeId);
+            if (node != null) {
+                Optional<MySensorsNodeConfig> c = node.getNodeConfig();
+                if (c.isPresent()) {
+                    MySensorsNodeConfig nodeConfig = c.get();
+                    int minutesTimeout = nodeConfig.getExpectUpdateTimeout();
+                    if (minutesTimeout > 0) {
+                        long nodeLastUpdate = node.getLastUpdate().getTime();
+                        long minutesTimeoutMillis = minutesTimeout * 60 * 1000;
+                        if (((System.currentTimeMillis() - nodeLastUpdate) > minutesTimeoutMillis)
+                                && node.isReachable()) {
+                            node.setReachable(false);
+                            myEventRegister.notifyNodeReachEvent(node, false);
+                        }
+                    }
+                }
+
+            }
+        }
     }
 
-    private void checkConnectionStatus() throws InterruptedException {
+    private void checkHeartbeatsResponse() {
+        for (Integer nodeId : myGateway.getGivenIds()) {
+            MySensorsNode node = myGateway.getNode(nodeId);
+            if (node != null) {
+                Optional<MySensorsNodeConfig> c = node.getNodeConfig();
+                if (c.isPresent()) {
+                    MySensorsNodeConfig nodeConfig = c.get();
+                    if (nodeConfig.getRequestHeartbeatResponse()) {
+                        synchronized (missingHearbeatsMap) {
+                            Integer missingHearbeat = missingHearbeatsMap.get(nodeId);
+                            if ((missingHearbeat > maxAttemptsBeforeDisconnectingNodes) && node.isReachable()) {
+                                node.setReachable(false);
+                                myEventRegister.notifyNodeReachEvent(node, false);
+                            } else if ((missingHearbeat <= maxAttemptsBeforeDisconnectingNodes)
+                                    && !node.isReachable()) {
+                                node.setReachable(true);
+                                myEventRegister.notifyNodeReachEvent(node, true);
+                            }
+                        }
+                    }
+                }
+
+            }
+        }
+    }
+
+    private void sendHeartbeatRequest() {
+        synchronized (missingHearbeatsMap) {
+            for (Integer nodeId : myGateway.getGivenIds()) {
+                if (nodeId != null) {
+                    MySensorsMessage msg = new MySensorsMessage(nodeId, MySensorsChild.MYSENSORS_CHILD_ID_RESERVED_255,
+                            MySensorsMessage.MYSENSORS_MSG_TYPE_INTERNAL, 0, false,
+                            MySensorsMessage.MYSENSORS_SUBTYPE_I_HEARTBEAT_REQUEST, "");
+                    myGateway.sendMessage(msg);
+
+                }
+            }
+        }
+    }
+
+    /**
+     * Check connection status based on the {@link MySensorsGatewayConfig}
+     *
+     * @return true if connection is ok and no request for disconnection done
+     *
+     * @throws InterruptedException see Thread.sleep for more info
+     */
+    private boolean checkConnectionStatus() throws InterruptedException {
+        boolean ret = true;
         myGateway.sendMessage(MySensorsMessage.I_VERSION_MESSAGE);
 
-        Thread.sleep(3000);
+        Thread.sleep(SEND_DELAY);
 
         synchronized (iVersionMessageMissing) {
             if (!iVersionMessageArrived) {
@@ -136,6 +214,7 @@ public class MySensorsNetworkSanityChecker implements MySensorsGatewayEventListe
                     logger.error("Retry period expired, gateway is down. Disconneting bridge...");
 
                     myCon.requestDisconnection(true);
+                    ret = false;
 
                 } else {
                     iVersionMessageMissing++;
@@ -147,13 +226,31 @@ public class MySensorsNetworkSanityChecker implements MySensorsGatewayEventListe
 
             iVersionMessageArrived = false;
         }
+
+        return ret;
+    }
+
+    private void reset() {
+        synchronized (iVersionMessageMissing) {
+            iVersionMessageArrived = false;
+            iVersionMessageMissing = 0;
+            missingHearbeatsMap = new HashMap<>();
+        }
     }
 
     @Override
     public void messageReceived(MySensorsMessage message) throws Throwable {
         synchronized (iVersionMessageMissing) {
             if (!iVersionMessageArrived) {
-                iVersionMessageArrived = message.isIVersionMessage();
+                if (message.isIVersionMessage()) {
+                    iVersionMessageArrived = true;
+                }
+            }
+        }
+
+        synchronized (missingHearbeatsMap) {
+            if (message.isHeartbeatResponseMessage()) {
+                missingHearbeatsMap.put(message.getNodeId(), 0); // Reset or set if exist
             }
         }
     }

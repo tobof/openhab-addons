@@ -16,12 +16,19 @@ package org.openhab.binding.mysensors.config;
  */
 public class MySensorsSensorConfiguration {
     public String nodeId; // node ID in the MySensors network
+
     public String childId; // child ID in the MySensors network
+
     public boolean requestAck; // should a message request an ACK?
+
     public boolean revertState; // If no ACK was received after the defined retries, should the state of the item get
                                 // reverted?
 
     public boolean smartSleep;
 
-    public int expectUpdateTimeout;
+    public int childUpdateTimeout;
+
+    public int nodeUpdateTimeout;
+
+    public boolean requestHeartbeatResponse;
 }

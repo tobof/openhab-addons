@@ -31,7 +31,9 @@ import org.openhab.binding.mysensors.internal.event.MySensorsNodeUpdateEventType
 import org.openhab.binding.mysensors.internal.gateway.MySensorsGateway;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
+import org.openhab.binding.mysensors.internal.sensors.MySensorsChildConfig;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsNode;
+import org.openhab.binding.mysensors.internal.sensors.MySensorsNodeConfig;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsVariable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,7 +75,7 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
         requestAck = configuration.requestAck;
         revertState = configuration.revertState;
         smartSleep = configuration.smartSleep;
-        expectUpdateTimeout = configuration.expectUpdateTimeout;
+        expectUpdateTimeout = configuration.childUpdateTimeout;
 
         myGateway = getBridgeHandler().getMySensorsGateway();
         addIntoGateway(getThing(), configuration);
@@ -294,8 +296,10 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
                         nodeId, childId, pres);
 
                 MySensorsChild child = MySensorsChild.fromPresentation(pres, childId);
+                child.setChildConfig(generateChildConfig(configuration));
                 if (child != null) {
                     ret = new MySensorsNode(nodeId);
+                    ret.setNodeConfig(generateNodeConfig(configuration));
                     ret.addChild(child);
                 }
             } else {
@@ -309,6 +313,23 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
 
         return ret;
 
+    }
+
+    private MySensorsChildConfig generateChildConfig(MySensorsSensorConfiguration configuration) {
+        MySensorsChildConfig ret = new MySensorsChildConfig();
+        ret.setRequestAck(configuration.requestAck);
+        ret.setRevertState(configuration.revertState);
+        ret.setExpectUpdateTimeout(configuration.childUpdateTimeout);
+
+        return ret;
+    }
+
+    private MySensorsNodeConfig generateNodeConfig(MySensorsSensorConfiguration configuration) {
+        MySensorsNodeConfig ret = new MySensorsNodeConfig();
+        ret.setRequestHeartbeatResponse(configuration.requestHeartbeatResponse);
+        ret.setExpectUpdateTimeout(configuration.nodeUpdateTimeout);
+
+        return ret;
     }
 
     @Override

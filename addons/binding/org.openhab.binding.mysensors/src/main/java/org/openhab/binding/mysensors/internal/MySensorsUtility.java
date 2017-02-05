@@ -13,6 +13,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+import org.openhab.binding.mysensors.internal.exception.MergeException;
+
 /**
  * Class gives some utility methods that not belong to a specific class
  *
@@ -59,10 +61,10 @@ public class MySensorsUtility {
      * @param map2 the map that will be merged into map1
      *
      * @throws NullPointerException
-     * @throws IllegalArgumentException if allowOverwrite is true and a duplicate is found for a key
+     * @throws MergeException if allowOverwrite is true and a duplicate is found for a key
      */
     public static <K, V> void mergeMap(Map<K, V> map1, Map<K, V> map2, boolean allowOverwrite)
-            throws NullPointerException, IllegalArgumentException {
+            throws MergeException, NullPointerException {
         if (!allowOverwrite) {
             map1.keySet().forEach((a) -> {
                 if (map2.containsKey(a)) {

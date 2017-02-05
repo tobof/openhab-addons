@@ -8,11 +8,10 @@
  */
 package org.openhab.binding.mysensors.internal.sensors;
 
-import static org.openhab.binding.mysensors.internal.MySensorsUtility.mergeMap;
-
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import org.openhab.binding.mysensors.internal.exception.MergeException;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
@@ -35,6 +34,8 @@ public class MySensorsNode {
 
     private final int nodeId;
 
+    private Optional<MySensorsNodeConfig> nodeConfig;
+
     private boolean reachable = true;
 
     private Map<Integer, MySensorsChild> chidldMap = null;
@@ -49,6 +50,22 @@ public class MySensorsNode {
         }
         this.nodeId = nodeId;
         this.chidldMap = new HashMap<Integer, MySensorsChild>();
+        this.nodeConfig = Optional.empty();
+        this.lastUpdate = new Date(0);
+    }
+
+    public MySensorsNode(int nodeId, MySensorsNodeConfig config) {
+        if (!isValidNodeId(nodeId)) {
+            throw new IllegalArgumentException("Invalid node id supplied: " + nodeId);
+        }
+
+        if (config == null) {
+            throw new IllegalArgumentException("Invalid config supplied for node: " + nodeId);
+        }
+
+        this.nodeId = nodeId;
+        this.chidldMap = new HashMap<Integer, MySensorsChild>();
+        this.nodeConfig = Optional.of(config);
         this.lastUpdate = new Date(0);
     }
 
@@ -149,24 +166,52 @@ public class MySensorsNode {
     }
 
     /**
-     * Merge to child map into one.
+     * Get optional node configuration
+     *
+     * @return the Optional that could contains {@link MySensorsNodeConfig}
+     */
+    public Optional<MySensorsNodeConfig> getNodeConfig() {
+        return nodeConfig;
+    }
+
+    /**
+     * Set configuration for node
+     *
+     * @param nodeConfig is a valid instance of {@link MySensorsNodeConfig}ß
+     */
+    public void setNodeConfig(MySensorsNodeConfig nodeConfig) {
+        this.nodeConfig = Optional.of(nodeConfig);
+    }
+
+    /**
+     * Merge to node into one.
      *
      * @param node
      *
      * @throws MergeException if try to merge to node with same child/children
      */
-    public void mergeNodeChildren(MySensorsNode node) throws MergeException {
+    public void merge(Object o) throws MergeException {
 
-        if (node == null) {
-            throw new IllegalArgumentException("Null node can't be merged");
+        if (o == null || !(o instanceof MySensorsNode)) {
+            throw new MergeException("Invalid object to merge");
+        }
+
+        MySensorsNode node = (MySensorsNode) o;
+
+        // Merge configurations
+        if (node.nodeConfig.isPresent() && !nodeConfig.isPresent()) {
+            nodeConfig = node.nodeConfig;
+        } else if (node.nodeConfig.isPresent() && nodeConfig.isPresent()) {
+            nodeConfig.get().merge(node.nodeConfig);
         }
 
         synchronized (chidldMap) {
-            try {
-                mergeMap(chidldMap, node.chidldMap, false);
-            } catch (Exception e) {
-                throw new MergeException("Merging child map of node " + this.nodeId + " and " + node.nodeId
-                        + " failed. Cause" + e.getMessage() + " (" + e.getClass().getSimpleName() + ")");
+            for (Integer i : node.chidldMap.keySet()) {
+                MySensorsChild child = node.chidldMap.get(i);
+                chidldMap.merge(i, child, (child1, child2) -> {
+                    child1.merge(child2);
+                    return child1;
+                });
             }
 
         }

@@ -380,6 +380,16 @@ public class MySensorsMessage {
     }
 
     /**
+     * Checks if the received message is a I_HEARTBEAT_RESPONSE (internal MySensors) message.
+     *
+     * @return true, if the received message is a I_HEARTBEAT_RESPONSE message.
+     */
+    public boolean isIHearbeatResponse() {
+        return (childId == MySensorsChild.MYSENSORS_CHILD_ID_RESERVED_255) && (msgType == MYSENSORS_MSG_TYPE_INTERNAL)
+                && (subType == MYSENSORS_SUBTYPE_I_HEARTBEAT_RESPONSE);
+    }
+
+    /**
      * Checks if the received message is a I_TIME (internal MySensors) message.
      *
      * @return true, if the received message is a I_TIME message.
