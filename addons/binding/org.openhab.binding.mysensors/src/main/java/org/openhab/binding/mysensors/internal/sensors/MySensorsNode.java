@@ -202,7 +202,7 @@ public class MySensorsNode {
         if (node.nodeConfig.isPresent() && !nodeConfig.isPresent()) {
             nodeConfig = node.nodeConfig;
         } else if (node.nodeConfig.isPresent() && nodeConfig.isPresent()) {
-            nodeConfig.get().merge(node.nodeConfig);
+            nodeConfig.get().merge(node.nodeConfig.get());
         }
 
         synchronized (chidldMap) {

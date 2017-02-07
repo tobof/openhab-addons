@@ -268,7 +268,7 @@ public abstract class MySensorsChild implements Mergeable {
         if (child.childConfig.isPresent() && !childConfig.isPresent()) {
             childConfig = child.childConfig;
         } else if (child.childConfig.isPresent() && childConfig.isPresent()) {
-            childConfig.get().merge(child.childConfig);
+            childConfig.get().merge(child.childConfig.get());
         }
 
     }
