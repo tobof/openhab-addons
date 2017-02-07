@@ -44,4 +44,11 @@ public class MySensorsNodeConfig implements Mergeable {
         }
 
     }
+
+    @Override
+    public String toString() {
+        return "MySensorsNodeConfig [requestHeartbeatResponse=" + requestHeartbeatResponse + ", expectUpdateTimeout="
+                + expectUpdateTimeout + "]";
+    }
+
 }

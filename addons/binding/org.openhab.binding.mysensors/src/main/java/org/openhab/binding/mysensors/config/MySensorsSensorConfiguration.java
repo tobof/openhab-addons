@@ -55,4 +55,13 @@ public class MySensorsSensorConfiguration {
      * ID will be set OFFLINE.
      */
     public boolean requestHeartbeatResponse;
+
+    @Override
+    public String toString() {
+        return "MySensorsSensorConfiguration [nodeId=" + nodeId + ", childId=" + childId + ", requestAck=" + requestAck
+                + ", revertState=" + revertState + ", smartSleep=" + smartSleep + ", childUpdateTimeout="
+                + childUpdateTimeout + ", nodeUpdateTimeout=" + nodeUpdateTimeout + ", requestHeartbeatResponse="
+                + requestHeartbeatResponse + "]";
+    }
+
 }

@@ -182,4 +182,14 @@ public class MySensorsGatewayConfig {
         this.sanCheckSendHeartbeatFailAttempts = sanCheckSendHeartbeatFailAttempts;
     }
 
+    @Override
+    public String toString() {
+        return "MySensorsGatewayConfig [gatewayType=" + gatewayType + ", sendDelay=" + sendDelay + ", imperial="
+                + imperial + ", skipStartupCheck=" + skipStartupCheck + ", enableNetworkSanCheck="
+                + enableNetworkSanCheck + ", sanityCheckerInterval=" + sanityCheckerInterval
+                + ", sanCheckConnectionFailAttempts=" + sanCheckConnectionFailAttempts + ", sanCheckSendHeartbeat="
+                + sanCheckSendHeartbeat + ", sanCheckSendHeartbeatFailAttempts=" + sanCheckSendHeartbeatFailAttempts
+                + ", serialPort=" + serialPort + ", baudRate=" + baudRate + ", ipAddress=" + ipAddress + ", tcpPort="
+                + tcpPort + "]";
+    }
 }

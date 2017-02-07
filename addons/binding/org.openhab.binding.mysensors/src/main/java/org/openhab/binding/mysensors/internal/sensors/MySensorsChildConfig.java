@@ -66,4 +66,10 @@ public class MySensorsChildConfig implements Mergeable {
         }
     }
 
+    @Override
+    public String toString() {
+        return "MySensorsChildConfig [requestAck=" + requestAck + ", revertState=" + revertState + ", smartSleep="
+                + smartSleep + ", expectUpdateTimeout=" + expectUpdateTimeout + "]";
+    }
+
 }
