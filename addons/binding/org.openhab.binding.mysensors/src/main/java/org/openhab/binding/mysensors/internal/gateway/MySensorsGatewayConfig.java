@@ -10,25 +10,73 @@ package org.openhab.binding.mysensors.internal.gateway;
 
 public class MySensorsGatewayConfig {
 
-    private MySensorsGatewayType gatewayType; // is a serial or ip gateway?
+    /**
+     * Is a serial or ip gateway?
+     */
+    private MySensorsGatewayType gatewayType;
 
-    // Globals
-    private Integer sendDelay; // delay at which messages are send from the internal queue to the MySensors network
-    private Boolean imperial; // should nodes send imperial or metric values?
-    private Boolean skipStartupCheck; // should the startup check of the bridge at boot skipped?
-    private Boolean enableNetworkSanCheck; // network sanity check enabled?
-    private Integer sanityCheckerInterval; // determines interval to start NetworkSanityCheck
-    private Integer sanCheckConnectionFailAttempts; // connection will wait this number of attempts before disconnecting
-    private boolean sanCheckSendHeartbeat; // network sanity checker will also send heartbeats to all known nodes
-    private Integer sanCheckSendHeartbeatFailAttempts; // disconnect nodes that fail to answer to heartbeat request
+    // GLOBALS
+    /**
+     * Delay at which messages are send from the internal queue to the MySensors network
+     */
+    private Integer sendDelay;
 
-    // Serial
-    private String serialPort; // serial port the gateway is attached to
-    private Integer baudRate; // baud rate used to connect the serial port
+    /**
+     * Should nodes send imperial or metric values?
+     */
+    private Boolean imperial; //
+
+    /**
+     * Should the startup check of the bridge at boot skipped?
+     */
+    private Boolean skipStartupCheck;
+
+    /**
+     * Network sanity check enabled?
+     */
+    private Boolean enableNetworkSanCheck;
+
+    /**
+     * Determines interval to start NetworkSanityCheck
+     */
+    private Integer sanityCheckerInterval;
+
+    /**
+     * Connection will wait this number of attempts before disconnecting
+     */
+    private Integer sanCheckConnectionFailAttempts;
+
+    /**
+     * Network sanity checker will also send heartbeats to all known nodes
+     */
+    private boolean sanCheckSendHeartbeat;
+
+    /**
+     * Disconnect nodes that fail to answer to heartbeat request
+     */
+    private Integer sanCheckSendHeartbeatFailAttempts;
+
+    // SERIAL
+    /**
+     * Serial port the gateway is attached to
+     */
+    private String serialPort;
+
+    /**
+     * Baud rate used to connect the serial port
+     */
+    private Integer baudRate;
 
     // Ip
-    private String ipAddress; // ip address the gateway is attached to
-    private Integer tcpPort; // tcp port the gateway is running at
+    /**
+     * ip address the gateway is attached to
+     */
+    private String ipAddress;
+
+    /**
+     * tcp port the gateway is running at
+     */
+    private Integer tcpPort;
 
     public MySensorsGatewayType getGatewayType() {
         return gatewayType;
