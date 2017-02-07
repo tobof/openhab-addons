@@ -15,17 +15,20 @@
 				<description>The serial port the MySensors Gateway is connected to
 				</description>
 			</parameter>
-			<parameter name="sendDelay" type="integer" required="false" min="1" max="1000">
-				<label>Send Delay</label>
-				<description>The delay between messages send to the gateway 
-				</description>
-				<default>100</default>
-			</parameter>
 			<parameter name="baudRate" type="integer" required="false" min="300" max="250000">
 				<label>Baudrate</label>
 				<description>Baudrate for serial port
 				</description>
 				<default>115200</default>
+			</parameter>
+
+			<!-- COMMON PARAMS STARTS HERE -->
+
+			<parameter name="sendDelay" type="integer" required="false" min="1" max="1000">
+				<label>Send Delay</label>
+				<description>The delay between messages send to the gateway
+				</description>
+				<default>100</default>
 			</parameter>
 			<parameter name="skipStartupCheck" type="boolean" required="false">
 				<label>Skip startup connection check</label>
@@ -42,6 +45,31 @@
 				<description>Network sanity check periodically unsure that gateway is up and running</description>
 				<default>false</default>
 			</parameter>
+			<parameter name="sanityCheckerInterval" type="integer" required="false">
+				<label>Interval to launch network sanity check</label>
+				<description>Network sanity check periodically unsure that gateway is up and running</description>
+				<default>3</default>
+			</parameter>
+			<parameter name="sanCheckConnectionFailAttempts" type="integer" required="false">
+				<label>Attempts before disconnecting the bridge</label>
+				<description>When gateway not respond, you could configure how many retry, sanity check, will do</description>
+				<default>3</default>
+			</parameter>
+			<parameter name="sanCheckSendHeartbeat" type="boolean" required="false">
+				<label>Send heartbeat to all nodes when network sanity checker run</label>
+				<description>When network sanity checker run, send heartbeat to all nodes</description>
+				<default>false</default>
+			</parameter>
+			<parameter name="sanCheckSendHeartbeatFailAttempts" type="integer" required="false">
+				<label>Attempts before disconnecting nodes</label>
+				<description>When nodes not respond to heartbeat, you could configure how many retry, sanity check, will do before
+					disconnecting them
+				</description>
+				<default>10</default>
+			</parameter>
+
+			<!-- COMMON PARAMS ENDS HERE -->
+
 		</config-description>
 
 	</bridge-type>
@@ -62,9 +90,12 @@
 				</description>
 				<default>5003</default>
 			</parameter>
+
+			<!-- COMMON PARAMS STARTS HERE -->
+
 			<parameter name="sendDelay" type="integer" required="false" min="1" max="1000">
 				<label>Send Delay</label>
-				<description>The delay between messages send to the gateway 
+				<description>The delay between messages send to the gateway
 				</description>
 				<default>100</default>
 			</parameter>
@@ -83,6 +114,33 @@
 				<description>Network sanity check periodically unsure that gateway is up and running</description>
 				<default>false</default>
 			</parameter>
+			<parameter name="sanityCheckerInterval" type="integer" required="false">
+				<label>Interval to launch network sanity check</label>
+				<description>Network sanity check periodically unsure that gateway is up and running</description>
+				<default>3</default>
+			</parameter>
+			<parameter name="sanCheckConnectionFailAttempts" type="integer" required="false">
+				<label>Attempts before disconnecting the bridge</label>
+				<description>When gateway not respond, you could configure how many retry, sanity check, will do before
+					disconnecting it
+				</description>
+				<default>3</default>
+			</parameter>
+			<parameter name="sanCheckSendHeartbeat" type="boolean" required="false">
+				<label>Send heartbeat to all nodes when network sanity checker run</label>
+				<description>When network sanity checker run, send heartbeat to all nodes</description>
+				<default>false</default>
+			</parameter>
+			<parameter name="sanCheckSendHeartbeatFailAttempts" type="integer" required="false">
+				<label>Attempts before disconnecting nodes</label>
+				<description>When nodes not respond to heartbeat, you could configure how many retry, sanity check, will do before
+					disconnecting them
+				</description>
+				<default>10</default>
+			</parameter>
+
+			<!-- COMMON PARAMS ENDS HERE -->
+
 		</config-description>
 
 	</bridge-type>
@@ -101,7 +159,7 @@
 		<channels>
 			<channel id="hum" typeId="hum-channel" />
 			<channel id="battery" typeId="battery-channel" />
-			<channel id="lastupdate" typeId="lastupdate-channel"/>
+			<channel id="lastupdate" typeId="lastupdate-channel" />
 			<channel id="custom" typeId="var1-channel" />
 		</channels>
 
@@ -117,6 +175,23 @@
 				<label>ChildId</label>
 				<description>The ID of the child of a node in the MySensors network
 				</description>
+			</parameter>
+			<parameter name="nodeUpdateTimeout" type="integer" required="false">
+				<label>Expected Communication Timeout</label>
+				<description>Minutes after, if no message received, ALL things with same node ID will be set to OFFLINE
+				</description>
+				<default>-1</default>
+			</parameter>
+			<parameter name="childUpdateTimeout" type="integer" required="false">
+				<label>Expected Communication Timeout</label>
+				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
+				<default>-1</default>
+			</parameter>
+			<parameter name="requestHeartbeatResponse" type="integer" required="false">
+				<label>Request Heartbeat Response</label>
+				<description>If no heartbeat received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL thing with
+					same node ID will be set OFFLINE.</description>
+				<default>false</default>
 			</parameter>
 		</config-description>
 
@@ -134,7 +209,7 @@
 		<channels>
 			<channel id="temp" typeId="temp-channel" />
 			<channel id="battery" typeId="battery-channel" />
-			<channel id="lastupdate" typeId="lastupdate-channel"/>
+			<channel id="lastupdate" typeId="lastupdate-channel" />
 			<channel id="custom" typeId="var1-channel" />
 		</channels>
 
@@ -148,6 +223,23 @@
 				<label>ChildId</label>
 				<description>The ID of the child of a node in the MySensors network
 				</description>
+			</parameter>
+			<parameter name="nodeUpdateTimeout" type="integer" required="false">
+				<label>Expected Communication Timeout</label>
+				<description>Minutes after, if no message received, ALL things with same node ID will be set to OFFLINE
+				</description>
+				<default>-1</default>
+			</parameter>
+			<parameter name="childUpdateTimeout" type="integer" required="false">
+				<label>Expected Communication Timeout</label>
+				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
+				<default>-1</default>
+			</parameter>
+			<parameter name="requestHeartbeatResponse" type="integer" required="false">
+				<label>Request Heartbeat Response</label>
+				<description>If no heartbeat received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL thing with
+					same node ID will be set OFFLINE.</description>
+				<default>false</default>
 			</parameter>
 		</config-description>
 
@@ -167,7 +259,7 @@
 			<channel id="current" typeId="current-channel" />
 			<channel id="impedance" typeId="impedance-channel" />
 			<channel id="battery" typeId="battery-channel" />
-			<channel id="lastupdate" typeId="lastupdate-channel"/>
+			<channel id="lastupdate" typeId="lastupdate-channel" />
 		</channels>
 
 		<config-description>
@@ -180,6 +272,23 @@
 				<label>ChildId</label>
 				<description>The ID of the child of a node in the MySensors network
 				</description>
+			</parameter>
+			<parameter name="nodeUpdateTimeout" type="integer" required="false">
+				<label>Expected Communication Timeout</label>
+				<description>Minutes after, if no message received, ALL things with same node ID will be set to OFFLINE
+				</description>
+				<default>-1</default>
+			</parameter>
+			<parameter name="childUpdateTimeout" type="integer" required="false">
+				<label>Expected Communication Timeout</label>
+				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
+				<default>-1</default>
+			</parameter>
+			<parameter name="requestHeartbeatResponse" type="integer" required="false">
+				<label>Request Heartbeat Response</label>
+				<description>If no heartbeat received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL thing with
+					same node ID will be set OFFLINE.</description>
+				<default>false</default>
 			</parameter>
 		</config-description>
 	</thing-type>
@@ -196,7 +305,7 @@
 		<channels>
 			<channel id="status" typeId="status-channel" />
 			<channel id="battery" typeId="battery-channel" />
-			<channel id="lastupdate" typeId="lastupdate-channel"/>
+			<channel id="lastupdate" typeId="lastupdate-channel" />
 		</channels>
 
 		<config-description>
@@ -210,6 +319,23 @@
 				<description>The ID of the child of a node in the MySensors network
 				</description>
 			</parameter>
+			<parameter name="nodeUpdateTimeout" type="integer" required="false">
+				<label>Expected Communication Timeout</label>
+				<description>Minutes after, if no message received, ALL things with same node ID will be set to OFFLINE
+				</description>
+				<default>-1</default>
+			</parameter>
+			<parameter name="childUpdateTimeout" type="integer" required="false">
+				<label>Expected Communication Timeout</label>
+				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
+				<default>-1</default>
+			</parameter>
+			<parameter name="requestHeartbeatResponse" type="integer" required="false">
+				<label>Request Heartbeat Response</label>
+				<description>If no heartbeat received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL thing with
+					same node ID will be set OFFLINE.</description>
+				<default>false</default>
+			</parameter>
 			<parameter name="requestAck" type="boolean" required="false">
 				<label>Request ACK</label>
 				<description>Request ACK from Actuator</description>
@@ -219,13 +345,6 @@
 				<label>Revert State</label>
 				<description>Revert state if no Ack received</description>
 				<default>true</default>
-			</parameter>
-			<parameter name="smartSleep" type="boolean" required="false">
-				<label>SmartSleep</label>
-				<description>Does this node support Smartsleep? 
-								A message to the node is only send in response to a heartbeat!
-				</description>
-				<default>false</default>
 			</parameter>
 		</config-description>
 	</thing-type>
@@ -243,7 +362,7 @@
 			<channel id="watt" typeId="watt-channel" />
 			<channel id="kwh" typeId="kwh-channel" />
 			<channel id="battery" typeId="battery-channel" />
-			<channel id="lastupdate" typeId="lastupdate-channel"/>
+			<channel id="lastupdate" typeId="lastupdate-channel" />
 		</channels>
 
 		<config-description>
@@ -256,6 +375,23 @@
 				<label>ChildId-watt</label>
 				<description>The ID of the first child, displaying watt, of a node in the MySensors network
 				</description>
+			</parameter>
+			<parameter name="nodeUpdateTimeout" type="integer" required="false">
+				<label>Expected Communication Timeout</label>
+				<description>Minutes after, if no message received, ALL things with same node ID will be set to OFFLINE
+				</description>
+				<default>-1</default>
+			</parameter>
+			<parameter name="childUpdateTimeout" type="integer" required="false">
+				<label>Expected Communication Timeout</label>
+				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
+				<default>-1</default>
+			</parameter>
+			<parameter name="requestHeartbeatResponse" type="integer" required="false">
+				<label>Request Heartbeat Response</label>
+				<description>If no heartbeat received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL thing with
+					same node ID will be set OFFLINE.</description>
+				<default>false</default>
 			</parameter>
 		</config-description>
 	</thing-type>
@@ -273,7 +409,7 @@
 			<channel id="baro" typeId="baro-channel" />
 			<channel id="pressure" typeId="pressure-channel" />
 			<channel id="battery" typeId="battery-channel" />
-			<channel id="lastupdate" typeId="lastupdate-channel"/>
+			<channel id="lastupdate" typeId="lastupdate-channel" />
 		</channels>
 
 		<config-description>
@@ -286,6 +422,23 @@
 				<label>ChildId</label>
 				<description>The ID of the child of a node in the MySensors network
 				</description>
+			</parameter>
+			<parameter name="nodeUpdateTimeout" type="integer" required="false">
+				<label>Expected Communication Timeout</label>
+				<description>Minutes after, if no message received, ALL things with same node ID will be set to OFFLINE
+				</description>
+				<default>-1</default>
+			</parameter>
+			<parameter name="childUpdateTimeout" type="integer" required="false">
+				<label>Expected Communication Timeout</label>
+				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
+				<default>-1</default>
+			</parameter>
+			<parameter name="requestHeartbeatResponse" type="integer" required="false">
+				<label>Request Heartbeat Response</label>
+				<description>If no heartbeat received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL thing with
+					same node ID will be set OFFLINE.</description>
+				<default>false</default>
 			</parameter>
 		</config-description>
 	</thing-type>
@@ -303,7 +456,7 @@
 			<channel id="tripped" typeId="tripped-channel" />
 			<channel id="armed" typeId="armed-channel" />
 			<channel id="battery" typeId="battery-channel" />
-			<channel id="lastupdate" typeId="lastupdate-channel"/>
+			<channel id="lastupdate" typeId="lastupdate-channel" />
 		</channels>
 
 		<config-description>
@@ -316,6 +469,23 @@
 				<label>ChildId</label>
 				<description>The ID of the child of a node in the MySensors network
 				</description>
+			</parameter>
+			<parameter name="nodeUpdateTimeout" type="integer" required="false">
+				<label>Expected Communication Timeout</label>
+				<description>Minutes after, if no message received, ALL things with same node ID will be set to OFFLINE
+				</description>
+				<default>-1</default>
+			</parameter>
+			<parameter name="childUpdateTimeout" type="integer" required="false">
+				<label>Expected Communication Timeout</label>
+				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
+				<default>-1</default>
+			</parameter>
+			<parameter name="requestHeartbeatResponse" type="integer" required="false">
+				<label>Request Heartbeat Response</label>
+				<description>If no heartbeat received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL thing with
+					same node ID will be set OFFLINE.</description>
+				<default>false</default>
 			</parameter>
 		</config-description>
 	</thing-type>
@@ -333,7 +503,7 @@
 			<channel id="tripped" typeId="tripped-channel" />
 			<channel id="armed" typeId="armed-channel" />
 			<channel id="battery" typeId="battery-channel" />
-			<channel id="lastupdate" typeId="lastupdate-channel"/>
+			<channel id="lastupdate" typeId="lastupdate-channel" />
 		</channels>
 
 		<config-description>
@@ -346,6 +516,23 @@
 				<label>ChildId</label>
 				<description>The ID of the child of a node in the MySensors network
 				</description>
+			</parameter>
+			<parameter name="nodeUpdateTimeout" type="integer" required="false">
+				<label>Expected Communication Timeout</label>
+				<description>Minutes after, if no message received, ALL things with same node ID will be set to OFFLINE
+				</description>
+				<default>-1</default>
+			</parameter>
+			<parameter name="childUpdateTimeout" type="integer" required="false">
+				<label>Expected Communication Timeout</label>
+				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
+				<default>-1</default>
+			</parameter>
+			<parameter name="requestHeartbeatResponse" type="integer" required="false">
+				<label>Request Heartbeat Response</label>
+				<description>If no heartbeat received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL thing with
+					same node ID will be set OFFLINE.</description>
+				<default>false</default>
 			</parameter>
 		</config-description>
 	</thing-type>
@@ -362,7 +549,7 @@
 		<channels>
 			<channel id="tripped" typeId="tripped-channel" />
 			<channel id="battery" typeId="battery-channel" />
-			<channel id="lastupdate" typeId="lastupdate-channel"/>
+			<channel id="lastupdate" typeId="lastupdate-channel" />
 		</channels>
 
 		<config-description>
@@ -375,6 +562,23 @@
 				<label>ChildId</label>
 				<description>The ID of the child of a node in the MySensors network
 				</description>
+			</parameter>
+			<parameter name="nodeUpdateTimeout" type="integer" required="false">
+				<label>Expected Communication Timeout</label>
+				<description>Minutes after, if no message received, ALL things with same node ID will be set to OFFLINE
+				</description>
+				<default>-1</default>
+			</parameter>
+			<parameter name="childUpdateTimeout" type="integer" required="false">
+				<label>Expected Communication Timeout</label>
+				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
+				<default>-1</default>
+			</parameter>
+			<parameter name="requestHeartbeatResponse" type="integer" required="false">
+				<label>Request Heartbeat Response</label>
+				<description>If no heartbeat received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL thing with
+					same node ID will be set OFFLINE.</description>
+				<default>false</default>
 			</parameter>
 		</config-description>
 	</thing-type>
@@ -392,7 +596,7 @@
 			<channel id="dimmer" typeId="dimmer-channel" />
 			<channel id="watt" typeId="watt-channel" />
 			<channel id="battery" typeId="battery-channel" />
-			<channel id="lastupdate" typeId="lastupdate-channel"/>
+			<channel id="lastupdate" typeId="lastupdate-channel" />
 		</channels>
 
 		<config-description>
@@ -406,11 +610,21 @@
 				<description>The ID of the child of a node in the MySensors network
 				</description>
 			</parameter>
-			<parameter name="smartSleep" type="boolean" required="false">
-				<label>SmartSleep</label>
-				<description>Does this node support Smartsleep? 
-								A message to the node is only send in response to a heartbeat!
+			<parameter name="nodeUpdateTimeout" type="integer" required="false">
+				<label>Expected Communication Timeout</label>
+				<description>Minutes after, if no message received, ALL things with same node ID will be set to OFFLINE
 				</description>
+				<default>-1</default>
+			</parameter>
+			<parameter name="childUpdateTimeout" type="integer" required="false">
+				<label>Expected Communication Timeout</label>
+				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
+				<default>-1</default>
+			</parameter>
+			<parameter name="requestHeartbeatResponse" type="integer" required="false">
+				<label>Request Heartbeat Response</label>
+				<description>If no heartbeat received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL thing with
+					same node ID will be set OFFLINE.</description>
 				<default>false</default>
 			</parameter>
 		</config-description>
@@ -428,7 +642,7 @@
 		<channels>
 			<channel id="cover" typeId="cover-channel" />
 			<channel id="battery" typeId="battery-channel" />
-			<channel id="lastupdate" typeId="lastupdate-channel"/>
+			<channel id="lastupdate" typeId="lastupdate-channel" />
 		</channels>
 
 		<config-description>
@@ -442,11 +656,21 @@
 				<description>The ID of the child of a node in the MySensors network
 				</description>
 			</parameter>
-			<parameter name="smartSleep" type="boolean" required="false">
-				<label>SmartSleep</label>
-				<description>Does this node support Smartsleep? 
-								A message to the node is only send in response to a heartbeat!
+			<parameter name="nodeUpdateTimeout" type="integer" required="false">
+				<label>Expected Communication Timeout</label>
+				<description>Minutes after, if no message received, ALL things with same node ID will be set to OFFLINE
 				</description>
+				<default>-1</default>
+			</parameter>
+			<parameter name="childUpdateTimeout" type="integer" required="false">
+				<label>Expected Communication Timeout</label>
+				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
+				<default>-1</default>
+			</parameter>
+			<parameter name="requestHeartbeatResponse" type="integer" required="false">
+				<label>Request Heartbeat Response</label>
+				<description>If no heartbeat received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL thing with
+					same node ID will be set OFFLINE.</description>
 				<default>false</default>
 			</parameter>
 		</config-description>
@@ -465,7 +689,7 @@
 			<channel id="wind" typeId="wind-channel" />
 			<channel id="gust" typeId="gust-channel" />
 			<channel id="battery" typeId="battery-channel" />
-			<channel id="lastupdate" typeId="lastupdate-channel"/>
+			<channel id="lastupdate" typeId="lastupdate-channel" />
 		</channels>
 
 		<config-description>
@@ -478,6 +702,23 @@
 				<label>ChildId</label>
 				<description>The ID of the child of a node in the MySensors network
 				</description>
+			</parameter>
+			<parameter name="nodeUpdateTimeout" type="integer" required="false">
+				<label>Expected Communication Timeout</label>
+				<description>Minutes after, if no message received, ALL things with same node ID will be set to OFFLINE
+				</description>
+				<default>-1</default>
+			</parameter>
+			<parameter name="childUpdateTimeout" type="integer" required="false">
+				<label>Expected Communication Timeout</label>
+				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
+				<default>-1</default>
+			</parameter>
+			<parameter name="requestHeartbeatResponse" type="integer" required="false">
+				<label>Request Heartbeat Response</label>
+				<description>If no heartbeat received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL thing with
+					same node ID will be set OFFLINE.</description>
+				<default>false</default>
 			</parameter>
 		</config-description>
 	</thing-type>
@@ -495,7 +736,7 @@
 			<channel id="rain" typeId="rain-channel" />
 			<channel id="rainrate" typeId="rainrate-channel" />
 			<channel id="battery" typeId="battery-channel" />
-			<channel id="lastupdate" typeId="lastupdate-channel"/>
+			<channel id="lastupdate" typeId="lastupdate-channel" />
 		</channels>
 
 		<config-description>
@@ -508,6 +749,23 @@
 				<label>ChildId</label>
 				<description>The ID of the child of a node in the MySensors network
 				</description>
+			</parameter>
+			<parameter name="nodeUpdateTimeout" type="integer" required="false">
+				<label>Expected Communication Timeout</label>
+				<description>Minutes after, if no message received, ALL things with same node ID will be set to OFFLINE
+				</description>
+				<default>-1</default>
+			</parameter>
+			<parameter name="childUpdateTimeout" type="integer" required="false">
+				<label>Expected Communication Timeout</label>
+				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
+				<default>-1</default>
+			</parameter>
+			<parameter name="requestHeartbeatResponse" type="integer" required="false">
+				<label>Request Heartbeat Response</label>
+				<description>If no heartbeat received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL thing with
+					same node ID will be set OFFLINE.</description>
+				<default>false</default>
 			</parameter>
 		</config-description>
 	</thing-type>
@@ -524,7 +782,7 @@
 		<channels>
 			<channel id="uv" typeId="uv-channel" />
 			<channel id="battery" typeId="battery-channel" />
-			<channel id="lastupdate" typeId="lastupdate-channel"/>
+			<channel id="lastupdate" typeId="lastupdate-channel" />
 		</channels>
 
 		<config-description>
@@ -537,6 +795,23 @@
 				<label>ChildId</label>
 				<description>The ID of the child of a node in the MySensors network
 				</description>
+			</parameter>
+			<parameter name="nodeUpdateTimeout" type="integer" required="false">
+				<label>Expected Communication Timeout</label>
+				<description>Minutes after, if no message received, ALL things with same node ID will be set to OFFLINE
+				</description>
+				<default>-1</default>
+			</parameter>
+			<parameter name="childUpdateTimeout" type="integer" required="false">
+				<label>Expected Communication Timeout</label>
+				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
+				<default>-1</default>
+			</parameter>
+			<parameter name="requestHeartbeatResponse" type="integer" required="false">
+				<label>Request Heartbeat Response</label>
+				<description>If no heartbeat received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL thing with
+					same node ID will be set OFFLINE.</description>
+				<default>false</default>
 			</parameter>
 		</config-description>
 	</thing-type>
@@ -554,7 +829,7 @@
 			<channel id="weight" typeId="weight-channel" />
 			<channel id="impedance" typeId="impedance-channel" />
 			<channel id="battery" typeId="battery-channel" />
-			<channel id="lastupdate" typeId="lastupdate-channel"/>
+			<channel id="lastupdate" typeId="lastupdate-channel" />
 		</channels>
 
 		<config-description>
@@ -567,6 +842,23 @@
 				<label>ChildId</label>
 				<description>The ID of the child of a node in the MySensors network
 				</description>
+			</parameter>
+			<parameter name="nodeUpdateTimeout" type="integer" required="false">
+				<label>Expected Communication Timeout</label>
+				<description>Minutes after, if no message received, ALL things with same node ID will be set to OFFLINE
+				</description>
+				<default>-1</default>
+			</parameter>
+			<parameter name="childUpdateTimeout" type="integer" required="false">
+				<label>Expected Communication Timeout</label>
+				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
+				<default>-1</default>
+			</parameter>
+			<parameter name="requestHeartbeatResponse" type="integer" required="false">
+				<label>Request Heartbeat Response</label>
+				<description>If no heartbeat received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL thing with
+					same node ID will be set OFFLINE.</description>
+				<default>false</default>
 			</parameter>
 		</config-description>
 	</thing-type>
@@ -583,7 +875,7 @@
 		<channels>
 			<channel id="distance" typeId="distance-channel" />
 			<channel id="battery" typeId="battery-channel" />
-			<channel id="lastupdate" typeId="lastupdate-channel"/>
+			<channel id="lastupdate" typeId="lastupdate-channel" />
 		</channels>
 
 		<config-description>
@@ -596,6 +888,23 @@
 				<label>ChildId</label>
 				<description>The ID of the child of a node in the MySensors network
 				</description>
+			</parameter>
+			<parameter name="nodeUpdateTimeout" type="integer" required="false">
+				<label>Expected Communication Timeout</label>
+				<description>Minutes after, if no message received, ALL things with same node ID will be set to OFFLINE
+				</description>
+				<default>-1</default>
+			</parameter>
+			<parameter name="childUpdateTimeout" type="integer" required="false">
+				<label>Expected Communication Timeout</label>
+				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
+				<default>-1</default>
+			</parameter>
+			<parameter name="requestHeartbeatResponse" type="integer" required="false">
+				<label>Request Heartbeat Response</label>
+				<description>If no heartbeat received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL thing with
+					same node ID will be set OFFLINE.</description>
+				<default>false</default>
 			</parameter>
 		</config-description>
 	</thing-type>
@@ -611,9 +920,8 @@
 
 		<channels>
 			<channel id="light-level" typeId="light-level-channel" />
-			<channel id="level" typeId="level-channel" />
 			<channel id="battery" typeId="battery-channel" />
-			<channel id="lastupdate" typeId="lastupdate-channel"/>
+			<channel id="lastupdate" typeId="lastupdate-channel" />
 		</channels>
 
 		<config-description>
@@ -627,6 +935,23 @@
 				<description>The ID of the child of a node in the MySensors network
 				</description>
 			</parameter>
+			<parameter name="nodeUpdateTimeout" type="integer" required="false">
+				<label>Expected Communication Timeout</label>
+				<description>Minutes after, if no message received, ALL things with same node ID will be set to OFFLINE
+				</description>
+				<default>-1</default>
+			</parameter>
+			<parameter name="childUpdateTimeout" type="integer" required="false">
+				<label>Expected Communication Timeout</label>
+				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
+				<default>-1</default>
+			</parameter>
+			<parameter name="requestHeartbeatResponse" type="integer" required="false">
+				<label>Request Heartbeat Response</label>
+				<description>If no heartbeat received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL thing with
+					same node ID will be set OFFLINE.</description>
+				<default>false</default>
+			</parameter>
 			<parameter name="requestAck" type="boolean" required="false">
 				<label>Request ACK</label>
 				<description>Request ACK from Actuator</description>
@@ -636,13 +961,6 @@
 				<label>Revert State</label>
 				<description>Revert state if no Ack received</description>
 				<default>true</default>
-			</parameter>
-			<parameter name="smartSleep" type="boolean" required="false">
-				<label>SmartSleep</label>
-				<description>Does this node support Smartsleep? 
-								A message to the node is only send in response to a heartbeat!
-				</description>
-				<default>false</default>
 			</parameter>
 		</config-description>
 	</thing-type>
@@ -669,7 +987,7 @@
 			<channel id="var4" typeId="var4-channel" />
 			<channel id="var5" typeId="var5-channel" />
 			<channel id="battery" typeId="battery-channel" />
-			<channel id="lastupdate" typeId="lastupdate-channel"/>
+			<channel id="lastupdate" typeId="lastupdate-channel" />
 		</channels>
 
 		<config-description>
@@ -683,11 +1001,21 @@
 				<description>The ID of the child of a node in the MySensors network
 				</description>
 			</parameter>
-			<parameter name="smartSleep" type="boolean" required="false">
-				<label>SmartSleep</label>
-				<description>Does this node support Smartsleep? 
-								A message to the node is only send in response to a heartbeat!
+			<parameter name="nodeUpdateTimeout" type="integer" required="false">
+				<label>Expected Communication Timeout</label>
+				<description>Minutes after, if no message received, ALL things with same node ID will be set to OFFLINE
 				</description>
+				<default>-1</default>
+			</parameter>
+			<parameter name="childUpdateTimeout" type="integer" required="false">
+				<label>Expected Communication Timeout</label>
+				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
+				<default>-1</default>
+			</parameter>
+			<parameter name="requestHeartbeatResponse" type="integer" required="false">
+				<label>Request Heartbeat Response</label>
+				<description>If no heartbeat received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL thing with
+					same node ID will be set OFFLINE.</description>
 				<default>false</default>
 			</parameter>
 		</config-description>
@@ -707,7 +1035,7 @@
 			<channel id="volume" typeId="volume-channel" />
 			<channel id="var1" typeId="var1-channel" />
 			<channel id="battery" typeId="battery-channel" />
-			<channel id="lastupdate" typeId="lastupdate-channel"/>
+			<channel id="lastupdate" typeId="lastupdate-channel" />
 		</channels>
 
 		<config-description>
@@ -720,6 +1048,23 @@
 				<label>ChildId</label>
 				<description>The ID of the child of a node in the MySensors network
 				</description>
+			</parameter>
+			<parameter name="nodeUpdateTimeout" type="integer" required="false">
+				<label>Expected Communication Timeout</label>
+				<description>Minutes after, if no message received, ALL things with same node ID will be set to OFFLINE
+				</description>
+				<default>-1</default>
+			</parameter>
+			<parameter name="childUpdateTimeout" type="integer" required="false">
+				<label>Expected Communication Timeout</label>
+				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
+				<default>-1</default>
+			</parameter>
+			<parameter name="requestHeartbeatResponse" type="integer" required="false">
+				<label>Request Heartbeat Response</label>
+				<description>If no heartbeat received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL thing with
+					same node ID will be set OFFLINE.</description>
+				<default>false</default>
 			</parameter>
 		</config-description>
 	</thing-type>
@@ -739,7 +1084,7 @@
 			<channel id="var3" typeId="var3-channel" />
 			<channel id="var4" typeId="var4-channel" />
 			<channel id="var5" typeId="var5-channel" />
-			<channel id="lastupdate" typeId="lastupdate-channel"/>
+			<channel id="lastupdate" typeId="lastupdate-channel" />
 		</channels>
 
 		<config-description>
@@ -753,6 +1098,23 @@
 				<description>The ID of the child of a node in the MySensors network
 				</description>
 			</parameter>
+			<parameter name="nodeUpdateTimeout" type="integer" required="false">
+				<label>Expected Communication Timeout</label>
+				<description>Minutes after, if no message received, ALL things with same node ID will be set to OFFLINE
+				</description>
+				<default>-1</default>
+			</parameter>
+			<parameter name="childUpdateTimeout" type="integer" required="false">
+				<label>Expected Communication Timeout</label>
+				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
+				<default>-1</default>
+			</parameter>
+			<parameter name="requestHeartbeatResponse" type="integer" required="false">
+				<label>Request Heartbeat Response</label>
+				<description>If no heartbeat received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL thing with
+					same node ID will be set OFFLINE.</description>
+				<default>false</default>
+			</parameter>
 			<parameter name="requestAck" type="boolean" required="false">
 				<label>Request ACK</label>
 				<description>Request ACK from Actuator</description>
@@ -763,16 +1125,9 @@
 				<description>Revert state if no Ack received</description>
 				<default>true</default>
 			</parameter>
-			<parameter name="smartSleep" type="boolean" required="false">
-				<label>SmartSleep</label>
-				<description>Does this node support Smartsleep? 
-								A message to the node is only send in response to a heartbeat!
-				</description>
-				<default>false</default>
-			</parameter>
 		</config-description>
 	</thing-type>
-	
+
 	<thing-type id="lock">
 		<supported-bridge-type-refs>
 			<bridge-type-ref id="bridge-ser" />
@@ -785,7 +1140,7 @@
 		<channels>
 			<channel id="lock" typeId="lock-channel" />
 			<channel id="battery" typeId="battery-channel" />
-			<channel id="lastupdate" typeId="lastupdate-channel"/>
+			<channel id="lastupdate" typeId="lastupdate-channel" />
 		</channels>
 
 		<config-description>
@@ -801,9 +1156,26 @@
 				<description>The ID of the child of a node in the MySensors network
 				</description>
 			</parameter>
+			<parameter name="nodeUpdateTimeout" type="integer" required="false">
+				<label>Expected Communication Timeout</label>
+				<description>Minutes after, if no message received, ALL things with same node ID will be set to OFFLINE
+				</description>
+				<default>-1</default>
+			</parameter>
+			<parameter name="childUpdateTimeout" type="integer" required="false">
+				<label>Expected Communication Timeout</label>
+				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
+				<default>-1</default>
+			</parameter>
+			<parameter name="requestHeartbeatResponse" type="integer" required="false">
+				<label>Request Heartbeat Response</label>
+				<description>If no heartbeat received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL thing with
+					same node ID will be set OFFLINE.</description>
+				<default>false</default>
+			</parameter>
 		</config-description>
 	</thing-type>
-	
+
 	<thing-type id="sound">
 		<supported-bridge-type-refs>
 			<bridge-type-ref id="bridge-ser" />
@@ -818,7 +1190,7 @@
 			<channel id="armed" typeId="armed-channel" />
 			<channel id="level" typeId="level-channel" />
 			<channel id="battery" typeId="battery-channel" />
-			<channel id="lastupdate" typeId="lastupdate-channel"/>
+			<channel id="lastupdate" typeId="lastupdate-channel" />
 		</channels>
 
 		<config-description>
@@ -834,9 +1206,26 @@
 				<description>The ID of the child of a node in the MySensors network
 				</description>
 			</parameter>
+			<parameter name="nodeUpdateTimeout" type="integer" required="false">
+				<label>Expected Communication Timeout</label>
+				<description>Minutes after, if no message received, ALL things with same node ID will be set to OFFLINE
+				</description>
+				<default>-1</default>
+			</parameter>
+			<parameter name="childUpdateTimeout" type="integer" required="false">
+				<label>Expected Communication Timeout</label>
+				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
+				<default>-1</default>
+			</parameter>
+			<parameter name="requestHeartbeatResponse" type="integer" required="false">
+				<label>Request Heartbeat Response</label>
+				<description>If no heartbeat received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL thing with
+					same node ID will be set OFFLINE.</description>
+				<default>false</default>
+			</parameter>
 		</config-description>
 	</thing-type>
-	
+
 	<thing-type id="rgbLight">
 		<supported-bridge-type-refs>
 			<bridge-type-ref id="bridge-ser" />
@@ -852,7 +1241,7 @@
 			<channel id="var2" typeId="var2-channel" />
 			<channel id="var3" typeId="var3-channel" />
 			<channel id="battery" typeId="battery-channel" />
-			<channel id="lastupdate" typeId="lastupdate-channel"/>
+			<channel id="lastupdate" typeId="lastupdate-channel" />
 		</channels>
 
 		<config-description>
@@ -868,26 +1257,26 @@
 				<description>The ID of the child of a node in the MySensors network
 				</description>
 			</parameter>
-			<parameter name="requestAck" type="boolean" required="false">
-				<label>Request ACK</label>
-				<description>Request ACK from Actuator</description>
-				<default>false</default>
-			</parameter>
-			<parameter name="revertState" type="boolean" required="false">
-				<label>Revert State</label>
-				<description>Revert state if no Ack received</description>
-				<default>true</default>
-			</parameter>
-			<parameter name="smartSleep" type="boolean" required="false">
-				<label>SmartSleep</label>
-				<description>Does this node support Smartsleep? 
-								A message to the node is only send in response to a heartbeat!
+			<parameter name="nodeUpdateTimeout" type="integer" required="false">
+				<label>Expected Communication Timeout</label>
+				<description>Minutes after, if no message received, ALL things with same node ID will be set to OFFLINE
 				</description>
+				<default>-1</default>
+			</parameter>
+			<parameter name="childUpdateTimeout" type="integer" required="false">
+				<label>Expected Communication Timeout</label>
+				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
+				<default>-1</default>
+			</parameter>
+			<parameter name="requestHeartbeatResponse" type="integer" required="false">
+				<label>Request Heartbeat Response</label>
+				<description>If no heartbeat received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL thing with
+					same node ID will be set OFFLINE.</description>
 				<default>false</default>
 			</parameter>
 		</config-description>
 	</thing-type>
-	
+
 	<thing-type id="rgbwLight">
 		<supported-bridge-type-refs>
 			<bridge-type-ref id="bridge-ser" />
@@ -904,7 +1293,7 @@
 			<channel id="var3" typeId="var3-channel" />
 			<channel id="var4" typeId="var4-channel" />
 			<channel id="battery" typeId="battery-channel" />
-			<channel id="lastupdate" typeId="lastupdate-channel"/>
+			<channel id="lastupdate" typeId="lastupdate-channel" />
 		</channels>
 
 		<config-description>
@@ -920,26 +1309,26 @@
 				<description>The ID of the child of a node in the MySensors network
 				</description>
 			</parameter>
-			<parameter name="requestAck" type="boolean" required="false">
-				<label>Request ACK</label>
-				<description>Request ACK from Actuator</description>
-				<default>false</default>
-			</parameter>
-			<parameter name="revertState" type="boolean" required="false">
-				<label>Revert State</label>
-				<description>Revert state if no Ack received</description>
-				<default>true</default>
-			</parameter>
-			<parameter name="smartSleep" type="boolean" required="false">
-				<label>SmartSleep</label>
-				<description>Does this node support Smartsleep? 
-								A message to the node is only send in response to a heartbeat!
+			<parameter name="nodeUpdateTimeout" type="integer" required="false">
+				<label>Expected Communication Timeout</label>
+				<description>Minutes after, if no message received, ALL things with same node ID will be set to OFFLINE
 				</description>
+				<default>-1</default>
+			</parameter>
+			<parameter name="childUpdateTimeout" type="integer" required="false">
+				<label>Expected Communication Timeout</label>
+				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
+				<default>-1</default>
+			</parameter>
+			<parameter name="requestHeartbeatResponse" type="integer" required="false">
+				<label>Request Heartbeat Response</label>
+				<description>If no heartbeat received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL thing with
+					same node ID will be set OFFLINE.</description>
 				<default>false</default>
 			</parameter>
 		</config-description>
 	</thing-type>
-	
+
 	<thing-type id="waterQuality">
 		<supported-bridge-type-refs>
 			<bridge-type-ref id="bridge-ser" />
@@ -955,7 +1344,7 @@
 			<channel id="orp" typeId="orp-channel" />
 			<channel id="ec" typeId="ec-channel" />
 			<channel id="battery" typeId="battery-channel" />
-			<channel id="lastupdate" typeId="lastupdate-channel"/>
+			<channel id="lastupdate" typeId="lastupdate-channel" />
 		</channels>
 
 		<config-description>
@@ -971,21 +1360,21 @@
 				<description>The ID of the child of a node in the MySensors network
 				</description>
 			</parameter>
-			<parameter name="requestAck" type="boolean" required="false">
-				<label>Request ACK</label>
-				<description>Request ACK from Actuator</description>
-				<default>false</default>
-			</parameter>
-			<parameter name="revertState" type="boolean" required="false">
-				<label>Revert State</label>
-				<description>Revert state if no Ack received</description>
-				<default>true</default>
-			</parameter>
-			<parameter name="smartSleep" type="boolean" required="false">
-				<label>SmartSleep</label>
-				<description>Does this node support Smartsleep? 
-								A message to the node is only send in response to a heartbeat!
+			<parameter name="nodeUpdateTimeout" type="integer" required="false">
+				<label>Expected Communication Timeout</label>
+				<description>Minutes after, if no message received, ALL things with same node ID will be set to OFFLINE
 				</description>
+				<default>-1</default>
+			</parameter>
+			<parameter name="childUpdateTimeout" type="integer" required="false">
+				<label>Expected Communication Timeout</label>
+				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
+				<default>-1</default>
+			</parameter>
+			<parameter name="requestHeartbeatResponse" type="integer" required="false">
+				<label>Request Heartbeat Response</label>
+				<description>If no heartbeat received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL thing with
+					same node ID will be set OFFLINE.</description>
 				<default>false</default>
 			</parameter>
 		</config-description>
@@ -1001,7 +1390,7 @@
 
 		<channels>
 			<channel id="mySensorsMessage" typeId="mySensorsMessage-channel" />
-			<channel id="lastupdate" typeId="lastupdate-channel"/>
+			<channel id="lastupdate" typeId="lastupdate-channel" />
 		</channels>
 
 		<config-description>
@@ -1018,6 +1407,23 @@
 				<description>The ID of the child of a node in the MySensors network
 				</description>
 				<default>999</default>
+			</parameter>
+			<parameter name="nodeUpdateTimeout" type="integer" required="false">
+				<label>Expected Communication Timeout</label>
+				<description>Minutes after, if no message received, ALL things with same node ID will be set to OFFLINE
+				</description>
+				<default>-1</default>
+			</parameter>
+			<parameter name="childUpdateTimeout" type="integer" required="false">
+				<label>Expected Communication Timeout</label>
+				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
+				<default>-1</default>
+			</parameter>
+			<parameter name="requestHeartbeatResponse" type="integer" required="false">
+				<label>Request Heartbeat Response</label>
+				<description>If no heartbeat received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL thing with
+					same node ID will be set OFFLINE.</description>
+				<default>false</default>
 			</parameter>
 		</config-description>
 	</thing-type>
@@ -1033,7 +1439,7 @@
 
 		<channels>
 			<channel id="text" typeId="text-channel" />
-			<channel id="lastupdate" typeId="lastupdate-channel"/>
+			<channel id="lastupdate" typeId="lastupdate-channel" />
 		</channels>
 
 		<config-description>
@@ -1051,42 +1457,27 @@
 				</description>
 				<default>999</default>
 			</parameter>
-		</config-description>
-	</thing-type>
-
-	<thing-type id="irSend">
-		<supported-bridge-type-refs>
-			<bridge-type-ref id="bridge-ser" />
-			<bridge-type-ref id="bridge-eth" />
-		</supported-bridge-type-refs>
-
-		<label>IR Send</label>
-		<description>Send IR codes</description>
-
-		<channels>
-			<channel id="irSend" typeId="irSend-channel" />
-			<channel id="lastupdate" typeId="lastupdate-channel"/>
-		</channels>
-
-		<config-description>
-			<parameter name="nodeId" type="text" required="true">
-				<context>NodeId</context>
-				<label>NodeId</label>
-				<description>The ID of the node in the MySensors network
+			<parameter name="nodeUpdateTimeout" type="integer" required="false">
+				<label>Expected Communication Timeout</label>
+				<description>Minutes after, if no message received, ALL things with same node ID will be set to OFFLINE
 				</description>
-				<default>999</default>
+				<default>-1</default>
 			</parameter>
-			<parameter name="childId" type="text" required="true">
-				<context>ChildId</context>
-				<label>ChildId</label>
-				<description>The ID of the child of a node in the MySensors network
-				</description>
-				<default>999</default>
+			<parameter name="childUpdateTimeout" type="integer" required="false">
+				<label>Expected Communication Timeout</label>
+				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
+				<default>-1</default>
+			</parameter>
+			<parameter name="requestHeartbeatResponse" type="integer" required="false">
+				<label>Request Heartbeat Response</label>
+				<description>If no heartbeat received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL thing with
+					same node ID will be set OFFLINE.</description>
+				<default>false</default>
 			</parameter>
 		</config-description>
 	</thing-type>
 
-	<thing-type id="irReceive">
+	<thing-type id="ir">
 		<supported-bridge-type-refs>
 			<bridge-type-ref id="bridge-ser" />
 			<bridge-type-ref id="bridge-eth" />
@@ -1096,8 +1487,9 @@
 		<description>Receive IR codes</description>
 
 		<channels>
+			<channel id="irSend" typeId="irSend-channel" />
 			<channel id="irReceive" typeId="irReceive-channel" />
-			<channel id="lastupdate" typeId="lastupdate-channel"/>
+			<channel id="lastupdate" typeId="lastupdate-channel" />
 		</channels>
 
 		<config-description>
@@ -1114,6 +1506,23 @@
 				<description>The ID of the child of a node in the MySensors network
 				</description>
 				<default>999</default>
+			</parameter>
+			<parameter name="nodeUpdateTimeout" type="integer" required="false">
+				<label>Expected Communication Timeout</label>
+				<description>Minutes after, if no message received, ALL things with same node ID will be set to OFFLINE
+				</description>
+				<default>-1</default>
+			</parameter>
+			<parameter name="childUpdateTimeout" type="integer" required="false">
+				<label>Expected Communication Timeout</label>
+				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
+				<default>-1</default>
+			</parameter>
+			<parameter name="requestHeartbeatResponse" type="integer" required="false">
+				<label>Request Heartbeat Response</label>
+				<description>If no heartbeat received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL thing with
+					same node ID will be set OFFLINE.</description>
+				<default>false</default>
 			</parameter>
 		</config-description>
 	</thing-type>
@@ -1130,7 +1539,7 @@
 		<channels>
 			<channel id="level" typeId="level-channel" />
 			<channel id="battery" typeId="battery-channel" />
-			<channel id="lastupdate" typeId="lastupdate-channel"/>
+			<channel id="lastupdate" typeId="lastupdate-channel" />
 		</channels>
 
 		<config-description>
@@ -1140,13 +1549,30 @@
 				</description>
 			</parameter>
 			<parameter name="childId" type="text" required="true">
-			<label>ChildId</label>
+				<label>ChildId</label>
 				<description>The ID of the child of a node in the MySensors network
 				</description>
 			</parameter>
+			<parameter name="nodeUpdateTimeout" type="integer" required="false">
+				<label>Expected Communication Timeout</label>
+				<description>Minutes after, if no message received, ALL things with same node ID will be set to OFFLINE
+				</description>
+				<default>-1</default>
+			</parameter>
+			<parameter name="childUpdateTimeout" type="integer" required="false">
+				<label>Expected Communication Timeout</label>
+				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
+				<default>-1</default>
+			</parameter>
+			<parameter name="requestHeartbeatResponse" type="integer" required="false">
+				<label>Request Heartbeat Response</label>
+				<description>If no heartbeat received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL thing with
+					same node ID will be set OFFLINE.</description>
+				<default>false</default>
+			</parameter>
 		</config-description>
 	</thing-type>
-	
+
 	<thing-type id="dust">
 		<supported-bridge-type-refs>
 			<bridge-type-ref id="bridge-ser" />
@@ -1159,7 +1585,7 @@
 		<channels>
 			<channel id="level" typeId="level-channel" />
 			<channel id="battery" typeId="battery-channel" />
-			<channel id="lastupdate" typeId="lastupdate-channel"/>
+			<channel id="lastupdate" typeId="lastupdate-channel" />
 		</channels>
 
 		<config-description>
@@ -1169,13 +1595,30 @@
 				</description>
 			</parameter>
 			<parameter name="childId" type="text" required="true">
-			<label>ChildId</label>
+				<label>ChildId</label>
 				<description>The ID of the child of a node in the MySensors network
 				</description>
 			</parameter>
+			<parameter name="nodeUpdateTimeout" type="integer" required="false">
+				<label>Expected Communication Timeout</label>
+				<description>Minutes after, if no message received, ALL things with same node ID will be set to OFFLINE
+				</description>
+				<default>-1</default>
+			</parameter>
+			<parameter name="childUpdateTimeout" type="integer" required="false">
+				<label>Expected Communication Timeout</label>
+				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
+				<default>-1</default>
+			</parameter>
+			<parameter name="requestHeartbeatResponse" type="integer" required="false">
+				<label>Request Heartbeat Response</label>
+				<description>If no heartbeat received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL thing with
+					same node ID will be set OFFLINE.</description>
+				<default>false</default>
+			</parameter>
 		</config-description>
 	</thing-type>
-	
+
 	<thing-type id="colorSensor">
 		<supported-bridge-type-refs>
 			<bridge-type-ref id="bridge-ser" />
@@ -1188,7 +1631,7 @@
 		<channels>
 			<channel id="rgb" typeId="rgb-channel" />
 			<channel id="battery" typeId="battery-channel" />
-			<channel id="lastupdate" typeId="lastupdate-channel"/>
+			<channel id="lastupdate" typeId="lastupdate-channel" />
 		</channels>
 
 		<config-description>
@@ -1198,9 +1641,26 @@
 				</description>
 			</parameter>
 			<parameter name="childId" type="text" required="true">
-			<label>ChildId</label>
+				<label>ChildId</label>
 				<description>The ID of the child of a node in the MySensors network
 				</description>
+			</parameter>
+			<parameter name="nodeUpdateTimeout" type="integer" required="false">
+				<label>Expected Communication Timeout</label>
+				<description>Minutes after, if no message received, ALL things with same node ID will be set to OFFLINE
+				</description>
+				<default>-1</default>
+			</parameter>
+			<parameter name="childUpdateTimeout" type="integer" required="false">
+				<label>Expected Communication Timeout</label>
+				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
+				<default>-1</default>
+			</parameter>
+			<parameter name="requestHeartbeatResponse" type="integer" required="false">
+				<label>Request Heartbeat Response</label>
+				<description>If no heartbeat received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL thing with
+					same node ID will be set OFFLINE.</description>
+				<default>false</default>
 			</parameter>
 		</config-description>
 	</thing-type>

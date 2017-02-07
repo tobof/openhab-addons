@@ -1,5 +1,6 @@
 /**
- * Copyright (c) 2014-2016 openHAB UG (haftungsbeschraenkt) and others.
+ * Copyright (c) 2014-2016 by the respective copyright holders.
+ *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,57 +16,51 @@ import java.util.Map;
 import org.eclipse.smarthome.config.discovery.AbstractDiscoveryService;
 import org.eclipse.smarthome.config.discovery.DiscoveryResult;
 import org.eclipse.smarthome.config.discovery.DiscoveryResultBuilder;
+import org.eclipse.smarthome.core.thing.ThingTypeUID;
 import org.eclipse.smarthome.core.thing.ThingUID;
-import org.openhab.binding.mysensors.internal.handler.MySensorsBridgeHandler;
-import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
+import org.openhab.binding.mysensors.handler.MySensorsBridgeHandler;
+import org.openhab.binding.mysensors.internal.event.MySensorsGatewayEventListener;
+import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
+import org.openhab.binding.mysensors.internal.sensors.MySensorsNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Discoveryservice for MySensors devices. Starts DiscoveryThread to listen for new things / nodes.
+ * Discovery service for MySensors devices. Starts DiscoveryThread to listen for new things / nodes.
  *
  * @author Tim Oberföll
  *
  */
-public class MySensorsDiscoveryService extends AbstractDiscoveryService {
+public class MySensorsDiscoveryService extends AbstractDiscoveryService implements MySensorsGatewayEventListener {
 
     private Logger logger = LoggerFactory.getLogger(MySensorsDiscoveryService.class);
 
     private MySensorsBridgeHandler bridgeHandler = null;
 
-    private DiscoveryThread discoThread = null;
-
     public MySensorsDiscoveryService(MySensorsBridgeHandler bridgeHandler) {
-        super(SUPPORTED_THING_TYPES_UIDS, 3000, false);
+        super(SUPPORTED_THING_TYPES_UIDS, 0, true);
         this.bridgeHandler = bridgeHandler;
     }
 
     @Override
     protected void startScan() {
-        if (discoThread == null) {
-            discoThread = new DiscoveryThread(bridgeHandler.getBridgeConnection(), this);
-        }
-        discoThread.start();
+        logger.debug("Starting MySensors discovery scan");
+        bridgeHandler.getMySensorsGateway().addEventListener(this);
     }
 
     public void activate() {
-
+        startScan();
     }
 
     @Override
     public void deactivate() {
-        if (discoThread == null) {
-            discoThread = new DiscoveryThread(bridgeHandler.getBridgeConnection(), this);
-        }
-        discoThread.stop();
+        stopScan();
     }
 
     @Override
     protected void stopScan() {
-        if (discoThread == null) {
-            discoThread = new DiscoveryThread(bridgeHandler.getBridgeConnection(), this);
-        }
-        discoThread.stop();
+        logger.debug("Stopping MySensors discovery scan");
+        bridgeHandler.getMySensorsGateway().removeEventListener(this);
     }
 
     /**
@@ -74,148 +69,35 @@ public class MySensorsDiscoveryService extends AbstractDiscoveryService {
      *
      * @param msg MySensors message received from the bridge / gateway.
      */
-    public void newDevicePresented(MySensorsMessage msg) {
+    public void newDevicePresented(MySensorsNode node, MySensorsChild child) {
 
-        // Representation Message?
-        if (msg.getMsgType() == MYSENSORS_MSG_TYPE_PRESENTATION) {
-            logger.debug("Representation Message received");
-            logger.debug("Preparing new thing for inbox");
+        // uid must not contains dots
+        ThingTypeUID thingUid = THING_UID_MAP.get(child.getPresentationCode());
 
-            ThingUID uid = null;
+        if (thingUid != null) {
+            logger.debug("Preparing new thing for inbox: {}", thingUid);
 
-            // uid must not contains dots
-            switch (msg.getSubType()) {
-                case MYSENSORS_SUBTYPE_S_HUM:
-                    uid = new ThingUID(THING_TYPE_HUMIDITY, bridgeHandler.getThing().getUID(),
-                            "Humidity_" + msg.getNodeId() + "_" + msg.getChildId());
-                    break;
-                case MYSENSORS_SUBTYPE_S_TEMP:
-                    uid = new ThingUID(THING_TYPE_TEMPERATURE, bridgeHandler.getThing().getUID(),
-                            "Temperature_" + msg.getNodeId() + "_" + msg.getChildId());
-                    break;
-                case MYSENSORS_SUBTYPE_S_MULTIMETER:
-                    uid = new ThingUID(THING_TYPE_MULTIMETER, bridgeHandler.getThing().getUID(),
-                            "Multimeter_" + msg.getNodeId() + "_" + msg.getChildId());
-                    break;
-                case MYSENSORS_SUBTYPE_S_LIGHT:
-                    uid = new ThingUID(THING_TYPE_LIGHT, bridgeHandler.getThing().getUID(),
-                            "Light_" + msg.getNodeId() + "_" + msg.getChildId());
-                    break;
-                case MYSENSORS_SUBTYPE_S_POWER:
-                    uid = new ThingUID(THING_TYPE_POWER, bridgeHandler.getThing().getUID(),
-                            "Power_" + msg.getNodeId() + "_" + msg.getChildId());
-                    break;
-                case MYSENSORS_SUBTYPE_S_BARO:
-                    uid = new ThingUID(THING_TYPE_BARO, bridgeHandler.getThing().getUID(),
-                            "Baro_" + msg.getNodeId() + "_" + msg.getChildId());
-                    break;
-                case MYSENSORS_SUBTYPE_S_DOOR:
-                    uid = new ThingUID(THING_TYPE_DOOR, bridgeHandler.getThing().getUID(),
-                            "Door_" + msg.getNodeId() + "_" + msg.getChildId());
-                    break;
-                case MYSENSORS_SUBTYPE_S_MOTION:
-                    uid = new ThingUID(THING_TYPE_MOTION, bridgeHandler.getThing().getUID(),
-                            "Motion_" + msg.getNodeId() + "_" + msg.getChildId());
-                    break;
-                case MYSENSORS_SUBTYPE_S_SMOKE:
-                    uid = new ThingUID(THING_TYPE_SMOKE, bridgeHandler.getThing().getUID(),
-                            "Smoke_" + msg.getNodeId() + "_" + msg.getChildId());
-                    break;
-                case MYSENSORS_SUBTYPE_S_DIMMER:
-                    uid = new ThingUID(THING_TYPE_DIMMER, bridgeHandler.getThing().getUID(),
-                            "Dimmer_" + msg.getNodeId() + "_" + msg.getChildId());
-                    break;
-                case MYSENSORS_SUBTYPE_S_COVER:
-                    uid = new ThingUID(THING_TYPE_COVER, bridgeHandler.getThing().getUID(),
-                            "Cover_" + msg.getNodeId() + "_" + msg.getChildId());
-                    break;
-                case MYSENSORS_SUBTYPE_S_WIND:
-                    uid = new ThingUID(THING_TYPE_WIND, bridgeHandler.getThing().getUID(),
-                            "Wind_" + msg.getNodeId() + "_" + msg.getChildId());
-                    break;
-                case MYSENSORS_SUBTYPE_S_RAIN:
-                    uid = new ThingUID(THING_TYPE_RAIN, bridgeHandler.getThing().getUID(),
-                            "Rain_" + msg.getNodeId() + "_" + msg.getChildId());
-                    break;
-                case MYSENSORS_SUBTYPE_S_UV:
-                    uid = new ThingUID(THING_TYPE_UV, bridgeHandler.getThing().getUID(),
-                            "UV_" + msg.getNodeId() + "_" + msg.getChildId());
-                    break;
-                case MYSENSORS_SUBTYPE_S_WEIGHT:
-                    uid = new ThingUID(THING_TYPE_WEIGHT, bridgeHandler.getThing().getUID(),
-                            "Weight_" + msg.getNodeId() + "_" + msg.getChildId());
-                    break;
-                case MYSENSORS_SUBTYPE_S_DISTANCE:
-                    uid = new ThingUID(THING_TYPE_DISTANCE, bridgeHandler.getThing().getUID(),
-                            "Distance_" + msg.getNodeId() + "_" + msg.getChildId());
-                    break;
-                case MYSENSORS_SUBTYPE_S_LIGHT_LEVEL:
-                    uid = new ThingUID(THING_TYPE_LIGHT_LEVEL, bridgeHandler.getThing().getUID(),
-                            "Light_level_" + msg.getNodeId() + "_" + msg.getChildId());
-                    break;
+            ThingUID uid = new ThingUID(thingUid, bridgeHandler.getThing().getUID(),
+                    thingUid.getId().toLowerCase() + "_" + node.getNodeId() + "_" + child.getChildId());
 
-                case MYSENSORS_SUBTYPE_S_HVAC:
-                    uid = new ThingUID(THING_TYPE_HVAC, bridgeHandler.getThing().getUID(),
-                            "HvacThermostat_" + msg.getNodeId() + "_" + msg.getChildId());
-                    break;
+            Map<String, Object> properties = new HashMap<>(2);
+            properties.put(PARAMETER_NODEID, "" + node.getNodeId());
+            properties.put(PARAMETER_CHILDID, "" + child.getChildId());
+            DiscoveryResult result = DiscoveryResultBuilder.create(uid).withProperties(properties)
+                    .withLabel("MySensors Device (" + node.getNodeId() + ";" + child.getChildId() + ")")
+                    .withBridge(bridgeHandler.getThing().getUID()).build();
+            thingDiscovered(result);
 
-                case MYSENSORS_SUBTYPE_S_WATER:
-                    uid = new ThingUID(THING_TYPE_WATER, bridgeHandler.getThing().getUID(),
-                            "WaterMeter_" + msg.getNodeId() + "_" + msg.getChildId());
-                    break;
-                case MYSENSORS_SUBTYPE_S_CUSTOM:
-                    uid = new ThingUID(THING_TYPE_CUSTOM, bridgeHandler.getThing().getUID(),
-                            "CustomSensor_" + msg.getNodeId() + "_" + msg.getChildId());
-                    break;
-                case MYSENSORS_SUBTYPE_S_LOCK:
-                    uid = new ThingUID(THING_TYPE_LOCK, bridgeHandler.getThing().getUID(),
-                            "Lock_" + msg.getNodeId() + "_" + msg.getChildId());
-                    break;
-                case MYSENSORS_SUBTYPE_S_SOUND:
-                    uid = new ThingUID(THING_TYPE_SOUND, bridgeHandler.getThing().getUID(),
-                            "Sound_level_" + msg.getNodeId() + "_" + msg.getChildId());
-                    break;
-                case MYSENSORS_SUBTYPE_S_RGB_LIGHT:
-                    uid = new ThingUID(THING_TYPE_RGB_LIGHT, bridgeHandler.getThing().getUID(),
-                            "RGB_light" + msg.getNodeId() + "_" + msg.getChildId());
-                    break;
-                case MYSENSORS_SUBTYPE_S_RGBW_LIGHT:
-                    uid = new ThingUID(THING_TYPE_RGBW_LIGHT, bridgeHandler.getThing().getUID(),
-                            "RGBW_light" + msg.getNodeId() + "_" + msg.getChildId());
-                    break;
-                case MYSENSORS_SUBTYPE_S_WATER_QUALITY:
-                    uid = new ThingUID(THING_TYPE_WATER_QUALITY, bridgeHandler.getThing().getUID(),
-                            "Water_quality" + msg.getNodeId() + "_" + msg.getChildId());
-                    break;
-                case MYSENSORS_SUBTYPE_S_INFO:
-                    uid = new ThingUID(THING_TYPE_TEXT, bridgeHandler.getThing().getUID(),
-                            "Text" + msg.getNodeId() + "_" + msg.getChildId());
-                    break;
-                case MYSENSORS_SUBTYPE_S_AIR_QUALITY:
-                    uid = new ThingUID(THING_TYPE_AIR_QUALITY, bridgeHandler.getThing().getUID(),
-                            "Level_" + msg.getNodeId() + "_" + msg.getChildId());
-                    break;
-                case MYSENSORS_SUBTYPE_S_DUST:
-                    uid = new ThingUID(THING_TYPE_DUST, bridgeHandler.getThing().getUID(),
-                            "Dust_" + msg.getNodeId() + "_" + msg.getChildId());
-                    break;
-                case MYSENSORS_SUBTYPE_S_COLOR_SENSOR:
-                    uid = new ThingUID(THING_TYPE_COLOR_SENSOR, bridgeHandler.getThing().getUID(),
-                            "Color_Sensor_" + msg.getNodeId() + "_" + msg.getChildId());
-                    break;
-            }
-            if (uid != null) {
-                Map<String, Object> properties = new HashMap<>(2);
-                properties.put(PARAMETER_NODEID, "" + msg.getNodeId());
-                properties.put(PARAMETER_CHILDID, "" + msg.getChildId());
-                DiscoveryResult result = DiscoveryResultBuilder.create(uid).withProperties(properties)
-                        .withLabel("MySensors Device (" + msg.getNodeId() + ";" + msg.getChildId() + ")")
-                        .withBridge(bridgeHandler.getThing().getUID()).build();
-                thingDiscovered(result);
-
-                logger.debug("Discovered device submitted");
-            }
+            logger.debug("Discovered device submitted");
+        } else {
+            logger.warn("Cannot automatic discover thing node: {}, child: {} please insert it manually",
+                    node.getNodeId(), child.getChildId());
         }
+    }
+
+    @Override
+    public void newNodeDiscovered(MySensorsNode node, MySensorsChild child) throws Throwable {
+        newDevicePresented(node, child);
     }
 
 }

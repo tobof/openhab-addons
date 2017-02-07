@@ -1,9 +1,19 @@
+/**
+ * Copyright (c) 2014-2016 by the respective copyright holders.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ */
 package org.openhab.binding.mysensors.test;
 
 import java.util.ArrayList;
 
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
-import org.openhab.binding.mysensors.internal.factory.MySensorsCacheFactory;
+import org.openhab.binding.mysensors.factory.MySensorsCacheFactory;
 
 import com.google.gson.reflect.TypeToken;
 
@@ -14,6 +24,13 @@ import com.google.gson.reflect.TypeToken;
  *
  */
 public class CacheTest {
+
+    private MySensorsCacheFactory c = null;
+
+    @BeforeClass
+    public void init() {
+        c = MySensorsCacheFactory.getCacheFactory();
+    }
 
     @Test
     public void writeGivenIdsCache() {
@@ -28,10 +45,15 @@ public class CacheTest {
 
     @Test
     public void readGivenIdsCache() {
-        MySensorsCacheFactory c = MySensorsCacheFactory.getCacheFactory();
+        c = MySensorsCacheFactory.getCacheFactory();
         System.out.println(c.readCache(MySensorsCacheFactory.GIVEN_IDS_CACHE_FILE, new ArrayList<Integer>(),
                 new TypeToken<ArrayList<Integer>>() {
                 }.getType()));
+    }
+
+    @AfterClass
+    public void deleteCache() {
+        c.deleteCache(MySensorsCacheFactory.GIVEN_IDS_CACHE_FILE);
     }
 
 }

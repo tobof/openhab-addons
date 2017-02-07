@@ -1,5 +1,6 @@
 /**
- * Copyright (c) 2014-2016 openHAB UG (haftungsbeschraenkt) and others.
+ * Copyright (c) 2014-2016 by the respective copyright holders.
+ *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,13 +8,22 @@
  */
 package org.openhab.binding.mysensors;
 
+import static org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage.*;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.smarthome.core.thing.ThingTypeUID;
-import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
+import org.openhab.binding.mysensors.converter.MySensorsDecimalTypeConverter;
+import org.openhab.binding.mysensors.converter.MySensorsOnOffTypeConverter;
+import org.openhab.binding.mysensors.converter.MySensorsOpenCloseTypeConverter;
+import org.openhab.binding.mysensors.converter.MySensorsPercentTypeConverter;
+import org.openhab.binding.mysensors.converter.MySensorsStringTypeConverter;
+import org.openhab.binding.mysensors.converter.MySensorsTypeConverter;
+import org.openhab.binding.mysensors.converter.MySensorsUpDownTypeConverter;
+import org.openhab.binding.mysensors.internal.MySensorsUtility;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
@@ -37,153 +47,6 @@ public class MySensorsBindingConstants {
     public static final String PARAMETER_BAUDRATE = "baudRate";
     public static final String PARAMETER_REQUESTACK = "requestack";
 
-    // Message types of the MySensors network
-    public static final int MYSENSORS_MSG_TYPE_PRESENTATION = 0;
-    public static final int MYSENSORS_MSG_TYPE_SET = 1;
-    public static final int MYSENSORS_MSG_TYPE_REQ = 2;
-    public static final int MYSENSORS_MSG_TYPE_INTERNAL = 3;
-    public static final int MYSENSORS_MSG_TYPE_STREAM = 4;
-
-    // NO ACK
-    public static final int MYSENSORS_ACK_TRUE = 1;
-    public static final int MYSENSORS_ACK_FALSE = 0;
-
-    // Subtypes for presentation
-    public static final int MYSENSORS_SUBTYPE_S_DOOR 				= 0;
-    public static final int MYSENSORS_SUBTYPE_S_MOTION 				= 1;
-    public static final int MYSENSORS_SUBTYPE_S_SMOKE 				= 2;
-    public static final int MYSENSORS_SUBTYPE_S_LIGHT 				= 3;
-    public static final int MYSENSORS_SUBTYPE_S_DIMMER 				= 4;
-    public static final int MYSENSORS_SUBTYPE_S_COVER 				= 5;
-    public static final int MYSENSORS_SUBTYPE_S_TEMP 				= 6;
-    public static final int MYSENSORS_SUBTYPE_S_HUM 				= 7;
-    public static final int MYSENSORS_SUBTYPE_S_BARO 				= 8;
-    public static final int MYSENSORS_SUBTYPE_S_WIND 				= 9;
-    public static final int MYSENSORS_SUBTYPE_S_RAIN 				= 10;
-    public static final int MYSENSORS_SUBTYPE_S_UV 					= 11;
-    public static final int MYSENSORS_SUBTYPE_S_WEIGHT 				= 12;
-    public static final int MYSENSORS_SUBTYPE_S_POWER 				= 13;
-    public static final int MYSENSORS_SUBTYPE_S_HEATER 				= 14;
-    public static final int MYSENSORS_SUBTYPE_S_DISTANCE 			= 15;
-    public static final int MYSENSORS_SUBTYPE_S_LIGHT_LEVEL 		= 16;
-    public static final int MYSENSORS_SUBTYPE_S_LOCK 				= 19;
-    public static final int MYSENSORS_SUBTYPE_S_IR 					= 20;
-    public static final int MYSENSORS_SUBTYPE_S_WATER 				= 21;
-    public static final int MYSENSORS_SUBTYPE_S_AIR_QUALITY 		= 22;
-    public static final int MYSENSORS_SUBTYPE_S_CUSTOM 				= 23;
-    public static final int MYSENSORS_SUBTYPE_S_DUST 				= 24;
-    public static final int MYSENSORS_SUBTYPE_S_SCENE_CONTROLLER 	= 25;
-    public static final int MYSENSORS_SUBTYPE_S_RGB_LIGHT 			= 26;
-    public static final int MYSENSORS_SUBTYPE_S_RGBW_LIGHT 			= 27;
-    public static final int MYSENSORS_SUBTYPE_S_COLOR_SENSOR		= 28;
-    public static final int MYSENSORS_SUBTYPE_S_HVAC 				= 29;
-    public static final int MYSENSORS_SUBTYPE_S_MULTIMETER 			= 30;
-    public static final int MYSENSORS_SUBTYPE_S_SPRINKLER 			= 31;
-    public static final int MYSENSORS_SUBTYPE_S_WATER_LEAK 			= 32;
-    public static final int MYSENSORS_SUBTYPE_S_SOUND 				= 33;
-    public static final int MYSENSORS_SUBTYPE_S_VIBRATION 			= 34;
-    public static final int MYSENSORS_SUBTYPE_S_MOISTURE 			= 35;
-    public static final int MYSENSORS_SUBTYPE_S_INFO 				= 36;
-    public static final int MYSENSORS_SUBTYPE_S_GAS 				= 37;
-    public static final int MYSENSORS_SUBTYPE_S_GPS 				= 38;
-    public static final int MYSENSORS_SUBTYPE_S_WATER_QUALITY 		= 39;
-
-    // Subtypes for set, req
-    public static final int MYSENSORS_SUBTYPE_V_TEMP 				= 0;
-    public static final int MYSENSORS_SUBTYPE_V_HUM 				= 1;
-    public static final int MYSENSORS_SUBTYPE_V_STATUS 				= 2;
-    public static final int MYSENSORS_SUBTYPE_V_PERCENTAGE 			= 3;
-    public static final int MYSENSORS_SUBTYPE_V_PRESSURE 			= 4;
-    public static final int MYSENSORS_SUBTYPE_V_FORECAST 			= 5;
-    public static final int MYSENSORS_SUBTYPE_V_RAIN 				= 6;
-    public static final int MYSENSORS_SUBTYPE_V_RAINRATE 			= 7;
-    public static final int MYSENSORS_SUBTYPE_V_WIND 				= 8;
-    public static final int MYSENSORS_SUBTYPE_V_GUST 				= 9;
-    public static final int MYSENSORS_SUBTYPE_V_DIRECTION 			= 10;
-    public static final int MYSENSORS_SUBTYPE_V_UV 					= 11;
-    public static final int MYSENSORS_SUBTYPE_V_WEIGHT 				= 12;
-    public static final int MYSENSORS_SUBTYPE_V_DISTANCE 			= 13;
-    public static final int MYSENSORS_SUBTYPE_V_IMPEDANCE 			= 14;
-    public static final int MYSENSORS_SUBTYPE_V_ARMED 				= 15;
-    public static final int MYSENSORS_SUBTYPE_V_TRIPPED 			= 16;
-    public static final int MYSENSORS_SUBTYPE_V_WATT 				= 17;
-    public static final int MYSENSORS_SUBTYPE_V_KWH 				= 18;
-    public static final int MYSENSORS_SUBTYPE_V_SCENE_ON 			= 19;
-    public static final int MYSENSORS_SUBTYPE_V_SCENE_OFF 			= 20;
-    public static final int MYSENSORS_SUBTYPE_V_HVAC_FLOW_STATE 	= 21;
-    public static final int MYSENSORS_SUBTYPE_V_HVAC_SPEED 			= 22;
-    public static final int MYSENSORS_SUBTYPE_V_LIGHT_LEVEL 		= 23;
-    public static final int MYSENSORS_SUBTYPE_V_VAR1 				= 24;
-    public static final int MYSENSORS_SUBTYPE_V_VAR2 				= 25;
-    public static final int MYSENSORS_SUBTYPE_V_VAR3 				= 26;
-    public static final int MYSENSORS_SUBTYPE_V_VAR4 				= 27;
-    public static final int MYSENSORS_SUBTYPE_V_VAR5 				= 28;
-    public static final int MYSENSORS_SUBTYPE_V_UP 					= 29;
-    public static final int MYSENSORS_SUBTYPE_V_DOWN 				= 30;
-    public static final int MYSENSORS_SUBTYPE_V_STOP 				= 31;
-    public static final int MYSENSORS_SUBTYPE_V_IR_SEND 			= 32;
-    public static final int MYSENSORS_SUBTYPE_V_IR_RECEIVE 			= 33;
-    public static final int MYSENSORS_SUBTYPE_V_FLOW 				= 34;
-    public static final int MYSENSORS_SUBTYPE_V_VOLUME 				= 35;
-    public static final int MYSENSORS_SUBTYPE_V_LOCK_STATUS 		= 36;
-    public static final int MYSENSORS_SUBTYPE_V_LEVEL 				= 37;
-    public static final int MYSENSORS_SUBTYPE_V_VOLTAGE 			= 38;
-    public static final int MYSENSORS_SUBTYPE_V_CURRENT 			= 39;
-    public static final int MYSENSORS_SUBTYPE_V_RGB 				= 40;
-    public static final int MYSENSORS_SUBTYPE_V_RGBW 				= 41;
-    public static final int MYSENSORS_SUBTYPE_V_ID 					= 42;
-    public static final int MYSENSORS_SUBTYPE_V_UNIT_PREFIX 		= 43;
-    public static final int MYSENSORS_SUBTYPE_V_HVAC_SETPOINT_COOL 	= 44;
-    public static final int MYSENSORS_SUBTYPE_V_HVAC_SETPOINT_HEAT 	= 45;
-    public static final int MYSENSORS_SUBTYPE_V_HVAC_FLOW_MODE 		= 46;
-    public static final int MYSENSORS_SUBTYPE_V_TEXT 				= 47;
-    public static final int MYSENSORS_SUBTYPE_V_CUSTOM 				= 48;
-    public static final int MYSENSORS_SUBTYPE_V_POSITION 			= 49;
-    public static final int MYSENSORS_SUBTYPE_V_IR_RECORD 			= 50;
-    public static final int MYSENSORS_SUBTYPE_V_PH 					= 51;
-    public static final int MYSENSORS_SUBTYPE_V_ORP 				= 52;
-    public static final int MYSENSORS_SUBTYPE_V_EC 					= 53;
-    public static final int MYSENSORS_SUBTYPE_V_VAR 				= 54;
-    public static final int MYSENSORS_SUBTYPE_V_VA 					= 55;
-    public static final int MYSENSORS_SUBTYPE_V_POWER_FACTOR 		= 56;
-
-    public static final int MYSENSORS_SUBTYPE_I_BATTERY_LEVEL 			= 0;
-    public static final int MYSENSORS_SUBTYPE_I_TIME 					= 1;
-    public static final int MYSENSORS_SUBTYPE_I_VERSION 				= 2;
-    public static final int MYSENSORS_SUBTYPE_I_ID_REQUEST 				= 3;
-    public static final int MYSENSORS_SUBTYPE_I_ID_RESPONSE 			= 4;
-    public static final int MYSENSORS_SUBTYPE_I_INCLUSION_MODE 			= 5;
-    public static final int MYSENSORS_SUBTYPE_I_CONFIG 					= 6;
-    public static final int MYSENSORS_SUBTYPE_I_FIND_PARENT 			= 7;
-    public static final int MYSENSORS_SUBTYPE_I_FIND_PARENT_RESPONSE 	= 8;
-    public static final int MYSENSORS_SUBTYPE_I_LOG_MESSAGE 			= 9;
-    public static final int MYSENSORS_SUBTYPE_I_CHILDREN 				= 10;
-    public static final int MYSENSORS_SUBTYPE_I_SKETCH_NAME 			= 11;
-    public static final int MYSENSORS_SUBTYPE_I_SKETCH_VERSION 			= 12;
-    public static final int MYSENSORS_SUBTYPE_I_REBOOT 					= 13;
-    public static final int MYSENSORS_SUBTYPE_I_GATEWAY_READY 			= 14;
-    public static final int MYSENSORS_SUBTYPE_I_REQUEST_SIGNING 		= 15;
-    public static final int MYSENSORS_SUBTYPE_I_GET_NONCE 				= 16;
-    public static final int MYSENSORS_SUBTYPE_I_GET_NONCE_RESONSE 		= 17;
-    public static final int MYSENSORS_SUBTYPE_I_HEARTBEAT_REQUEST 		= 18;
-    public static final int MYSENSORS_SUBTYPE_I_PRESENTATION 			= 19;
-    public static final int MYSENSORS_SUBTYPE_I_DISCOVER 				= 20;
-    public static final int MYSENSORS_SUBTYPE_I_DISCOVER_RESPONSE 		= 21;
-    public static final int MYSENSORS_SUBTYPE_I_HEARTBEAT_RESPONSE 		= 22;
-    public static final int MYSENSORS_SUBTYPE_I_LOCKED 					= 23;
-    public static final int MYSENSORS_SUBTYPE_I_PING 					= 24;
-    public static final int MYSENSORS_SUBTYPE_I_PONG 					= 25;
-    public static final int MYSENSORS_SUBTYPE_I_REGISTRATION_REQUEST 	= 26;
-    public static final int MYSENSORS_SUBTYPE_I_REGISTRATION_RESPONSE 	= 27;
-    public static final int MYSENSORS_SUBTYPE_I_DEBUG 					= 28;
-
-    // How often and at which times should the binding retry to send a message if requestAck is true?
-    public static final int MYSENSORS_NUMBER_OF_RETRIES = 5;
-    public static final int[] MYSENSORS_RETRY_TIMES = { 0, 100, 500, 1000, 2000 };
-    
-    // How long should a Smartsleep message be left in the queue?
-    public static final int MYSENSORS_SMARTSLEEP_TIMEOUT = 216000; // 6 hours
-
     /**
      * All knowing thing. A node with nodeId 999 and childId 999 receives all messages
      * received from the MySensors bridge/gateway. Useful for debugging and for implementation
@@ -191,12 +54,6 @@ public class MySensorsBindingConstants {
      */
     public static final int MYSENSORS_NODE_ID_ALL_KNOWING = 999;
     public static final int MYSENSORS_CHILD_ID_ALL_KNOWING = 999;
-
-    // Reserved ids
-    public static final int MYSENSORS_NODE_ID_RESERVED_0 = 0;
-    public static final int MYSENSORS_NODE_ID_RESERVED_255 = 255;
-    public static final int MYSENSORS_CHILD_ID_RESERVED_0 = 0;
-    public static final int MYSENSORS_CHILD_ID_RESERVED_255 = 255;
 
     // List of all Thing Type UIDs
     public final static ThingTypeUID THING_TYPE_HUMIDITY = new ThingTypeUID(BINDING_ID, "humidity");
@@ -226,8 +83,7 @@ public class MySensorsBindingConstants {
     public final static ThingTypeUID THING_TYPE_WATER_QUALITY = new ThingTypeUID(BINDING_ID, "waterQuality");
     public final static ThingTypeUID THING_TYPE_MYSENSORS_MESSAGE = new ThingTypeUID(BINDING_ID, "mySensorsMessage");
     public final static ThingTypeUID THING_TYPE_TEXT = new ThingTypeUID(BINDING_ID, "text");
-    public final static ThingTypeUID THING_TYPE_IR_SEND = new ThingTypeUID(BINDING_ID, "irSend");
-    public final static ThingTypeUID THING_TYPE_IR_RECEIVE = new ThingTypeUID(BINDING_ID, "irReceive");
+    public final static ThingTypeUID THING_TYPE_IR = new ThingTypeUID(BINDING_ID, "ir");
     public final static ThingTypeUID THING_TYPE_AIR_QUALITY = new ThingTypeUID(BINDING_ID, "airQuality");
     public final static ThingTypeUID THING_TYPE_DUST = new ThingTypeUID(BINDING_ID, "dust");
     public final static ThingTypeUID THING_TYPE_COLOR_SENSOR = new ThingTypeUID(BINDING_ID, "colorSensor");
@@ -291,20 +147,18 @@ public class MySensorsBindingConstants {
     public final static String CHANNEL_POWER_FACTOR = "power-factor";
     public final static String CHANNEL_IR_SEND = "irSend";
     public final static String CHANNEL_IR_RECEIVE = "irReceive";
+
+    // Extra channel names for non-standard MySensors channels
     public final static String CHANNEL_MYSENSORS_MESSAGE = "mySensorsMessage";
     public final static String CHANNEL_LAST_UPDATE = "lastupdate";
 
-    // Wait time Arduino reset
-    public final static int RESET_TIME = 3000;
-
-    // I version message for startup check
-    public static final MySensorsMessage I_VERSION_MESSAGE = new MySensorsMessage(0, 0, 3, 0, false, 2, "");
-
     /**
-     * Mapping MySensors subtypes to channels.
+     * Mapping MySensors message type/subtypes to channels.
      */
-    public final static Map<Number, String> CHANNEL_MAP = new HashMap<Number, String>() {
-
+    public final static Map<Integer, String> CHANNEL_MAP = new HashMap<Integer, String>() {
+        /**
+         *
+         */
         private static final long serialVersionUID = -7970323220036599380L;
 
         {
@@ -367,40 +221,161 @@ public class MySensorsBindingConstants {
     };
 
     /**
-     * Mapping MySensors internal messages to channels.
+     * Inverse of the CHANNEL_MAP, duplicate allowed (see also Converters here below)
      */
-    public final static Map<Number, String> CHANNEL_MAP_INTERNAL = new HashMap<Number, String>() {
+    public final static Map<String, Integer> INVERSE_CHANNEL_MAP = MySensorsUtility.invertMap(CHANNEL_MAP, true);
 
+    /**
+     * Converters will be used to map values from OH to/from MySensors Variables
+     */
+    public static final MySensorsDecimalTypeConverter DECIMAL_TYPE_CONVERTER = new MySensorsDecimalTypeConverter();
+    public static final MySensorsPercentTypeConverter PERCENT_TYPE_CONVERTER = new MySensorsPercentTypeConverter();
+    public static final MySensorsOnOffTypeConverter ONOFF_TYPE_CONVERTER = new MySensorsOnOffTypeConverter();
+    public static final MySensorsOpenCloseTypeConverter OPENCLOSE_TYPE_CONVERTER = new MySensorsOpenCloseTypeConverter();
+    public static final MySensorsUpDownTypeConverter UPDOWN_TYPE_CONVERTER = new MySensorsUpDownTypeConverter();
+    public static final MySensorsStringTypeConverter STRING_TYPE_CONVERTER = new MySensorsStringTypeConverter();
+
+    /**
+     * Mappings between ChannelUID and class that represents the type of the channel
+     */
+    public final static Map<String, MySensorsTypeConverter> TYPE_MAP = new HashMap<String, MySensorsTypeConverter>() {
+
+        /**
+         *
+         */
         private static final long serialVersionUID = 6273187523631143905L;
-
         {
-            put(MYSENSORS_SUBTYPE_I_VERSION, CHANNEL_VERSION);
-            put(MYSENSORS_SUBTYPE_I_BATTERY_LEVEL, CHANNEL_BATTERY);
+            put(CHANNEL_TEMP, DECIMAL_TYPE_CONVERTER);
+            put(CHANNEL_HUM, DECIMAL_TYPE_CONVERTER);
+            put(CHANNEL_STATUS, ONOFF_TYPE_CONVERTER);
+            put(CHANNEL_VOLT, DECIMAL_TYPE_CONVERTER);
+            put(CHANNEL_WATT, DECIMAL_TYPE_CONVERTER);
+            put(CHANNEL_KWH, DECIMAL_TYPE_CONVERTER);
+            put(CHANNEL_PRESSURE, DECIMAL_TYPE_CONVERTER);
+            put(CHANNEL_BARO, STRING_TYPE_CONVERTER);
+            put(CHANNEL_TRIPPED, OPENCLOSE_TYPE_CONVERTER);
+            put(CHANNEL_ARMED, ONOFF_TYPE_CONVERTER);
+            put(CHANNEL_DIMMER, PERCENT_TYPE_CONVERTER);
+            put(CHANNEL_COVER, UPDOWN_TYPE_CONVERTER);
+            put(CHANNEL_COVER, UPDOWN_TYPE_CONVERTER); // !
+            put(CHANNEL_COVER, UPDOWN_TYPE_CONVERTER); // !
+            put(CHANNEL_WIND, DECIMAL_TYPE_CONVERTER);
+            put(CHANNEL_GUST, DECIMAL_TYPE_CONVERTER);
+            put(CHANNEL_RAIN, DECIMAL_TYPE_CONVERTER);
+            put(CHANNEL_RAINRATE, DECIMAL_TYPE_CONVERTER);
+            put(CHANNEL_UV, DECIMAL_TYPE_CONVERTER);
+            put(CHANNEL_WEIGHT, DECIMAL_TYPE_CONVERTER);
+            put(CHANNEL_IMPEDANCE, DECIMAL_TYPE_CONVERTER);
+            put(CHANNEL_DISTANCE, DECIMAL_TYPE_CONVERTER);
+            put(CHANNEL_LIGHT_LEVEL, DECIMAL_TYPE_CONVERTER);
+            put(CHANNEL_CURRENT, DECIMAL_TYPE_CONVERTER);
+            put(CHANNEL_HVAC_FLOW_STATE, STRING_TYPE_CONVERTER);
+            put(CHANNEL_HVAC_SPEED, STRING_TYPE_CONVERTER);
+            put(CHANNEL_HVAC_SETPOINT_COOL, DECIMAL_TYPE_CONVERTER);
+            put(CHANNEL_HVAC_SETPOINT_HEAT, DECIMAL_TYPE_CONVERTER);
+            put(CHANNEL_HVAC_FLOW_MODE, STRING_TYPE_CONVERTER);
+            put(CHANNEL_VAR1, DECIMAL_TYPE_CONVERTER);
+            put(CHANNEL_VAR2, DECIMAL_TYPE_CONVERTER);
+            put(CHANNEL_VAR3, DECIMAL_TYPE_CONVERTER);
+            put(CHANNEL_VAR4, DECIMAL_TYPE_CONVERTER);
+            put(CHANNEL_VAR5, DECIMAL_TYPE_CONVERTER);
+            put(CHANNEL_FLOW, DECIMAL_TYPE_CONVERTER);
+            put(CHANNEL_VOLUME, DECIMAL_TYPE_CONVERTER);
+            put(CHANNEL_LOCK_STATUS, OPENCLOSE_TYPE_CONVERTER);
+            put(CHANNEL_LEVEL, DECIMAL_TYPE_CONVERTER);
+            put(CHANNEL_RGB, STRING_TYPE_CONVERTER);
+            put(CHANNEL_RGBW, STRING_TYPE_CONVERTER);
+            put(CHANNEL_ID, DECIMAL_TYPE_CONVERTER);
+            put(CHANNEL_UNIT_PREFIX, DECIMAL_TYPE_CONVERTER);
+            put(CHANNEL_TEXT, STRING_TYPE_CONVERTER);
+            put(CHANNEL_CUSTOM, DECIMAL_TYPE_CONVERTER);
+            put(CHANNEL_POSITION, DECIMAL_TYPE_CONVERTER);
+            put(CHANNEL_IR_RECORD, DECIMAL_TYPE_CONVERTER);
+            put(CHANNEL_PH, DECIMAL_TYPE_CONVERTER);
+            put(CHANNEL_ORP, DECIMAL_TYPE_CONVERTER);
+            put(CHANNEL_EC, DECIMAL_TYPE_CONVERTER);
+            put(CHANNEL_VAR, DECIMAL_TYPE_CONVERTER);
+            put(CHANNEL_VA, DECIMAL_TYPE_CONVERTER);
+            put(CHANNEL_POWER_FACTOR, DECIMAL_TYPE_CONVERTER);
+            put(CHANNEL_TEXT, STRING_TYPE_CONVERTER);
+            put(CHANNEL_IR_SEND, STRING_TYPE_CONVERTER);
+            put(CHANNEL_IR_RECEIVE, STRING_TYPE_CONVERTER);
+
+            // Internal
+            put(CHANNEL_VERSION, STRING_TYPE_CONVERTER);
+            put(CHANNEL_BATTERY, DECIMAL_TYPE_CONVERTER);
         }
     };
 
-    /** Supported Things without bridges */
+    /**
+     * Used in DiscoveryService to map subtype of a presentation message to thing type
+     */
+    public final static Map<Integer, ThingTypeUID> THING_UID_MAP = new HashMap<Integer, ThingTypeUID>() {
+
+        /**
+         *
+         */
+        private static final long serialVersionUID = -2042537863671385026L;
+        {
+            put(MYSENSORS_SUBTYPE_S_HUM, THING_TYPE_HUMIDITY);
+            put(MYSENSORS_SUBTYPE_S_TEMP, THING_TYPE_TEMPERATURE);
+            put(MYSENSORS_SUBTYPE_S_MULTIMETER, THING_TYPE_MULTIMETER);
+            put(MYSENSORS_SUBTYPE_S_LIGHT, THING_TYPE_LIGHT);
+            put(MYSENSORS_SUBTYPE_S_POWER, THING_TYPE_POWER);
+            put(MYSENSORS_SUBTYPE_S_BARO, THING_TYPE_BARO);
+            put(MYSENSORS_SUBTYPE_S_DOOR, THING_TYPE_DOOR);
+            put(MYSENSORS_SUBTYPE_S_MOTION, THING_TYPE_MOTION);
+            put(MYSENSORS_SUBTYPE_S_SMOKE, THING_TYPE_SMOKE);
+            put(MYSENSORS_SUBTYPE_S_DIMMER, THING_TYPE_DIMMER);
+            put(MYSENSORS_SUBTYPE_S_COVER, THING_TYPE_COVER);
+            put(MYSENSORS_SUBTYPE_S_WIND, THING_TYPE_WIND);
+            put(MYSENSORS_SUBTYPE_S_RAIN, THING_TYPE_RAIN);
+            put(MYSENSORS_SUBTYPE_S_UV, THING_TYPE_UV);
+            put(MYSENSORS_SUBTYPE_S_WEIGHT, THING_TYPE_WEIGHT);
+            put(MYSENSORS_SUBTYPE_S_DISTANCE, THING_TYPE_DISTANCE);
+            put(MYSENSORS_SUBTYPE_S_LIGHT_LEVEL, THING_TYPE_LIGHT_LEVEL);
+            put(MYSENSORS_SUBTYPE_S_WATER, THING_TYPE_WATER);
+            put(MYSENSORS_SUBTYPE_S_CUSTOM, THING_TYPE_CUSTOM);
+            put(MYSENSORS_SUBTYPE_S_HVAC, THING_TYPE_HVAC);
+            put(MYSENSORS_SUBTYPE_S_LOCK, THING_TYPE_LOCK);
+            put(MYSENSORS_SUBTYPE_S_SOUND, THING_TYPE_SOUND);
+            put(MYSENSORS_SUBTYPE_S_RGB_LIGHT, THING_TYPE_RGB_LIGHT);
+            put(MYSENSORS_SUBTYPE_S_RGBW_LIGHT, THING_TYPE_RGBW_LIGHT);
+            put(MYSENSORS_SUBTYPE_S_WATER_QUALITY, THING_TYPE_WATER_QUALITY);
+            put(MYSENSORS_SUBTYPE_S_INFO, THING_TYPE_TEXT);
+            put(MYSENSORS_SUBTYPE_S_IR, THING_TYPE_IR);
+            put(MYSENSORS_SUBTYPE_S_AIR_QUALITY, THING_TYPE_AIR_QUALITY);
+            put(MYSENSORS_SUBTYPE_S_DUST, THING_TYPE_DUST);
+            put(MYSENSORS_SUBTYPE_S_COLOR_SENSOR, THING_TYPE_COLOR_SENSOR);
+        }
+
+    };
+
+    /**
+     * Inverse of the THING_UID_MAP, helps on building child for every thing type
+     */
+    public final static Map<ThingTypeUID, Integer> INVERSE_THING_UID_MAP = MySensorsUtility.invertMap(THING_UID_MAP,
+            true);
+
+    /** Supported Things without bridge */
     public final static Set<ThingTypeUID> SUPPORTED_THING_TYPES_UIDS = ImmutableSet.of(THING_TYPE_HUMIDITY,
             THING_TYPE_TEMPERATURE, THING_TYPE_LIGHT, THING_TYPE_MULTIMETER, THING_TYPE_POWER, THING_TYPE_BARO,
             THING_TYPE_DOOR, THING_TYPE_MOTION, THING_TYPE_SMOKE, THING_TYPE_DIMMER, THING_TYPE_COVER, THING_TYPE_WIND,
             THING_TYPE_RAIN, THING_TYPE_UV, THING_TYPE_WEIGHT, THING_TYPE_DISTANCE, THING_TYPE_LIGHT_LEVEL,
             THING_TYPE_HVAC, THING_TYPE_WATER, THING_TYPE_CUSTOM, THING_TYPE_LOCK, THING_TYPE_SOUND,
             THING_TYPE_RGB_LIGHT, THING_TYPE_RGBW_LIGHT, THING_TYPE_WATER_QUALITY, THING_TYPE_MYSENSORS_MESSAGE,
-            THING_TYPE_TEXT, THING_TYPE_IR_SEND, THING_TYPE_IR_RECEIVE, THING_TYPE_AIR_QUALITY, THING_TYPE_DUST,
-            THING_TYPE_COLOR_SENSOR);
+            THING_TYPE_TEXT, THING_TYPE_IR, THING_TYPE_AIR_QUALITY, THING_TYPE_DUST, THING_TYPE_COLOR_SENSOR);
     /** Supported bridges */
     public final static Set<ThingTypeUID> SUPPORTED_BRIDGE_THING_TYPES_UIDS = ImmutableSet.of(THING_TYPE_BRIDGE_SER,
             THING_TYPE_BRIDGE_ETH);
 
-    /** Supported devices (things + bridges) */
+    /** Supported devices (things + brdiges) */
     public final static Collection<ThingTypeUID> SUPPORTED_DEVICE_TYPES_UIDS = Lists.newArrayList(THING_TYPE_HUMIDITY,
             THING_TYPE_TEMPERATURE, THING_TYPE_LIGHT, THING_TYPE_MULTIMETER, THING_TYPE_POWER, THING_TYPE_BARO,
             THING_TYPE_DOOR, THING_TYPE_MOTION, THING_TYPE_SMOKE, THING_TYPE_DIMMER, THING_TYPE_COVER, THING_TYPE_WIND,
             THING_TYPE_RAIN, THING_TYPE_UV, THING_TYPE_WEIGHT, THING_TYPE_DISTANCE, THING_TYPE_LIGHT_LEVEL,
             THING_TYPE_HVAC, THING_TYPE_WATER, THING_TYPE_CUSTOM, THING_TYPE_LOCK, THING_TYPE_SOUND,
             THING_TYPE_RGB_LIGHT, THING_TYPE_RGBW_LIGHT, THING_TYPE_WATER_QUALITY, THING_TYPE_MYSENSORS_MESSAGE,
-            THING_TYPE_TEXT, THING_TYPE_IR_SEND, THING_TYPE_IR_RECEIVE, THING_TYPE_AIR_QUALITY, THING_TYPE_DUST,
-            THING_TYPE_COLOR_SENSOR,
-            THING_TYPE_BRIDGE_SER,
-            THING_TYPE_BRIDGE_ETH);
+            THING_TYPE_TEXT, THING_TYPE_IR, THING_TYPE_AIR_QUALITY, THING_TYPE_DUST, THING_TYPE_COLOR_SENSOR,
+            THING_TYPE_BRIDGE_SER, THING_TYPE_BRIDGE_ETH);
 }

@@ -1,5 +1,6 @@
 /**
- * Copyright (c) 2014-2016 openHAB UG (haftungsbeschraenkt) and others.
+ * Copyright (c) 2014-2016 by the respective copyright holders.
+ *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,11 +13,9 @@ import java.util.Arrays;
 import java.util.Enumeration;
 
 import org.apache.commons.lang.StringUtils;
-import org.openhab.binding.mysensors.MySensorsBindingConstants;
-import org.openhab.binding.mysensors.internal.handler.MySensorsBridgeHandler;
-import org.openhab.binding.mysensors.internal.protocol.MySensorsBridgeConnection;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.openhab.binding.mysensors.internal.event.MySensorsEventRegister;
+import org.openhab.binding.mysensors.internal.gateway.MySensorsGatewayConfig;
+import org.openhab.binding.mysensors.internal.protocol.MySensorsAbstractConnection;
 
 import gnu.io.CommPortIdentifier;
 import gnu.io.NRSerialPort;
@@ -28,23 +27,12 @@ import gnu.io.NRSerialPort;
  * @author Andrea Cioni
  *
  */
-public class MySensorsSerialConnection extends MySensorsBridgeConnection {
-
-    private Logger logger = LoggerFactory.getLogger(MySensorsSerialConnection.class);
-
-    private String serialPort = "";
-    private int baudRate = 115200;
-    private int sendDelay = 0;
+public class MySensorsSerialConnection extends MySensorsAbstractConnection {
 
     private NRSerialPort serialConnection = null;
 
-    public MySensorsSerialConnection(MySensorsBridgeHandler bridgeHandler, String serialPort, int baudRate,
-            int sendDelay) {
-        super(bridgeHandler);
-
-        this.serialPort = serialPort;
-        this.baudRate = baudRate;
-        this.sendDelay = sendDelay;
+    public MySensorsSerialConnection(MySensorsGatewayConfig myConf, MySensorsEventRegister myEventRegister) {
+        super(myConf, myEventRegister);
     }
 
     /**
@@ -52,27 +40,27 @@ public class MySensorsSerialConnection extends MySensorsBridgeConnection {
      */
     @Override
     public boolean _connect() {
-        logger.debug("Connecting to {} [baudRate:{}]", serialPort, baudRate);
+        logger.debug("Connecting to {} [baudRate:{}]", myGatewayConfig.getSerialPort(), myGatewayConfig.getBaudRate());
 
         boolean ret = false;
 
-        updateSerialProperties(serialPort);
+        updateSerialProperties(myGatewayConfig.getSerialPort());
         // deleteLockFile(serialPort);
 
-        serialConnection = new NRSerialPort(serialPort, baudRate);
+        serialConnection = new NRSerialPort(myGatewayConfig.getSerialPort(), myGatewayConfig.getBaudRate());
         if (serialConnection.connect()) {
             logger.debug("Successfully connected to serial port.");
 
             try {
                 logger.debug("Waiting {} seconds to allow correct reset trigger on serial connection opening",
-                        MySensorsBindingConstants.RESET_TIME / 1000);
-                Thread.sleep(MySensorsBindingConstants.RESET_TIME);
+                        RESET_TIME / 1000);
+                Thread.sleep(RESET_TIME);
             } catch (InterruptedException e) {
                 logger.error("Interrupted reset time wait");
             }
 
-            mysConReader = new MySensorsSerialReader(serialConnection.getInputStream(), this);
-            mysConWriter = new MySensorsSerialWriter(serialConnection.getOutputStream(), this, sendDelay);
+            mysConReader = new MySensorsReader(serialConnection.getInputStream());
+            mysConWriter = new MySensorsWriter(serialConnection.getOutputStream());
 
             ret = startReaderWriterThread(mysConReader, mysConWriter);
         } else {
@@ -166,4 +154,11 @@ public class MySensorsSerialConnection extends MySensorsBridgeConnection {
         //
         System.setProperty("gnu.io.rxtx.SerialPorts", finalPorts);
     }
+
+    @Override
+    public String toString() {
+        return "MySensorsSerialConnection [serialPort=" + myGatewayConfig.getSerialPort() + ", baudRate="
+                + myGatewayConfig.getBaudRate() + "]";
+    }
+
 }
