@@ -80,9 +80,7 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
         myGateway = getBridgeHandler().getMySensorsGateway();
         addIntoGateway(getThing(), configuration);
 
-        logger.debug(
-                "Configuration: nodeId {}, chiledId: {}, requestAck: {}, revertState: {}, smartSleep: {}, expectUpdateTimeout: {}",
-                nodeId, childId, requestAck, revertState, smartSleep, expectUpdateTimeout);
+        logger.debug(configuration.toString());
 
         registerListeners();
 
@@ -321,6 +319,8 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
         ret.setRevertState(configuration.revertState);
         ret.setExpectUpdateTimeout(configuration.childUpdateTimeout);
 
+        logger.trace("ChildConfig for {}/{}: {}", nodeId, childId, ret.toString());
+
         return ret;
     }
 
@@ -328,6 +328,8 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
         MySensorsNodeConfig ret = new MySensorsNodeConfig();
         ret.setRequestHeartbeatResponse(configuration.requestHeartbeatResponse);
         ret.setExpectUpdateTimeout(configuration.nodeUpdateTimeout);
+
+        logger.trace("NodeConfig for {}/{}: {}", nodeId, childId, ret.toString());
 
         return ret;
     }
