@@ -7,12 +7,22 @@ public class MySensorsChildConfig implements Mergeable {
 
     private boolean requestAck;
     private boolean revertState;
+    private boolean smartSleep;
     private int expectUpdateTimeout;
 
     public MySensorsChildConfig() {
         requestAck = false;
         revertState = false;
+        smartSleep = false;
         expectUpdateTimeout = -1;
+    }
+
+    public boolean getSmartSleep() {
+        return smartSleep;
+    }
+
+    public void setSmartSleep(boolean smartSleep) {
+        this.smartSleep = smartSleep;
     }
 
     public int getExpectUpdateTimeout() {
@@ -49,6 +59,7 @@ public class MySensorsChildConfig implements Mergeable {
 
         requestAck |= childConfig.requestAck;
         revertState |= childConfig.revertState;
+        smartSleep |= childConfig.smartSleep;
 
         if (expectUpdateTimeout <= 0) {
             expectUpdateTimeout = childConfig.expectUpdateTimeout;
