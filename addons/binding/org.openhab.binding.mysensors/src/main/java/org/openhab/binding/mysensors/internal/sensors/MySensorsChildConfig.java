@@ -33,7 +33,7 @@ public class MySensorsChildConfig implements Mergeable {
         this.expectUpdateTimeout = expectUpdateTimeout;
     }
 
-    public boolean setRequestAck() {
+    public boolean getRequestAck() {
         return requestAck;
     }
 
@@ -41,7 +41,7 @@ public class MySensorsChildConfig implements Mergeable {
         this.requestAck = requestAck;
     }
 
-    public boolean setRevertState() {
+    public boolean getRevertState() {
         return revertState;
     }
 

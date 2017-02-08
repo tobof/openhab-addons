@@ -491,6 +491,8 @@ public abstract class MySensorsAbstractConnection implements Runnable {
                     logger.debug(line);
                     MySensorsMessage msg = MySensorsMessage.parse(line);
 
+                    msg.setDirection(MySensorsMessage.MYSENSORS_MSG_DIRECTION_INCOMING);
+
                     // Have we get a I_VERSION message?
                     if (msg.isIVersionMessage()) {
                         iVersionMessageReceived(msg.getMsg());

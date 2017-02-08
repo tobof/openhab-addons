@@ -607,7 +607,7 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
     private void updateLastUpdateFromMessage(MySensorsMessage msg) {
         Date now = new Date();
 
-        if (msg != null) {
+        if (msg != null && msg.getDirection() == MySensorsMessage.MYSENSORS_MSG_DIRECTION_INCOMING) {
             MySensorsNode node = getNode(msg.getNodeId());
 
             if (node != null) {

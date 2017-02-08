@@ -23,6 +23,10 @@ import org.slf4j.LoggerFactory;
  */
 public class MySensorsMessage {
 
+    // Message direction
+    public static final int MYSENSORS_MSG_DIRECTION_INCOMING = 0;
+    public static final int MYSENSORS_MSG_DIRECTION_OUTGOING = 1;
+
     // Message parts
     public static final int MYSENSORS_MSG_PART_NODE = 0;
     public static final int MYSENSORS_MSG_PART_CHILD = 1;
@@ -191,6 +195,7 @@ public class MySensorsMessage {
     private int retries = 0; // number of retries if a message is not acknowledged by the receiver
     private long nextSend = 0; // timestamp when the message should be send
     private boolean smartSleep = false; // smartsleep message
+    private int direction = MYSENSORS_MSG_DIRECTION_OUTGOING; // Is this message incoming or outgoing?
 
     public MySensorsMessage() {
 
@@ -337,6 +342,14 @@ public class MySensorsMessage {
 
     public void setNextSend(long nextSend) {
         this.nextSend = nextSend;
+    }
+
+    public int getDirection() {
+        return direction;
+    }
+
+    public void setDirection(int direction) {
+        this.direction = direction;
     }
 
     /**
