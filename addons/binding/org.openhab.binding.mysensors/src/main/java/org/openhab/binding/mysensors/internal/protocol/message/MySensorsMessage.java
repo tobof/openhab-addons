@@ -295,6 +295,10 @@ public class MySensorsMessage {
         }
     }
 
+    public void setAck(boolean ack) {
+        setAck(ack ? 1 : 0);
+    }
+
     public int getSubType() {
         return subType;
     }
