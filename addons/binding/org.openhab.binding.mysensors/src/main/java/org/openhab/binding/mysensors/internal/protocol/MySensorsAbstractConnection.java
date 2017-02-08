@@ -490,19 +490,18 @@ public abstract class MySensorsAbstractConnection implements Runnable {
 
                     logger.debug(line);
                     MySensorsMessage msg = MySensorsMessage.parse(line);
-                    if (msg != null) {
-                        // Have we get a I_VERSION message?
-                        if (msg.isIVersionMessage()) {
-                            iVersionMessageReceived(msg.getMsg());
-                        }
 
-                        // Is this an ACK message?
-                        if (msg.getAck() == 1) {
-                            handleAckReceived(msg);
-                        }
-
-                        myEventRegister.notifyMessageReceived(msg);
+                    // Have we get a I_VERSION message?
+                    if (msg.isIVersionMessage()) {
+                        iVersionMessageReceived(msg.getMsg());
                     }
+
+                    // Is this an ACK message?
+                    if (msg.getAck() == 1) {
+                        handleAckReceived(msg);
+                    }
+
+                    myEventRegister.notifyMessageReceived(msg);
                 } catch (InterruptedException e) {
                     logger.warn("Interrupted MySensorsReader");
                 } catch (Exception e) {
@@ -598,49 +597,49 @@ public abstract class MySensorsAbstractConnection implements Runnable {
 
                 try {
                     MySensorsMessage msg = pollMySensorsOutboundQueue();
-                    synchronized (outboundMessageQueue) {
-                        if (msg != null) {
-                            if (msg.getNextSend() < System.currentTimeMillis()
-                                    && (lastSend + myGatewayConfig.getSendDelay()) < System.currentTimeMillis()) {
-                                // if we request an ACK we will wait for it and keep the message in the queue (at the
-                                // end)
-                                // otherwise we remove the message from the queue
-                                if (msg.getAck() == 1) {
-                                    msg.setRetries(msg.getRetries() + 1);
-                                    if (!(msg.getRetries() > MYSENSORS_NUMBER_OF_RETRIES)) {
-                                        msg.setNextSend(System.currentTimeMillis()
-                                                + MYSENSORS_RETRY_TIMES[msg.getRetries() - 1]);
-                                        addMySensorsOutboundMessage(msg);
-                                    } else {
-                                        logger.warn("NO ACK from nodeId: {}", msg.getNodeId());
-                                        /*
-                                         * if (msg.getOldMsg().isEmpty() || msg.getOldMsg() == null) {
-                                         * logger.warn("No old status know to revert to!");
-                                         * } else if (msg.getRevert()) {
-                                         * logger.debug("Reverting status!");
-                                         * msg.setMsg(msg.getOldMsg());
-                                         * msg.setAck(0);
-                                         *
-                                         * } else if (!msg.getRevert()) {
-                                         * logger.debug("Not reverted due to configuration!");
-                                         * }
-                                         */
-                                        myEventRegister.notifyAckNotReceived(msg);
-                                        continue;
-                                    }
+                    if (msg != null) {
+                        if (msg.getNextSend() < System.currentTimeMillis()
+                                && (lastSend + myGatewayConfig.getSendDelay()) < System.currentTimeMillis()) {
+                            /*
+                             * if we request an ACK we will wait for it and keep the message in the queue (at the
+                             * end)
+                             * otherwise we remove the message from the queue
+                             */
+                            if (msg.getAck() == 1) {
+                                msg.setRetries(msg.getRetries() + 1);
+                                if (!(msg.getRetries() > MYSENSORS_NUMBER_OF_RETRIES)) {
+                                    msg.setNextSend(
+                                            System.currentTimeMillis() + MYSENSORS_RETRY_TIMES[msg.getRetries() - 1]);
+                                    addMySensorsOutboundMessage(msg);
+                                } else {
+                                    logger.warn("NO ACK from nodeId: {}", msg.getNodeId());
+                                    /*
+                                     * if (msg.getOldMsg().isEmpty() || msg.getOldMsg() == null) {
+                                     * logger.warn("No old status know to revert to!");
+                                     * } else if (msg.getRevert()) {
+                                     * logger.debug("Reverting status!");
+                                     * msg.setMsg(msg.getOldMsg());
+                                     * msg.setAck(0);
+                                     *
+                                     * } else if (!msg.getRevert()) {
+                                     * logger.debug("Not reverted due to configuration!");
+                                     * }
+                                     */
+                                    myEventRegister.notifyAckNotReceived(msg);
+                                    continue;
                                 }
-                                String output = MySensorsMessage.generateAPIString(msg);
-                                logger.debug("Sending to MySensors: {}", output.trim());
-
-                                sendMessage(output);
-                                lastSend = System.currentTimeMillis();
-                            } else {
-                                // Is not time for send again...
-                                addMySensorsOutboundMessage(msg);
                             }
+                            String output = MySensorsMessage.generateAPIString(msg);
+                            logger.debug("Sending to MySensors: {}", output.trim());
+
+                            sendMessage(output);
+                            lastSend = System.currentTimeMillis();
                         } else {
-                            logger.warn("Message returned from queue is null");
+                            // Is not time for send again...
+                            addMySensorsOutboundMessage(msg);
                         }
+                    } else {
+                        logger.warn("Message returned from queue is null");
                     }
 
                 } catch (InterruptedException e) {
