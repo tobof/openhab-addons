@@ -59,9 +59,6 @@ public abstract class MySensorsAbstractConnection implements Runnable {
     // Connector will check for connection status every CONNECTOR_INTERVAL_CHECK seconds
     public static final int CONNECTOR_INTERVAL_CHECK = 10;
 
-    // ??
-    private boolean pauseWriter = false;
-
     // Blocking queue wait for message
     private BlockingQueue<MySensorsMessage> outboundMessageQueue = null;
 
@@ -313,23 +310,23 @@ public abstract class MySensorsAbstractConnection implements Runnable {
      */
     public void removeMySensorsOutboundMessage(MySensorsMessage msg) {
 
-        pauseWriter = true;
-
-        Iterator<MySensorsMessage> iterator = outboundMessageQueue.iterator();
-        if (iterator != null) {
-            while (iterator.hasNext()) {
-                MySensorsMessage msgInQueue = iterator.next();
-                if (msgInQueue.getNodeId() == msg.getNodeId() && msgInQueue.getChildId() == msg.getChildId()
-                        && msgInQueue.getMsgType() == msg.getMsgType() && msgInQueue.getSubType() == msg.getSubType()
-                        && msgInQueue.getAck() == msg.getAck() && msgInQueue.getMsg().equals(msg.getMsg())) {
-                    iterator.remove();
-                } else {
-                    logger.debug("Message NOT removed: {}", msg.getDebugInfo());
+        synchronized (outboundMessageQueue) {
+            Iterator<MySensorsMessage> iterator = outboundMessageQueue.iterator();
+            if (iterator != null) {
+                while (iterator.hasNext()) {
+                    MySensorsMessage msgInQueue = iterator.next();
+                    // TODO Use MySensorsMessage.customHashCode
+                    if (msgInQueue.getNodeId() == msg.getNodeId() && msgInQueue.getChildId() == msg.getChildId()
+                            && msgInQueue.getMsgType() == msg.getMsgType()
+                            && msgInQueue.getSubType() == msg.getSubType() && msgInQueue.getAck() == msg.getAck()
+                            && msgInQueue.getMsg().equals(msg.getMsg())) {
+                        iterator.remove();
+                    } else {
+                        logger.debug("Message NOT removed: {}", msg.getDebugInfo());
+                    }
                 }
             }
         }
-
-        pauseWriter = false;
     }
 
     /**
@@ -352,15 +349,7 @@ public abstract class MySensorsAbstractConnection implements Runnable {
                 }
             }
         }
-    }
 
-    /**
-     * Status for the writer / message sender.
-     *
-     * @return true if writer is paused.
-     */
-    public boolean isWriterPaused() {
-        return pauseWriter;
     }
 
     /**
@@ -392,15 +381,17 @@ public abstract class MySensorsAbstractConnection implements Runnable {
      * @param nodeId of the messages that should be send immediately
      */
     public void checkPendingSmartSleepMessage(int nodeId) {
-        Iterator<MySensorsMessage> iterator = smartSleepMessageQueue.iterator();
-        if (iterator != null) {
+        synchronized (smartSleepMessageQueue) {
+            Iterator<MySensorsMessage> iterator = smartSleepMessageQueue.iterator();
+            if (iterator != null) {
 
-            while (iterator.hasNext()) {
-                MySensorsMessage msgInQueue = iterator.next();
-                if (msgInQueue.getNodeId() == nodeId) {
-                    iterator.remove();
-                    addMySensorsOutboundMessage(msgInQueue);
-                    logger.debug("Message for nodeId: {} in queue needs to be send immediately!", nodeId);
+                while (iterator.hasNext()) {
+                    MySensorsMessage msgInQueue = iterator.next();
+                    if (msgInQueue.getNodeId() == nodeId) {
+                        iterator.remove();
+                        addMySensorsOutboundMessage(msgInQueue);
+                        logger.debug("Message for nodeId: {} in queue needs to be send immediately!", nodeId);
+                    }
                 }
             }
         }
@@ -410,23 +401,22 @@ public abstract class MySensorsAbstractConnection implements Runnable {
      * Debug print of the smart sleep queue content to logs
      */
     public void printSmartSleepQueue() {
-        pauseWriter = true;
+        synchronized (smartSleepMessageQueue) {
+            Iterator<MySensorsMessage> iterator = smartSleepMessageQueue.iterator();
+            if (iterator != null) {
 
-        Iterator<MySensorsMessage> iterator = smartSleepMessageQueue.iterator();
-        if (iterator != null) {
+                logger.debug("####### START SmartSleep queue #####");
+                int i = 1;
+                while (iterator.hasNext()) {
+                    MySensorsMessage msgInQueue = iterator.next();
 
-            logger.debug("####### START SmartSleep queue #####");
-            int i = 1;
-            while (iterator.hasNext()) {
-                MySensorsMessage msgInQueue = iterator.next();
-
-                logger.debug("Msg: {}, nodeId: {], childId: {}, nextSend: {}.", i, msgInQueue.getNodeId(),
-                        msgInQueue.getChildId(), msgInQueue.getNextSend());
-                i++;
+                    logger.debug("Msg: {}, nodeId: {], childId: {}, nextSend: {}.", i, msgInQueue.getNodeId(),
+                            msgInQueue.getChildId(), msgInQueue.getNextSend());
+                    i++;
+                }
+                logger.debug("####### END SmartSleep queue #####");
             }
-            logger.debug("####### END SmartSleep queue #####");
         }
-        pauseWriter = false;
     }
 
     private void iVersionMessageReceived(String msg) {
@@ -607,7 +597,7 @@ public abstract class MySensorsAbstractConnection implements Runnable {
         public void run() {
             Thread.currentThread().setName(MySensorsWriter.class.getName());
             while (!stopWriting) {
-                if (!isWriterPaused()) {
+                synchronized (outboundMessageQueue) {
                     try {
                         MySensorsMessage msg = pollMySensorsOutboundQueue();
 
