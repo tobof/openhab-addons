@@ -262,14 +262,12 @@ public abstract class MySensorsAbstractConnection implements Runnable {
      * @param copy the number of copies that should be stored.
      */
     private void addMySensorsOutboundMessage(MySensorsMessage msg, int copy) {
-        synchronized (outboundMessageQueue) {
-            try {
-                for (int i = 0; i < copy; i++) {
-                    outboundMessageQueue.put(msg);
-                }
-            } catch (InterruptedException e) {
-                logger.error("Interrupted message while ruuning");
+        try {
+            for (int i = 0; i < copy; i++) {
+                outboundMessageQueue.put(msg);
             }
+        } catch (InterruptedException e) {
+            logger.error("Interrupted message while ruuning");
         }
 
     }
@@ -597,10 +595,10 @@ public abstract class MySensorsAbstractConnection implements Runnable {
         public void run() {
             Thread.currentThread().setName(MySensorsWriter.class.getName());
             while (!stopWriting) {
-                synchronized (outboundMessageQueue) {
-                    try {
-                        MySensorsMessage msg = pollMySensorsOutboundQueue();
 
+                try {
+                    MySensorsMessage msg = pollMySensorsOutboundQueue();
+                    synchronized (outboundMessageQueue) {
                         if (msg != null) {
                             if (msg.getNextSend() < System.currentTimeMillis()
                                     && (lastSend + myGatewayConfig.getSendDelay()) < System.currentTimeMillis()) {
@@ -643,13 +641,14 @@ public abstract class MySensorsAbstractConnection implements Runnable {
                         } else {
                             logger.warn("Message returned from queue is null");
                         }
-
-                    } catch (InterruptedException e) {
-                        logger.warn("Interrupted MySensorsWriter");
-                    } catch (Exception e) {
-                        logger.error("({}) on writing to connection, message: {}", e, getClass(), e.getMessage());
                     }
+
+                } catch (InterruptedException e) {
+                    logger.warn("Interrupted MySensorsWriter");
+                } catch (Exception e) {
+                    logger.error("({}) on writing to connection, message: {}", e, getClass(), e.getMessage());
                 }
+
             }
         }
 
