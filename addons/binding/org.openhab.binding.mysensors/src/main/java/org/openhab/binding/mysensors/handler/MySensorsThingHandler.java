@@ -77,10 +77,10 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
         smartSleep = configuration.smartSleep;
         expectUpdateTimeout = configuration.childUpdateTimeout;
 
+        logger.debug(configuration.toString());
+
         myGateway = getBridgeHandler().getMySensorsGateway();
         addIntoGateway(getThing(), configuration);
-
-        logger.debug(configuration.toString());
 
         registerListeners();
 

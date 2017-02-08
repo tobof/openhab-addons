@@ -339,14 +339,16 @@ public abstract class MySensorsAbstractConnection implements Runnable {
      * @param childId the childId which messages should be deleted.
      */
     private void removeSmartSleepMessage(int nodeId, int childId) {
-        Iterator<MySensorsMessage> iterator = smartSleepMessageQueue.iterator();
-        if (iterator != null) {
-            while (iterator.hasNext()) {
-                MySensorsMessage msgInQueue = iterator.next();
-                if (msgInQueue.getNodeId() == nodeId && msgInQueue.getChildId() == childId) {
-                    iterator.remove();
-                } else {
-                    logger.debug("Message NOT removed for nodeId: {} and childId: {}.", nodeId, childId);
+        synchronized (smartSleepMessageQueue) {
+            Iterator<MySensorsMessage> iterator = smartSleepMessageQueue.iterator();
+            if (iterator != null) {
+                while (iterator.hasNext()) {
+                    MySensorsMessage msgInQueue = iterator.next();
+                    if (msgInQueue.getNodeId() == nodeId && msgInQueue.getChildId() == childId) {
+                        iterator.remove();
+                    } else {
+                        logger.debug("Message NOT removed for nodeId: {} and childId: {}.", nodeId, childId);
+                    }
                 }
             }
         }
