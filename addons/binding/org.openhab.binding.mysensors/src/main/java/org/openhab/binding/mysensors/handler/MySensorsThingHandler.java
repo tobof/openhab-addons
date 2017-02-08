@@ -10,6 +10,7 @@ package org.openhab.binding.mysensors.handler;
 
 import static org.openhab.binding.mysensors.MySensorsBindingConstants.*;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Map;
 
@@ -123,9 +124,12 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
         if (channelUID.getId().equals(CHANNEL_MYSENSORS_MESSAGE)) {
             if (command instanceof StringType) {
                 StringType stringTypeMessage = (StringType) command;
-                MySensorsMessage msg = MySensorsMessage.parse(stringTypeMessage.toString());
-                myGateway.sendMessage(msg);
-                return;
+                try {
+                    MySensorsMessage msg = MySensorsMessage.parse(stringTypeMessage.toString());
+                    myGateway.sendMessage(msg);
+                } catch (ParseException e) {
+                    logger.error("Invalid message to send", e);
+                }
             }
         } else {
             MySensorsTypeConverter adapter = loadAdapterForChannelType(channelUID.getId());
