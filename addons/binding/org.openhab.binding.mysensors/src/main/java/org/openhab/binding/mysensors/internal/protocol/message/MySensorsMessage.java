@@ -8,6 +8,8 @@
  */
 package org.openhab.binding.mysensors.internal.protocol.message;
 
+import java.text.ParseException;
+
 import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsNode;
 import org.slf4j.Logger;
@@ -514,32 +516,37 @@ public class MySensorsMessage {
     /**
      * @param line Input is a String containing the message received from the MySensors network
      * @return Returns the content of the message as a MySensorsMessage
+     *
+     * @throws ParseException
      */
-    public static MySensorsMessage parse(String line) {
-        String[] splitMessage = line.split(";");
-        if (splitMessage.length > 4) {
+    public static MySensorsMessage parse(String line) throws ParseException {
+        try {
+            String[] splitMessage = line.split(";");
+            if (splitMessage.length > 4) {
 
-            MySensorsMessage mysensorsmessage = new MySensorsMessage();
+                MySensorsMessage mysensorsmessage = new MySensorsMessage();
 
-            int nodeId = Integer.parseInt(splitMessage[MYSENSORS_MSG_PART_NODE]);
+                int nodeId = Integer.parseInt(splitMessage[MYSENSORS_MSG_PART_NODE]);
 
-            mysensorsmessage.setNodeId(nodeId);
-            mysensorsmessage.setChildId(Integer.parseInt(splitMessage[MYSENSORS_MSG_PART_CHILD]));
-            mysensorsmessage.setMsgType(Integer.parseInt(splitMessage[MYSENSORS_MSG_PART_TYPE]));
-            mysensorsmessage.setAck(Integer.parseInt(splitMessage[MYSENSORS_MSG_PART_ACK]));
-            mysensorsmessage.setSubType(Integer.parseInt(splitMessage[MYSENSORS_MSG_PART_SUBTYPE]));
-            if (splitMessage.length == 6) {
-                String msg = splitMessage[5].replaceAll("\\r|\\n", "").trim();
-                mysensorsmessage.setMsg(msg);
+                mysensorsmessage.setNodeId(nodeId);
+                mysensorsmessage.setChildId(Integer.parseInt(splitMessage[MYSENSORS_MSG_PART_CHILD]));
+                mysensorsmessage.setMsgType(Integer.parseInt(splitMessage[MYSENSORS_MSG_PART_TYPE]));
+                mysensorsmessage.setAck(Integer.parseInt(splitMessage[MYSENSORS_MSG_PART_ACK]));
+                mysensorsmessage.setSubType(Integer.parseInt(splitMessage[MYSENSORS_MSG_PART_SUBTYPE]));
+                if (splitMessage.length == 6) {
+                    String msg = splitMessage[5].replaceAll("\\r|\\n", "").trim();
+                    mysensorsmessage.setMsg(msg);
+                } else {
+                    mysensorsmessage.setMsg("");
+                }
+                return mysensorsmessage;
             } else {
-                mysensorsmessage.setMsg("");
+                throw new ParseException("Message lenght is not > 4", 0);
             }
 
-            return mysensorsmessage;
-        } else {
-            return null;
+        } catch (Exception e) {
+            throw new ParseException(e.getClass() + " : " + e.getMessage(), 0);
         }
-
     }
 
     /**
