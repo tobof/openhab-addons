@@ -20,6 +20,7 @@ import org.eclipse.smarthome.core.thing.Bridge;
 import org.eclipse.smarthome.core.thing.ChannelUID;
 import org.eclipse.smarthome.core.thing.Thing;
 import org.eclipse.smarthome.core.thing.ThingStatus;
+import org.eclipse.smarthome.core.thing.ThingStatusDetail;
 import org.eclipse.smarthome.core.thing.ThingStatusInfo;
 import org.eclipse.smarthome.core.thing.binding.BaseThingHandler;
 import org.eclipse.smarthome.core.types.Command;
@@ -30,6 +31,7 @@ import org.openhab.binding.mysensors.converter.MySensorsTypeConverter;
 import org.openhab.binding.mysensors.internal.event.MySensorsGatewayEventListener;
 import org.openhab.binding.mysensors.internal.event.MySensorsNodeUpdateEventType;
 import org.openhab.binding.mysensors.internal.gateway.MySensorsGateway;
+import org.openhab.binding.mysensors.internal.protocol.MySensorsAbstractConnection;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsChildConfig;
@@ -201,9 +203,23 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
     }
 
     @Override
+    public void connectionStatusUpdate(MySensorsAbstractConnection connection, boolean connected) throws Throwable {
+        if (!connected) {
+            updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.BRIDGE_OFFLINE);
+        } else {
+            updateStatus(ThingStatus.ONLINE);
+        }
+    }
+
+    @Override
     public void nodeReachStatusChanged(MySensorsNode node, boolean reach) {
-        // TODO Network Sanity Checker could put node to 'unreachable' causing, here, to set this thing to
-        // OFFLINE, by now thing reachability depends only on bridgeStatusChanged method
+        if (node.getNodeId() == nodeId) {
+            if (!reach) {
+                updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR);
+            } else {
+                updateStatus(ThingStatus.ONLINE);
+            }
+        }
 
     }
 
