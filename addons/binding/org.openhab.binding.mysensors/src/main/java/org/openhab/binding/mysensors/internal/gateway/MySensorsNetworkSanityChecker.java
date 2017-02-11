@@ -110,9 +110,10 @@ public class MySensorsNetworkSanityChecker implements MySensorsGatewayEventListe
 
             myEventRegister.addEventListener(this);
 
-            if (checkConnectionStatus()) { // Connection is ok, let's go on with some other check
+            if (checkConnectionStatus()) { // Connection is ok, let's go on with other check
 
                 if (sendHeartbeat) {
+                    logger.debug("Sending I_HEARTBEAT_REQUESTs");
                     sendHeartbeatRequest();
                     Thread.sleep(SEND_DELAY);
                     checkHeartbeatsResponse();
@@ -138,16 +139,23 @@ public class MySensorsNetworkSanityChecker implements MySensorsGatewayEventListe
                     MySensorsNodeConfig nodeConfig = c.get();
                     int minutesTimeout = nodeConfig.getExpectUpdateTimeout();
                     if (minutesTimeout > 0) {
-                        long nodeLastUpdate = node.getLastUpdate().getTime();
-                        long minutesTimeoutMillis = minutesTimeout * 60 * 1000;
-                        if (((System.currentTimeMillis() - nodeLastUpdate) > minutesTimeoutMillis)
-                                && node.isReachable()) {
-                            node.setReachable(false);
-                            myEventRegister.notifyNodeReachEvent(node, false);
+                        if (!nodeConfig.getRequestHeartbeatResponse()) {
+                            long nodeLastUpdate = node.getLastUpdate().getTime();
+                            long minutesTimeoutMillis = minutesTimeout * 60 * 1000;
+                            logger.debug("Node {} request update every {} minutes, current: {}", nodeId, minutesTimeout,
+                                    (System.currentTimeMillis() - nodeLastUpdate) / (1000 * 60));
+                            if (((System.currentTimeMillis() - nodeLastUpdate) > minutesTimeoutMillis)
+                                    && node.isReachable()) {
+                                logger.warn("Node {} not receive excpected update", nodeId);
+                                node.setReachable(false);
+                                myEventRegister.notifyNodeReachEvent(node, false);
+                            }
+                        } else {
+                            logger.warn(
+                                    "Check expected update can't be performed on node {} if request heartbeat is active.");
                         }
                     }
                 }
-
             }
         }
     }
@@ -162,6 +170,8 @@ public class MySensorsNetworkSanityChecker implements MySensorsGatewayEventListe
                     if (nodeConfig.getRequestHeartbeatResponse()) {
                         synchronized (missingHearbeatsMap) {
                             Integer missingHearbeat = missingHearbeatsMap.get(nodeId);
+                            logger.debug("Node {} request heartbreat answer, missing {} of {}", nodeId, missingHearbeat,
+                                    maxAttemptsBeforeDisconnectingNodes);
                             if ((missingHearbeat > maxAttemptsBeforeDisconnectingNodes) && node.isReachable()) {
                                 node.setReachable(false);
                                 myEventRegister.notifyNodeReachEvent(node, false);
@@ -206,6 +216,7 @@ public class MySensorsNetworkSanityChecker implements MySensorsGatewayEventListe
         Thread.sleep(SEND_DELAY);
 
         synchronized (iVersionMessageMissing) {
+
             if (!iVersionMessageArrived) {
                 logger.warn("I_VERSION message response is not arrived. Remained attempts before disconnection {}",
                         maxAttemptsBeforeDisconnecting - iVersionMessageMissing);
