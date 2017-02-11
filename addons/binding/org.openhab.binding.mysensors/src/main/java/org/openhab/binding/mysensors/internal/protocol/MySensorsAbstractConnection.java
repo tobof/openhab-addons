@@ -88,6 +88,8 @@ public abstract class MySensorsAbstractConnection implements Runnable {
     // Connection retry done
     private int numOfRetry = 0;
 
+    private int errorCount;
+
     // Connection status watchdog
     private ScheduledExecutorService watchdogExecutor = null;
     private Future<?> futureWatchdog = null;
@@ -97,6 +99,7 @@ public abstract class MySensorsAbstractConnection implements Runnable {
         this.myGatewayConfig = myGatewayConfig;
         this.watchdogExecutor = Executors.newSingleThreadScheduledExecutor();
         this.iVersionResponse = false;
+        this.errorCount = 0;
     }
 
     /**
@@ -271,6 +274,17 @@ public abstract class MySensorsAbstractConnection implements Runnable {
         requestDisconnection = flag;
     }
 
+    private void handleReaderWriterException() {
+        synchronized (this) {
+            if (errorCount < ERROR_COUNT_REQ_DISCONNECT) {
+                errorCount++;
+            } else {
+                errorCount = 0;
+                requestDisconnection(true);
+            }
+        }
+    }
+
     /**
      * Implements the reader (IP & serial) that receives the messages from the MySensors network.
      *
@@ -289,10 +303,7 @@ public abstract class MySensorsAbstractConnection implements Runnable {
 
         private boolean stopReader = false;
 
-        private int readErrorCount = 0;
-
         public MySensorsReader(InputStream inStream) {
-            this.readErrorCount = 0;
             this.inStream = inStream;
             this.reads = new BufferedReader(new InputStreamReader(inStream));
         }
@@ -351,13 +362,8 @@ public abstract class MySensorsAbstractConnection implements Runnable {
                     logger.warn("Interrupted MySensorsReader");
                 } catch (Exception e) {
                     logger.error("Exception on reading from connection", e);
+                    handleReaderWriterException();
 
-                    if (readErrorCount < ERROR_COUNT_REQ_DISCONNECT) {
-                        readErrorCount++;
-                    } else {
-                        readErrorCount = 0;
-                        requestDisconnection(true);
-                    }
                 }
 
             }
@@ -521,6 +527,7 @@ public abstract class MySensorsAbstractConnection implements Runnable {
                     logger.warn("Interrupted MySensorsWriter");
                 } catch (Exception e) {
                     logger.error("({}) on writing to connection, message: {}", e, getClass(), e.getMessage());
+                    handleReaderWriterException();
                 }
 
                 try {

@@ -250,7 +250,7 @@ public class MySensorsNode {
                     msg.setChildId(childId);
                     msg.setMsgType(MySensorsMessage.MYSENSORS_MSG_TYPE_SET);
                     msg.setSubType(type);
-                    msg.setAck(childConfig.getRequestAck() ? 1 : 0);
+                    msg.setAck(childConfig.getRequestAck());
                     msg.setMsg(state);
 
                     // Optional
