@@ -489,6 +489,17 @@ public class MySensorsMessage {
     }
 
     /**
+     * Is this a debug message?
+     *
+     * @return true if this message is I_DEBUG
+     */
+    public boolean isDebugMessage() {
+        return (nodeId == MySensorsNode.MYSENSORS_NODE_ID_RESERVED_0)
+                && (childId == MySensorsChild.MYSENSORS_CHILD_ID_RESERVED_255)
+                && (msgType == MYSENSORS_MSG_TYPE_INTERNAL) && (subType == MYSENSORS_SUBTYPE_I_DEBUG);
+    }
+
+    /**
      * Generate a custom hash by message parts passed as vararg
      * Usage example: customHashCode(MYSENSORS_MSG_PAYLOAD_PART, MYSENSORS_MSG_SUBTYPE_PART);
      *
