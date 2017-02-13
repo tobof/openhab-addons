@@ -10,6 +10,7 @@ package org.openhab.binding.mysensors.handler;
 
 import static org.openhab.binding.mysensors.MySensorsBindingConstants.*;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Map;
 
@@ -19,6 +20,7 @@ import org.eclipse.smarthome.core.thing.Bridge;
 import org.eclipse.smarthome.core.thing.ChannelUID;
 import org.eclipse.smarthome.core.thing.Thing;
 import org.eclipse.smarthome.core.thing.ThingStatus;
+import org.eclipse.smarthome.core.thing.ThingStatusDetail;
 import org.eclipse.smarthome.core.thing.ThingStatusInfo;
 import org.eclipse.smarthome.core.thing.binding.BaseThingHandler;
 import org.eclipse.smarthome.core.types.Command;
@@ -29,6 +31,7 @@ import org.openhab.binding.mysensors.converter.MySensorsTypeConverter;
 import org.openhab.binding.mysensors.internal.event.MySensorsGatewayEventListener;
 import org.openhab.binding.mysensors.internal.event.MySensorsNodeUpdateEventType;
 import org.openhab.binding.mysensors.internal.gateway.MySensorsGateway;
+import org.openhab.binding.mysensors.internal.protocol.MySensorsAbstractConnection;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsChildConfig;
@@ -77,12 +80,10 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
         smartSleep = configuration.smartSleep;
         expectUpdateTimeout = configuration.childUpdateTimeout;
 
+        logger.debug(configuration.toString());
+
         myGateway = getBridgeHandler().getMySensorsGateway();
         addIntoGateway(getThing(), configuration);
-
-        logger.debug(
-                "Configuration: nodeId {}, chiledId: {}, requestAck: {}, revertState: {}, smartSleep: {}, expectUpdateTimeout: {}",
-                nodeId, childId, requestAck, revertState, smartSleep, expectUpdateTimeout);
 
         registerListeners();
 
@@ -125,9 +126,12 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
         if (channelUID.getId().equals(CHANNEL_MYSENSORS_MESSAGE)) {
             if (command instanceof StringType) {
                 StringType stringTypeMessage = (StringType) command;
-                MySensorsMessage msg = MySensorsMessage.parse(stringTypeMessage.toString());
-                myGateway.sendMessage(msg);
-                return;
+                try {
+                    MySensorsMessage msg = MySensorsMessage.parse(stringTypeMessage.toString());
+                    myGateway.sendMessage(msg);
+                } catch (ParseException e) {
+                    logger.error("Invalid message to send", e);
+                }
             }
         } else {
             MySensorsTypeConverter adapter = loadAdapterForChannelType(channelUID.getId());
@@ -199,9 +203,23 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
     }
 
     @Override
+    public void connectionStatusUpdate(MySensorsAbstractConnection connection, boolean connected) throws Throwable {
+        if (!connected) {
+            updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.BRIDGE_OFFLINE);
+        } else {
+            updateStatus(ThingStatus.ONLINE);
+        }
+    }
+
+    @Override
     public void nodeReachStatusChanged(MySensorsNode node, boolean reach) {
-        // TODO Network Sanity Checker could put node to 'unreachable' causing, here, to set this thing to
-        // OFFLINE, by now thing reachability depends only on bridgeStatusChanged method
+        if (node.getNodeId() == nodeId) {
+            if (!reach) {
+                updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR);
+            } else {
+                updateStatus(ThingStatus.ONLINE);
+            }
+        }
 
     }
 
@@ -321,6 +339,8 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
         ret.setRevertState(configuration.revertState);
         ret.setExpectUpdateTimeout(configuration.childUpdateTimeout);
 
+        logger.trace("ChildConfig for {}/{}: {}", nodeId, childId, ret.toString());
+
         return ret;
     }
 
@@ -328,6 +348,8 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
         MySensorsNodeConfig ret = new MySensorsNodeConfig();
         ret.setRequestHeartbeatResponse(configuration.requestHeartbeatResponse);
         ret.setExpectUpdateTimeout(configuration.nodeUpdateTimeout);
+
+        logger.trace("NodeConfig for {}/{}: {}", nodeId, childId, ret.toString());
 
         return ret;
     }

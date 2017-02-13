@@ -202,7 +202,7 @@ public class MySensorsNode {
         if (node.nodeConfig.isPresent() && !nodeConfig.isPresent()) {
             nodeConfig = node.nodeConfig;
         } else if (node.nodeConfig.isPresent() && nodeConfig.isPresent()) {
-            nodeConfig.get().merge(node.nodeConfig);
+            nodeConfig.get().merge(node.nodeConfig.get());
         }
 
         synchronized (chidldMap) {
@@ -219,16 +219,47 @@ public class MySensorsNode {
 
     /**
      * Generate message from a state. This method doesn't update variable itself.
+     * No check will be performed on value of state parameter
      *
      * @param childId
      * @param type
      * @param state
      *
-     * @return a message ready to be sent
+     * @return a non-null message ready to be sent if childId/type are available on this node
+     *
+     * @throws NullPointerException if state is null
      */
     public MySensorsMessage updateVariableState(int childId, int type, String state) {
         MySensorsMessage msg = null;
-        // TODO
+
+        if (state == null) {
+            throw new NullPointerException("State is null");
+        }
+
+        synchronized (chidldMap) {
+            MySensorsChild child = getChild(childId);
+            MySensorsChildConfig childConfig = (child.getChildConfig().isPresent()) ? child.getChildConfig().get()
+                    : new MySensorsChildConfig();
+            if (child != null) {
+                MySensorsVariable var = child.getVariable(type);
+                if (var != null) {
+                    msg = new MySensorsMessage();
+
+                    // MySensors
+                    msg.setNodeId(nodeId);
+                    msg.setChildId(childId);
+                    msg.setMsgType(MySensorsMessage.MYSENSORS_MSG_TYPE_SET);
+                    msg.setSubType(type);
+                    msg.setAck(childConfig.getRequestAck());
+                    msg.setMsg(state);
+
+                    // Optional
+                    msg.setRevert(childConfig.getRevertState());
+                    msg.setSmartSleep(childConfig.getSmartSleep());
+                }
+            }
+        }
+
         return msg;
     }
 

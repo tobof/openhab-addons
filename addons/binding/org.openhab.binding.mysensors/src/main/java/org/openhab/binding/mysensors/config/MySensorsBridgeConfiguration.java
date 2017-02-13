@@ -27,4 +27,15 @@ public class MySensorsBridgeConfiguration {
     public Integer sanCheckConnectionFailAttempts; // connection will wait this number of attempts before disconnecting
     public boolean sanCheckSendHeartbeat; // network sanity checker will also send heartbeats to all known nodes
     public Integer sanCheckSendHeartbeatFailAttempts; // disconnect nodes that fail to answer to heartbeat request
+
+    @Override
+    public String toString() {
+        return "MySensorsBridgeConfiguration [serialPort=" + serialPort + ", ipAddress=" + ipAddress + ", tcpPort="
+                + tcpPort + ", sendDelay=" + sendDelay + ", baudRate=" + baudRate + ", imperial=" + imperial
+                + ", skipStartupCheck=" + skipStartupCheck + ", enableNetworkSanCheck=" + enableNetworkSanCheck
+                + ", sanityCheckerInterval=" + sanityCheckerInterval + ", sanCheckConnectionFailAttempts="
+                + sanCheckConnectionFailAttempts + ", sanCheckSendHeartbeat=" + sanCheckSendHeartbeat
+                + ", sanCheckSendHeartbeatFailAttempts=" + sanCheckSendHeartbeatFailAttempts + "]";
+    }
+
 }

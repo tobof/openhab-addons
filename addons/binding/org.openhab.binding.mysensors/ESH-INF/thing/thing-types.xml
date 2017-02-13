@@ -187,10 +187,25 @@
 				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
 				<default>-1</default>
 			</parameter>
-			<parameter name="requestHeartbeatResponse" type="integer" required="false">
+			<parameter name="requestHeartbeatResponse" type="boolean" required="false">
 				<label>Request Heartbeat Response</label>
 				<description>If no heartbeat received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL thing with
 					same node ID will be set OFFLINE.</description>
+				<default>false</default>
+			</parameter>
+			<parameter name="requestAck" type="boolean" required="false">
+				<label>Request ACK</label>
+				<description>Request ACK from Actuator</description>
+				<default>false</default>
+			</parameter>
+			<parameter name="revertState" type="boolean" required="false">
+				<label>Revert State</label>
+				<description>Revert state if no Ack received</description>
+				<default>true</default>
+			</parameter>
+			<parameter name="smartSleep" type="boolean" required="false">
+				<label>SmartSleep</label>
+				<description>Does this node support Smartsleep? A message to the node is only send in response to a heartbeat!</description>
 				<default>false</default>
 			</parameter>
 		</config-description>
@@ -235,10 +250,25 @@
 				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
 				<default>-1</default>
 			</parameter>
-			<parameter name="requestHeartbeatResponse" type="integer" required="false">
+			<parameter name="requestHeartbeatResponse" type="boolean" required="false">
 				<label>Request Heartbeat Response</label>
 				<description>If no heartbeat received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL thing with
 					same node ID will be set OFFLINE.</description>
+				<default>false</default>
+			</parameter>
+			<parameter name="requestAck" type="boolean" required="false">
+				<label>Request ACK</label>
+				<description>Request ACK from Actuator</description>
+				<default>false</default>
+			</parameter>
+			<parameter name="revertState" type="boolean" required="false">
+				<label>Revert State</label>
+				<description>Revert state if no Ack received</description>
+				<default>true</default>
+			</parameter>
+			<parameter name="smartSleep" type="boolean" required="false">
+				<label>SmartSleep</label>
+				<description>Does this node support Smartsleep? A message to the node is only send in response to a heartbeat!</description>
 				<default>false</default>
 			</parameter>
 		</config-description>
@@ -284,10 +314,25 @@
 				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
 				<default>-1</default>
 			</parameter>
-			<parameter name="requestHeartbeatResponse" type="integer" required="false">
+			<parameter name="requestHeartbeatResponse" type="boolean" required="false">
 				<label>Request Heartbeat Response</label>
 				<description>If no heartbeat received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL thing with
 					same node ID will be set OFFLINE.</description>
+				<default>false</default>
+			</parameter>
+			<parameter name="requestAck" type="boolean" required="false">
+				<label>Request ACK</label>
+				<description>Request ACK from Actuator</description>
+				<default>false</default>
+			</parameter>
+			<parameter name="revertState" type="boolean" required="false">
+				<label>Revert State</label>
+				<description>Revert state if no Ack received</description>
+				<default>true</default>
+			</parameter>
+			<parameter name="smartSleep" type="boolean" required="false">
+				<label>SmartSleep</label>
+				<description>Does this node support Smartsleep? A message to the node is only send in response to a heartbeat!</description>
 				<default>false</default>
 			</parameter>
 		</config-description>
@@ -330,7 +375,7 @@
 				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
 				<default>-1</default>
 			</parameter>
-			<parameter name="requestHeartbeatResponse" type="integer" required="false">
+			<parameter name="requestHeartbeatResponse" type="boolean" required="false">
 				<label>Request Heartbeat Response</label>
 				<description>If no heartbeat received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL thing with
 					same node ID will be set OFFLINE.</description>
@@ -345,6 +390,11 @@
 				<label>Revert State</label>
 				<description>Revert state if no Ack received</description>
 				<default>true</default>
+			</parameter>
+			<parameter name="smartSleep" type="boolean" required="false">
+				<label>SmartSleep</label>
+				<description>Does this node support Smartsleep? A message to the node is only send in response to a heartbeat!</description>
+				<default>false</default>
 			</parameter>
 		</config-description>
 	</thing-type>
@@ -387,10 +437,25 @@
 				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
 				<default>-1</default>
 			</parameter>
-			<parameter name="requestHeartbeatResponse" type="integer" required="false">
+			<parameter name="requestHeartbeatResponse" type="boolean" required="false">
 				<label>Request Heartbeat Response</label>
 				<description>If no heartbeat received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL thing with
 					same node ID will be set OFFLINE.</description>
+				<default>false</default>
+			</parameter>
+			<parameter name="requestAck" type="boolean" required="false">
+				<label>Request ACK</label>
+				<description>Request ACK from Actuator</description>
+				<default>false</default>
+			</parameter>
+			<parameter name="revertState" type="boolean" required="false">
+				<label>Revert State</label>
+				<description>Revert state if no Ack received</description>
+				<default>true</default>
+			</parameter>
+			<parameter name="smartSleep" type="boolean" required="false">
+				<label>SmartSleep</label>
+				<description>Does this node support Smartsleep? A message to the node is only send in response to a heartbeat!</description>
 				<default>false</default>
 			</parameter>
 		</config-description>
@@ -434,10 +499,25 @@
 				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
 				<default>-1</default>
 			</parameter>
-			<parameter name="requestHeartbeatResponse" type="integer" required="false">
+			<parameter name="requestHeartbeatResponse" type="boolean" required="false">
 				<label>Request Heartbeat Response</label>
 				<description>If no heartbeat received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL thing with
 					same node ID will be set OFFLINE.</description>
+				<default>false</default>
+			</parameter>
+			<parameter name="requestAck" type="boolean" required="false">
+				<label>Request ACK</label>
+				<description>Request ACK from Actuator</description>
+				<default>false</default>
+			</parameter>
+			<parameter name="revertState" type="boolean" required="false">
+				<label>Revert State</label>
+				<description>Revert state if no Ack received</description>
+				<default>true</default>
+			</parameter>
+			<parameter name="smartSleep" type="boolean" required="false">
+				<label>SmartSleep</label>
+				<description>Does this node support Smartsleep? A message to the node is only send in response to a heartbeat!</description>
 				<default>false</default>
 			</parameter>
 		</config-description>
@@ -481,10 +561,25 @@
 				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
 				<default>-1</default>
 			</parameter>
-			<parameter name="requestHeartbeatResponse" type="integer" required="false">
+			<parameter name="requestHeartbeatResponse" type="boolean" required="false">
 				<label>Request Heartbeat Response</label>
 				<description>If no heartbeat received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL thing with
 					same node ID will be set OFFLINE.</description>
+				<default>false</default>
+			</parameter>
+			<parameter name="requestAck" type="boolean" required="false">
+				<label>Request ACK</label>
+				<description>Request ACK from Actuator</description>
+				<default>false</default>
+			</parameter>
+			<parameter name="revertState" type="boolean" required="false">
+				<label>Revert State</label>
+				<description>Revert state if no Ack received</description>
+				<default>true</default>
+			</parameter>
+			<parameter name="smartSleep" type="boolean" required="false">
+				<label>SmartSleep</label>
+				<description>Does this node support Smartsleep? A message to the node is only send in response to a heartbeat!</description>
 				<default>false</default>
 			</parameter>
 		</config-description>
@@ -528,10 +623,25 @@
 				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
 				<default>-1</default>
 			</parameter>
-			<parameter name="requestHeartbeatResponse" type="integer" required="false">
+			<parameter name="requestHeartbeatResponse" type="boolean" required="false">
 				<label>Request Heartbeat Response</label>
 				<description>If no heartbeat received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL thing with
 					same node ID will be set OFFLINE.</description>
+				<default>false</default>
+			</parameter>
+			<parameter name="requestAck" type="boolean" required="false">
+				<label>Request ACK</label>
+				<description>Request ACK from Actuator</description>
+				<default>false</default>
+			</parameter>
+			<parameter name="revertState" type="boolean" required="false">
+				<label>Revert State</label>
+				<description>Revert state if no Ack received</description>
+				<default>true</default>
+			</parameter>
+			<parameter name="smartSleep" type="boolean" required="false">
+				<label>SmartSleep</label>
+				<description>Does this node support Smartsleep? A message to the node is only send in response to a heartbeat!</description>
 				<default>false</default>
 			</parameter>
 		</config-description>
@@ -574,10 +684,25 @@
 				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
 				<default>-1</default>
 			</parameter>
-			<parameter name="requestHeartbeatResponse" type="integer" required="false">
+			<parameter name="requestHeartbeatResponse" type="boolean" required="false">
 				<label>Request Heartbeat Response</label>
 				<description>If no heartbeat received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL thing with
 					same node ID will be set OFFLINE.</description>
+				<default>false</default>
+			</parameter>
+			<parameter name="requestAck" type="boolean" required="false">
+				<label>Request ACK</label>
+				<description>Request ACK from Actuator</description>
+				<default>false</default>
+			</parameter>
+			<parameter name="revertState" type="boolean" required="false">
+				<label>Revert State</label>
+				<description>Revert state if no Ack received</description>
+				<default>true</default>
+			</parameter>
+			<parameter name="smartSleep" type="boolean" required="false">
+				<label>SmartSleep</label>
+				<description>Does this node support Smartsleep? A message to the node is only send in response to a heartbeat!</description>
 				<default>false</default>
 			</parameter>
 		</config-description>
@@ -621,10 +746,25 @@
 				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
 				<default>-1</default>
 			</parameter>
-			<parameter name="requestHeartbeatResponse" type="integer" required="false">
+			<parameter name="requestHeartbeatResponse" type="boolean" required="false">
 				<label>Request Heartbeat Response</label>
 				<description>If no heartbeat received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL thing with
 					same node ID will be set OFFLINE.</description>
+				<default>false</default>
+			</parameter>
+			<parameter name="requestAck" type="boolean" required="false">
+				<label>Request ACK</label>
+				<description>Request ACK from Actuator</description>
+				<default>false</default>
+			</parameter>
+			<parameter name="revertState" type="boolean" required="false">
+				<label>Revert State</label>
+				<description>Revert state if no Ack received</description>
+				<default>true</default>
+			</parameter>
+			<parameter name="smartSleep" type="boolean" required="false">
+				<label>SmartSleep</label>
+				<description>Does this node support Smartsleep? A message to the node is only send in response to a heartbeat!</description>
 				<default>false</default>
 			</parameter>
 		</config-description>
@@ -667,10 +807,25 @@
 				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
 				<default>-1</default>
 			</parameter>
-			<parameter name="requestHeartbeatResponse" type="integer" required="false">
+			<parameter name="requestHeartbeatResponse" type="boolean" required="false">
 				<label>Request Heartbeat Response</label>
 				<description>If no heartbeat received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL thing with
 					same node ID will be set OFFLINE.</description>
+				<default>false</default>
+			</parameter>
+			<parameter name="requestAck" type="boolean" required="false">
+				<label>Request ACK</label>
+				<description>Request ACK from Actuator</description>
+				<default>false</default>
+			</parameter>
+			<parameter name="revertState" type="boolean" required="false">
+				<label>Revert State</label>
+				<description>Revert state if no Ack received</description>
+				<default>true</default>
+			</parameter>
+			<parameter name="smartSleep" type="boolean" required="false">
+				<label>SmartSleep</label>
+				<description>Does this node support Smartsleep? A message to the node is only send in response to a heartbeat!</description>
 				<default>false</default>
 			</parameter>
 		</config-description>
@@ -714,10 +869,25 @@
 				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
 				<default>-1</default>
 			</parameter>
-			<parameter name="requestHeartbeatResponse" type="integer" required="false">
+			<parameter name="requestHeartbeatResponse" type="boolean" required="false">
 				<label>Request Heartbeat Response</label>
 				<description>If no heartbeat received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL thing with
 					same node ID will be set OFFLINE.</description>
+				<default>false</default>
+			</parameter>
+			<parameter name="requestAck" type="boolean" required="false">
+				<label>Request ACK</label>
+				<description>Request ACK from Actuator</description>
+				<default>false</default>
+			</parameter>
+			<parameter name="revertState" type="boolean" required="false">
+				<label>Revert State</label>
+				<description>Revert state if no Ack received</description>
+				<default>true</default>
+			</parameter>
+			<parameter name="smartSleep" type="boolean" required="false">
+				<label>SmartSleep</label>
+				<description>Does this node support Smartsleep? A message to the node is only send in response to a heartbeat!</description>
 				<default>false</default>
 			</parameter>
 		</config-description>
@@ -761,10 +931,25 @@
 				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
 				<default>-1</default>
 			</parameter>
-			<parameter name="requestHeartbeatResponse" type="integer" required="false">
+			<parameter name="requestHeartbeatResponse" type="boolean" required="false">
 				<label>Request Heartbeat Response</label>
 				<description>If no heartbeat received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL thing with
 					same node ID will be set OFFLINE.</description>
+				<default>false</default>
+			</parameter>
+			<parameter name="requestAck" type="boolean" required="false">
+				<label>Request ACK</label>
+				<description>Request ACK from Actuator</description>
+				<default>false</default>
+			</parameter>
+			<parameter name="revertState" type="boolean" required="false">
+				<label>Revert State</label>
+				<description>Revert state if no Ack received</description>
+				<default>true</default>
+			</parameter>
+			<parameter name="smartSleep" type="boolean" required="false">
+				<label>SmartSleep</label>
+				<description>Does this node support Smartsleep? A message to the node is only send in response to a heartbeat!</description>
 				<default>false</default>
 			</parameter>
 		</config-description>
@@ -807,10 +992,25 @@
 				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
 				<default>-1</default>
 			</parameter>
-			<parameter name="requestHeartbeatResponse" type="integer" required="false">
+			<parameter name="requestHeartbeatResponse" type="boolean" required="false">
 				<label>Request Heartbeat Response</label>
 				<description>If no heartbeat received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL thing with
 					same node ID will be set OFFLINE.</description>
+				<default>false</default>
+			</parameter>
+			<parameter name="requestAck" type="boolean" required="false">
+				<label>Request ACK</label>
+				<description>Request ACK from Actuator</description>
+				<default>false</default>
+			</parameter>
+			<parameter name="revertState" type="boolean" required="false">
+				<label>Revert State</label>
+				<description>Revert state if no Ack received</description>
+				<default>true</default>
+			</parameter>
+			<parameter name="smartSleep" type="boolean" required="false">
+				<label>SmartSleep</label>
+				<description>Does this node support Smartsleep? A message to the node is only send in response to a heartbeat!</description>
 				<default>false</default>
 			</parameter>
 		</config-description>
@@ -854,10 +1054,25 @@
 				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
 				<default>-1</default>
 			</parameter>
-			<parameter name="requestHeartbeatResponse" type="integer" required="false">
+			<parameter name="requestHeartbeatResponse" type="boolean" required="false">
 				<label>Request Heartbeat Response</label>
 				<description>If no heartbeat received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL thing with
 					same node ID will be set OFFLINE.</description>
+				<default>false</default>
+			</parameter>
+			<parameter name="requestAck" type="boolean" required="false">
+				<label>Request ACK</label>
+				<description>Request ACK from Actuator</description>
+				<default>false</default>
+			</parameter>
+			<parameter name="revertState" type="boolean" required="false">
+				<label>Revert State</label>
+				<description>Revert state if no Ack received</description>
+				<default>true</default>
+			</parameter>
+			<parameter name="smartSleep" type="boolean" required="false">
+				<label>SmartSleep</label>
+				<description>Does this node support Smartsleep? A message to the node is only send in response to a heartbeat!</description>
 				<default>false</default>
 			</parameter>
 		</config-description>
@@ -900,10 +1115,25 @@
 				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
 				<default>-1</default>
 			</parameter>
-			<parameter name="requestHeartbeatResponse" type="integer" required="false">
+			<parameter name="requestHeartbeatResponse" type="boolean" required="false">
 				<label>Request Heartbeat Response</label>
 				<description>If no heartbeat received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL thing with
 					same node ID will be set OFFLINE.</description>
+				<default>false</default>
+			</parameter>
+			<parameter name="requestAck" type="boolean" required="false">
+				<label>Request ACK</label>
+				<description>Request ACK from Actuator</description>
+				<default>false</default>
+			</parameter>
+			<parameter name="revertState" type="boolean" required="false">
+				<label>Revert State</label>
+				<description>Revert state if no Ack received</description>
+				<default>true</default>
+			</parameter>
+			<parameter name="smartSleep" type="boolean" required="false">
+				<label>SmartSleep</label>
+				<description>Does this node support Smartsleep? A message to the node is only send in response to a heartbeat!</description>
 				<default>false</default>
 			</parameter>
 		</config-description>
@@ -946,7 +1176,7 @@
 				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
 				<default>-1</default>
 			</parameter>
-			<parameter name="requestHeartbeatResponse" type="integer" required="false">
+			<parameter name="requestHeartbeatResponse" type="boolean" required="false">
 				<label>Request Heartbeat Response</label>
 				<description>If no heartbeat received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL thing with
 					same node ID will be set OFFLINE.</description>
@@ -961,6 +1191,11 @@
 				<label>Revert State</label>
 				<description>Revert state if no Ack received</description>
 				<default>true</default>
+			</parameter>
+			<parameter name="smartSleep" type="boolean" required="false">
+				<label>SmartSleep</label>
+				<description>Does this node support Smartsleep? A message to the node is only send in response to a heartbeat!</description>
+				<default>false</default>
 			</parameter>
 		</config-description>
 	</thing-type>
@@ -1012,10 +1247,25 @@
 				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
 				<default>-1</default>
 			</parameter>
-			<parameter name="requestHeartbeatResponse" type="integer" required="false">
+			<parameter name="requestHeartbeatResponse" type="boolean" required="false">
 				<label>Request Heartbeat Response</label>
 				<description>If no heartbeat received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL thing with
 					same node ID will be set OFFLINE.</description>
+				<default>false</default>
+			</parameter>
+			<parameter name="requestAck" type="boolean" required="false">
+				<label>Request ACK</label>
+				<description>Request ACK from Actuator</description>
+				<default>false</default>
+			</parameter>
+			<parameter name="revertState" type="boolean" required="false">
+				<label>Revert State</label>
+				<description>Revert state if no Ack received</description>
+				<default>true</default>
+			</parameter>
+			<parameter name="smartSleep" type="boolean" required="false">
+				<label>SmartSleep</label>
+				<description>Does this node support Smartsleep? A message to the node is only send in response to a heartbeat!</description>
 				<default>false</default>
 			</parameter>
 		</config-description>
@@ -1060,10 +1310,25 @@
 				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
 				<default>-1</default>
 			</parameter>
-			<parameter name="requestHeartbeatResponse" type="integer" required="false">
+			<parameter name="requestHeartbeatResponse" type="boolean" required="false">
 				<label>Request Heartbeat Response</label>
 				<description>If no heartbeat received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL thing with
 					same node ID will be set OFFLINE.</description>
+				<default>false</default>
+			</parameter>
+			<parameter name="requestAck" type="boolean" required="false">
+				<label>Request ACK</label>
+				<description>Request ACK from Actuator</description>
+				<default>false</default>
+			</parameter>
+			<parameter name="revertState" type="boolean" required="false">
+				<label>Revert State</label>
+				<description>Revert state if no Ack received</description>
+				<default>true</default>
+			</parameter>
+			<parameter name="smartSleep" type="boolean" required="false">
+				<label>SmartSleep</label>
+				<description>Does this node support Smartsleep? A message to the node is only send in response to a heartbeat!</description>
 				<default>false</default>
 			</parameter>
 		</config-description>
@@ -1109,7 +1374,7 @@
 				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
 				<default>-1</default>
 			</parameter>
-			<parameter name="requestHeartbeatResponse" type="integer" required="false">
+			<parameter name="requestHeartbeatResponse" type="boolean" required="false">
 				<label>Request Heartbeat Response</label>
 				<description>If no heartbeat received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL thing with
 					same node ID will be set OFFLINE.</description>
@@ -1124,6 +1389,11 @@
 				<label>Revert State</label>
 				<description>Revert state if no Ack received</description>
 				<default>true</default>
+			</parameter>
+			<parameter name="smartSleep" type="boolean" required="false">
+				<label>SmartSleep</label>
+				<description>Does this node support Smartsleep? A message to the node is only send in response to a heartbeat!</description>
+				<default>false</default>
 			</parameter>
 		</config-description>
 	</thing-type>
@@ -1167,10 +1437,25 @@
 				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
 				<default>-1</default>
 			</parameter>
-			<parameter name="requestHeartbeatResponse" type="integer" required="false">
+			<parameter name="requestHeartbeatResponse" type="boolean" required="false">
 				<label>Request Heartbeat Response</label>
 				<description>If no heartbeat received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL thing with
 					same node ID will be set OFFLINE.</description>
+				<default>false</default>
+			</parameter>
+			<parameter name="requestAck" type="boolean" required="false">
+				<label>Request ACK</label>
+				<description>Request ACK from Actuator</description>
+				<default>false</default>
+			</parameter>
+			<parameter name="revertState" type="boolean" required="false">
+				<label>Revert State</label>
+				<description>Revert state if no Ack received</description>
+				<default>true</default>
+			</parameter>
+			<parameter name="smartSleep" type="boolean" required="false">
+				<label>SmartSleep</label>
+				<description>Does this node support Smartsleep? A message to the node is only send in response to a heartbeat!</description>
 				<default>false</default>
 			</parameter>
 		</config-description>
@@ -1217,10 +1502,25 @@
 				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
 				<default>-1</default>
 			</parameter>
-			<parameter name="requestHeartbeatResponse" type="integer" required="false">
+			<parameter name="requestHeartbeatResponse" type="boolean" required="false">
 				<label>Request Heartbeat Response</label>
 				<description>If no heartbeat received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL thing with
 					same node ID will be set OFFLINE.</description>
+				<default>false</default>
+			</parameter>
+			<parameter name="requestAck" type="boolean" required="false">
+				<label>Request ACK</label>
+				<description>Request ACK from Actuator</description>
+				<default>false</default>
+			</parameter>
+			<parameter name="revertState" type="boolean" required="false">
+				<label>Revert State</label>
+				<description>Revert state if no Ack received</description>
+				<default>true</default>
+			</parameter>
+			<parameter name="smartSleep" type="boolean" required="false">
+				<label>SmartSleep</label>
+				<description>Does this node support Smartsleep? A message to the node is only send in response to a heartbeat!</description>
 				<default>false</default>
 			</parameter>
 		</config-description>
@@ -1268,10 +1568,25 @@
 				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
 				<default>-1</default>
 			</parameter>
-			<parameter name="requestHeartbeatResponse" type="integer" required="false">
+			<parameter name="requestHeartbeatResponse" type="boolean" required="false">
 				<label>Request Heartbeat Response</label>
 				<description>If no heartbeat received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL thing with
 					same node ID will be set OFFLINE.</description>
+				<default>false</default>
+			</parameter>
+			<parameter name="requestAck" type="boolean" required="false">
+				<label>Request ACK</label>
+				<description>Request ACK from Actuator</description>
+				<default>false</default>
+			</parameter>
+			<parameter name="revertState" type="boolean" required="false">
+				<label>Revert State</label>
+				<description>Revert state if no Ack received</description>
+				<default>true</default>
+			</parameter>
+			<parameter name="smartSleep" type="boolean" required="false">
+				<label>SmartSleep</label>
+				<description>Does this node support Smartsleep? A message to the node is only send in response to a heartbeat!</description>
 				<default>false</default>
 			</parameter>
 		</config-description>
@@ -1320,10 +1635,25 @@
 				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
 				<default>-1</default>
 			</parameter>
-			<parameter name="requestHeartbeatResponse" type="integer" required="false">
+			<parameter name="requestHeartbeatResponse" type="boolean" required="false">
 				<label>Request Heartbeat Response</label>
 				<description>If no heartbeat received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL thing with
 					same node ID will be set OFFLINE.</description>
+				<default>false</default>
+			</parameter>
+			<parameter name="requestAck" type="boolean" required="false">
+				<label>Request ACK</label>
+				<description>Request ACK from Actuator</description>
+				<default>false</default>
+			</parameter>
+			<parameter name="revertState" type="boolean" required="false">
+				<label>Revert State</label>
+				<description>Revert state if no Ack received</description>
+				<default>true</default>
+			</parameter>
+			<parameter name="smartSleep" type="boolean" required="false">
+				<label>SmartSleep</label>
+				<description>Does this node support Smartsleep? A message to the node is only send in response to a heartbeat!</description>
 				<default>false</default>
 			</parameter>
 		</config-description>
@@ -1371,10 +1701,25 @@
 				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
 				<default>-1</default>
 			</parameter>
-			<parameter name="requestHeartbeatResponse" type="integer" required="false">
+			<parameter name="requestHeartbeatResponse" type="boolean" required="false">
 				<label>Request Heartbeat Response</label>
 				<description>If no heartbeat received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL thing with
 					same node ID will be set OFFLINE.</description>
+				<default>false</default>
+			</parameter>
+			<parameter name="requestAck" type="boolean" required="false">
+				<label>Request ACK</label>
+				<description>Request ACK from Actuator</description>
+				<default>false</default>
+			</parameter>
+			<parameter name="revertState" type="boolean" required="false">
+				<label>Revert State</label>
+				<description>Revert state if no Ack received</description>
+				<default>true</default>
+			</parameter>
+			<parameter name="smartSleep" type="boolean" required="false">
+				<label>SmartSleep</label>
+				<description>Does this node support Smartsleep? A message to the node is only send in response to a heartbeat!</description>
 				<default>false</default>
 			</parameter>
 		</config-description>
@@ -1419,10 +1764,25 @@
 				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
 				<default>-1</default>
 			</parameter>
-			<parameter name="requestHeartbeatResponse" type="integer" required="false">
+			<parameter name="requestHeartbeatResponse" type="boolean" required="false">
 				<label>Request Heartbeat Response</label>
 				<description>If no heartbeat received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL thing with
 					same node ID will be set OFFLINE.</description>
+				<default>false</default>
+			</parameter>
+			<parameter name="requestAck" type="boolean" required="false">
+				<label>Request ACK</label>
+				<description>Request ACK from Actuator</description>
+				<default>false</default>
+			</parameter>
+			<parameter name="revertState" type="boolean" required="false">
+				<label>Revert State</label>
+				<description>Revert state if no Ack received</description>
+				<default>true</default>
+			</parameter>
+			<parameter name="smartSleep" type="boolean" required="false">
+				<label>SmartSleep</label>
+				<description>Does this node support Smartsleep? A message to the node is only send in response to a heartbeat!</description>
 				<default>false</default>
 			</parameter>
 		</config-description>
@@ -1468,10 +1828,25 @@
 				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
 				<default>-1</default>
 			</parameter>
-			<parameter name="requestHeartbeatResponse" type="integer" required="false">
+			<parameter name="requestHeartbeatResponse" type="boolean" required="false">
 				<label>Request Heartbeat Response</label>
 				<description>If no heartbeat received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL thing with
 					same node ID will be set OFFLINE.</description>
+				<default>false</default>
+			</parameter>
+			<parameter name="requestAck" type="boolean" required="false">
+				<label>Request ACK</label>
+				<description>Request ACK from Actuator</description>
+				<default>false</default>
+			</parameter>
+			<parameter name="revertState" type="boolean" required="false">
+				<label>Revert State</label>
+				<description>Revert state if no Ack received</description>
+				<default>true</default>
+			</parameter>
+			<parameter name="smartSleep" type="boolean" required="false">
+				<label>SmartSleep</label>
+				<description>Does this node support Smartsleep? A message to the node is only send in response to a heartbeat!</description>
 				<default>false</default>
 			</parameter>
 		</config-description>
@@ -1518,10 +1893,25 @@
 				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
 				<default>-1</default>
 			</parameter>
-			<parameter name="requestHeartbeatResponse" type="integer" required="false">
+			<parameter name="requestHeartbeatResponse" type="boolean" required="false">
 				<label>Request Heartbeat Response</label>
 				<description>If no heartbeat received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL thing with
 					same node ID will be set OFFLINE.</description>
+				<default>false</default>
+			</parameter>
+			<parameter name="requestAck" type="boolean" required="false">
+				<label>Request ACK</label>
+				<description>Request ACK from Actuator</description>
+				<default>false</default>
+			</parameter>
+			<parameter name="revertState" type="boolean" required="false">
+				<label>Revert State</label>
+				<description>Revert state if no Ack received</description>
+				<default>true</default>
+			</parameter>
+			<parameter name="smartSleep" type="boolean" required="false">
+				<label>SmartSleep</label>
+				<description>Does this node support Smartsleep? A message to the node is only send in response to a heartbeat!</description>
 				<default>false</default>
 			</parameter>
 		</config-description>
@@ -1564,10 +1954,25 @@
 				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
 				<default>-1</default>
 			</parameter>
-			<parameter name="requestHeartbeatResponse" type="integer" required="false">
+			<parameter name="requestHeartbeatResponse" type="boolean" required="false">
 				<label>Request Heartbeat Response</label>
 				<description>If no heartbeat received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL thing with
 					same node ID will be set OFFLINE.</description>
+				<default>false</default>
+			</parameter>
+			<parameter name="requestAck" type="boolean" required="false">
+				<label>Request ACK</label>
+				<description>Request ACK from Actuator</description>
+				<default>false</default>
+			</parameter>
+			<parameter name="revertState" type="boolean" required="false">
+				<label>Revert State</label>
+				<description>Revert state if no Ack received</description>
+				<default>true</default>
+			</parameter>
+			<parameter name="smartSleep" type="boolean" required="false">
+				<label>SmartSleep</label>
+				<description>Does this node support Smartsleep? A message to the node is only send in response to a heartbeat!</description>
 				<default>false</default>
 			</parameter>
 		</config-description>
@@ -1610,10 +2015,25 @@
 				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
 				<default>-1</default>
 			</parameter>
-			<parameter name="requestHeartbeatResponse" type="integer" required="false">
+			<parameter name="requestHeartbeatResponse" type="boolean" required="false">
 				<label>Request Heartbeat Response</label>
 				<description>If no heartbeat received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL thing with
 					same node ID will be set OFFLINE.</description>
+				<default>false</default>
+			</parameter>
+			<parameter name="requestAck" type="boolean" required="false">
+				<label>Request ACK</label>
+				<description>Request ACK from Actuator</description>
+				<default>false</default>
+			</parameter>
+			<parameter name="revertState" type="boolean" required="false">
+				<label>Revert State</label>
+				<description>Revert state if no Ack received</description>
+				<default>true</default>
+			</parameter>
+			<parameter name="smartSleep" type="boolean" required="false">
+				<label>SmartSleep</label>
+				<description>Does this node support Smartsleep? A message to the node is only send in response to a heartbeat!</description>
 				<default>false</default>
 			</parameter>
 		</config-description>
@@ -1656,10 +2076,25 @@
 				<description>Minutes after, if no message received, thing will be set to OFFLINE</description>
 				<default>-1</default>
 			</parameter>
-			<parameter name="requestHeartbeatResponse" type="integer" required="false">
+			<parameter name="requestHeartbeatResponse" type="boolean" required="false">
 				<label>Request Heartbeat Response</label>
 				<description>If no heartbeat received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL thing with
 					same node ID will be set OFFLINE.</description>
+				<default>false</default>
+			</parameter>
+			<parameter name="requestAck" type="boolean" required="false">
+				<label>Request ACK</label>
+				<description>Request ACK from Actuator</description>
+				<default>false</default>
+			</parameter>
+			<parameter name="revertState" type="boolean" required="false">
+				<label>Revert State</label>
+				<description>Revert state if no Ack received</description>
+				<default>true</default>
+			</parameter>
+			<parameter name="smartSleep" type="boolean" required="false">
+				<label>SmartSleep</label>
+				<description>Does this node support Smartsleep? A message to the node is only send in response to a heartbeat!</description>
 				<default>false</default>
 			</parameter>
 		</config-description>

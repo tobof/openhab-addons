@@ -8,6 +8,8 @@
  */
 package org.openhab.binding.mysensors.internal.protocol.message;
 
+import java.text.ParseException;
+
 import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsNode;
 import org.slf4j.Logger;
@@ -20,6 +22,10 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class MySensorsMessage {
+
+    // Message direction
+    public static final int MYSENSORS_MSG_DIRECTION_INCOMING = 0;
+    public static final int MYSENSORS_MSG_DIRECTION_OUTGOING = 1;
 
     // Message parts
     public static final int MYSENSORS_MSG_PART_NODE = 0;
@@ -189,6 +195,7 @@ public class MySensorsMessage {
     private int retries = 0; // number of retries if a message is not acknowledged by the receiver
     private long nextSend = 0; // timestamp when the message should be send
     private boolean smartSleep = false; // smartsleep message
+    private int direction = MYSENSORS_MSG_DIRECTION_OUTGOING; // Is this message incoming or outgoing?
 
     public MySensorsMessage() {
 
@@ -293,6 +300,10 @@ public class MySensorsMessage {
         }
     }
 
+    public void setAck(boolean ack) {
+        setAck(ack ? 1 : 0);
+    }
+
     public int getSubType() {
         return subType;
     }
@@ -331,6 +342,14 @@ public class MySensorsMessage {
 
     public void setNextSend(long nextSend) {
         this.nextSend = nextSend;
+    }
+
+    public int getDirection() {
+        return direction;
+    }
+
+    public void setDirection(int direction) {
+        this.direction = direction;
     }
 
     /**
@@ -514,32 +533,37 @@ public class MySensorsMessage {
     /**
      * @param line Input is a String containing the message received from the MySensors network
      * @return Returns the content of the message as a MySensorsMessage
+     *
+     * @throws ParseException
      */
-    public static MySensorsMessage parse(String line) {
-        String[] splitMessage = line.split(";");
-        if (splitMessage.length > 4) {
+    public static MySensorsMessage parse(String line) throws ParseException {
+        try {
+            String[] splitMessage = line.split(";");
+            if (splitMessage.length > 4) {
 
-            MySensorsMessage mysensorsmessage = new MySensorsMessage();
+                MySensorsMessage mysensorsmessage = new MySensorsMessage();
 
-            int nodeId = Integer.parseInt(splitMessage[MYSENSORS_MSG_PART_NODE]);
+                int nodeId = Integer.parseInt(splitMessage[MYSENSORS_MSG_PART_NODE]);
 
-            mysensorsmessage.setNodeId(nodeId);
-            mysensorsmessage.setChildId(Integer.parseInt(splitMessage[MYSENSORS_MSG_PART_CHILD]));
-            mysensorsmessage.setMsgType(Integer.parseInt(splitMessage[MYSENSORS_MSG_PART_TYPE]));
-            mysensorsmessage.setAck(Integer.parseInt(splitMessage[MYSENSORS_MSG_PART_ACK]));
-            mysensorsmessage.setSubType(Integer.parseInt(splitMessage[MYSENSORS_MSG_PART_SUBTYPE]));
-            if (splitMessage.length == 6) {
-                String msg = splitMessage[5].replaceAll("\\r|\\n", "").trim();
-                mysensorsmessage.setMsg(msg);
+                mysensorsmessage.setNodeId(nodeId);
+                mysensorsmessage.setChildId(Integer.parseInt(splitMessage[MYSENSORS_MSG_PART_CHILD]));
+                mysensorsmessage.setMsgType(Integer.parseInt(splitMessage[MYSENSORS_MSG_PART_TYPE]));
+                mysensorsmessage.setAck(Integer.parseInt(splitMessage[MYSENSORS_MSG_PART_ACK]));
+                mysensorsmessage.setSubType(Integer.parseInt(splitMessage[MYSENSORS_MSG_PART_SUBTYPE]));
+                if (splitMessage.length == 6) {
+                    String msg = splitMessage[5].replaceAll("\\r|\\n", "").trim();
+                    mysensorsmessage.setMsg(msg);
+                } else {
+                    mysensorsmessage.setMsg("");
+                }
+                return mysensorsmessage;
             } else {
-                mysensorsmessage.setMsg("");
+                throw new ParseException("Message lenght is not > 4", 0);
             }
 
-            return mysensorsmessage;
-        } else {
-            return null;
+        } catch (Exception e) {
+            throw new ParseException(e.getClass() + " : " + e.getMessage(), 0);
         }
-
     }
 
     /**
