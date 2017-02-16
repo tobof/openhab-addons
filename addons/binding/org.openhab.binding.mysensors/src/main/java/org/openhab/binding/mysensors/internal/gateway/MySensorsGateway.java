@@ -458,7 +458,7 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
                         break;
                     case MySensorsMessage.MYSENSORS_MSG_TYPE_REQ:
                     case MySensorsMessage.MYSENSORS_MSG_TYPE_SET:
-                        ret = handleSetReqMessage(msg);
+                        ret = handleSetReqMessage(msg, true);
                         break;
                     case MySensorsMessage.MYSENSORS_MSG_TYPE_PRESENTATION:
                         ret = handlePresentationMessage(msg);
@@ -483,7 +483,7 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
             if (msg.getDirection() == MySensorsMessage.MYSENSORS_MSG_DIRECTION_OUTGOING) {
                 switch (msg.getMsgType()) {
                     case MySensorsMessage.MYSENSORS_MSG_TYPE_SET:
-                        ret = handleSetReqMessage(msg);
+                        ret = handleSetReqMessage(msg, false);
                         break;
                 }
             } else {
@@ -551,7 +551,7 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
         return ret;
     }
 
-    private boolean handleSetReqMessage(MySensorsMessage msg) {
+    private boolean handleSetReqMessage(MySensorsMessage msg, boolean dispatchUpdate) {
         boolean ret = false;
 
         MySensorsNode node = getNode(msg.getNodeId());
@@ -573,8 +573,10 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
                             logger.trace("Variable {}({}) found in child, post-update value: {}",
                                     variable.getClass().getSimpleName(), variable.getType(), variable.getValue());
 
-                            myEventRegister.notifyNodeUpdateEvent(node, child, variable,
-                                    MySensorsNodeUpdateEventType.UPDATE);
+                            if (dispatchUpdate) {
+                                myEventRegister.notifyNodeUpdateEvent(node, child, variable,
+                                        MySensorsNodeUpdateEventType.UPDATE);
+                            }
                         } else {
                             logger.warn("Could not set value to node {} if not reachable", node.getNodeId());
                         }

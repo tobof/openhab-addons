@@ -340,24 +340,28 @@ public abstract class MySensorsAbstractConnection implements Runnable {
                     logger.debug(line);
                     MySensorsMessage msg = MySensorsMessage.parse(line);
 
-                    msg.setDirection(MySensorsMessage.MYSENSORS_MSG_DIRECTION_INCOMING);
+                    // Debug message are useless, just print it
+                    if (!msg.isDebugMessage()) {
+                        msg.setDirection(MySensorsMessage.MYSENSORS_MSG_DIRECTION_INCOMING);
 
-                    // Have we get a I_HEARBEAT_RESPONSE
-                    if (msg.isHeartbeatResponseMessage()) {
-                        handleSmartSleepMessage(msg);
+                        // Have we get a I_HEARBEAT_RESPONSE
+                        if (msg.isHeartbeatResponseMessage()) {
+                            handleSmartSleepMessage(msg);
+                        }
+
+                        // Have we get a I_VERSION message?
+                        if (msg.isIVersionMessage()) {
+                            iVersionMessageReceived(msg.getMsg());
+                        }
+
+                        // Is this an ACK message?
+                        if (msg.getAck() == 1) {
+                            handleAckReceived(msg);
+                        }
+
+                        myEventRegister.notifyMessageReceived(msg);
                     }
 
-                    // Have we get a I_VERSION message?
-                    if (msg.isIVersionMessage()) {
-                        iVersionMessageReceived(msg.getMsg());
-                    }
-
-                    // Is this an ACK message?
-                    if (msg.getAck() == 1) {
-                        handleAckReceived(msg);
-                    }
-
-                    myEventRegister.notifyMessageReceived(msg);
                 } catch (InterruptedException e) {
                     logger.warn("Interrupted MySensorsReader");
                 } catch (Exception e) {
@@ -617,7 +621,7 @@ public abstract class MySensorsAbstractConnection implements Runnable {
                             && ackM.getMsgType() == msg.getMsgType() && ackM.getSubType() == msg.getSubType()
                             && ackM.getAck() == msg.getAck() && ackM.getMsg().equals(msg.getMsg())) {
                         iterator.remove();
-                        ret = true && (msg.getRetries() != 0); // First time we only clear old ack, if present
+                        ret = (msg.getRetries() != 0); // First time we only clear old ack, if present
                     }
                 }
             }

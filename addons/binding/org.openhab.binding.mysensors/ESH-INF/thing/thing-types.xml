@@ -2173,7 +2173,6 @@
 		<item-type>Switch</item-type>
 		<label>Armed Status</label>
 		<description>Armed Status</description>
-		<state readOnly="true"></state>
 	</channel-type>
 	<channel-type id="dimmer-channel">
 		<item-type>Dimmer</item-type>
