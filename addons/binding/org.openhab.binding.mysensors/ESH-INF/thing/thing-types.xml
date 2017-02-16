@@ -719,6 +719,7 @@
 
 		<channels>
 			<channel id="dimmer" typeId="dimmer-channel" />
+			<channel id="status" typeId="status-channel" />
 			<channel id="watt" typeId="watt-channel" />
 			<channel id="battery" typeId="battery-channel" />
 			<channel id="lastupdate" typeId="lastupdate-channel" />
