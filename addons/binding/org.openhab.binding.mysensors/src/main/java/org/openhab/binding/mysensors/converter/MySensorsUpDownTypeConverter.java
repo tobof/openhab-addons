@@ -8,6 +8,7 @@
  */
 package org.openhab.binding.mysensors.converter;
 
+import org.eclipse.smarthome.core.library.types.PercentType;
 import org.eclipse.smarthome.core.library.types.StopMoveType;
 import org.eclipse.smarthome.core.library.types.UpDownType;
 import org.eclipse.smarthome.core.types.Command;
@@ -21,16 +22,22 @@ public class MySensorsUpDownTypeConverter implements MySensorsTypeConverter {
     @Override
     public Integer typeFromChannelCommand(String channel, Command command) {
         if (channel.equals(MySensorsBindingConstants.CHANNEL_COVER)) {
-            if (command.equals(UpDownType.UP)) {
-                return MySensorsMessage.MYSENSORS_SUBTYPE_V_UP;
-            } else if (command.equals(UpDownType.DOWN)) {
-                return MySensorsMessage.MYSENSORS_SUBTYPE_V_DOWN;
+            if (command instanceof UpDownType) {
+                if (command.equals(UpDownType.UP)) {
+                    return MySensorsMessage.MYSENSORS_SUBTYPE_V_UP;
+                } else if (command.equals(UpDownType.DOWN)) {
+                    return MySensorsMessage.MYSENSORS_SUBTYPE_V_DOWN;
+                } else {
+                    throw new IllegalArgumentException("Invalid command of type UpDownType: " + command);
+                }
             } else if (command instanceof StopMoveType) {
                 if (command.equals(StopMoveType.STOP)) {
                     return MySensorsMessage.MYSENSORS_SUBTYPE_V_STOP;
                 } else {
                     throw new IllegalArgumentException("Invalid command of type StopMoveType");
                 }
+            } else if (command instanceof PercentType) {
+                return MySensorsMessage.MYSENSORS_SUBTYPE_V_PERCENTAGE;
             } else {
                 throw new IllegalArgumentException("Invalid command (" + command + ") passed to UpDown adapter");
 
@@ -46,8 +53,10 @@ public class MySensorsUpDownTypeConverter implements MySensorsTypeConverter {
             return UpDownType.DOWN;
         } else if (value.getType() == MySensorsMessage.MYSENSORS_SUBTYPE_V_UP) {
             return UpDownType.UP;
+        } else if (value.getType() == MySensorsMessage.MYSENSORS_SUBTYPE_V_PERCENTAGE) {
+            return new PercentType(value.getValue());
         } else {
-            throw new IllegalArgumentException("Variable " + value.getType() + " is not up/down");
+            throw new IllegalArgumentException("Variable " + value.getType() + " is not up/down or percent type");
         }
     }
 
@@ -61,9 +70,12 @@ public class MySensorsUpDownTypeConverter implements MySensorsTypeConverter {
             }
         } else if (state instanceof StopMoveType) {
             return "1";
+        } else if (state instanceof PercentType) {
+            return state.toFullString();
         } else {
-            throw new IllegalStateException("UpDown command is the only one command allowed by this adapter, passed: "
-                    + state + "(" + (state != null ? state.getClass() : "") + ")");
+            throw new IllegalStateException(
+                    "UpDown/Percent command are the only one command allowed by this adapter, passed: " + state + "("
+                            + (state != null ? state.getClass() : "") + ")");
         }
     }
 
