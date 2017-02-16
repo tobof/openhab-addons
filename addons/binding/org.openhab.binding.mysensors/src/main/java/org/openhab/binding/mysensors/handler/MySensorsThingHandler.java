@@ -26,6 +26,7 @@ import org.eclipse.smarthome.core.thing.binding.BaseThingHandler;
 import org.eclipse.smarthome.core.types.Command;
 import org.eclipse.smarthome.core.types.RefreshType;
 import org.eclipse.smarthome.core.types.State;
+import org.openhab.binding.mysensors.MySensorsBindingConstants;
 import org.openhab.binding.mysensors.config.MySensorsSensorConfiguration;
 import org.openhab.binding.mysensors.converter.MySensorsTypeConverter;
 import org.openhab.binding.mysensors.internal.event.MySensorsGatewayEventListener;
@@ -91,12 +92,23 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
     }
 
     @Override
+    public void dispose() {
+        myGateway.removeEventListener(this);
+        super.dispose();
+    }
+
+    @Override
     public void bridgeStatusChanged(ThingStatusInfo bridgeStatusInfo) {
         logger.debug("MySensors Bridge Status updated to {} for device: {}", bridgeStatusInfo.getStatus().toString(),
                 getThing().getUID().toString());
         if (bridgeStatusInfo.getStatus().equals(ThingStatus.ONLINE)
                 || bridgeStatusInfo.getStatus().equals(ThingStatus.OFFLINE)) {
-            registerListeners();
+
+            if (bridgeStatusInfo.getStatus().equals(ThingStatus.ONLINE)) {
+                registerListeners();
+            } else {
+                myGateway.removeEventListener(this);
+            }
 
             // the node has the same status of the bridge
             updateStatus(bridgeStatusInfo.getStatus());
@@ -259,11 +271,20 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
     }
 
     private void handleChildUpdateEvent(MySensorsVariable var) {
-        String channelName = CHANNEL_MAP.get(var.getType());
+        String channelName = getChannelNameFromVar(var);
         State newState = loadAdapterForChannelType(channelName).stateFromChannel(var);
         logger.debug("Updating channel: {}({}) value to: {}", channelName, var.getType(), newState);
         updateState(channelName, newState);
 
+    }
+
+    private String getChannelNameFromVar(MySensorsVariable var) {
+        // Cover thing has a specific behavior
+        if (getThing().getThingTypeUID().equals(MySensorsBindingConstants.THING_TYPE_COVER)) {
+            return MySensorsBindingConstants.CHANNEL_COVER;
+        } else {
+            return CHANNEL_MAP.get(var.getType());
+        }
     }
 
     private MySensorsTypeConverter loadAdapterForChannelType(String channelName) {

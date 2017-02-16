@@ -96,6 +96,7 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
         unregisterDeviceDiscoveryService();
 
         if (myGateway != null) {
+            myGateway.removeEventListener(this);
             myGateway.shutdown();
         }
 

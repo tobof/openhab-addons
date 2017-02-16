@@ -719,6 +719,7 @@
 
 		<channels>
 			<channel id="dimmer" typeId="dimmer-channel" />
+			<channel id="status" typeId="status-channel" />
 			<channel id="watt" typeId="watt-channel" />
 			<channel id="battery" typeId="battery-channel" />
 			<channel id="lastupdate" typeId="lastupdate-channel" />
@@ -2173,7 +2174,6 @@
 		<item-type>Switch</item-type>
 		<label>Armed Status</label>
 		<description>Armed Status</description>
-		<state readOnly="true"></state>
 	</channel-type>
 	<channel-type id="dimmer-channel">
 		<item-type>Dimmer</item-type>
