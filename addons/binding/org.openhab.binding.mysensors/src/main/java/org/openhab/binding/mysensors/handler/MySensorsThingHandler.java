@@ -148,9 +148,9 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
         } else {
             MySensorsTypeConverter adapter = loadAdapterForChannelType(channelUID.getId());
 
-            logger.trace("Adapter {} found for type {}", adapter.getClass().getSimpleName(), channelUID.getId());
-
             if (adapter != null) {
+                logger.trace("Adapter {} found for type {}", adapter.getClass().getSimpleName(), channelUID.getId());
+
                 Integer type = adapter.typeFromChannelCommand(channelUID.getId(), command);
 
                 if (type != null) {
