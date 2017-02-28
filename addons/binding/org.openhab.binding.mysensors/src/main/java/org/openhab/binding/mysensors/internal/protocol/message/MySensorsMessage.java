@@ -180,7 +180,7 @@ public class MySensorsMessage {
 
     // I version message for startup check
     public static final MySensorsMessage I_VERSION_MESSAGE = new MySensorsMessage(
-            MySensorsNode.MYSENSORS_NODE_ID_RESERVED_0, MySensorsChild.MYSENSORS_CHILD_ID_RESERVED_0,
+            MySensorsNode.MYSENSORS_NODE_ID_RESERVED_GATEWAY_0, MySensorsChild.MYSENSORS_CHILD_ID_RESERVED_0,
             MYSENSORS_MSG_TYPE_INTERNAL, MYSENSORS_ACK_FALSE, false, MYSENSORS_SUBTYPE_I_VERSION, "");
 
     private Logger logger = LoggerFactory.getLogger(MySensorsMessage.class);
@@ -382,7 +382,7 @@ public class MySensorsMessage {
     public boolean isIVersionMessage() {
         boolean ret = false;
 
-        if (nodeId == MySensorsNode.MYSENSORS_NODE_ID_RESERVED_0) {
+        if (nodeId == MySensorsNode.MYSENSORS_NODE_ID_RESERVED_GATEWAY_0) {
             if (childId == MySensorsChild.MYSENSORS_CHILD_ID_RESERVED_0
                     || childId == MySensorsChild.MYSENSORS_CHILD_ID_RESERVED_255) {
                 if (msgType == MYSENSORS_MSG_TYPE_INTERNAL) {
@@ -494,7 +494,7 @@ public class MySensorsMessage {
      * @return true if this message is I_DEBUG
      */
     public boolean isDebugMessage() {
-        return (nodeId == MySensorsNode.MYSENSORS_NODE_ID_RESERVED_0)
+        return (nodeId == MySensorsNode.MYSENSORS_NODE_ID_RESERVED_GATEWAY_0)
                 && (childId == MySensorsChild.MYSENSORS_CHILD_ID_RESERVED_255)
                 && (msgType == MYSENSORS_MSG_TYPE_INTERNAL) && (subType == MYSENSORS_SUBTYPE_I_DEBUG);
     }

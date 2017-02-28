@@ -29,7 +29,7 @@ import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
 public class MySensorsNode {
 
     // Reserved ids
-    public static final int MYSENSORS_NODE_ID_RESERVED_0 = 0;
+    public static final int MYSENSORS_NODE_ID_RESERVED_GATEWAY_0 = 0;
     public static final int MYSENSORS_NODE_ID_RESERVED_255 = 255;
 
     private final int nodeId;
@@ -271,9 +271,16 @@ public class MySensorsNode {
      * @return true if ID is valid
      */
     public static boolean isValidNodeId(int id) {
-        return (id > MYSENSORS_NODE_ID_RESERVED_0 && id < MYSENSORS_NODE_ID_RESERVED_255);
+        return (id >= MYSENSORS_NODE_ID_RESERVED_GATEWAY_0 && id < MYSENSORS_NODE_ID_RESERVED_255);
     }
 
+    /**
+     * Check if a node has a valid node ID
+     *
+     * @param node to test
+     *
+     * @return true if node is valid
+     */
     public static boolean isValidNode(MySensorsNode n) {
         return (n != null) && (isValidNodeId(n.nodeId));
     }
