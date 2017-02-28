@@ -122,6 +122,12 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
     }
 
     @Override
+    public void handleUpdate(ChannelUID channelUID, State newState) {
+        logger.trace("New state {} received for channel uid {}", newState, channelUID);
+        super.handleUpdate(channelUID, newState);
+    }
+
+    @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
         logger.trace("Command {} received for channel uid {}", command, channelUID);
         /*
@@ -148,9 +154,9 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
         } else {
             MySensorsTypeConverter adapter = loadAdapterForChannelType(channelUID.getId());
 
-            logger.trace("Adapter {} found for type {}", adapter.getClass().getSimpleName(), channelUID.getId());
-
             if (adapter != null) {
+                logger.trace("Adapter {} found for type {}", adapter.getClass().getSimpleName(), channelUID.getId());
+
                 Integer type = adapter.typeFromChannelCommand(channelUID.getId(), command);
 
                 if (type != null) {
