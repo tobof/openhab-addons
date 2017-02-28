@@ -445,13 +445,11 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
      */
     private boolean handleIncomingMessage(MySensorsMessage msg) throws Throwable {
         boolean ret = false;
-
         if (MySensorsNode.isValidNodeId(msg.getNodeId()) && MySensorsChild.isValidChildId(msg.getChildId())) {
 
             if (msg.getDirection() == MySensorsMessage.MYSENSORS_MSG_DIRECTION_INCOMING) {
                 updateReachable(msg);
                 updateLastUpdateFromMessage(msg);
-
                 switch (msg.getMsgType()) {
                     case MySensorsMessage.MYSENSORS_MSG_TYPE_INTERNAL:
                         ret = handleInternalMessage(msg);
@@ -617,9 +615,9 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
         if (node != null) {
             switch (msg.getSubType()) {
                 case MySensorsMessage.MYSENSORS_SUBTYPE_I_BATTERY_LEVEL:
-                    logger.trace("Battery percent for node {} update to: {}%", node.getNodeId(),
-                            node.getBatteryPercent());
                     node.setBatteryPercent(Integer.parseInt(msg.getMsg()));
+                    logger.debug("Battery percent for node {} update to: {}%", node.getNodeId(),
+                            node.getBatteryPercent());
                     myEventRegister.notifyNodeUpdateEvent(node, null, null, MySensorsNodeUpdateEventType.BATTERY);
                     ret = true;
                     break;

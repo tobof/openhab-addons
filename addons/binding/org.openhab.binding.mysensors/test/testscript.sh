@@ -192,10 +192,10 @@ echo "101;2;1;0;37;246" > $serialPort
 
 # INTERNAL
 # batteryLevel
-#echo "12;255;3;0;0;100" > $serialPort
+echo "101;255;3;0;0;94" > $serialPort
 
 # I_HEARTBEAT_RESPONSE
-echo "172;3;3;0;22;1" > $serialPort
+#echo "172;3;3;0;22;1" > $serialPort
 
 # Representation of a S_COLOR_SENSOR
 #echo "1;0;0;0;28;2.1.0" > $serialPort

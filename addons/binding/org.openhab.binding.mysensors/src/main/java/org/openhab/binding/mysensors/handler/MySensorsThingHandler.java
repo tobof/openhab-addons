@@ -15,6 +15,7 @@ import java.text.SimpleDateFormat;
 import java.util.Map;
 
 import org.eclipse.smarthome.core.library.types.DateTimeType;
+import org.eclipse.smarthome.core.library.types.DecimalType;
 import org.eclipse.smarthome.core.library.types.StringType;
 import org.eclipse.smarthome.core.thing.Bridge;
 import org.eclipse.smarthome.core.thing.ChannelUID;
@@ -213,6 +214,7 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
                 break;
             case BATTERY:
                 if (node.getNodeId() == nodeId) {
+                    handleBatteryUpdateEvent(node);
                     updateLastUpdate(node, eventType == MySensorsNodeUpdateEventType.REVERT);
                 }
                 break;
@@ -282,6 +284,11 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
         logger.debug("Updating channel: {}({}) value to: {}", channelName, var.getType(), newState);
         updateState(channelName, newState);
 
+    }
+
+    private void handleBatteryUpdateEvent(MySensorsNode node) {
+        logger.debug("Updating channel: {} value to: {}", CHANNEL_BATTERY, node.getBatteryPercent());
+        updateState(CHANNEL_BATTERY, new DecimalType(node.getBatteryPercent()));
     }
 
     private String getChannelNameFromVar(MySensorsVariable var) {

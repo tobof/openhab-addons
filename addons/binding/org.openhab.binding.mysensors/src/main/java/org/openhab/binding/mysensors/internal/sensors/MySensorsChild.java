@@ -288,7 +288,7 @@ public abstract class MySensorsChild implements Mergeable {
      * @return true if passed id is valid
      */
     public static boolean isValidChildId(int id) {
-        return (id >= MYSENSORS_CHILD_ID_RESERVED_0 && id < MYSENSORS_CHILD_ID_RESERVED_255);
+        return (id >= MYSENSORS_CHILD_ID_RESERVED_0 && id <= MYSENSORS_CHILD_ID_RESERVED_255);
     }
 
     /**
