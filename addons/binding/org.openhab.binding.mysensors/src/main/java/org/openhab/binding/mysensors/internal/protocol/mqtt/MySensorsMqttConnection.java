@@ -157,7 +157,7 @@ public class MySensorsMqttConnection extends MySensorsAbstractConnection {
 
         @Override
         public void connectionLost(Throwable arg0) {
-            logger.debug("Connection lost.");
+            logger.debug("Connection lost: {}", arg0.toString());
         }
 
     }
