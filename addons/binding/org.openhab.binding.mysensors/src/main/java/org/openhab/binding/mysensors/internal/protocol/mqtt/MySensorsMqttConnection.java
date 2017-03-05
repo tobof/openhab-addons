@@ -19,35 +19,18 @@ import org.openhab.binding.mysensors.internal.protocol.MySensorsAbstractConnecti
 
 public class MySensorsMqttConnection extends MySensorsAbstractConnection {
 
-    // private Logger logger = LoggerFactory.getLogger(MySensorsMqttConnection.class);
-
-    // Configuration from thing file
-    // private MySensorsBridgeConfiguration myConfiguration = null;
-
     private MqttAsyncClient mqttClient = null;
 
     private MqttConnectOptions options = null;
 
-    // private MySensorsBridgeHandler bridgeHandler = null;
     private String url = null;
     private String topic = null;
     private String clientid = null;
 
     PipedOutputStream out = new PipedOutputStream();
 
-    // private ByteArrayOutputStream out = new ByteArrayOutputStream();
-    // private ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
-
     public MySensorsMqttConnection(MySensorsGatewayConfig myConf, MySensorsEventRegister myEventRegister) {
         super(myConf, myEventRegister);
-        // this.url = url;
-        // this.topic = topic;
-        // myConfiguration = bridgeHandler.getBridgeConfiguration();
-
-        // options = new MqttConnectOptions();
-        // Setzen einer Persistent Session
-        // options.setCleanSession(false);
-
     }
 
     @Override
@@ -152,7 +135,6 @@ public class MySensorsMqttConnection extends MySensorsAbstractConnection {
         @Override
         public void deliveryComplete(IMqttDeliveryToken arg0) {
             // TODO Auto-generated method stub
-
         }
 
         @Override
