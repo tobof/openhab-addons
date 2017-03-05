@@ -43,7 +43,8 @@ public class MySensorsHandlerFactory extends BaseThingHandlerFactory {
 
         if (SUPPORTED_THING_TYPES_UIDS.contains(thingTypeUID)) {
             handler = new MySensorsThingHandler(thing);
-        } else if (thingTypeUID.equals(THING_TYPE_BRIDGE_SER) || thingTypeUID.equals(THING_TYPE_BRIDGE_ETH)) {
+        } else if (thingTypeUID.equals(THING_TYPE_BRIDGE_SER) || thingTypeUID.equals(THING_TYPE_BRIDGE_ETH)
+                || thingTypeUID.equals(THING_TYPE_BRIDGE_MQTT)) {
             handler = new MySensorsBridgeHandler((Bridge) thing);
         } else {
             logger.error("Thing {} cannot be configured, is this thing supported by the binding?", thingTypeUID);
