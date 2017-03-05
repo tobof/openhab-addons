@@ -78,6 +78,36 @@ public class MySensorsGatewayConfig {
      */
     private Integer tcpPort;
 
+    /**
+     * URL of MQTT broker
+     */
+    private String url;
+
+    /**
+     * MQQT broker username
+     */
+    private String username;
+
+    /**
+     * MQTT broker password
+     */
+    private String password;
+
+    /**
+     * MQTT topic to subscribe to
+     */
+    private String topicSubscribe;
+
+    /**
+     * MQTT topic to publish to
+     */
+    private String topicPublish;
+
+    /**
+     * MQTT client ID
+     */
+    private String clientid;
+
     public MySensorsGatewayType getGatewayType() {
         return gatewayType;
     }
@@ -108,6 +138,54 @@ public class MySensorsGatewayConfig {
 
     public void setTcpPort(Integer tcpPort) {
         this.tcpPort = tcpPort;
+    }
+
+    public String getURL() {
+        return url;
+    }
+
+    public void setURL(String url) {
+        this.url = url;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getTopicSubscribe() {
+        return topicSubscribe;
+    }
+
+    public void setTopicSubscribe(String topicSubscribe) {
+        this.topicSubscribe = topicSubscribe;
+    }
+
+    public String getTopicPublish() {
+        return topicPublish;
+    }
+
+    public void setTopicPublish(String topicPublish) {
+        this.topicPublish = topicPublish;
+    }
+
+    public String getClientId() {
+        return clientid;
+    }
+
+    public void setClientId(String clientid) {
+        this.clientid = clientid;
     }
 
     public Integer getSendDelay() {
