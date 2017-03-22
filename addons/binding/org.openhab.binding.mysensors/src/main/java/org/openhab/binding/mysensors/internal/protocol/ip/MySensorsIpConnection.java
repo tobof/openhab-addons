@@ -34,7 +34,7 @@ public class MySensorsIpConnection extends MySensorsAbstractConnection {
      * Tries to accomplish a TCP/IP connection via socket to ethernet gateway.
      */
     @Override
-    public boolean _connect() {
+    public boolean establishConnection() {
         logger.debug("Connecting to IP bridge [{}:{}]", myGatewayConfig.getIpAddress(), myGatewayConfig.getTcpPort());
 
         boolean ret = false;
@@ -63,7 +63,7 @@ public class MySensorsIpConnection extends MySensorsAbstractConnection {
      * Ensures a clean disconnect from the TCP/IP connection to the gateway.
      */
     @Override
-    public void _disconnect() {
+    public void stopConnection() {
         logger.debug("Disconnecting from IP bridge ...");
 
         if (mysConWriter != null) {

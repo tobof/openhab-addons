@@ -366,7 +366,7 @@ public abstract class MySensorsAbstractConnection implements Runnable {
                 } catch (InterruptedException e) {
                     logger.warn("Interrupted MySensorsReader");
                 } catch (Exception e) {
-                    logger.error("Exception on reading from connection", e);
+                    logger.warn("Exception on reading from connection", e);
                     handleReaderWriterException();
 
                 }
@@ -426,7 +426,7 @@ public abstract class MySensorsAbstractConnection implements Runnable {
             try {
                 mysConWriter.confirmAcknowledgeMessage(msg);
             } catch (NoAckException e) {
-                logger.error("Invalid ACK message received: {}", e.toString());
+                logger.warn("Invalid ACK message received: {}", e.toString());
             }
         }
 
