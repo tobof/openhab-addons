@@ -139,7 +139,7 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
             return;
         }
 
-        int int_requestack = requestAck ? 1 : 0;
+        int intRequestAck = requestAck ? 1 : 0;
 
         // just forward the message in case it is received via this channel. This is special!
         if (channelUID.getId().equals(CHANNEL_MYSENSORS_MESSAGE)) {
@@ -172,7 +172,7 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
 
                         // Create the real message to send
                         MySensorsMessage newMsg = new MySensorsMessage(nodeId, childId,
-                                MySensorsMessage.MYSENSORS_MSG_TYPE_SET, int_requestack, revertState, smartSleep);
+                                MySensorsMessage.MYSENSORS_MSG_TYPE_SET, intRequestAck, revertState, smartSleep);
 
                         newMsg.setSubType(subType);
                         newMsg.setMsg(adapter.fromCommand(command));
@@ -196,7 +196,7 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
     }
 
     @Override
-    public void messageReceived(MySensorsMessage message) throws Throwable {
+    public void messageReceived(MySensorsMessage message) throws Exception {
         handleIncomingMessageEvent(message);
 
     }
@@ -223,7 +223,7 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
     }
 
     @Override
-    public void connectionStatusUpdate(MySensorsAbstractConnection connection, boolean connected) throws Throwable {
+    public void connectionStatusUpdate(MySensorsAbstractConnection connection, boolean connected) throws Exception {
         if (!connected) {
             updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.BRIDGE_OFFLINE);
         } else {

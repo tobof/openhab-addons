@@ -11,6 +11,13 @@ package org.openhab.binding.mysensors.internal.sensors;
 import org.openhab.binding.mysensors.internal.Mergeable;
 import org.openhab.binding.mysensors.internal.exception.MergeException;
 
+/**
+ * Configuration and parameters of a child from a MySensors node.
+ * 
+ * @author Tim Oberföll
+ * @author Andrea Cioni
+ *
+ */
 public class MySensorsChildConfig implements Mergeable {
 
     private boolean requestAck;

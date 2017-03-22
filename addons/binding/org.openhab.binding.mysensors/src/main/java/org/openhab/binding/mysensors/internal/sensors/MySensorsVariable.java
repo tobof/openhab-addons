@@ -13,6 +13,13 @@ import java.util.Date;
 import org.openhab.binding.mysensors.internal.exception.RevertVariableStateException;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
 
+/**
+ * Variables (states) of a MySensors child.
+ * 
+ * @author Tim Oberföll
+ * @author Andrea Cioni
+ *
+ */
 public abstract class MySensorsVariable {
 
     private final int type;

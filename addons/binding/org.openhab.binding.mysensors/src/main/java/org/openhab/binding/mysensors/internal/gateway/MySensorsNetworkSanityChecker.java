@@ -250,7 +250,7 @@ public class MySensorsNetworkSanityChecker implements MySensorsGatewayEventListe
     }
 
     @Override
-    public void messageReceived(MySensorsMessage message) throws Throwable {
+    public void messageReceived(MySensorsMessage message) throws Exception {
         synchronized (iVersionMessageMissing) {
             if (!iVersionMessageArrived) {
                 if (message.isIVersionMessage()) {

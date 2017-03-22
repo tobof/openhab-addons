@@ -584,15 +584,15 @@ public class MySensorsMessage {
      * @return the MySensorsMessage as a String.
      */
     public static String generateAPIString(MySensorsMessage msg) {
-        String APIString = "";
-        APIString += msg.getNodeId() + ";";
-        APIString += msg.getChildId() + ";";
-        APIString += msg.getMsgType() + ";";
-        APIString += msg.getAck() + ";";
-        APIString += msg.getSubType() + ";";
-        APIString += msg.getMsg() + "\n";
+        String apiString = "";
+        apiString += msg.getNodeId() + ";";
+        apiString += msg.getChildId() + ";";
+        apiString += msg.getMsgType() + ";";
+        apiString += msg.getAck() + ";";
+        apiString += msg.getSubType() + ";";
+        apiString += msg.getMsg() + "\n";
 
-        return APIString;
+        return apiString;
     }
 
     @Override

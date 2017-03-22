@@ -11,6 +11,12 @@ package org.openhab.binding.mysensors.converter;
 import org.eclipse.smarthome.core.library.types.StringType;
 import org.eclipse.smarthome.core.types.State;
 
+/**
+ * Used to convert a String from an incoming MySensors message to a StringType
+ * 
+ * @author Andrea Cioni
+ *
+ */
 public class MySensorsStringTypeConverter implements MySensorsTypeConverter {
 
     @Override

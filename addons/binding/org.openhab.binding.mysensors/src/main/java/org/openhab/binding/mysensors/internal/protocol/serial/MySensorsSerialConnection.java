@@ -38,7 +38,7 @@ public class MySensorsSerialConnection extends MySensorsAbstractConnection {
      * Tries to accomplish a connection via a serial port to the serial gateway.
      */
     @Override
-    public boolean _connect() {
+    public boolean establishConnection() {
         logger.debug("Connecting to {} [baudRate:{}]", myGatewayConfig.getSerialPort(), myGatewayConfig.getBaudRate());
 
         boolean ret = false;
@@ -73,7 +73,7 @@ public class MySensorsSerialConnection extends MySensorsAbstractConnection {
      * Initiates a clean disconnect from the serial gateway.
      */
     @Override
-    public void _disconnect() {
+    public void stopConnection() {
         logger.debug("Shutting down serial connection!");
 
         if (mysConWriter != null) {

@@ -19,6 +19,7 @@ import org.openhab.binding.mysensors.internal.event.MySensorsGatewayEventListene
 import org.openhab.binding.mysensors.internal.event.MySensorsNodeUpdateEventType;
 import org.openhab.binding.mysensors.internal.exception.MergeException;
 import org.openhab.binding.mysensors.internal.exception.NoMoreIdsException;
+import org.openhab.binding.mysensors.internal.exception.NotInitializedException;
 import org.openhab.binding.mysensors.internal.protocol.MySensorsAbstractConnection;
 import org.openhab.binding.mysensors.internal.protocol.ip.MySensorsIpConnection;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
@@ -194,7 +195,11 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
         MySensorsMessage msg = null;
 
         if (node != null) {
-            msg = node.updateVariableState(childId, type, state);
+            try {
+                msg = node.updateVariableState(childId, type, state);
+            } catch (NotInitializedException e) {
+                logger.error("State not initialized: {}", e.toString());
+            }
         }
 
         return msg;
@@ -356,7 +361,7 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
 
         try {
             handleOutgoingMessage(message);
-        } catch (Throwable e) {
+        } catch (Exception e) {
             logger.error("Handling outgoing message throw an exception", e);
         }
 
@@ -364,14 +369,14 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
     }
 
     @Override
-    public void messageReceived(MySensorsMessage message) throws Throwable {
+    public void messageReceived(MySensorsMessage message) throws Exception {
         if (!handleIncomingMessage(message)) {
             handleSpecialMessageEvent(message);
         }
     }
 
     @Override
-    public void ackNotReceived(MySensorsMessage msg) throws Throwable {
+    public void ackNotReceived(MySensorsMessage msg) throws Exception {
         if (MySensorsNode.isValidNodeId(msg.getNodeId()) && MySensorsChild.isValidChildId(msg.getChildId())
                 && msg.isSetReqMessage()) {
             MySensorsNode node = getNode(msg.getNodeId());
@@ -406,7 +411,7 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
     }
 
     @Override
-    public void connectionStatusUpdate(MySensorsAbstractConnection connection, boolean connected) throws Throwable {
+    public void connectionStatusUpdate(MySensorsAbstractConnection connection, boolean connected) throws Exception {
         if (myNetSanCheck != null) {
             if (connected) {
                 myNetSanCheck.start();
@@ -441,9 +446,9 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
      *         -message arrives from a device new device in the network or
      *         -message is REQ type and variable is defined for it
      *
-     * @throws Throwable
+     * @throws Exception
      */
-    private boolean handleIncomingMessage(MySensorsMessage msg) throws Throwable {
+    private boolean handleIncomingMessage(MySensorsMessage msg) throws Exception {
         boolean ret = false;
         if (MySensorsNode.isValidNodeId(msg.getNodeId()) && MySensorsChild.isValidChildId(msg.getChildId())) {
 
@@ -475,7 +480,7 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
         return ret;
     }
 
-    private boolean handleOutgoingMessage(MySensorsMessage msg) throws Throwable {
+    private boolean handleOutgoingMessage(MySensorsMessage msg) throws Exception {
         boolean ret = false;
         if (MySensorsNode.isValidNodeId(msg.getNodeId()) && MySensorsChild.isValidChildId(msg.getChildId())) {
             if (msg.getDirection() == MySensorsMessage.MYSENSORS_MSG_DIRECTION_OUTGOING) {

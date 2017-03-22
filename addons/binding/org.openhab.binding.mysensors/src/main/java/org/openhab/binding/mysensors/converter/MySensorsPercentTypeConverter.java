@@ -11,6 +11,12 @@ package org.openhab.binding.mysensors.converter;
 import org.eclipse.smarthome.core.library.types.PercentType;
 import org.eclipse.smarthome.core.types.State;
 
+/**
+ * Used to convert a String from an incoming MySensors message to a PercentType
+ * 
+ * @author Andrea Cioni
+ *
+ */
 public class MySensorsPercentTypeConverter implements MySensorsTypeConverter {
 
     @Override

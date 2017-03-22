@@ -11,6 +11,13 @@ package org.openhab.binding.mysensors.internal.sensors;
 import org.openhab.binding.mysensors.internal.Mergeable;
 import org.openhab.binding.mysensors.internal.exception.MergeException;
 
+/**
+ * Configuration and parameters of a MySensors node.
+ * 
+ * @author Tim Oberföll
+ * @author Andrea Cioni
+ *
+ */
 public class MySensorsNodeConfig implements Mergeable {
 
     private boolean requestHeartbeatResponse;

@@ -11,6 +11,12 @@ package org.openhab.binding.mysensors.converter;
 import org.eclipse.smarthome.core.library.types.DecimalType;
 import org.eclipse.smarthome.core.types.State;
 
+/**
+ * Used to convert a String from an incoming MySensors message to a DecimalType
+ * 
+ * @author Andrea Cioni
+ *
+ */
 public class MySensorsDecimalTypeConverter implements MySensorsTypeConverter {
 
     @Override

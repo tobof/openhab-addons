@@ -13,6 +13,12 @@ import org.eclipse.smarthome.core.library.types.OpenClosedType;
 import org.eclipse.smarthome.core.types.Command;
 import org.eclipse.smarthome.core.types.State;
 
+/**
+ * Used to convert a String from an incoming MySensors message to an OpenCloseType
+ * 
+ * @author Andrea Cioni
+ *
+ */
 public class MySensorsOpenCloseTypeConverter implements MySensorsTypeConverter {
     @Override
     public State fromString(String s) {

@@ -12,6 +12,12 @@ import org.eclipse.smarthome.core.library.types.OnOffType;
 import org.eclipse.smarthome.core.types.Command;
 import org.eclipse.smarthome.core.types.State;
 
+/**
+ * Used to convert a String from an incoming MySensors message to an OnOffType
+ * 
+ * @author Andrea Cioni
+ *
+ */
 public class MySensorsOnOffTypeConverter implements MySensorsTypeConverter {
 
     @Override

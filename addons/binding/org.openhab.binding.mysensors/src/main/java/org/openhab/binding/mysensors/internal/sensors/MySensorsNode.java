@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.openhab.binding.mysensors.internal.exception.MergeException;
+import org.openhab.binding.mysensors.internal.exception.NotInitializedException;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
 
 /**
@@ -227,13 +228,13 @@ public class MySensorsNode {
      *
      * @return a non-null message ready to be sent if childId/type are available on this node
      *
-     * @throws NullPointerException if state is null
+     * @throws NotInitializedException if state is null
      */
-    public MySensorsMessage updateVariableState(int childId, int type, String state) {
+    public MySensorsMessage updateVariableState(int childId, int type, String state) throws NotInitializedException{
         MySensorsMessage msg = null;
 
         if (state == null) {
-            throw new NullPointerException("State is null");
+            throw new NotInitializedException("State is null");
         }
 
         synchronized (chidldMap) {

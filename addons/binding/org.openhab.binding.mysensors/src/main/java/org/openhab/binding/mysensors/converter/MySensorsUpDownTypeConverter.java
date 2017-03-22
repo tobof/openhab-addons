@@ -17,6 +17,12 @@ import org.openhab.binding.mysensors.MySensorsBindingConstants;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsVariable;
 
+/**
+ * Used to convert a String from an incoming MySensors message to a UpDownType
+ * 
+ * @author Andrea Cioni
+ *
+ */
 public class MySensorsUpDownTypeConverter implements MySensorsTypeConverter {
 
     @Override

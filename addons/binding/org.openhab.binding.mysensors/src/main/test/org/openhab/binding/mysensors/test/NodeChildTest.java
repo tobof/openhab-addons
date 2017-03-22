@@ -10,18 +10,18 @@ package org.openhab.binding.mysensors.test;
 
 import org.junit.Test;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsNode;
-import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_CUSTOM;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChildSCustom;
 
 public class NodeChildTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testWrongChildIdNeg() {
-        new MySensorsChild_S_CUSTOM(-1);
+        new MySensorsChildSCustom(-1);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testWrongChildId() {
-        new MySensorsChild_S_CUSTOM(255);
+        new MySensorsChildSCustom(255);
     }
 
     @Test(expected = IllegalArgumentException.class)

@@ -28,9 +28,6 @@ public class MySensorsEventRegister extends EventRegister<MySensorsGatewayEventL
 
     private EventRegister<MySensorsGatewayEventListener> eventRegister;
 
-    // TODO #1 send update only if necessary (e.g.: status update true->false, false->true)
-    // TODO #2 asynchronous message notify
-
     public MySensorsEventRegister() {
         eventRegister = new EventRegister<>();
     }
@@ -69,7 +66,7 @@ public class MySensorsEventRegister extends EventRegister<MySensorsGatewayEventL
 
                 try {
                     listener.connectionStatusUpdate(connection, connected);
-                } catch (Throwable e) {
+                } catch (Exception e) {
                     logger.error("Event broadcasting throw an exception", e);
                 }
             }
@@ -83,7 +80,7 @@ public class MySensorsEventRegister extends EventRegister<MySensorsGatewayEventL
 
                 try {
                     listener.messageReceived(msg);
-                } catch (Throwable e) {
+                } catch (Exception e) {
                     logger.error("Event broadcasting throw an exception", e);
                 }
             }
@@ -98,7 +95,7 @@ public class MySensorsEventRegister extends EventRegister<MySensorsGatewayEventL
 
                 try {
                     listener.newNodeDiscovered(node, child);
-                } catch (Throwable e) {
+                } catch (Exception e) {
                     logger.error("Event broadcasting throw an exception", e);
                 }
             }
@@ -112,7 +109,7 @@ public class MySensorsEventRegister extends EventRegister<MySensorsGatewayEventL
 
                 try {
                     listener.nodeIdReservationDone(reserved);
-                } catch (Throwable e) {
+                } catch (Exception e) {
                     logger.error("Event broadcasting throw an exception", e);
                 }
             }
@@ -127,7 +124,7 @@ public class MySensorsEventRegister extends EventRegister<MySensorsGatewayEventL
 
                 try {
                     listener.sensorUpdateEvent(node, child, variable, eventType);
-                } catch (Throwable e) {
+                } catch (Exception e) {
                     logger.error("Event broadcasting throw an exception", e);
                 }
             }
@@ -141,7 +138,7 @@ public class MySensorsEventRegister extends EventRegister<MySensorsGatewayEventL
 
                 try {
                     listener.nodeReachStatusChanged(node, reach);
-                } catch (Throwable e) {
+                } catch (Exception e) {
                     logger.error("Event broadcasting throw an exception", e);
                 }
             }
@@ -155,7 +152,7 @@ public class MySensorsEventRegister extends EventRegister<MySensorsGatewayEventL
 
                 try {
                     listener.ackNotReceived(msg);
-                } catch (Throwable e) {
+                } catch (Exception e) {
                     logger.error("Event broadcasting throw an exception", e);
                 }
             }

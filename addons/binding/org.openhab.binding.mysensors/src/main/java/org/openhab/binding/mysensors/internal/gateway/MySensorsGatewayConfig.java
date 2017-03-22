@@ -8,6 +8,13 @@
  */
 package org.openhab.binding.mysensors.internal.gateway;
 
+/**
+ * Holds the configuration and parameters of the MySensors gateway.
+ * 
+ * @author Tim Oberföll
+ * @author Andrea Cioni
+ *
+ */
 public class MySensorsGatewayConfig {
 
     /**
