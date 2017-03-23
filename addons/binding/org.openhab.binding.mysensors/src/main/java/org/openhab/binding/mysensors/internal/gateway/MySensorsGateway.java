@@ -23,6 +23,7 @@ import org.openhab.binding.mysensors.internal.exception.NotInitializedException;
 import org.openhab.binding.mysensors.internal.protocol.MySensorsAbstractConnection;
 import org.openhab.binding.mysensors.internal.protocol.ip.MySensorsIpConnection;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
+import org.openhab.binding.mysensors.internal.protocol.mqtt.MySensorsMqttConnection;
 import org.openhab.binding.mysensors.internal.protocol.serial.MySensorsSerialConnection;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsNode;
@@ -87,6 +88,10 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
                     break;
                 case IP:
                     myCon = new MySensorsIpConnection(myConf, myEventRegister);
+                    ret = true;
+                    break;
+                case MQTT:
+                    myCon = new MySensorsMqttConnection(myConf, myEventRegister);
                     ret = true;
                     break;
             }

@@ -18,6 +18,9 @@ public class MySensorsBridgeConfiguration {
     public String serialPort; // serial port the gateway is attached to
     public String ipAddress; // ip address the gateway is attached to
     public Integer tcpPort; // tcp port the gateway is running at
+    public String brokerName; // MQTT Broker Name
+    public String topicSubscribe; // MQTT topic to subscribe to
+    public String topicPublish; // MQTT topic to publish to
     public Integer sendDelay; // delay at which messages are send from the internal queue to the MySensors network
     public Integer baudRate; // baud rate used to connect the serial port
     public Boolean imperial; // should nodes send imperial or metric values?
@@ -30,12 +33,13 @@ public class MySensorsBridgeConfiguration {
 
     @Override
     public String toString() {
-        return "MySensorsBridgeConfiguration [serialPort=" + serialPort + ", ipAddress=" + ipAddress + ", tcpPort="
-                + tcpPort + ", sendDelay=" + sendDelay + ", baudRate=" + baudRate + ", imperial=" + imperial
-                + ", skipStartupCheck=" + skipStartupCheck + ", enableNetworkSanCheck=" + enableNetworkSanCheck
-                + ", sanityCheckerInterval=" + sanityCheckerInterval + ", sanCheckConnectionFailAttempts="
-                + sanCheckConnectionFailAttempts + ", sanCheckSendHeartbeat=" + sanCheckSendHeartbeat
-                + ", sanCheckSendHeartbeatFailAttempts=" + sanCheckSendHeartbeatFailAttempts + "]";
+        return "MySensorsBridgeConfiguration [serialPort=" + serialPort + ", ipAddress=" + ipAddress 
+                + ", tcpPort=" + tcpPort + ",brokerName=" + brokerName + ",  topicSubscribe="+ topicSubscribe + ", topicPublish=" 
+                + topicPublish + ", sendDelay=" + sendDelay + ", baudRate=" + baudRate + ", imperial=" + imperial + ", skipStartupCheck="
+                + skipStartupCheck + ", enableNetworkSanCheck=" + enableNetworkSanCheck + ", sanityCheckerInterval="
+                + sanityCheckerInterval + ", sanCheckConnectionFailAttempts=" + sanCheckConnectionFailAttempts
+                + ", sanCheckSendHeartbeat=" + sanCheckSendHeartbeat + ", sanCheckSendHeartbeatFailAttempts="
+                + sanCheckSendHeartbeatFailAttempts + "]";
     }
 
 }
