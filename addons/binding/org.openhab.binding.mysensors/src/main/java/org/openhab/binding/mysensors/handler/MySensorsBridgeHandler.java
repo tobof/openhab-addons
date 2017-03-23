@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014-2016 by the respective copyright holders.
+ * Copyright (c) 2010-2017 by the respective copyright holders.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -61,6 +61,8 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
 
     // Discovery service
     private MySensorsDiscoveryService discoveryService;
+    
+    private MySensorsCacheFactory cacheFactory = new MySensorsCacheFactory();
 
     public MySensorsBridgeHandler(Bridge bridge) {
         super(bridge);
@@ -75,13 +77,10 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
         myGateway = new MySensorsGateway(loadCacheFile());
 
         if (myGateway.setup(openhabToMySensorsGatewayConfig(myBridgeConfiguration, getThing().getThingTypeUID()))) {
-            logger.debug("myGateway startup");
             myGateway.startup();
 
-            logger.debug("myGateway addEventListener");
             myGateway.addEventListener(this);
 
-            logger.debug("myGateway registerDeviceDiscoveryService");
             registerDeviceDiscoveryService();
             // reloadSensors();
 
@@ -131,7 +130,7 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
     }
 
     @Override
-    public void connectionStatusUpdate(MySensorsAbstractConnection connection, boolean connected) throws Throwable {
+    public void connectionStatusUpdate(MySensorsAbstractConnection connection, boolean connected) throws Exception {
         if (connected) {
             updateStatus(ThingStatus.ONLINE);
         } else {
@@ -142,12 +141,12 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
     }
 
     @Override
-    public void nodeIdReservationDone(Integer reservedId) throws Throwable {
+    public void nodeIdReservationDone(Integer reservedId) throws Exception {
         updateCacheFile();
     }
 
     @Override
-    public void newNodeDiscovered(MySensorsNode node, MySensorsChild child) throws Throwable {
+    public void newNodeDiscovered(MySensorsNode node, MySensorsChild child) throws Exception {
         updateCacheFile();
     }
 
@@ -158,7 +157,6 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
     }
 
     private void updateCacheFile() {
-        MySensorsCacheFactory cacheFactory = MySensorsCacheFactory.getCacheFactory();
 
         List<Integer> givenIds = myGateway.getGivenIds();
 
@@ -167,7 +165,6 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
     }
 
     private Map<Integer, MySensorsNode> loadCacheFile() {
-        MySensorsCacheFactory cacheFactory = MySensorsCacheFactory.getCacheFactory();
         Map<Integer, MySensorsNode> nodes = new HashMap<Integer, MySensorsNode>();
 
         List<Integer> givenIds = cacheFactory.readCache(MySensorsCacheFactory.GIVEN_IDS_CACHE_FILE,

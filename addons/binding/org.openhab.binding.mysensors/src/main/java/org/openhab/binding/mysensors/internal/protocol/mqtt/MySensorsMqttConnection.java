@@ -45,7 +45,7 @@ public class MySensorsMqttConnection extends MySensorsAbstractConnection {
     }
 
     @Override
-    public boolean _connect() {
+    public boolean establishConnection() {
 
         boolean ret = false;
         if (MySensorsMqttService.getInstance() != null) {
@@ -71,7 +71,7 @@ public class MySensorsMqttConnection extends MySensorsAbstractConnection {
     }
 
     @Override
-    protected void _disconnect() {
+    protected void stopConnection() {
         logger.debug("Unregistering MQTT publisher/consumer");
         mqttService.unregisterMessageConsumer(brokerName, mqttConsumer);
         mqttService.unregisterMessageProducer(brokerName, mqttPublisher);

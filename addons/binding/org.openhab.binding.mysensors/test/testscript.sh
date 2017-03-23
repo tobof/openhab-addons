@@ -34,18 +34,19 @@ serialPort=$1
 #echo "172;3;0;0;3;1.4.1" > $serialPort
 
 # Request I_TIME
-echo "172;255;3;0;1;0" > $serialPort # What time is it?
+#echo "172;255;3;0;1;0" > $serialPort # What time is it?
 
 #echo "172;255;3;0;6;0" > $serialPort ############################### is metric?
 
 # Set Humidty status
-echo "172;0;1;0;1;87" > $serialPort
+#echo "172;0;1;0;1;87" > $serialPort
 
 # Set Humidty status
+echo "173;0;0;0;7;1.4.1" > $serialPort
 echo "173;0;1;0;1;44" > $serialPort
 
 # Set Temperature status
-echo "172;1;1;0;0;27" > $serialPort
+#echo "172;1;1;0;0;27" > $serialPort
 
 # Set V_TEXT
 #echo "123;123;1;0;47;ipsumlorum" > $serialPort
@@ -57,13 +58,13 @@ echo "172;1;1;0;0;27" > $serialPort
 #echo "111;112;1;0;32;ABCDEFGHIJKL" > $serialPort
 
 #### Represent door
-#echo "172;4;0;0;0;1.4.1" > $serialPort
+echo "172;4;0;0;0;1.4.1" > $serialPort
 
 # Set Tripped status
-#echo "172;4;1;0;16;1" > $serialPort
+echo "172;4;1;0;16;1" > $serialPort
 
 # Set Armed status
-#echo "172;4;1;0;15;1" > $serialPort
+echo "172;4;1;0;15;1" > $serialPort
 
 #### Represent motion
 #echo "174;0;0;0;1;2.0.1" > $serialPort
@@ -142,11 +143,11 @@ echo "172;1;1;0;0;27" > $serialPort
 
 #### Represent LIGHT_LEVEL
 #echo "172;14;0;0;16;1.4.1" > $serialPort
-echo "101;2;0;0;16;2.1.0" > $serialPort
+#echo "101;2;0;0;16;2.1.0" > $serialPort
 
 # Set LIGHT_LEVEL
-echo "101;2;1;0;23;1543.98" > $serialPort
-echo "101;2;1;0;37;246" > $serialPort
+#echo "101;2;1;0;23;1543.98" > $serialPort
+#echo "101;2;1;0;37;246" > $serialPort
 
 # Set watt status
 #echo "172;7;1;0;17;0815" > $serialPort
@@ -192,7 +193,7 @@ echo "101;2;1;0;37;246" > $serialPort
 
 # INTERNAL
 # batteryLevel
-echo "101;255;3;0;0;94" > $serialPort
+#echo "101;255;3;0;0;94" > $serialPort
 
 # I_HEARTBEAT_RESPONSE
 #echo "172;3;3;0;22;1" > $serialPort

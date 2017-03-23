@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014-2016 by the respective copyright holders.
+ * Copyright (c) 2010-2017 by the respective copyright holders.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -8,6 +8,13 @@
  */
 package org.openhab.binding.mysensors.internal.gateway;
 
+/**
+ * Holds the configuration and parameters of the MySensors gateway.
+ * 
+ * @author Tim Oberföll
+ * @author Andrea Cioni
+ *
+ */
 public class MySensorsGatewayConfig {
 
     /**
@@ -79,6 +86,11 @@ public class MySensorsGatewayConfig {
     private Integer tcpPort;
 
     /**
+     * MQTT broker name
+     */
+    private String brokerName;
+
+    /**
      * MQTT topic to subscribe to
      */
     private String topicSubscribe;
@@ -87,11 +99,6 @@ public class MySensorsGatewayConfig {
      * MQTT topic to publish to
      */
     private String topicPublish;
-
-    /**
-     * MQTT broker name
-     */
-    private String brokerName;
 
     public MySensorsGatewayType getGatewayType() {
         return gatewayType;
@@ -125,6 +132,14 @@ public class MySensorsGatewayConfig {
         this.tcpPort = tcpPort;
     }
 
+    public String getBrokerName() {
+        return brokerName;
+    }
+
+    public void setBrokerName(String brokername) {
+        this.brokerName = brokername;
+    }
+
     public String getTopicSubscribe() {
         return topicSubscribe;
     }
@@ -139,14 +154,6 @@ public class MySensorsGatewayConfig {
 
     public void setTopicPublish(String topicPublish) {
         this.topicPublish = topicPublish;
-    }
-
-    public String getBrokerName() {
-        return brokerName;
-    }
-
-    public void setBrokerName(String brokername) {
-        this.brokerName = brokername;
     }
 
     public Integer getSendDelay() {

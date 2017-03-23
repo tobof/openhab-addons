@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014-2016 by the respective copyright holders.
+ * Copyright (c) 2010-2017 by the respective copyright holders.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -29,12 +29,11 @@ public class CacheTest {
 
     @BeforeClass
     public void init() {
-        c = MySensorsCacheFactory.getCacheFactory();
+        c = new MySensorsCacheFactory();
     }
 
     @Test
     public void writeGivenIdsCache() {
-        MySensorsCacheFactory c = MySensorsCacheFactory.getCacheFactory();
         ArrayList<Integer> ids = new ArrayList<Integer>();
         ids.add(2);
         ids.add(3);
@@ -45,7 +44,6 @@ public class CacheTest {
 
     @Test
     public void readGivenIdsCache() {
-        c = MySensorsCacheFactory.getCacheFactory();
         System.out.println(c.readCache(MySensorsCacheFactory.GIVEN_IDS_CACHE_FILE, new ArrayList<Integer>(),
                 new TypeToken<ArrayList<Integer>>() {
                 }.getType()));
@@ -55,5 +53,4 @@ public class CacheTest {
     public void deleteCache() {
         c.deleteCache(MySensorsCacheFactory.GIVEN_IDS_CACHE_FILE);
     }
-
 }

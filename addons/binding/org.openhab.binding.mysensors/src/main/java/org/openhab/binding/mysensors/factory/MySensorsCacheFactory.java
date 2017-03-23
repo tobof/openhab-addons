@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014-2016 by the respective copyright holders.
+ * Copyright (c) 2010-2017 by the respective copyright holders.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -30,8 +30,6 @@ import com.google.gson.stream.JsonWriter;
 public class MySensorsCacheFactory {
     private Logger logger = LoggerFactory.getLogger(getClass());
 
-    private static MySensorsCacheFactory singleton = null;
-
     private static final String CACHE_BASE_PATH = "./mysensors/cache";
     private static final String CACHE_FILE_SUFFIX = ".cached";
 
@@ -39,20 +37,7 @@ public class MySensorsCacheFactory {
 
     private Gson gson = null;
 
-    /**
-     * Singelton of the CacheFactory
-     *
-     * @return Returns the singleton of the CacheFactory. Only one instance is allowed at a time.
-     */
-    public static MySensorsCacheFactory getCacheFactory() {
-        if (singleton == null) {
-            singleton = new MySensorsCacheFactory();
-        }
-
-        return singleton;
-    }
-
-    private MySensorsCacheFactory() {
+    public MySensorsCacheFactory() {
         gson = new Gson();
         initializeCacheDir();
     }

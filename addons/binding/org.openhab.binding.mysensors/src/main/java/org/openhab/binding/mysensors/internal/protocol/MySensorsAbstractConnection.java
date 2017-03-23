@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014-2016 by the respective copyright holders.
+ * Copyright (c) 2010-2017 by the respective copyright holders.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -27,6 +27,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import org.openhab.binding.mysensors.internal.event.MySensorsEventRegister;
+import org.openhab.binding.mysensors.internal.exception.NoAckException;
 import org.openhab.binding.mysensors.internal.gateway.MySensorsGatewayConfig;
 import org.openhab.binding.mysensors.internal.gateway.MySensorsNetworkSanityChecker;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
@@ -148,12 +149,12 @@ public abstract class MySensorsAbstractConnection implements Runnable {
      * @return true, if connection established correctly
      */
     private boolean connect() {
-        connected = _connect();
+        connected = establishConnection();
         myEventRegister.notifyBridgeStatusUpdate(this, isConnected());
         return connected;
     }
 
-    protected abstract boolean _connect();
+    protected abstract boolean establishConnection();
 
     /**
      * Shutdown method that allows the correct disconnection with the used bridge
@@ -165,7 +166,7 @@ public abstract class MySensorsAbstractConnection implements Runnable {
             netSanityChecker = null;
         }
 
-        _disconnect();
+        stopConnection();
         connected = false;
         requestDisconnection = false;
         iVersionResponse = false;
@@ -173,7 +174,7 @@ public abstract class MySensorsAbstractConnection implements Runnable {
         myEventRegister.notifyBridgeStatusUpdate(this, isConnected());
     }
 
-    protected abstract void _disconnect();
+    protected abstract void stopConnection();
 
     /**
      * Stop all threads holding the connection (serial/tcp).
@@ -365,7 +366,7 @@ public abstract class MySensorsAbstractConnection implements Runnable {
                 } catch (InterruptedException e) {
                     logger.warn("Interrupted MySensorsReader");
                 } catch (Exception e) {
-                    logger.error("Exception on reading from connection", e);
+                    logger.warn("Exception on reading from connection", e);
                     handleReaderWriterException();
 
                 }
@@ -422,7 +423,11 @@ public abstract class MySensorsAbstractConnection implements Runnable {
         }
 
         private void handleAckReceived(MySensorsMessage msg) {
-            mysConWriter.confirmAcknowledgeMessage(msg);
+            try {
+                mysConWriter.confirmAcknowledgeMessage(msg);
+            } catch (NoAckException e) {
+                logger.warn("Invalid ACK message received: {}", e.toString());
+            }
         }
 
         /**
@@ -592,10 +597,11 @@ public abstract class MySensorsAbstractConnection implements Runnable {
          * Confirm acknowledge for a message from the outbound message queue.
          *
          * @param msg The message that should be acknowledged from the queue.
+         * @throws NoAckException 
          */
-        private void confirmAcknowledgeMessage(MySensorsMessage msg) {
+        private void confirmAcknowledgeMessage(MySensorsMessage msg) throws NoAckException {
             if (msg == null) {
-                throw new NullPointerException("Invalid ack message to insert");
+                throw new NoAckException("Invalid ack message to insert");
             }
 
             synchronized (acknowledgeMessages) {

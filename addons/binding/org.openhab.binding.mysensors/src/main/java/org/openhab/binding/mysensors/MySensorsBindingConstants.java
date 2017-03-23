@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014-2016 by the respective copyright holders.
+ * Copyright (c) 2010-2017 by the respective copyright holders.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -370,7 +370,7 @@ public class MySensorsBindingConstants {
     public final static Set<ThingTypeUID> SUPPORTED_BRIDGE_THING_TYPES_UIDS = ImmutableSet.of(THING_TYPE_BRIDGE_SER,
             THING_TYPE_BRIDGE_ETH, THING_TYPE_BRIDGE_MQTT);
 
-    /** Supported devices (things + brdiges) */
+    /** Supported devices (things + bridges) */
     public final static Collection<ThingTypeUID> SUPPORTED_DEVICE_TYPES_UIDS = Lists.newArrayList(THING_TYPE_HUMIDITY,
             THING_TYPE_TEMPERATURE, THING_TYPE_LIGHT, THING_TYPE_MULTIMETER, THING_TYPE_POWER, THING_TYPE_BARO,
             THING_TYPE_DOOR, THING_TYPE_MOTION, THING_TYPE_SMOKE, THING_TYPE_DIMMER, THING_TYPE_COVER, THING_TYPE_WIND,
