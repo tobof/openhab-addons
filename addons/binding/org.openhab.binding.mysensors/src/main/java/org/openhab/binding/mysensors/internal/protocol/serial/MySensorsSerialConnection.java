@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2017 by the respective copyright holders.
+ * Copyright (c) 2014-2016 by the respective copyright holders.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -16,6 +16,7 @@ import org.apache.commons.lang.StringUtils;
 import org.openhab.binding.mysensors.internal.event.MySensorsEventRegister;
 import org.openhab.binding.mysensors.internal.gateway.MySensorsGatewayConfig;
 import org.openhab.binding.mysensors.internal.protocol.MySensorsAbstractConnection;
+
 import gnu.io.CommPortIdentifier;
 import gnu.io.NRSerialPort;
 
@@ -38,7 +39,7 @@ public class MySensorsSerialConnection extends MySensorsAbstractConnection {
      * Tries to accomplish a connection via a serial port to the serial gateway.
      */
     @Override
-    public boolean establishConnection() {
+    public boolean _connect() {
         logger.debug("Connecting to {} [baudRate:{}]", myGatewayConfig.getSerialPort(), myGatewayConfig.getBaudRate());
 
         boolean ret = false;
@@ -73,7 +74,7 @@ public class MySensorsSerialConnection extends MySensorsAbstractConnection {
      * Initiates a clean disconnect from the serial gateway.
      */
     @Override
-    public void stopConnection() {
+    public void _disconnect() {
         logger.debug("Shutting down serial connection!");
 
         if (mysConWriter != null) {

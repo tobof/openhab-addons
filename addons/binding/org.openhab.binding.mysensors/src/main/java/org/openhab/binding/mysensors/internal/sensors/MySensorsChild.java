@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2017 by the respective copyright holders.
+ * Copyright (c) 2014-2016 by the respective copyright holders.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -18,52 +18,51 @@ import java.util.Optional;
 
 import org.openhab.binding.mysensors.internal.Mergeable;
 import org.openhab.binding.mysensors.internal.exception.MergeException;
-import org.openhab.binding.mysensors.internal.exception.NoContentException;
-import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChildSAirQuality;
-import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChildSArduinoNode;
-import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChildSArduinoRepeaterNode;
-import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChildSBaro;
-import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChildSBinary;
-import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChildSColorSensor;
-import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChildSCover;
-import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChildSCustom;
-import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChildSDimmer;
-import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChildSDistance;
-import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChildSDoor;
-import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChildSDust;
-import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChildSGas;
-import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChildSGps;
-import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChildSHeater;
-import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChildSHum;
-import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChildSHvac;
-import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChildSInfo;
-import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChildSIr;
-import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChildSLightLevel;
-import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChildSLock;
-import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChildSMoisture;
-import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChildSMotion;
-import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChildSMultimeter;
-import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChildSPower;
-import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChildSRain;
-import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChildSRgbwLight;
-import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChildSRgbLight;
-import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChildSSceneController;
-import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChildSSmoke;
-import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChildSSound;
-import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChildSSprinkler;
-import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChildSTemp;
-import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChildSUv;
-import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChildSVibration;
-import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChildSWater;
-import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChildSWaterLeak;
-import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChildSWaterQuality;
-import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChildSWeight;
-import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChildSWind;
-import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariableVVar1;
-import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariableVVar2;
-import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariableVVar3;
-import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariableVVar4;
-import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariableVVar5;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_AIR_QUALITY;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_ARDUINO_NODE;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_ARDUINO_REPEATER_NODE;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_BARO;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_BINARY;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_COLOR_SENSOR;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_COVER;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_CUSTOM;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_DIMMER;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_DISTANCE;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_DOOR;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_DUST;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_GAS;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_GPS;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_HEATER;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_HUM;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_HVAC;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_INFO;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_IR;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_LIGHT_LEVEL;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_LOCK;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_MOISTURE;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_MOTION;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_MULTIMETER;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_POWER;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_RAIN;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_RGBW_LIGHT;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_RGB_LIGHT;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_SCENE_CONTROLLER;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_SMOKE;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_SOUND;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_SPRINKLER;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_TEMP;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_UV;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_VIBRATION;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_WATER;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_WATER_LEAK;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_WATER_QUALITY;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_WEIGHT;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChild_S_WIND;
+import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariable_V_VAR1;
+import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariable_V_VAR2;
+import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariable_V_VAR3;
+import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariable_V_VAR4;
+import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariable_V_VAR5;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -93,47 +92,47 @@ public abstract class MySensorsChild implements Mergeable {
         private static final long serialVersionUID = -3479184996747993491L;
 
         {
-            put(MYSENSORS_SUBTYPE_S_DOOR, MySensorsChildSDoor.class);
-            put(MYSENSORS_SUBTYPE_S_MOTION, MySensorsChildSMotion.class);
-            put(MYSENSORS_SUBTYPE_S_SMOKE, MySensorsChildSSmoke.class);
-            put(MYSENSORS_SUBTYPE_S_LIGHT, MySensorsChildSBinary.class); // BINARY=LIGHT
-            put(MYSENSORS_SUBTYPE_S_BINARY, MySensorsChildSBinary.class);
-            put(MYSENSORS_SUBTYPE_S_DIMMER, MySensorsChildSDimmer.class);
-            put(MYSENSORS_SUBTYPE_S_COVER, MySensorsChildSCover.class);
-            put(MYSENSORS_SUBTYPE_S_TEMP, MySensorsChildSTemp.class);
-            put(MYSENSORS_SUBTYPE_S_HUM, MySensorsChildSHum.class);
-            put(MYSENSORS_SUBTYPE_S_BARO, MySensorsChildSBaro.class);
-            put(MYSENSORS_SUBTYPE_S_WIND, MySensorsChildSWind.class);
-            put(MYSENSORS_SUBTYPE_S_RAIN, MySensorsChildSRain.class);
-            put(MYSENSORS_SUBTYPE_S_UV, MySensorsChildSUv.class);
-            put(MYSENSORS_SUBTYPE_S_WEIGHT, MySensorsChildSWeight.class);
-            put(MYSENSORS_SUBTYPE_S_POWER, MySensorsChildSPower.class);
-            put(MYSENSORS_SUBTYPE_S_HEATER, MySensorsChildSHeater.class);
-            put(MYSENSORS_SUBTYPE_S_DISTANCE, MySensorsChildSDistance.class);
-            put(MYSENSORS_SUBTYPE_S_LIGHT_LEVEL, MySensorsChildSLightLevel.class);
-            put(MYSENSORS_SUBTYPE_S_LOCK, MySensorsChildSLock.class);
-            put(MYSENSORS_SUBTYPE_S_IR, MySensorsChildSIr.class);
-            put(MYSENSORS_SUBTYPE_S_WATER, MySensorsChildSWater.class);
-            put(MYSENSORS_SUBTYPE_S_AIR_QUALITY, MySensorsChildSAirQuality.class);
-            put(MYSENSORS_SUBTYPE_S_CUSTOM, MySensorsChildSCustom.class);
-            put(MYSENSORS_SUBTYPE_S_RGB_LIGHT, MySensorsChildSRgbLight.class);
-            put(MYSENSORS_SUBTYPE_S_RGBW_LIGHT, MySensorsChildSRgbwLight.class);
-            put(MYSENSORS_SUBTYPE_S_HVAC, MySensorsChildSHvac.class);
-            put(MYSENSORS_SUBTYPE_S_MULTIMETER, MySensorsChildSMultimeter.class);
-            put(MYSENSORS_SUBTYPE_S_SPRINKLER, MySensorsChildSSprinkler.class);
-            put(MYSENSORS_SUBTYPE_S_WATER_LEAK, MySensorsChildSWaterLeak.class);
-            put(MYSENSORS_SUBTYPE_S_SOUND, MySensorsChildSSound.class);
-            put(MYSENSORS_SUBTYPE_S_VIBRATION, MySensorsChildSVibration.class);
-            put(MYSENSORS_SUBTYPE_S_MOISTURE, MySensorsChildSMoisture.class);
-            put(MYSENSORS_SUBTYPE_S_INFO, MySensorsChildSInfo.class);
-            put(MYSENSORS_SUBTYPE_S_GAS, MySensorsChildSGas.class);
-            put(MYSENSORS_SUBTYPE_S_GPS, MySensorsChildSGps.class);
-            put(MYSENSORS_SUBTYPE_S_WATER_QUALITY, MySensorsChildSWaterQuality.class);
-            put(MYSENSORS_SUBTYPE_S_SCENE_CONTROLLER, MySensorsChildSSceneController.class);
-            put(MYSENSORS_SUBTYPE_S_DUST, MySensorsChildSDust.class);
-            put(MYSENSORS_SUBTYPE_S_COLOR_SENSOR, MySensorsChildSColorSensor.class);
-            put(MYSENSORS_SUBTYPE_S_ARDUINO_REPEATER_NODE, MySensorsChildSArduinoRepeaterNode.class);
-            put(MYSENSORS_SUBTYPE_S_ARDUINO_NODE, MySensorsChildSArduinoNode.class);
+            put(MYSENSORS_SUBTYPE_S_DOOR, MySensorsChild_S_DOOR.class);
+            put(MYSENSORS_SUBTYPE_S_MOTION, MySensorsChild_S_MOTION.class);
+            put(MYSENSORS_SUBTYPE_S_SMOKE, MySensorsChild_S_SMOKE.class);
+            put(MYSENSORS_SUBTYPE_S_LIGHT, MySensorsChild_S_BINARY.class); // BINARY=LIGHT
+            put(MYSENSORS_SUBTYPE_S_BINARY, MySensorsChild_S_BINARY.class);
+            put(MYSENSORS_SUBTYPE_S_DIMMER, MySensorsChild_S_DIMMER.class);
+            put(MYSENSORS_SUBTYPE_S_COVER, MySensorsChild_S_COVER.class);
+            put(MYSENSORS_SUBTYPE_S_TEMP, MySensorsChild_S_TEMP.class);
+            put(MYSENSORS_SUBTYPE_S_HUM, MySensorsChild_S_HUM.class);
+            put(MYSENSORS_SUBTYPE_S_BARO, MySensorsChild_S_BARO.class);
+            put(MYSENSORS_SUBTYPE_S_WIND, MySensorsChild_S_WIND.class);
+            put(MYSENSORS_SUBTYPE_S_RAIN, MySensorsChild_S_RAIN.class);
+            put(MYSENSORS_SUBTYPE_S_UV, MySensorsChild_S_UV.class);
+            put(MYSENSORS_SUBTYPE_S_WEIGHT, MySensorsChild_S_WEIGHT.class);
+            put(MYSENSORS_SUBTYPE_S_POWER, MySensorsChild_S_POWER.class);
+            put(MYSENSORS_SUBTYPE_S_HEATER, MySensorsChild_S_HEATER.class);
+            put(MYSENSORS_SUBTYPE_S_DISTANCE, MySensorsChild_S_DISTANCE.class);
+            put(MYSENSORS_SUBTYPE_S_LIGHT_LEVEL, MySensorsChild_S_LIGHT_LEVEL.class);
+            put(MYSENSORS_SUBTYPE_S_LOCK, MySensorsChild_S_LOCK.class);
+            put(MYSENSORS_SUBTYPE_S_IR, MySensorsChild_S_IR.class);
+            put(MYSENSORS_SUBTYPE_S_WATER, MySensorsChild_S_WATER.class);
+            put(MYSENSORS_SUBTYPE_S_AIR_QUALITY, MySensorsChild_S_AIR_QUALITY.class);
+            put(MYSENSORS_SUBTYPE_S_CUSTOM, MySensorsChild_S_CUSTOM.class);
+            put(MYSENSORS_SUBTYPE_S_RGB_LIGHT, MySensorsChild_S_RGB_LIGHT.class);
+            put(MYSENSORS_SUBTYPE_S_RGBW_LIGHT, MySensorsChild_S_RGBW_LIGHT.class);
+            put(MYSENSORS_SUBTYPE_S_HVAC, MySensorsChild_S_HVAC.class);
+            put(MYSENSORS_SUBTYPE_S_MULTIMETER, MySensorsChild_S_MULTIMETER.class);
+            put(MYSENSORS_SUBTYPE_S_SPRINKLER, MySensorsChild_S_SPRINKLER.class);
+            put(MYSENSORS_SUBTYPE_S_WATER_LEAK, MySensorsChild_S_WATER_LEAK.class);
+            put(MYSENSORS_SUBTYPE_S_SOUND, MySensorsChild_S_SOUND.class);
+            put(MYSENSORS_SUBTYPE_S_VIBRATION, MySensorsChild_S_VIBRATION.class);
+            put(MYSENSORS_SUBTYPE_S_MOISTURE, MySensorsChild_S_MOISTURE.class);
+            put(MYSENSORS_SUBTYPE_S_INFO, MySensorsChild_S_INFO.class);
+            put(MYSENSORS_SUBTYPE_S_GAS, MySensorsChild_S_GAS.class);
+            put(MYSENSORS_SUBTYPE_S_GPS, MySensorsChild_S_GPS.class);
+            put(MYSENSORS_SUBTYPE_S_WATER_QUALITY, MySensorsChild_S_WATER_QUALITY.class);
+            put(MYSENSORS_SUBTYPE_S_SCENE_CONTROLLER, MySensorsChild_S_SCENE_CONTROLLER.class);
+            put(MYSENSORS_SUBTYPE_S_DUST, MySensorsChild_S_DUST.class);
+            put(MYSENSORS_SUBTYPE_S_COLOR_SENSOR, MySensorsChild_S_COLOR_SENSOR.class);
+            put(MYSENSORS_SUBTYPE_S_ARDUINO_REPEATER_NODE, MySensorsChild_S_ARDUINO_REPEATER_NODE.class);
+            put(MYSENSORS_SUBTYPE_S_ARDUINO_NODE, MySensorsChild_S_ARDUINO_NODE.class);
         }
 
     };
@@ -182,10 +181,10 @@ public abstract class MySensorsChild implements Mergeable {
      *
      * @throws NullPointerException if var is null
      */
-    public void addVariable(MySensorsVariable var) throws NoContentException {
+    public void addVariable(MySensorsVariable var) throws NullPointerException {
 
         if (var == null) {
-            throw new NoContentException("Cannot add a null variable");
+            throw new NullPointerException("Cannot add a null variable");
         }
 
         synchronized (variableMap) {
@@ -275,15 +274,11 @@ public abstract class MySensorsChild implements Mergeable {
     }
 
     private void addCommonVariables() {
-        try {
-            addVariable(new MySensorsVariableVVar1());
-            addVariable(new MySensorsVariableVVar2());
-            addVariable(new MySensorsVariableVVar3());
-            addVariable(new MySensorsVariableVVar4());
-            addVariable(new MySensorsVariableVVar5());
-        } catch (NoContentException e) {
-            logger.error("Variable has no content: {}", e.toString());
-        }
+        addVariable(new MySensorsVariable_V_VAR1());
+        addVariable(new MySensorsVariable_V_VAR2());
+        addVariable(new MySensorsVariable_V_VAR3());
+        addVariable(new MySensorsVariable_V_VAR4());
+        addVariable(new MySensorsVariable_V_VAR5());
     }
 
     /**

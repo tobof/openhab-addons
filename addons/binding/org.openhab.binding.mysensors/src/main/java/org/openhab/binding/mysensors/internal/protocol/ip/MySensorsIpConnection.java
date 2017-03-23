@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2017 by the respective copyright holders.
+ * Copyright (c) 2014-2016 by the respective copyright holders.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -11,6 +11,7 @@ package org.openhab.binding.mysensors.internal.protocol.ip;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
+
 import org.openhab.binding.mysensors.internal.event.MySensorsEventRegister;
 import org.openhab.binding.mysensors.internal.gateway.MySensorsGatewayConfig;
 import org.openhab.binding.mysensors.internal.protocol.MySensorsAbstractConnection;
@@ -34,7 +35,7 @@ public class MySensorsIpConnection extends MySensorsAbstractConnection {
      * Tries to accomplish a TCP/IP connection via socket to ethernet gateway.
      */
     @Override
-    public boolean establishConnection() {
+    public boolean _connect() {
         logger.debug("Connecting to IP bridge [{}:{}]", myGatewayConfig.getIpAddress(), myGatewayConfig.getTcpPort());
 
         boolean ret = false;
@@ -63,7 +64,7 @@ public class MySensorsIpConnection extends MySensorsAbstractConnection {
      * Ensures a clean disconnect from the TCP/IP connection to the gateway.
      */
     @Override
-    public void stopConnection() {
+    public void _disconnect() {
         logger.debug("Disconnecting from IP bridge ...");
 
         if (mysConWriter != null) {

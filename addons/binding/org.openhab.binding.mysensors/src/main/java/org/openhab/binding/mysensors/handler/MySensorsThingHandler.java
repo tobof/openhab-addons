@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2017 by the respective copyright holders.
+ * Copyright (c) 2014-2016 by the respective copyright holders.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -139,7 +139,7 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
             return;
         }
 
-        int intRequestAck = requestAck ? 1 : 0;
+        int int_requestack = requestAck ? 1 : 0;
 
         // just forward the message in case it is received via this channel. This is special!
         if (channelUID.getId().equals(CHANNEL_MYSENSORS_MESSAGE)) {
@@ -172,7 +172,7 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
 
                         // Create the real message to send
                         MySensorsMessage newMsg = new MySensorsMessage(nodeId, childId,
-                                MySensorsMessage.MYSENSORS_MSG_TYPE_SET, intRequestAck, revertState, smartSleep);
+                                MySensorsMessage.MYSENSORS_MSG_TYPE_SET, int_requestack, revertState, smartSleep);
 
                         newMsg.setSubType(subType);
                         newMsg.setMsg(adapter.fromCommand(command));
@@ -196,7 +196,7 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
     }
 
     @Override
-    public void messageReceived(MySensorsMessage message) throws Exception {
+    public void messageReceived(MySensorsMessage message) throws Throwable {
         handleIncomingMessageEvent(message);
 
     }
@@ -223,7 +223,7 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
     }
 
     @Override
-    public void connectionStatusUpdate(MySensorsAbstractConnection connection, boolean connected) throws Exception {
+    public void connectionStatusUpdate(MySensorsAbstractConnection connection, boolean connected) throws Throwable {
         if (!connected) {
             updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.BRIDGE_OFFLINE);
         } else {

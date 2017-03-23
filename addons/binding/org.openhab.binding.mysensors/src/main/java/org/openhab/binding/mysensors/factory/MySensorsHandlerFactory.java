@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2017 by the respective copyright holders.
+ * Copyright (c) 2014-2016 by the respective copyright holders.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -43,7 +43,8 @@ public class MySensorsHandlerFactory extends BaseThingHandlerFactory {
 
         if (SUPPORTED_THING_TYPES_UIDS.contains(thingTypeUID)) {
             handler = new MySensorsThingHandler(thing);
-        } else if (thingTypeUID.equals(THING_TYPE_BRIDGE_SER) || thingTypeUID.equals(THING_TYPE_BRIDGE_ETH)) {
+        } else if (thingTypeUID.equals(THING_TYPE_BRIDGE_SER) || thingTypeUID.equals(THING_TYPE_BRIDGE_ETH)
+                || thingTypeUID.equals(THING_TYPE_BRIDGE_MQTT)) {
             handler = new MySensorsBridgeHandler((Bridge) thing);
         } else {
             logger.error("Thing {} cannot be configured, is this thing supported by the binding?", thingTypeUID);

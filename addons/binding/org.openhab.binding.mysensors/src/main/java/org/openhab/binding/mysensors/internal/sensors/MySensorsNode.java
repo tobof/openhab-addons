@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2017 by the respective copyright holders.
+ * Copyright (c) 2014-2016 by the respective copyright holders.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.openhab.binding.mysensors.internal.exception.MergeException;
-import org.openhab.binding.mysensors.internal.exception.NotInitializedException;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
 
 /**
@@ -228,13 +227,13 @@ public class MySensorsNode {
      *
      * @return a non-null message ready to be sent if childId/type are available on this node
      *
-     * @throws NotInitializedException if state is null
+     * @throws NullPointerException if state is null
      */
-    public MySensorsMessage updateVariableState(int childId, int type, String state) throws NotInitializedException{
+    public MySensorsMessage updateVariableState(int childId, int type, String state) {
         MySensorsMessage msg = null;
 
         if (state == null) {
-            throw new NotInitializedException("State is null");
+            throw new NullPointerException("State is null");
         }
 
         synchronized (chidldMap) {

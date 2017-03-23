@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2017 by the respective copyright holders.
+ * Copyright (c) 2014-2016 by the respective copyright holders.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -8,13 +8,6 @@
  */
 package org.openhab.binding.mysensors.internal.gateway;
 
-/**
- * Holds the configuration and parameters of the MySensors gateway.
- * 
- * @author Tim Oberföll
- * @author Andrea Cioni
- *
- */
 public class MySensorsGatewayConfig {
 
     /**
@@ -85,6 +78,21 @@ public class MySensorsGatewayConfig {
      */
     private Integer tcpPort;
 
+    /**
+     * MQTT topic to subscribe to
+     */
+    private String topicSubscribe;
+
+    /**
+     * MQTT topic to publish to
+     */
+    private String topicPublish;
+
+    /**
+     * MQTT broker name
+     */
+    private String brokerName;
+
     public MySensorsGatewayType getGatewayType() {
         return gatewayType;
     }
@@ -115,6 +123,30 @@ public class MySensorsGatewayConfig {
 
     public void setTcpPort(Integer tcpPort) {
         this.tcpPort = tcpPort;
+    }
+
+    public String getTopicSubscribe() {
+        return topicSubscribe;
+    }
+
+    public void setTopicSubscribe(String topicSubscribe) {
+        this.topicSubscribe = topicSubscribe;
+    }
+
+    public String getTopicPublish() {
+        return topicPublish;
+    }
+
+    public void setTopicPublish(String topicPublish) {
+        this.topicPublish = topicPublish;
+    }
+
+    public String getBrokerName() {
+        return brokerName;
+    }
+
+    public void setBrokerName(String brokername) {
+        this.brokerName = brokername;
     }
 
     public Integer getSendDelay() {
@@ -197,6 +229,7 @@ public class MySensorsGatewayConfig {
                 + ", sanCheckConnectionFailAttempts=" + sanCheckConnectionFailAttempts + ", sanCheckSendHeartbeat="
                 + sanCheckSendHeartbeat + ", sanCheckSendHeartbeatFailAttempts=" + sanCheckSendHeartbeatFailAttempts
                 + ", serialPort=" + serialPort + ", baudRate=" + baudRate + ", ipAddress=" + ipAddress + ", tcpPort="
-                + tcpPort + "]";
+                + tcpPort + ", brokerName=" + brokerName + ", topicSubsribe=" + topicSubscribe + ", topicPublish="
+                + topicPublish + "]";
     }
 }

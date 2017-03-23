@@ -13,6 +13,7 @@
 
   <name>MySensors Binding</name>
   <packaging>eclipse-plugin</packaging>
+  
   <build>
     <pluginManagement>
       <plugins>

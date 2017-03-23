@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2017 by the respective copyright holders.
+ * Copyright (c) 2014-2016 by the respective copyright holders.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -91,6 +91,7 @@ public class MySensorsBindingConstants {
     // List of bridges
     public final static ThingTypeUID THING_TYPE_BRIDGE_SER = new ThingTypeUID(BINDING_ID, "bridge-ser");
     public final static ThingTypeUID THING_TYPE_BRIDGE_ETH = new ThingTypeUID(BINDING_ID, "bridge-eth");
+    public final static ThingTypeUID THING_TYPE_BRIDGE_MQTT = new ThingTypeUID(BINDING_ID, "bridge-mqtt");
 
     // List of all Channel ids
     public final static String CHANNEL_HUM = "hum";
@@ -367,7 +368,7 @@ public class MySensorsBindingConstants {
             THING_TYPE_TEXT, THING_TYPE_IR, THING_TYPE_AIR_QUALITY, THING_TYPE_DUST, THING_TYPE_COLOR_SENSOR);
     /** Supported bridges */
     public final static Set<ThingTypeUID> SUPPORTED_BRIDGE_THING_TYPES_UIDS = ImmutableSet.of(THING_TYPE_BRIDGE_SER,
-            THING_TYPE_BRIDGE_ETH);
+            THING_TYPE_BRIDGE_ETH, THING_TYPE_BRIDGE_MQTT);
 
     /** Supported devices (things + brdiges) */
     public final static Collection<ThingTypeUID> SUPPORTED_DEVICE_TYPES_UIDS = Lists.newArrayList(THING_TYPE_HUMIDITY,
@@ -377,5 +378,5 @@ public class MySensorsBindingConstants {
             THING_TYPE_HVAC, THING_TYPE_WATER, THING_TYPE_CUSTOM, THING_TYPE_LOCK, THING_TYPE_SOUND,
             THING_TYPE_RGB_LIGHT, THING_TYPE_RGBW_LIGHT, THING_TYPE_WATER_QUALITY, THING_TYPE_MYSENSORS_MESSAGE,
             THING_TYPE_TEXT, THING_TYPE_IR, THING_TYPE_AIR_QUALITY, THING_TYPE_DUST, THING_TYPE_COLOR_SENSOR,
-            THING_TYPE_BRIDGE_SER, THING_TYPE_BRIDGE_ETH);
+            THING_TYPE_BRIDGE_SER, THING_TYPE_BRIDGE_ETH, THING_TYPE_BRIDGE_MQTT);
 }
