@@ -1,3 +1,11 @@
+/**
+ * Copyright (c) 2010-2017 by the respective copyright holders.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ */
 package org.openhab.binding.mysensors.internal.protocol.mqtt;
 
 import java.io.IOException;
@@ -16,6 +24,13 @@ import org.openhab.io.transport.mqtt.MqttService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Implements the MQTT connection to a gateway of the MySensors network.
+ *
+ * @author Sean McGuire
+ *
+ */
+
 public class MySensorsMqttConnection extends MySensorsAbstractConnection {
 
     private static final Logger logger = LoggerFactory.getLogger(MySensorsMqttConnection.class);
@@ -33,46 +48,60 @@ public class MySensorsMqttConnection extends MySensorsAbstractConnection {
 
     public MySensorsMqttConnection(MySensorsGatewayConfig myConf, MySensorsEventRegister myEventRegister) {
         super(myConf, myEventRegister);
-        out = new PipedOutputStream();
-        in = new PipedInputStream();
-        try {
-            in.connect(out);
-        } catch (IOException e) {
-            logger.debug(e.toString());
-        }
-        mysConReader = new MySensorsReader(in);
-        mysConWriter = new MySensorsMqttWriter(System.out); // null output rather than stdout?
+
     }
 
+    /**
+     * Creates Streams to communicate with the Abstract connection, MQTT producers and consumers
+     * to talk to the MQTT broker (via the Openhab MQTT transport bundle) and connects them
+     * all together
+     */
     @Override
     public boolean establishConnection() {
 
         boolean ret = false;
-        if (MySensorsMqttService.getInstance() != null) {
 
-            mqttService = myMqtt.getService();
-            System.out.println("MQTT SERVICE: " + mqttService);
+        if (myMqtt.getService() != null) {
 
-            logger.debug("Getting MQTT gateway configuration");
-            topicSubscribe = myGatewayConfig.getTopicSubscribe();
-            topicPublish = myGatewayConfig.getTopicPublish();
-            brokerName = myGatewayConfig.getBrokerName();
-            logger.debug("Setting subscribe topic");
-            mqttConsumer.setTopic(topicSubscribe + "/+/+/+/+/+");
-            logger.debug("registering consumer" + mqttConsumer);
-            mqttService.registerMessageConsumer(brokerName, mqttConsumer);
-            logger.debug("registering publisher " + mqttPublisher);
-            mqttService.registerMessageProducer(brokerName, mqttPublisher);
+            in = null;
+            out = null;
+            out = new PipedOutputStream();
+            in = new PipedInputStream();
+            try {
+                in.connect(out);
+                mysConReader = new MySensorsReader(in);
+                mysConWriter = new MySensorsMqttWriter(System.out);
+                // null output rather than stdout?
+                // it should never be written to however, as we have overridden the sendMessage method
 
-            ret = startReaderWriterThread(mysConReader, mysConWriter);
+                mqttService = myMqtt.getService();
+
+                topicSubscribe = myGatewayConfig.getTopicSubscribe();
+                topicPublish = myGatewayConfig.getTopicPublish();
+                brokerName = myGatewayConfig.getBrokerName();
+
+                mqttConsumer.setTopic(topicSubscribe + "/+/+/+/+/+");
+
+                mqttService.registerMessageConsumer(brokerName, mqttConsumer);
+                mqttService.registerMessageProducer(brokerName, mqttPublisher);
+
+                ret = startReaderWriterThread(mysConReader, mysConWriter);
+
+            } catch (IOException e) {
+                logger.debug(e.toString());
+            }
         }
 
         return ret;
     }
 
+    /**
+     * Cleans up all resources
+     */
     @Override
     protected void stopConnection() {
-        logger.debug("Unregistering MQTT publisher/consumer");
+        in = null;
+        out = null;
         mqttService.unregisterMessageConsumer(brokerName, mqttConsumer);
         mqttService.unregisterMessageProducer(brokerName, mqttPublisher);
     }
@@ -86,9 +115,13 @@ public class MySensorsMqttConnection extends MySensorsAbstractConnection {
         @Override
         protected void sendMessage(String msg) {
 
-            // topicPublish = myGatewayConfig.getTopicPublish();
             logger.debug("Sending MQTT Message: Topic: {}, Message: {}", topicPublish, msg);
             try {
+                // The following produces a nullPointerException if the broker connection is not available
+                // for any reason (name does not exist in mqtt.cfg or network problems etc.).
+                // There is no way that I have found to check that a broker connection is available
+                // before attempting to publish. The 'getConnection' method of the base MqttService is
+                // private so cannot be used.
                 mqttPublisher.publish(topicPublish, msg);
             } catch (Exception e) {
                 logger.debug("Error sending MQTT message: {}", e.toString());
@@ -98,15 +131,19 @@ public class MySensorsMqttConnection extends MySensorsAbstractConnection {
 
     }
 
+    /**
+     * Receives messages from MQTT transport, translates them and passes them on to
+     * the MySensors abstract connection
+     */
     public class MySensorsMqttConsumer implements MqttMessageConsumer {
 
-        private EventPublisher ep;
+        private EventPublisher eventPublisher;
         private String topic;
 
         @Override
         public void processMessage(String topic, byte[] payload) {
 
-            logger.debug("MQTT message received. Topic: {}, Message: {}", topic, payload);
+            logger.debug("MQTT message received. Topic: {}, Message: {}", topic, payload.toString());
             String[] splitMessage = topic.split("/");
             if (topic.contains(topicSubscribe) && splitMessage.length == 6) {
 
@@ -117,11 +154,12 @@ public class MySensorsMqttConnection extends MySensorsAbstractConnection {
                 String subType = splitMessage[5];
                 String messagetext = nodeId + ";" + childId + ";" + msgType + ";" + ack + ";" + subType + ";"
                         + payload.toString() + "\n";
-                logger.debug("writing message to byte buffer: {}", messagetext);
+                logger.debug("Converted MQTT message to MySensors Serial format. Sending on to bridge: {}",
+                        messagetext);
                 try {
                     out.write(messagetext.getBytes());
                 } catch (IOException e) {
-                    logger.debug("Unable to write message to byte buffer: {}", e.toString());
+                    logger.debug("Unable to send message to bridge: {}", e.toString());
                 }
             }
         }
@@ -139,11 +177,20 @@ public class MySensorsMqttConnection extends MySensorsAbstractConnection {
 
         @Override
         public void setEventPublisher(EventPublisher eventPublisher) {
-            this.ep = eventPublisher;
+            this.eventPublisher = eventPublisher;
+        }
+
+        public EventPublisher getEventPublisher(EventPublisher eventPublisher) {
+            return this.eventPublisher;
         }
 
     }
 
+    /**
+     * Receives messages from the MySensors abstract connection,
+     * translates them and passes them on to the MQTT transport.
+     *
+     */
     public class MySensorsMqttPublisher implements MqttMessageProducer {
 
         public MqttSenderChannel channel;
