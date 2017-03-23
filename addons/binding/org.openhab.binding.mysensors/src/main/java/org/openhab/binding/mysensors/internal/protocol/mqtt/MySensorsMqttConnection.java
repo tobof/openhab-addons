@@ -128,7 +128,6 @@ public class MySensorsMqttConnection extends MySensorsAbstractConnection {
 
         @Override
         public String getTopic() {
-            // TODO Auto-generated method stub
             return topic;
         }
 
