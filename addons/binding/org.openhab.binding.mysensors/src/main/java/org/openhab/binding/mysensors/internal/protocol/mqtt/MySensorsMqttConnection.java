@@ -117,12 +117,10 @@ public class MySensorsMqttConnection extends MySensorsAbstractConnection {
 
             logger.debug("Sending MQTT Message: Topic: {}, Message: {}", topicPublish, msg);
             try {
-                // The following produces a nullPointerException if the broker connection is not available
-                // for any reason (name does not exist in mqtt.cfg or network problems etc.).
-                // There is no way that I have found to check that a broker connection is available
-                // before attempting to publish. The 'getConnection' method of the base MqttService is
-                // private so cannot be used.
                 mqttPublisher.publish(topicPublish, msg);
+            } catch (NullPointerException ne) {
+                logger.debug("Null exception from MQTT transport service, broker unavailable");
+                MySensorsMqttConnection.this.requestDisconnection(true);
             } catch (Exception e) {
                 logger.debug("Error sending MQTT message: {}", e.toString());
             }
