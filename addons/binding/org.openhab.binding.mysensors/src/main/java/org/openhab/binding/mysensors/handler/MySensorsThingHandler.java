@@ -100,12 +100,12 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
 
     @Override
     public void bridgeStatusChanged(ThingStatusInfo bridgeStatusInfo) {
-        logger.debug("MySensors Bridge Status updated to {} for device: {}", bridgeStatusInfo.getStatus().toString(),
+        logger.debug("MySensors Bridge Status updated to {} for device: {}", bridgeStatusInfo.getStatus(),
                 getThing().getUID().toString());
-        if (bridgeStatusInfo.getStatus().equals(ThingStatus.ONLINE)
-                || bridgeStatusInfo.getStatus().equals(ThingStatus.OFFLINE)) {
+        if (bridgeStatusInfo.getStatus() == ThingStatus.ONLINE
+                || bridgeStatusInfo.getStatus() == ThingStatus.OFFLINE) {
 
-            if (bridgeStatusInfo.getStatus().equals(ThingStatus.ONLINE)) {
+            if (bridgeStatusInfo.getStatus() == ThingStatus.ONLINE) {
                 registerListeners();
             } else {
                 myGateway.removeEventListener(this);
@@ -118,7 +118,7 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
 
     @Override
     public void handleConfigurationUpdate(Map<String, Object> configurationParameters) {
-        logger.debug("Configuation update fo thing {}-{}: {}", nodeId, childId, configurationParameters);
+        logger.debug("Configuation update for thing {}-{}: {}", nodeId, childId, configurationParameters);
         super.handleConfigurationUpdate(configurationParameters);
     }
 
@@ -131,10 +131,8 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
     @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
         logger.trace("Command {} received for channel uid {}", command, channelUID);
-        /*
-         * We don't handle refresh commands yet
-         *
-         */
+        
+        // We don't handle refresh commands yet
         if (command == RefreshType.REFRESH) {
             return;
         }
@@ -270,10 +268,8 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
      * @return BridgeHandler of the bridge/gateway to the MySensors network
      */
     private synchronized MySensorsBridgeHandler getBridgeHandler() {
-        MySensorsBridgeHandler myBridgeHandler = null;
-
         Bridge bridge = getBridge();
-        myBridgeHandler = (MySensorsBridgeHandler) bridge.getHandler();
+        MySensorsBridgeHandler myBridgeHandler = (MySensorsBridgeHandler) bridge.getHandler();
 
         return myBridgeHandler;
     }
@@ -293,7 +289,7 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
 
     private String getChannelNameFromVar(MySensorsVariable var) {
         // Cover thing has a specific behavior
-        if (getThing().getThingTypeUID().equals(MySensorsBindingConstants.THING_TYPE_COVER)) {
+        if (getThing().getThingTypeUID() == MySensorsBindingConstants.THING_TYPE_COVER) {
             return MySensorsBindingConstants.CHANNEL_COVER;
         } else {
             return CHANNEL_MAP.get(var.getType());
@@ -336,34 +332,34 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
     }
 
     private MySensorsNode generateNodeFromThing(Thing t, MySensorsSensorConfiguration configuration) {
-        MySensorsNode ret = null;
-        Integer nodeId = -1, childId = -1, pres = -1;
+        MySensorsNode node = null;
+
         try {
-            nodeId = t.getConfiguration().as(MySensorsSensorConfiguration.class).nodeId;
-            childId = t.getConfiguration().as(MySensorsSensorConfiguration.class).childId;
-            pres = INVERSE_THING_UID_MAP.get(t.getThingTypeUID());
+            Integer nodeId = t.getConfiguration().as(MySensorsSensorConfiguration.class).nodeId;
+            Integer childId = t.getConfiguration().as(MySensorsSensorConfiguration.class).childId;
+            Integer presentation = INVERSE_THING_UID_MAP.get(t.getThingTypeUID());
 
-            if (pres != null) {
+            if (presentation != null) {
                 logger.trace("Building sensors from thing: {}, node: {}, child: {}, presentation: {}", t.getUID(),
-                        nodeId, childId, pres);
+                        nodeId, childId, presentation);
 
-                MySensorsChild child = MySensorsChild.fromPresentation(pres, childId);
+                MySensorsChild child = MySensorsChild.fromPresentation(presentation, childId);
                 child.setChildConfig(generateChildConfig(configuration));
                 if (child != null) {
-                    ret = new MySensorsNode(nodeId);
-                    ret.setNodeConfig(generateNodeConfig(configuration));
-                    ret.addChild(child);
+                    node = new MySensorsNode(nodeId);
+                    node.setNodeConfig(generateNodeConfig(configuration));
+                    node.addChild(child);
                 }
             } else {
                 logger.error("Error on building sensors from thing: {}, node: {}, child: {}, presentation: {}",
-                        t.getUID(), nodeId, childId, pres);
+                        t.getUID(), nodeId, childId, presentation);
             }
 
         } catch (Exception e) {
             logger.error("Failing on create node/child for thing {}", thing.getUID(), e);
         }
 
-        return ret;
+        return node;
 
     }
 
