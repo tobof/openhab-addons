@@ -82,7 +82,6 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
             myGateway.addEventListener(this);
 
             registerDeviceDiscoveryService();
-            // reloadSensors();
 
             logger.debug("Initialization of the MySensors bridge DONE!");
         } else {
@@ -182,30 +181,30 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
 
     private MySensorsGatewayConfig openhabToMySensorsGatewayConfig(MySensorsBridgeConfiguration conf,
             ThingTypeUID bridgeuid) {
-        MySensorsGatewayConfig ret = new MySensorsGatewayConfig();
+        MySensorsGatewayConfig gatewayConfig = new MySensorsGatewayConfig();
 
         if (bridgeuid.equals(THING_TYPE_BRIDGE_SER)) {
-            ret.setGatewayType(MySensorsGatewayType.SERIAL);
-            ret.setBaudRate(conf.baudRate);
-            ret.setSerialPort(conf.serialPort);
+            gatewayConfig.setGatewayType(MySensorsGatewayType.SERIAL);
+            gatewayConfig.setBaudRate(conf.baudRate);
+            gatewayConfig.setSerialPort(conf.serialPort);
         } else if (bridgeuid.equals(THING_TYPE_BRIDGE_ETH)) {
-            ret.setGatewayType(MySensorsGatewayType.IP);
-            ret.setIpAddress(conf.ipAddress);
-            ret.setTcpPort(conf.tcpPort);
+            gatewayConfig.setGatewayType(MySensorsGatewayType.IP);
+            gatewayConfig.setIpAddress(conf.ipAddress);
+            gatewayConfig.setTcpPort(conf.tcpPort);
         } else {
-            throw new IllegalArgumentException("BridgeUID is unkonown: " + bridgeuid);
+            throw new IllegalArgumentException("BridgeUID is unknown: " + bridgeuid);
         }
 
-        ret.setSendDelay(conf.sendDelay);
-        ret.setEnableNetworkSanCheck(conf.enableNetworkSanCheck);
-        ret.setImperial(conf.imperial);
-        ret.setSkipStartupCheck(conf.skipStartupCheck);
-        ret.setSanityCheckerInterval(conf.sanityCheckerInterval);
-        ret.setSanCheckConnectionFailAttempts(conf.sanCheckConnectionFailAttempts);
-        ret.setSanCheckSendHeartbeat(conf.sanCheckSendHeartbeat);
-        ret.setSanCheckSendHeartbeatFailAttempts(conf.sanCheckSendHeartbeatFailAttempts);
+        gatewayConfig.setSendDelay(conf.sendDelay);
+        gatewayConfig.setEnableNetworkSanCheck(conf.networkSanCheckEnabled);
+        gatewayConfig.setImperial(conf.imperial);
+        gatewayConfig.setStartupCheck(conf.startupCheckEnabled);
+        gatewayConfig.setSanityCheckerInterval(conf.networkSanCheckInterval);
+        gatewayConfig.setSanCheckConnectionFailAttempts(conf.networkSanCheckConnectionFailAttempts);
+        gatewayConfig.setSanCheckSendHeartbeat(conf.networkSanCheckSendHeartbeat);
+        gatewayConfig.setSanCheckSendHeartbeatFailAttempts(conf.networkSanCheckSendHeartbeatFailAttempts);
 
-        return ret;
+        return gatewayConfig;
     }
 
     private void registerDeviceDiscoveryService() {
@@ -229,10 +228,4 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
             discoveryService = null;
         }
     }
-
-    @Override
-    public String toString() {
-        return "MySensorsBridgeHandler []";
-    }
-
 }

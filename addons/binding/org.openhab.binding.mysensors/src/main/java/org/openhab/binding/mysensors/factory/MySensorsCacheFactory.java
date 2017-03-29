@@ -35,10 +35,9 @@ public class MySensorsCacheFactory {
 
     public static final String GIVEN_IDS_CACHE_FILE = "given_ids";
 
-    private Gson gson = null;
+    private final Gson gson = new Gson();
 
     public MySensorsCacheFactory() {
-        gson = new Gson();
         initializeCacheDir();
     }
 

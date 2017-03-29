@@ -73,7 +73,7 @@ public abstract class MySensorsAbstractConnection implements Runnable {
     private boolean iVersionResponse = false;
 
     // Check connection on startup flag
-    private boolean skipStartupCheck = false;
+    private boolean startupCheckEnabled = true;
 
     // Reader and writer thread
     protected MySensorsWriter mysConWriter = null;
@@ -107,8 +107,8 @@ public abstract class MySensorsAbstractConnection implements Runnable {
      * Initialization of the BridgeConnection
      */
     public void initialize() {
-        logger.debug("Set skip check on startup to: {}", myGatewayConfig.getSkipStartupCheck());
-        skipStartupCheck = myGatewayConfig.getSkipStartupCheck();
+        logger.debug("Set startupCheckEnabeld to: {}", myGatewayConfig.getStartupCheck());
+        startupCheckEnabled = myGatewayConfig.getStartupCheck();
 
         // Launch connection watchdog
         logger.debug("Enabling connection watchdog");
@@ -209,7 +209,7 @@ public abstract class MySensorsAbstractConnection implements Runnable {
         reader.startReader();
         writer.startWriter();
 
-        if (!skipStartupCheck) {
+        if (startupCheckEnabled) {
             try {
                 int i = 0;
                 synchronized (this) {
@@ -230,7 +230,7 @@ public abstract class MySensorsAbstractConnection implements Runnable {
 
         if (!iVersionResponse) {
             logger.error(
-                    "Cannot start reading/writing thread, probably sync message (I_VERSION) not received. Try set skipStartupCheck to true");
+                    "Cannot start reading/writing thread, probably sync message (I_VERSION) not received. Try set startupCheckEnabled to false");
         }
 
         return iVersionResponse;

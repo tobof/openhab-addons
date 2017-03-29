@@ -21,36 +21,29 @@ import org.openhab.binding.mysensors.internal.sensors.MySensorsVariable;
  * Used to convert a String from an incoming MySensors message to a UpDownType
  * 
  * @author Andrea Cioni
+ * @author Tim Oberföll
  *
  */
 public class MySensorsUpDownTypeConverter implements MySensorsTypeConverter {
 
     @Override
     public Integer typeFromChannelCommand(String channel, Command command) {
-        if (channel.equals(MySensorsBindingConstants.CHANNEL_COVER)) {
+        if (channel == MySensorsBindingConstants.CHANNEL_COVER) {
             if (command instanceof UpDownType) {
-                if (command.equals(UpDownType.UP)) {
+                if (command == UpDownType.UP) {
                     return MySensorsMessage.MYSENSORS_SUBTYPE_V_UP;
-                } else if (command.equals(UpDownType.DOWN)) {
+                } else if (command == UpDownType.DOWN) {
                     return MySensorsMessage.MYSENSORS_SUBTYPE_V_DOWN;
-                } else {
-                    throw new IllegalArgumentException("Invalid command of type UpDownType: " + command);
-                }
+                } 
             } else if (command instanceof StopMoveType) {
-                if (command.equals(StopMoveType.STOP)) {
+                if (command == StopMoveType.STOP) {
                     return MySensorsMessage.MYSENSORS_SUBTYPE_V_STOP;
-                } else {
-                    throw new IllegalArgumentException("Invalid command of type StopMoveType");
-                }
+                } 
             } else if (command instanceof PercentType) {
                 return MySensorsMessage.MYSENSORS_SUBTYPE_V_PERCENTAGE;
-            } else {
-                throw new IllegalArgumentException("Invalid command (" + command + ") passed to UpDown adapter");
-
             }
-        } else {
-            throw new IllegalArgumentException("Invalid channel(" + channel + ") passed to UpDown adapter");
         }
+        throw new IllegalArgumentException("Invalid command (" + command + ") passed to UpDown adapter");
     }
 
     @Override

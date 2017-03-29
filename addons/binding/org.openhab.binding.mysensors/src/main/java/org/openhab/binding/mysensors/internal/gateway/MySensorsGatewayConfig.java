@@ -36,32 +36,32 @@ public class MySensorsGatewayConfig {
     /**
      * Should the startup check of the bridge at boot skipped?
      */
-    private Boolean skipStartupCheck;
+    private Boolean startupCheckEnabled;
 
     /**
      * Network sanity check enabled?
      */
-    private Boolean enableNetworkSanCheck;
+    private Boolean networkSanCheckEnabled;
 
     /**
      * Determines interval to start NetworkSanityCheck
      */
-    private Integer sanityCheckerInterval;
+    private Integer networkSanCheckInterval;
 
     /**
      * Connection will wait this number of attempts before disconnecting
      */
-    private Integer sanCheckConnectionFailAttempts;
+    private Integer networkSanCheckConnectionFailAttempts;
 
     /**
      * Network sanity checker will also send heartbeats to all known nodes
      */
-    private boolean sanCheckSendHeartbeat;
+    private boolean networkSanCheckSendHeartbeat;
 
     /**
      * Disconnect nodes that fail to answer to heartbeat request
      */
-    private Integer sanCheckSendHeartbeatFailAttempts;
+    private Integer networkSanCheckSendHeartbeatFailAttempts;
 
     // SERIAL
     /**
@@ -141,61 +141,61 @@ public class MySensorsGatewayConfig {
         this.imperial = imperial;
     }
 
-    public Boolean getSkipStartupCheck() {
-        return skipStartupCheck;
+    public Boolean getStartupCheck() {
+        return startupCheckEnabled;
     }
 
-    public void setSkipStartupCheck(Boolean skipStartupCheck) {
-        this.skipStartupCheck = skipStartupCheck;
+    public void setStartupCheck(Boolean startupCheckEnabled) {
+        this.startupCheckEnabled = startupCheckEnabled;
     }
 
     public Boolean getEnableNetworkSanCheck() {
-        return enableNetworkSanCheck;
+        return networkSanCheckEnabled;
     }
 
     public void setEnableNetworkSanCheck(Boolean enableNetworkSanCheck) {
-        this.enableNetworkSanCheck = enableNetworkSanCheck;
+        this.networkSanCheckEnabled = enableNetworkSanCheck;
     }
 
     public Integer getSanityCheckerInterval() {
-        return sanityCheckerInterval;
+        return networkSanCheckInterval;
     }
 
     public void setSanityCheckerInterval(Integer sanityCheckerInterval) {
-        this.sanityCheckerInterval = sanityCheckerInterval;
+        this.networkSanCheckInterval = sanityCheckerInterval;
     }
 
     public Integer getSanCheckConnectionFailAttempts() {
-        return sanCheckConnectionFailAttempts;
+        return networkSanCheckConnectionFailAttempts;
     }
 
     public void setSanCheckConnectionFailAttempts(Integer sanCheckConnectionFailAttempts) {
-        this.sanCheckConnectionFailAttempts = sanCheckConnectionFailAttempts;
+        this.networkSanCheckConnectionFailAttempts = sanCheckConnectionFailAttempts;
     }
 
     public boolean getSanCheckSendHeartbeat() {
-        return sanCheckSendHeartbeat;
+        return networkSanCheckSendHeartbeat;
     }
 
     public void setSanCheckSendHeartbeat(boolean sanCheckSendHeartbeat) {
-        this.sanCheckSendHeartbeat = sanCheckSendHeartbeat;
+        this.networkSanCheckSendHeartbeat = sanCheckSendHeartbeat;
     }
 
     public Integer getSanCheckSendHeartbeatFailAttempts() {
-        return sanCheckSendHeartbeatFailAttempts;
+        return networkSanCheckSendHeartbeatFailAttempts;
     }
 
     public void setSanCheckSendHeartbeatFailAttempts(Integer sanCheckSendHeartbeatFailAttempts) {
-        this.sanCheckSendHeartbeatFailAttempts = sanCheckSendHeartbeatFailAttempts;
+        this.networkSanCheckSendHeartbeatFailAttempts = sanCheckSendHeartbeatFailAttempts;
     }
 
     @Override
     public String toString() {
         return "MySensorsGatewayConfig [gatewayType=" + gatewayType + ", sendDelay=" + sendDelay + ", imperial="
-                + imperial + ", skipStartupCheck=" + skipStartupCheck + ", enableNetworkSanCheck="
-                + enableNetworkSanCheck + ", sanityCheckerInterval=" + sanityCheckerInterval
-                + ", sanCheckConnectionFailAttempts=" + sanCheckConnectionFailAttempts + ", sanCheckSendHeartbeat="
-                + sanCheckSendHeartbeat + ", sanCheckSendHeartbeatFailAttempts=" + sanCheckSendHeartbeatFailAttempts
+                + imperial + ", skipStartupCheck=" + startupCheckEnabled + ", enableNetworkSanCheck="
+                + networkSanCheckEnabled + ", sanityCheckerInterval=" + networkSanCheckInterval
+                + ", sanCheckConnectionFailAttempts=" + networkSanCheckConnectionFailAttempts + ", sanCheckSendHeartbeat="
+                + networkSanCheckSendHeartbeat + ", sanCheckSendHeartbeatFailAttempts=" + networkSanCheckSendHeartbeatFailAttempts
                 + ", serialPort=" + serialPort + ", baudRate=" + baudRate + ", ipAddress=" + ipAddress + ", tcpPort="
                 + tcpPort + "]";
     }

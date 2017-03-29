@@ -11,19 +11,20 @@ package org.openhab.binding.mysensors.config;
 /**
  * Parameters used for node / thing configuration.
  *
- * @author toberfoe
+ * @author Tim Oberföll
+ * @author Andrea Cioni
  *
  */
 public class MySensorsSensorConfiguration {
     /**
      * Node ID in the MySensors network
      */
-    public String nodeId;
+    public int nodeId;
 
     /**
      * Child ID in the MySensors network
      */
-    public String childId;
+    public int childId;
 
     /**
      * Should a message request an ACK?
@@ -58,9 +59,14 @@ public class MySensorsSensorConfiguration {
 
     @Override
     public String toString() {
-        return "MySensorsSensorConfiguration [nodeId=" + nodeId + ", childId=" + childId + ", requestAck=" + requestAck
-                + ", revertState=" + revertState + ", smartSleep=" + smartSleep + ", childUpdateTimeout="
-                + childUpdateTimeout + ", nodeUpdateTimeout=" + nodeUpdateTimeout + ", requestHeartbeatResponse="
-                + requestHeartbeatResponse + "]";
+        return "MySensorsSensorConfiguration [nodeId=" + nodeId
+                + ", childId=" + childId
+                + ", requestAck=" + requestAck
+                + ", revertState=" + revertState
+                + ", smartSleep=" + smartSleep
+                + ", childUpdateTimeout=" + childUpdateTimeout
+                + ", nodeUpdateTimeout=" + nodeUpdateTimeout
+                + ", requestHeartbeatResponse=" + requestHeartbeatResponse
+                + "]";
     }
 }

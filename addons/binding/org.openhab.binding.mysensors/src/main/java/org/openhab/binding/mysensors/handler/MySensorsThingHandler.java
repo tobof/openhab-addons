@@ -53,7 +53,7 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
-    private MySensorsSensorConfiguration configuration = null;
+    private MySensorsSensorConfiguration configuration;
 
     private int nodeId = 0;
     private int childId = 0;
@@ -75,8 +75,8 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
     @Override
     public void initialize() {
         configuration = getConfigAs(MySensorsSensorConfiguration.class);
-        nodeId = Integer.parseInt(configuration.nodeId);
-        childId = Integer.parseInt(configuration.childId);
+        nodeId = configuration.nodeId;
+        childId = configuration.childId;
         requestAck = configuration.requestAck;
         revertState = configuration.revertState;
         smartSleep = configuration.smartSleep;
@@ -339,8 +339,8 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
         MySensorsNode ret = null;
         Integer nodeId = -1, childId = -1, pres = -1;
         try {
-            nodeId = Integer.parseInt(t.getConfiguration().as(MySensorsSensorConfiguration.class).nodeId);
-            childId = Integer.parseInt(t.getConfiguration().as(MySensorsSensorConfiguration.class).childId);
+            nodeId = t.getConfiguration().as(MySensorsSensorConfiguration.class).nodeId;
+            childId = t.getConfiguration().as(MySensorsSensorConfiguration.class).childId;
             pres = INVERSE_THING_UID_MAP.get(t.getThingTypeUID());
 
             if (pres != null) {

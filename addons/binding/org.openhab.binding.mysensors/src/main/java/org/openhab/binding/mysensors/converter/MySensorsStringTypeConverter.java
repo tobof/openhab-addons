@@ -20,8 +20,8 @@ import org.eclipse.smarthome.core.types.State;
 public class MySensorsStringTypeConverter implements MySensorsTypeConverter {
 
     @Override
-    public State fromString(String s) {
-        return new StringType(s);
+    public State fromString(String string) {
+        return new StringType(string);
     }
 
 }

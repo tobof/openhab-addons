@@ -105,7 +105,7 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
         myCon.initialize();
 
         myEventRegister.addEventListener(this);
-
+        
         if (myConf.getEnableNetworkSanCheck()) {
             myNetSanCheck = new MySensorsNetworkSanityChecker(this, myEventRegister, myCon);
         }
