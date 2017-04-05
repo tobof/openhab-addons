@@ -240,18 +240,6 @@ public class MySensorsMessage {
         setSmartSleep(smartSleep);
     }
 
-    public MySensorsMessage(String topic, byte[] payload) {
-        String[] splitTopic = topic.split("/");
-        String payloadString = new String(payload);
-
-        setNodeId(Integer.parseInt(splitTopic[1]));
-        setChildId(Integer.parseInt(splitTopic[2]));
-        setMsgType(Integer.parseInt(splitTopic[3]));
-        setAck(Integer.parseInt(splitTopic[4]));
-        setSubType(Integer.parseInt(splitTopic[5]));
-        setMsg(payloadString);
-    }
-
     /**
      * Write message to DEBUG.
      */
