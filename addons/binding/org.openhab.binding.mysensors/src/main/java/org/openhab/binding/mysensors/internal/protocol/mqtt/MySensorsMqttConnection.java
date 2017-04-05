@@ -12,10 +12,12 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
+import java.text.ParseException;
 
 import org.openhab.binding.mysensors.internal.event.MySensorsEventRegister;
 import org.openhab.binding.mysensors.internal.gateway.MySensorsGatewayConfig;
 import org.openhab.binding.mysensors.internal.protocol.MySensorsAbstractConnection;
+import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
 import org.openhab.core.events.EventPublisher;
 import org.openhab.io.transport.mqtt.MqttMessageConsumer;
 import org.openhab.io.transport.mqtt.MqttMessageProducer;
@@ -77,10 +79,16 @@ public class MySensorsMqttConnection extends MySensorsAbstractConnection {
                 mqttService = myMqtt.getService();
 
                 topicSubscribe = myGatewayConfig.getTopicSubscribe();
+                if (topicSubscribe.substring(topicSubscribe.length() - 1) != "/") {
+                    topicSubscribe += "/";
+                }
                 topicPublish = myGatewayConfig.getTopicPublish();
+                if (topicPublish.substring(topicPublish.length() - 1) != "/") {
+                    topicPublish += "/";
+                }
                 brokerName = myGatewayConfig.getBrokerName();
 
-                mqttConsumer.setTopic(topicSubscribe + "/+/+/+/+/+");
+                mqttConsumer.setTopic(topicSubscribe + "+/+/+/+/+");
 
                 mqttService.registerMessageConsumer(brokerName, mqttConsumer);
                 mqttService.registerMessageProducer(brokerName, mqttPublisher);
@@ -140,24 +148,26 @@ public class MySensorsMqttConnection extends MySensorsAbstractConnection {
 
         @Override
         public void processMessage(String topic, byte[] payload) {
+            String payloadString = new String(payload);
+            logger.debug("MQTT message received. Topic: {}, Message: {}", topic, payloadString);
+            if (topic.indexOf(topicSubscribe) == 0) {
 
-            logger.debug("MQTT message received. Topic: {}, Message: {}", topic, payload.toString());
-            String[] splitMessage = topic.split("/");
-            if (topic.contains(topicSubscribe) && splitMessage.length == 6) {
-
-                String nodeId = splitMessage[1];
-                String childId = splitMessage[2];
-                String msgType = splitMessage[3];
-                String ack = splitMessage[4];
-                String subType = splitMessage[5];
-                String messagetext = nodeId + ";" + childId + ";" + msgType + ";" + ack + ";" + subType + ";"
-                        + payload.toString() + "\n";
-                logger.debug("Converted MQTT message to MySensors Serial format. Sending on to bridge: {}",
-                        messagetext);
+                String messageTopicPart = topic.replace(topicSubscribe, "");
+                logger.debug("Message topic part: {}", messageTopicPart);
+                MySensorsMessage incomingMessage = new MySensorsMessage();
                 try {
-                    out.write(messagetext.getBytes());
-                } catch (IOException e) {
-                    logger.debug("Unable to send message to bridge: {}", e.toString());
+                    incomingMessage = MySensorsMessage.parseMQTT(messageTopicPart, payloadString);
+                    logger.debug("Converted MQTT message to MySensors Serial format. Sending on to bridge: {}",
+                            MySensorsMessage.generateAPIString(incomingMessage).trim());
+                    try {
+
+                        out.write(MySensorsMessage.generateAPIString(incomingMessage).getBytes());
+                    } catch (IOException ioe) {
+                        ioe.toString();
+                    }
+
+                } catch (ParseException pe) {
+                    logger.debug("Unable to send message to bridge: {}", pe.toString());
                 }
             }
         }
@@ -203,26 +213,14 @@ public class MySensorsMqttConnection extends MySensorsAbstractConnection {
         }
 
         public void publish(String topicPublish, String mySensorsMessage) throws Exception {
-            logger.debug("Splitting Message");
-            String[] splitMessage = mySensorsMessage.split(";");
-            if (splitMessage.length > 5) {
 
-                String nodeId = splitMessage[0];
-                String childId = splitMessage[1];
-                String msgType = splitMessage[2];
-                String ack = splitMessage[3];
-                String subType = splitMessage[4];
-                String payload = splitMessage[5];
+            MySensorsMessage outgoingMessage = new MySensorsMessage();
+            outgoingMessage = MySensorsMessage.parse(mySensorsMessage);
 
-                String newTopic = topicPublish + "/" + nodeId + "/" + childId + "/" + msgType + "/" + ack + "/"
-                        + subType;
-                logger.debug("Publishing message: Topic: {}, Message: {}", newTopic, payload);
-                this.channel.publish(newTopic, payload.getBytes());
+            String newTopic = topicPublish + MySensorsMessage.generateMQTTString(outgoingMessage);
+            logger.debug("Publishing message: Topic: {}, Message: {}", newTopic, outgoingMessage.getMsg());
+            this.channel.publish(newTopic, outgoingMessage.getMsg().getBytes());
 
-            } else {
-                logger.debug("Invalid message: {}", mySensorsMessage);
-                return;
-            }
         }
 
     }
