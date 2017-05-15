@@ -10,6 +10,7 @@ package org.openhab.binding.mysensors.test;
 
 import java.util.ArrayList;
 
+import org.eclipse.smarthome.config.core.ConfigConstants;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -29,7 +30,7 @@ public class CacheTest {
 
     @BeforeClass
     public void init() {
-        c = new MySensorsCacheFactory();
+        c = new MySensorsCacheFactory(ConfigConstants.getUserDataFolder());
     }
 
     @Test

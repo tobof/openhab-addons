@@ -9,6 +9,7 @@
 package org.openhab.binding.mysensors.internal.event;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.openhab.binding.mysensors.internal.protocol.MySensorsAbstractConnection;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
@@ -19,6 +20,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Event register is used to notify registered things about updates
+ * and messages received by the gateway.
+ * 
  * @author Andrea Cioni
  *
  */

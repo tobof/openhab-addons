@@ -16,6 +16,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.smarthome.config.core.ConfigConstants;
 import org.eclipse.smarthome.config.discovery.DiscoveryService;
 import org.eclipse.smarthome.core.thing.Bridge;
 import org.eclipse.smarthome.core.thing.ChannelUID;
@@ -62,10 +63,11 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
     // Discovery service
     private MySensorsDiscoveryService discoveryService;
     
-    private MySensorsCacheFactory cacheFactory = new MySensorsCacheFactory();
+    private MySensorsCacheFactory cacheFactory;
 
     public MySensorsBridgeHandler(Bridge bridge) {
         super(bridge);
+        cacheFactory = new MySensorsCacheFactory(ConfigConstants.getUserDataFolder());
     }
 
     @Override

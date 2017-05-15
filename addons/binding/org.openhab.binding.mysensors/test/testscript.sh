@@ -193,7 +193,7 @@ echo "172;4;1;0;15;1" > $serialPort
 
 # INTERNAL
 # batteryLevel
-#echo "101;255;3;0;0;94" > $serialPort
+echo "173;255;3;0;0;91" > $serialPort
 
 # I_HEARTBEAT_RESPONSE
 #echo "172;3;3;0;22;1" > $serialPort

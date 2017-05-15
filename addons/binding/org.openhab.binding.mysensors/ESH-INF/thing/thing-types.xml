@@ -2327,7 +2327,7 @@
 		<description>MySensors Water Volume Channel</description>
 	</channel-type>
 	<channel-type id="lock-status-channel">
-		<item-type>Status</item-type>
+		<item-type>Switch</item-type>
 		<label>Lock</label>
 		<description>MySensors Lock Channel</description>
 		<state readOnly="false"></state>
