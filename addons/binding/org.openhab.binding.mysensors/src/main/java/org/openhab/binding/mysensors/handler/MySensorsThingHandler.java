@@ -55,16 +55,7 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
 
     private MySensorsSensorConfiguration configuration;
 
-    private int nodeId = 0;
-    private int childId = 0;
-    private boolean requestAck = false;
-    private boolean revertState = true;
-
-    private boolean smartSleep = false;
-
-    private int expectUpdateTimeout = -1;
-
-    private DateTimeType lastUpdate = null;
+    private DateTimeType lastUpdate;
 
     private MySensorsGateway myGateway;
 
@@ -75,12 +66,6 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
     @Override
     public void initialize() {
         configuration = getConfigAs(MySensorsSensorConfiguration.class);
-        nodeId = configuration.nodeId;
-        childId = configuration.childId;
-        requestAck = configuration.requestAck;
-        revertState = configuration.revertState;
-        smartSleep = configuration.smartSleep;
-        expectUpdateTimeout = configuration.childUpdateTimeout;
 
         logger.debug(configuration.toString());
 
@@ -118,7 +103,7 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
 
     @Override
     public void handleConfigurationUpdate(Map<String, Object> configurationParameters) {
-        logger.debug("Configuation update for thing {}-{}: {}", nodeId, childId, configurationParameters);
+        logger.debug("Configuation update for thing {}-{}: {}", configuration.nodeId, configuration.childId, configurationParameters);
         super.handleConfigurationUpdate(configurationParameters);
     }
 
@@ -137,7 +122,7 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
             return;
         }
 
-        int intRequestAck = requestAck ? 1 : 0;
+        int intRequestAck = configuration.requestAck ? 1 : 0;
 
         // just forward the message in case it is received via this channel. This is special!
         if (channelUID.getId().equals(CHANNEL_MYSENSORS_MESSAGE)) {
@@ -162,15 +147,15 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
                     logger.trace("Type for channel: {}, command: {} of thing {} is: {}", thing.getUID(), command,
                             thing.getUID(), type);
 
-                    MySensorsVariable var = myGateway.getVariable(nodeId, childId, type);
+                    MySensorsVariable var = myGateway.getVariable(configuration.nodeId, configuration.childId, type);
 
                     if (var != null) {
 
                         int subType = var.getType();
 
                         // Create the real message to send
-                        MySensorsMessage newMsg = new MySensorsMessage(nodeId, childId,
-                                MySensorsMessage.MYSENSORS_MSG_TYPE_SET, intRequestAck, revertState, smartSleep);
+                        MySensorsMessage newMsg = new MySensorsMessage(configuration.nodeId, configuration.childId,
+                                MySensorsMessage.MYSENSORS_MSG_TYPE_SET, intRequestAck, configuration.revertState, configuration.smartSleep);
 
                         newMsg.setSubType(subType);
                         newMsg.setMsg(adapter.fromCommand(command));
@@ -205,13 +190,13 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
         switch (eventType) {
             case UPDATE:
             case REVERT:
-                if ((node.getNodeId() == nodeId) && (child.getChildId() == childId)) {
+                if ((node.getNodeId() == configuration.nodeId) && (child.getChildId() == configuration.childId)) {
                     handleChildUpdateEvent(var);
                     updateLastUpdate(node, eventType == MySensorsNodeUpdateEventType.REVERT);
                 }
                 break;
             case BATTERY:
-                if (node.getNodeId() == nodeId) {
+                if (node.getNodeId() == configuration.nodeId) {
                     handleBatteryUpdateEvent(node);
                     updateLastUpdate(node, eventType == MySensorsNodeUpdateEventType.REVERT);
                 }
@@ -231,7 +216,7 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
 
     @Override
     public void nodeReachStatusChanged(MySensorsNode node, boolean reach) {
-        if (node.getNodeId() == nodeId) {
+        if (node.getNodeId() == configuration.nodeId) {
             if (!reach) {
                 updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR);
             } else {
@@ -248,15 +233,15 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
     private void updateLastUpdate(MySensorsNode node, boolean isRevert) {
         // Don't always fire last update channel, do it only after a minute by
         if (lastUpdate == null || (System.currentTimeMillis() > (lastUpdate.getCalendar().getTimeInMillis() + 60000))
-                || revertState) {
+                || configuration.revertState) {
             DateTimeType dt = new DateTimeType(
                     new SimpleDateFormat(DateTimeType.DATE_PATTERN).format(node.getLastUpdate()));
             lastUpdate = dt;
             updateState(CHANNEL_LAST_UPDATE, dt);
             if (!isRevert) {
-                logger.debug("Setting last update for node/child {}/{} to {}", nodeId, childId, dt.toString());
+                logger.debug("Setting last update for node/child {}/{} to {}", configuration.nodeId, configuration.childId, dt.toString());
             } else {
-                logger.warn("Setting last update for node/child {}/{} BACK (due to revert) to {}", nodeId, childId,
+                logger.warn("Setting last update for node/child {}/{} BACK (due to revert) to {}", configuration.nodeId, configuration.childId,
                         dt.toString());
             }
         }
@@ -308,7 +293,7 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
      */
     private void handleIncomingMessageEvent(MySensorsMessage msg) {
         // Am I the all knowing node that receives all messages?
-        if (nodeId == MYSENSORS_NODE_ID_ALL_KNOWING && childId == MYSENSORS_CHILD_ID_ALL_KNOWING) {
+        if (configuration.nodeId == MYSENSORS_NODE_ID_ALL_KNOWING && configuration.childId == MYSENSORS_CHILD_ID_ALL_KNOWING) {
             updateState(CHANNEL_MYSENSORS_MESSAGE,
                     new StringType(MySensorsMessage.generateAPIString(msg).replaceAll("(\\r|\\n)", "")));
 
@@ -317,7 +302,7 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
 
     private void registerListeners() {
         if (!myGateway.isEventListenerRegisterd(this)) {
-            logger.debug("Event listener for node {}-{} not registered yet, registering...", nodeId, childId);
+            logger.debug("Event listener for node {}-{} not registered yet, registering...", configuration.nodeId, configuration.childId);
             myGateway.addEventListener(this);
         }
     }
@@ -369,7 +354,7 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
         ret.setRevertState(configuration.revertState);
         ret.setExpectUpdateTimeout(configuration.childUpdateTimeout);
 
-        logger.trace("ChildConfig for {}/{}: {}", nodeId, childId, ret.toString());
+        logger.trace("ChildConfig for {}/{}: {}", configuration.nodeId, configuration.childId, ret.toString());
 
         return ret;
     }
@@ -379,14 +364,8 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
         ret.setRequestHeartbeatResponse(configuration.requestHeartbeatResponse);
         ret.setExpectUpdateTimeout(configuration.nodeUpdateTimeout);
 
-        logger.trace("NodeConfig for {}/{}: {}", nodeId, childId, ret.toString());
+        logger.trace("NodeConfig for {}/{}: {}", configuration.nodeId, configuration.childId, ret.toString());
 
         return ret;
     }
-
-    @Override
-    public String toString() {
-        return "MySensorsThingHandler [nodeId=" + nodeId + ", childId=" + childId + "]";
-    }
-
 }

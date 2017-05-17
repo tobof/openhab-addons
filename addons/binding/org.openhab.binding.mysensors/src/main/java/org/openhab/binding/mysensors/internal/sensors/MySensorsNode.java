@@ -102,7 +102,7 @@ public class MySensorsNode {
      * Get a child from a node
      *
      * @param childId the id of the child to get from this node
-     * @return
+     * @return MySensorsChild for the given childId
      */
     public MySensorsChild getChild(int childId) {
         return chidldMap.get(childId);

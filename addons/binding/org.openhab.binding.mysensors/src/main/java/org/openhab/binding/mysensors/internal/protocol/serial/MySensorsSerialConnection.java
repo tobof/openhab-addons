@@ -52,8 +52,8 @@ public class MySensorsSerialConnection extends MySensorsAbstractConnection {
 
             try {
                 logger.debug("Waiting {} seconds to allow correct reset trigger on serial connection opening",
-                        RESET_TIME / 1000);
-                Thread.sleep(RESET_TIME);
+                        RESET_TIME_IN_MILLISECONDS / 1000);
+                Thread.sleep(RESET_TIME_IN_MILLISECONDS);
             } catch (InterruptedException e) {
                 logger.error("Interrupted reset time wait");
             }

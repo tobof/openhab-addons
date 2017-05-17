@@ -17,14 +17,7 @@ package org.openhab.binding.mysensors.internal.exception;
 public class NoContentException extends Exception {
     private static final long serialVersionUID = -3446354234423332363L;
 
-    private String message;
-
     public NoContentException(String message) {
-        this.message = message;
-    }
-
-    @Override
-    public String getMessage() {
-        return message;
+        super(message);
     }
 }
