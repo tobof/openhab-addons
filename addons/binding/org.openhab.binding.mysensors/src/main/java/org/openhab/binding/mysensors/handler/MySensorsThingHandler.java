@@ -95,6 +95,7 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
     @Override
     public void dispose() {
         myGateway.removeEventListener(this);
+        myGateway.removeNode(nodeId);
         super.dispose();
     }
 
