@@ -140,6 +140,12 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
             return nodeMap.get(nodeId);
         }
     }
+    
+    public void removeNode(int nodeId) {
+        synchronized (nodeMap) {
+            nodeMap.remove(nodeId);
+        }
+    }
 
     /**
      * Get a child from a node
