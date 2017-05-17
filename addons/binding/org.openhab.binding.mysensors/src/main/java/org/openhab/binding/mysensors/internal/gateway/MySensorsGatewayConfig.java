@@ -31,7 +31,7 @@ public class MySensorsGatewayConfig {
     /**
      * Should nodes send imperial or metric values?
      */
-    private Boolean imperial; //
+    private Boolean imperial;
 
     /**
      * Should the startup check of the bridge at boot skipped?
