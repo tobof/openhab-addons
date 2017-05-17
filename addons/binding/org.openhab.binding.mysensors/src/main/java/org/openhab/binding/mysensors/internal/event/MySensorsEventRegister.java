@@ -65,7 +65,7 @@ public class MySensorsEventRegister extends EventRegister<MySensorsGatewayEventL
 
     public void notifyBridgeStatusUpdate(MySensorsAbstractConnection connection, boolean connected) {
         synchronized (eventRegister.getEventListeners()) {
-            for (MySensorsGatewayEventListener listener : eventRegister.getEventListeners()) {
+            eventRegister.getEventListeners().forEach((MySensorsGatewayEventListener listener) -> {
                 logger.trace("Broadcasting event {} to: {}", connection.toString(), listener);
 
                 try {
@@ -73,13 +73,13 @@ public class MySensorsEventRegister extends EventRegister<MySensorsGatewayEventL
                 } catch (Exception e) {
                     logger.error("Event broadcasting throw an exception", e);
                 }
-            }
+            });
         }
     }
 
     public void notifyMessageReceived(MySensorsMessage msg) {
         synchronized (eventRegister.getEventListeners()) {
-            for (MySensorsGatewayEventListener listener : eventRegister.getEventListeners()) {
+            eventRegister.getEventListeners().forEach((MySensorsGatewayEventListener listener) -> {
                 logger.trace("Broadcasting event {} to: {}", msg, listener);
 
                 try {
@@ -87,14 +87,14 @@ public class MySensorsEventRegister extends EventRegister<MySensorsGatewayEventL
                 } catch (Exception e) {
                     logger.error("Event broadcasting throw an exception", e);
                 }
-            }
+            });
         }
 
     }
 
     public void notifyNewNodeDiscovered(MySensorsNode node, MySensorsChild child) {
         synchronized (eventRegister.getEventListeners()) {
-            for (MySensorsGatewayEventListener listener : eventRegister.getEventListeners()) {
+            eventRegister.getEventListeners().forEach((MySensorsGatewayEventListener listener) -> {
                 logger.trace("Broadcasting event {} to: {}", node, listener);
 
                 try {
@@ -102,13 +102,13 @@ public class MySensorsEventRegister extends EventRegister<MySensorsGatewayEventL
                 } catch (Exception e) {
                     logger.error("Event broadcasting throw an exception", e);
                 }
-            }
+            });
         }
     }
 
     public void notifyNodeIdReserved(Integer reserved) {
         synchronized (eventRegister.getEventListeners()) {
-            for (MySensorsGatewayEventListener listener : eventRegister.getEventListeners()) {
+            eventRegister.getEventListeners().forEach((MySensorsGatewayEventListener listener) -> {
                 logger.trace("Broadcasting event {} to: {}", reserved, listener);
 
                 try {
@@ -116,14 +116,14 @@ public class MySensorsEventRegister extends EventRegister<MySensorsGatewayEventL
                 } catch (Exception e) {
                     logger.error("Event broadcasting throw an exception", e);
                 }
-            }
+            });
         }
     }
 
     public void notifyNodeUpdateEvent(MySensorsNode node, MySensorsChild child, MySensorsVariable variable,
             MySensorsNodeUpdateEventType eventType) {
         synchronized (eventRegister.getEventListeners()) {
-            for (MySensorsGatewayEventListener listener : eventRegister.getEventListeners()) {
+            eventRegister.getEventListeners().forEach((MySensorsGatewayEventListener listener) -> {
                 logger.trace("Broadcasting event {} to: {}", (variable != null ? variable : node), listener);
 
                 try {
@@ -131,13 +131,13 @@ public class MySensorsEventRegister extends EventRegister<MySensorsGatewayEventL
                 } catch (Exception e) {
                     logger.error("Event broadcasting throw an exception", e);
                 }
-            }
+            });
         }
     }
 
     public void notifyNodeReachEvent(MySensorsNode node, boolean reach) {
         synchronized (eventRegister.getEventListeners()) {
-            for (MySensorsGatewayEventListener listener : eventRegister.getEventListeners()) {
+            eventRegister.getEventListeners().forEach((MySensorsGatewayEventListener listener) -> {
                 logger.trace("Broadcasting event {} to: {}", node, listener);
 
                 try {
@@ -145,13 +145,13 @@ public class MySensorsEventRegister extends EventRegister<MySensorsGatewayEventL
                 } catch (Exception e) {
                     logger.error("Event broadcasting throw an exception", e);
                 }
-            }
+            });
         }
     }
 
     public void notifyAckNotReceived(MySensorsMessage msg) {
         synchronized (eventRegister.getEventListeners()) {
-            for (MySensorsGatewayEventListener listener : eventRegister.getEventListeners()) {
+            eventRegister.getEventListeners().forEach((MySensorsGatewayEventListener listener) -> {
                 logger.trace("Broadcasting event {} to: {}", msg, listener);
 
                 try {
@@ -159,7 +159,7 @@ public class MySensorsEventRegister extends EventRegister<MySensorsGatewayEventL
                 } catch (Exception e) {
                     logger.error("Event broadcasting throw an exception", e);
                 }
-            }
+            });
         }
 
     }
