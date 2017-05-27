@@ -511,6 +511,8 @@ public abstract class MySensorsAbstractConnection implements Runnable {
                                             logger.warn("NO ACK for message: {}",
                                                     MySensorsMessage.generateAPIString(msg));
                                             myEventRegister.notifyAckNotReceived(msg);
+                                            requestDisconnection(true);
+                                            addMySensorsOutboundMessage(msg);
                                             continue;
                                         }
                                     } else {
@@ -597,7 +599,7 @@ public abstract class MySensorsAbstractConnection implements Runnable {
          * Confirm acknowledge for a message from the outbound message queue.
          *
          * @param msg The message that should be acknowledged from the queue.
-         * @throws NoAckException 
+         * @throws NoAckException
          */
         private void confirmAcknowledgeMessage(MySensorsMessage msg) throws NoAckException {
             if (msg == null) {
