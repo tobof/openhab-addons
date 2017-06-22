@@ -26,10 +26,10 @@ import com.google.gson.reflect.TypeToken;
  */
 public class CacheTest {
 
-    private MySensorsCacheFactory c = null;
+    private static MySensorsCacheFactory c = null;
 
     @BeforeClass
-    public void init() {
+    public static void init() {
         c = new MySensorsCacheFactory(ConfigConstants.getUserDataFolder());
     }
 
@@ -51,7 +51,7 @@ public class CacheTest {
     }
 
     @AfterClass
-    public void deleteCache() {
+    public static void deleteCache() {
         c.deleteCache(MySensorsCacheFactory.GIVEN_IDS_CACHE_FILE);
     }
 }
