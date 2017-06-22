@@ -199,13 +199,13 @@ echo "173;255;3;0;0;91" > $serialPort
 #echo "172;3;3;0;22;1" > $serialPort
 
 # Representation of a S_COLOR_SENSOR
-#echo "1;0;0;0;28;2.1.0" > $serialPort
+echo "1;0;0;0;28;2.1.0" > $serialPort
 
 # set rgb
-#echo "1;0;1;0;40;ff00ff" > $serialPort
+echo "1;0;1;0;40;ff00ff" > $serialPort
 
 # Representation of a S_DUST
 #echo "1;1;0;0;24;2.1.0" > $serialPort
 
 # set dust level
-#echo "1;1;1;0;37;66" > $serialPort
+echo "1;1;1;0;37;66" > $serialPort
