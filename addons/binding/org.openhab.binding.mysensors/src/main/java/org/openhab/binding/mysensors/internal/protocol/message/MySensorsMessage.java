@@ -46,7 +46,8 @@ public class MySensorsMessage {
 
     }
 
-    public MySensorsMessage(int nodeId, int childId, MySensorsMessageType msgType, MySensorsMessageAck ack, boolean revert) {
+    public MySensorsMessage(int nodeId, int childId, MySensorsMessageType msgType, MySensorsMessageAck ack,
+            boolean revert) {
         setNodeId(nodeId);
         setChildId(childId);
         setMsgType(msgType);
@@ -54,7 +55,8 @@ public class MySensorsMessage {
         setRevert(revert);
     }
 
-    public MySensorsMessage(int nodeId, int childId, MySensorsMessageType msgType, MySensorsMessageAck ack, boolean revert, boolean smartSleep) {
+    public MySensorsMessage(int nodeId, int childId, MySensorsMessageType msgType, MySensorsMessageAck ack,
+            boolean revert, boolean smartSleep) {
         setNodeId(nodeId);
         setChildId(childId);
         setMsgType(msgType);
@@ -63,7 +65,8 @@ public class MySensorsMessage {
         setSmartSleep(smartSleep);
     }
 
-    public MySensorsMessage(int nodeId, int childId, MySensorsMessageType msgType, MySensorsMessageAck ack, boolean revert, MySensorsMessageSubType subType, String msg) {
+    public MySensorsMessage(int nodeId, int childId, MySensorsMessageType msgType, MySensorsMessageAck ack,
+            boolean revert, MySensorsMessageSubType subType, String msg) {
         setNodeId(nodeId);
         setChildId(childId);
         setMsgType(msgType);
@@ -73,8 +76,8 @@ public class MySensorsMessage {
         setMsg(msg);
     }
 
-    public MySensorsMessage(int nodeId, int childId, MySensorsMessageType msgType, MySensorsMessageAck ack, boolean revert, MySensorsMessageSubType subType, String msg,
-            boolean smartSleep) {
+    public MySensorsMessage(int nodeId, int childId, MySensorsMessageType msgType, MySensorsMessageAck ack,
+            boolean revert, MySensorsMessageSubType subType, String msg, boolean smartSleep) {
         setNodeId(nodeId);
         setChildId(childId);
         setMsgType(msgType);
@@ -120,7 +123,7 @@ public class MySensorsMessage {
     public MySensorsMessageAck getAck() {
         return ack;
     }
-    
+
     public void setAck(MySensorsMessageAck ack) {
         this.ack = ack;
     }
@@ -128,12 +131,13 @@ public class MySensorsMessage {
     public void setAck(boolean ack) {
         setAck(ack ? MySensorsMessageAck.TRUE : MySensorsMessageAck.FALSE);
     }
-    
+
     public boolean isAck() {
-        if(ack == MySensorsMessageAck.TRUE)
+        if (ack == MySensorsMessageAck.TRUE) {
             return true;
-        else
+        } else {
             return false;
+        }
     }
 
     public MySensorsMessageSubType getSubType() {
@@ -192,8 +196,7 @@ public class MySensorsMessage {
     public boolean isIConfigMessage() {
         return (childId == MySensorsChild.MYSENSORS_CHILD_ID_RESERVED_0
                 || childId == MySensorsChild.MYSENSORS_CHILD_ID_RESERVED_255)
-                && (msgType == MySensorsMessageType.INTERNAL)
-                && (ack == MySensorsMessageAck.FALSE) 
+                && (msgType == MySensorsMessageType.INTERNAL) && (ack == MySensorsMessageAck.FALSE)
                 && (subType == MySensorsMessageSubType.I_CONFIG);
     }
 
@@ -204,11 +207,10 @@ public class MySensorsMessage {
      */
     public boolean isIVersionMessage() {
         return (nodeId == MySensorsNode.MYSENSORS_NODE_ID_RESERVED_GATEWAY_0)
-            && (childId == MySensorsChild.MYSENSORS_CHILD_ID_RESERVED_0
-                    || childId == MySensorsChild.MYSENSORS_CHILD_ID_RESERVED_255)
-            && (msgType == MySensorsMessageType.INTERNAL)
-            && (ack == MySensorsMessageAck.FALSE)
-            && (subType == MySensorsMessageSubType.I_VERSION); 
+                && (childId == MySensorsChild.MYSENSORS_CHILD_ID_RESERVED_0
+                        || childId == MySensorsChild.MYSENSORS_CHILD_ID_RESERVED_255)
+                && (msgType == MySensorsMessageType.INTERNAL) && (ack == MySensorsMessageAck.FALSE)
+                && (subType == MySensorsMessageSubType.I_VERSION);
     }
 
     /**
@@ -229,9 +231,8 @@ public class MySensorsMessage {
     public boolean isITimeMessage() {
         return (childId == MySensorsChild.MYSENSORS_CHILD_ID_RESERVED_0
                 || childId == MySensorsChild.MYSENSORS_CHILD_ID_RESERVED_255)
-            && (msgType == MySensorsMessageType.INTERNAL)
-            && (ack == MySensorsMessageAck.FALSE)
-            && (subType == MySensorsMessageSubType.I_TIME);
+                && (msgType == MySensorsMessageType.INTERNAL) && (ack == MySensorsMessageAck.FALSE)
+                && (subType == MySensorsMessageSubType.I_TIME);
     }
 
     /**
@@ -241,10 +242,9 @@ public class MySensorsMessage {
      */
     public boolean isIdRequestMessage() {
         return (nodeId == MySensorsNode.MYSENSORS_NODE_ID_RESERVED_255)
-            && (childId == MySensorsChild.MYSENSORS_CHILD_ID_RESERVED_255)
-            && (msgType == MySensorsMessageType.INTERNAL)
-            && (ack == MySensorsMessageAck.FALSE)
-            && (subType == MySensorsMessageSubType.I_ID_REQUEST);
+                && (childId == MySensorsChild.MYSENSORS_CHILD_ID_RESERVED_255)
+                && (msgType == MySensorsMessageType.INTERNAL) && (ack == MySensorsMessageAck.FALSE)
+                && (subType == MySensorsMessageSubType.I_ID_REQUEST);
     }
 
     /**
@@ -310,23 +310,22 @@ public class MySensorsMessage {
 
                 mysensorsmessage.setNodeId(nodeId);
                 mysensorsmessage.setChildId(Integer.parseInt(splitMessage[MySensorsMessagePart.CHILD.getId()]));
-                
+
                 int msgTypeId = Integer.parseInt(splitMessage[MySensorsMessagePart.TYPE.getId()]);
                 mysensorsmessage.setMsgType(MySensorsMessageType.getById(msgTypeId));
-                
+
                 int ackId = Integer.parseInt(splitMessage[MySensorsMessagePart.ACK.getId()]);
                 mysensorsmessage.setAck(MySensorsMessageAck.getById(ackId));
-                
+
                 int subTypeId = Integer.parseInt(splitMessage[MySensorsMessagePart.SUBTYPE.getId()]);
-                if (mysensorsmessage.getMsgType() == MySensorsMessageType.INTERNAL)
+                if (mysensorsmessage.getMsgType() == MySensorsMessageType.INTERNAL) {
                     mysensorsmessage.setSubType(MySensorsMessageSubType.getInternalById(subTypeId));
-                else if (mysensorsmessage.getMsgType() == MySensorsMessageType.PRESENTATION)
+                } else if (mysensorsmessage.getMsgType() == MySensorsMessageType.PRESENTATION) {
                     mysensorsmessage.setSubType(MySensorsMessageSubType.getPresentationById(subTypeId));
-                else
+                } else {
                     mysensorsmessage.setSubType(MySensorsMessageSubType.getSetReqById(subTypeId));
-                
-                
-                
+                }
+
                 if (splitMessage.length == 6) {
                     String msg = splitMessage[5].replaceAll("\\r|\\n", "").trim();
                     mysensorsmessage.setMsg(msg);
@@ -421,6 +420,42 @@ public class MySensorsMessage {
             return false;
         }
         return true;
+    }
+
+    /**
+     * Generate a custom hash by message parts passed as vararg
+     * Usage example: customHashCode(MYSENSORS_MSG_PAYLOAD_PART, MYSENSORS_MSG_SUBTYPE_PART);
+     *
+     * @param messagePart one or mode valid message part, use MYSENSORS_MSG_*_PART definition
+     *
+     * @return the hash code
+     */
+    public int customHashCode(MySensorsMessagePart... messageParts) {
+
+        final int prime = 101;
+
+        int result = 1;
+        for (int i = 0; i < messageParts.length; i++) {
+            if (messageParts[i] == MySensorsMessagePart.PAYLOAD) {
+                result = prime * result + ((msg == null) ? 0 : msg.hashCode());
+            } else if (messageParts[i] == MySensorsMessagePart.SUBTYPE) {
+                result = prime * result + subType.getId();
+            } else if (messageParts[i] == MySensorsMessagePart.ACK) {
+                result = prime * result + ack.getId();
+            } else if (messageParts[i] == MySensorsMessagePart.TYPE) {
+                result = prime * result + msgType.getId();
+            } else if (messageParts[i] == MySensorsMessagePart.CHILD) {
+                result = prime * result + childId;
+            } else if (messageParts[i] == MySensorsMessagePart.NODE) {
+                result = prime * result + nodeId;
+            } else {
+                throw new IllegalArgumentException("Messsage part must be in [0,5] interval");
+            }
+
+        }
+
+        return result;
+
     }
 
     @Override
