@@ -9,7 +9,7 @@
 package org.openhab.binding.mysensors.internal.sensors.child;
 
 import org.openhab.binding.mysensors.internal.exception.NoContentException;
-import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
+import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageSubType;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
 import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariableVLockStatus;
 
@@ -25,7 +25,7 @@ public class MySensorsChildSLock extends MySensorsChild {
 
     public MySensorsChildSLock(int childId) {
         super(childId);
-        setPresentationCode(MySensorsMessage.MYSENSORS_SUBTYPE_S_LOCK);
+        setPresentationCode(MySensorsMessageSubType.S_LOCK);
         try {
             addVariable(new MySensorsVariableVLockStatus());
         } catch (NoContentException e) {

@@ -16,6 +16,8 @@ import java.util.Optional;
 import org.openhab.binding.mysensors.internal.exception.MergeException;
 import org.openhab.binding.mysensors.internal.exception.NotInitializedException;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
+import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageSubType;
+import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageType;
 
 /**
  * Characteristics of a thing/node are stored here:
@@ -223,14 +225,14 @@ public class MySensorsNode {
      * No check will be performed on value of state parameter
      *
      * @param childId
-     * @param type
+     * @param subType
      * @param state
      *
      * @return a non-null message ready to be sent if childId/type are available on this node
      *
      * @throws NotInitializedException if state is null
      */
-    public MySensorsMessage updateVariableState(int childId, int type, String state) throws NotInitializedException{
+    public MySensorsMessage updateVariableState(int childId, MySensorsMessageSubType subType, String state) throws NotInitializedException{
         MySensorsMessage msg = null;
 
         if (state == null) {
@@ -242,15 +244,15 @@ public class MySensorsNode {
             MySensorsChildConfig childConfig = (child.getChildConfig().isPresent()) ? child.getChildConfig().get()
                     : new MySensorsChildConfig();
             if (child != null) {
-                MySensorsVariable var = child.getVariable(type);
+                MySensorsVariable var = child.getVariable(subType);
                 if (var != null) {
                     msg = new MySensorsMessage();
 
                     // MySensors
                     msg.setNodeId(nodeId);
                     msg.setChildId(childId);
-                    msg.setMsgType(MySensorsMessage.MYSENSORS_MSG_TYPE_SET);
-                    msg.setSubType(type);
+                    msg.setMsgType(MySensorsMessageType.SET);
+                    msg.setSubType(subType);
                     msg.setAck(childConfig.getRequestAck());
                     msg.setMsg(state);
 

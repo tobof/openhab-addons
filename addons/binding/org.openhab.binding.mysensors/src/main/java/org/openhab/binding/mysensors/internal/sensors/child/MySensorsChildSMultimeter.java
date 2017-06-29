@@ -9,7 +9,7 @@
 package org.openhab.binding.mysensors.internal.sensors.child;
 
 import org.openhab.binding.mysensors.internal.exception.NoContentException;
-import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
+import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageSubType;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
 import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariableVCurrent;
 import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariableVImpedance;
@@ -27,7 +27,7 @@ public class MySensorsChildSMultimeter extends MySensorsChild {
 
     public MySensorsChildSMultimeter(int childId) {
         super(childId);
-        setPresentationCode(MySensorsMessage.MYSENSORS_SUBTYPE_S_MULTIMETER);
+        setPresentationCode(MySensorsMessageSubType.S_MULTIMETER);
         try {
             addVariable(new MySensorsVariableVVoltage());
             addVariable(new MySensorsVariableVCurrent());

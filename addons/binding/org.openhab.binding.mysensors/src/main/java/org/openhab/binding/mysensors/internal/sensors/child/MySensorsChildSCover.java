@@ -9,7 +9,7 @@
 package org.openhab.binding.mysensors.internal.sensors.child;
 
 import org.openhab.binding.mysensors.internal.exception.NoContentException;
-import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
+import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageSubType;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
 import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariableVDown;
 import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariableVPercentage;
@@ -28,7 +28,7 @@ public class MySensorsChildSCover extends MySensorsChild {
 
     public MySensorsChildSCover(int childId) {
         super(childId);
-        setPresentationCode(MySensorsMessage.MYSENSORS_SUBTYPE_S_COVER);
+        setPresentationCode(MySensorsMessageSubType.S_COVER);
         try {
             addVariable(new MySensorsVariableVUp());
             addVariable(new MySensorsVariableVDown());

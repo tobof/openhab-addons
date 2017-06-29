@@ -11,6 +11,7 @@ package org.openhab.binding.mysensors.converter;
 import org.eclipse.smarthome.core.types.Command;
 import org.eclipse.smarthome.core.types.State;
 import org.openhab.binding.mysensors.MySensorsBindingConstants;
+import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageSubType;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsVariable;
 
 /**
@@ -61,7 +62,7 @@ public interface MySensorsTypeConverter {
      *
      * @return the variable number
      */
-    default Integer typeFromChannelCommand(String channel, Command command) {
+    default MySensorsMessageSubType typeFromChannelCommand(String channel, Command command) {
         return MySensorsBindingConstants.INVERSE_CHANNEL_MAP.get(channel);
     }
 }

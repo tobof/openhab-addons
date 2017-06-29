@@ -9,7 +9,7 @@
 package org.openhab.binding.mysensors.internal.sensors.child;
 
 import org.openhab.binding.mysensors.internal.exception.NoContentException;
-import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
+import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageSubType;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
 import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariableVRgb;
 
@@ -25,7 +25,7 @@ public class MySensorsChildSColorSensor extends MySensorsChild {
 
     public MySensorsChildSColorSensor(int childId) {
         super(childId);
-        setPresentationCode(MySensorsMessage.MYSENSORS_SUBTYPE_S_COLOR_SENSOR);
+        setPresentationCode(MySensorsMessageSubType.S_COLOR_SENSOR);
         try {
             addVariable(new MySensorsVariableVRgb());
         } catch (NoContentException e) {

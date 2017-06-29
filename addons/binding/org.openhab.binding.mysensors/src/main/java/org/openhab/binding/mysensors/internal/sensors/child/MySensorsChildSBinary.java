@@ -9,7 +9,7 @@
 package org.openhab.binding.mysensors.internal.sensors.child;
 
 import org.openhab.binding.mysensors.internal.exception.NoContentException;
-import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
+import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageSubType;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
 import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariableVStatus;
 import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariableVWatt;
@@ -26,7 +26,7 @@ public class MySensorsChildSBinary extends MySensorsChild {
 
     public MySensorsChildSBinary(int childId) {
         super(childId);
-        setPresentationCode(MySensorsMessage.MYSENSORS_SUBTYPE_S_BINARY);
+        setPresentationCode(MySensorsMessageSubType.S_BINARY);
         try {
             addVariable(new MySensorsVariableVStatus());
             addVariable(new MySensorsVariableVWatt());

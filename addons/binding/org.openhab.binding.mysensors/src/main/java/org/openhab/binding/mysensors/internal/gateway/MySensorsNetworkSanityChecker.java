@@ -20,6 +20,9 @@ import org.openhab.binding.mysensors.internal.event.MySensorsEventRegister;
 import org.openhab.binding.mysensors.internal.event.MySensorsGatewayEventListener;
 import org.openhab.binding.mysensors.internal.protocol.MySensorsAbstractConnection;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
+import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageAck;
+import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageSubType;
+import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageType;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsNode;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsNodeConfig;
@@ -193,8 +196,8 @@ public class MySensorsNetworkSanityChecker implements MySensorsGatewayEventListe
             for (Integer nodeId : myGateway.getGivenIds()) {
                 if (nodeId != null) {
                     MySensorsMessage msg = new MySensorsMessage(nodeId, MySensorsChild.MYSENSORS_CHILD_ID_RESERVED_255,
-                            MySensorsMessage.MYSENSORS_MSG_TYPE_INTERNAL, 0, false,
-                            MySensorsMessage.MYSENSORS_SUBTYPE_I_HEARTBEAT_REQUEST, "");
+                            MySensorsMessageType.INTERNAL, MySensorsMessageAck.FALSE, false,
+                            MySensorsMessageSubType.I_HEARTBEAT_REQUEST, "");
                     myGateway.sendMessage(msg);
 
                 }

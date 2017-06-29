@@ -9,7 +9,7 @@
 package org.openhab.binding.mysensors.internal.sensors.child;
 
 import org.openhab.binding.mysensors.internal.exception.NoContentException;
-import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
+import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageSubType;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
 import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariableVArmed;
 import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariableVLevel;
@@ -27,7 +27,7 @@ public class MySensorsChildSVibration extends MySensorsChild {
 
     public MySensorsChildSVibration(int childId) {
         super(childId);
-        setPresentationCode(MySensorsMessage.MYSENSORS_SUBTYPE_S_VIBRATION);
+        setPresentationCode(MySensorsMessageSubType.S_VIBRATION);
         try {
             addVariable(new MySensorsVariableVLevel());
             addVariable(new MySensorsVariableVTripped());

@@ -8,8 +8,6 @@
  */
 package org.openhab.binding.mysensors;
 
-import static org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage.*;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,6 +22,8 @@ import org.openhab.binding.mysensors.converter.MySensorsStringTypeConverter;
 import org.openhab.binding.mysensors.converter.MySensorsTypeConverter;
 import org.openhab.binding.mysensors.converter.MySensorsUpDownTypeConverter;
 import org.openhab.binding.mysensors.internal.MySensorsUtility;
+import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageSubType;
+import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageType;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
@@ -59,7 +59,7 @@ public class MySensorsBindingConstants {
     public final static ThingTypeUID THING_TYPE_HUMIDITY = new ThingTypeUID(BINDING_ID, "humidity");
     public final static ThingTypeUID THING_TYPE_TEMPERATURE = new ThingTypeUID(BINDING_ID, "temperature");
     public final static ThingTypeUID THING_TYPE_MULTIMETER = new ThingTypeUID(BINDING_ID, "multimeter");
-    public final static ThingTypeUID THING_TYPE_LIGHT = new ThingTypeUID(BINDING_ID, "light");
+    public final static ThingTypeUID THING_TYPE_BINARY = new ThingTypeUID(BINDING_ID, "light");
     public final static ThingTypeUID THING_TYPE_POWER = new ThingTypeUID(BINDING_ID, "power");
     public final static ThingTypeUID THING_TYPE_BARO = new ThingTypeUID(BINDING_ID, "baro");
     public final static ThingTypeUID THING_TYPE_DOOR = new ThingTypeUID(BINDING_ID, "door");
@@ -155,75 +155,75 @@ public class MySensorsBindingConstants {
     /**
      * Mapping MySensors message type/subtypes to channels.
      */
-    public final static Map<Integer, String> CHANNEL_MAP = new HashMap<Integer, String>() {
+    public final static Map<MySensorsMessageSubType, String> CHANNEL_MAP = new HashMap<MySensorsMessageSubType, String>() {
         /**
          *
          */
         private static final long serialVersionUID = -7970323220036599380L;
 
         {
-            put(MYSENSORS_SUBTYPE_V_TEMP, CHANNEL_TEMP);
-            put(MYSENSORS_SUBTYPE_V_HUM, CHANNEL_HUM);
-            put(MYSENSORS_SUBTYPE_V_STATUS, CHANNEL_STATUS);
-            put(MYSENSORS_SUBTYPE_V_VOLTAGE, CHANNEL_VOLT);
-            put(MYSENSORS_SUBTYPE_V_WATT, CHANNEL_WATT);
-            put(MYSENSORS_SUBTYPE_V_KWH, CHANNEL_KWH);
-            put(MYSENSORS_SUBTYPE_V_PRESSURE, CHANNEL_PRESSURE);
-            put(MYSENSORS_SUBTYPE_V_FORECAST, CHANNEL_BARO);
-            put(MYSENSORS_SUBTYPE_V_TRIPPED, CHANNEL_TRIPPED);
-            put(MYSENSORS_SUBTYPE_V_ARMED, CHANNEL_ARMED);
-            put(MYSENSORS_SUBTYPE_V_PERCENTAGE, CHANNEL_DIMMER);
-            put(MYSENSORS_SUBTYPE_V_UP, CHANNEL_COVER);
-            put(MYSENSORS_SUBTYPE_V_DOWN, CHANNEL_COVER);
-            put(MYSENSORS_SUBTYPE_V_STOP, CHANNEL_COVER);
-            put(MYSENSORS_SUBTYPE_V_WIND, CHANNEL_WIND);
-            put(MYSENSORS_SUBTYPE_V_GUST, CHANNEL_GUST);
-            put(MYSENSORS_SUBTYPE_V_RAIN, CHANNEL_RAIN);
-            put(MYSENSORS_SUBTYPE_V_RAINRATE, CHANNEL_RAINRATE);
-            put(MYSENSORS_SUBTYPE_V_UV, CHANNEL_UV);
-            put(MYSENSORS_SUBTYPE_V_WEIGHT, CHANNEL_WEIGHT);
-            put(MYSENSORS_SUBTYPE_V_IMPEDANCE, CHANNEL_IMPEDANCE);
-            put(MYSENSORS_SUBTYPE_V_DISTANCE, CHANNEL_DISTANCE);
-            put(MYSENSORS_SUBTYPE_V_LIGHT_LEVEL, CHANNEL_LIGHT_LEVEL);
-            put(MYSENSORS_SUBTYPE_V_CURRENT, CHANNEL_CURRENT);
-            put(MYSENSORS_SUBTYPE_V_HVAC_FLOW_STATE, CHANNEL_HVAC_FLOW_STATE);
-            put(MYSENSORS_SUBTYPE_V_HVAC_SPEED, CHANNEL_HVAC_SPEED);
-            put(MYSENSORS_SUBTYPE_V_HVAC_SETPOINT_COOL, CHANNEL_HVAC_SETPOINT_COOL);
-            put(MYSENSORS_SUBTYPE_V_HVAC_SETPOINT_HEAT, CHANNEL_HVAC_SETPOINT_HEAT);
-            put(MYSENSORS_SUBTYPE_V_HVAC_FLOW_MODE, CHANNEL_HVAC_FLOW_MODE);
-            put(MYSENSORS_SUBTYPE_V_VAR1, CHANNEL_VAR1);
-            put(MYSENSORS_SUBTYPE_V_VAR2, CHANNEL_VAR2);
-            put(MYSENSORS_SUBTYPE_V_VAR3, CHANNEL_VAR3);
-            put(MYSENSORS_SUBTYPE_V_VAR4, CHANNEL_VAR4);
-            put(MYSENSORS_SUBTYPE_V_VAR5, CHANNEL_VAR5);
-            put(MYSENSORS_SUBTYPE_V_FLOW, CHANNEL_FLOW);
-            put(MYSENSORS_SUBTYPE_V_VOLUME, CHANNEL_VOLUME);
-            put(MYSENSORS_SUBTYPE_V_LOCK_STATUS, CHANNEL_LOCK_STATUS);
-            put(MYSENSORS_SUBTYPE_V_LEVEL, CHANNEL_LEVEL);
-            put(MYSENSORS_SUBTYPE_V_RGB, CHANNEL_RGB);
-            put(MYSENSORS_SUBTYPE_V_RGBW, CHANNEL_RGBW);
-            put(MYSENSORS_SUBTYPE_V_ID, CHANNEL_ID);
-            put(MYSENSORS_SUBTYPE_V_UNIT_PREFIX, CHANNEL_UNIT_PREFIX);
-            put(MYSENSORS_SUBTYPE_V_TEXT, CHANNEL_TEXT);
-            put(MYSENSORS_SUBTYPE_V_CUSTOM, CHANNEL_CUSTOM);
-            put(MYSENSORS_SUBTYPE_V_POSITION, CHANNEL_POSITION);
-            put(MYSENSORS_SUBTYPE_V_IR_RECORD, CHANNEL_IR_RECORD);
-            put(MYSENSORS_SUBTYPE_V_PH, CHANNEL_PH);
-            put(MYSENSORS_SUBTYPE_V_ORP, CHANNEL_ORP);
-            put(MYSENSORS_SUBTYPE_V_EC, CHANNEL_EC);
-            put(MYSENSORS_SUBTYPE_V_VAR, CHANNEL_VAR);
-            put(MYSENSORS_SUBTYPE_V_VA, CHANNEL_VA);
-            put(MYSENSORS_SUBTYPE_V_POWER_FACTOR, CHANNEL_POWER_FACTOR);
-            put(MYSENSORS_SUBTYPE_V_TEXT, CHANNEL_TEXT);
-            put(MYSENSORS_SUBTYPE_V_IR_SEND, CHANNEL_IR_SEND);
-            put(MYSENSORS_SUBTYPE_V_IR_RECEIVE, CHANNEL_IR_RECEIVE);
+            put(MySensorsMessageSubType.V_TEMP, CHANNEL_TEMP);
+            put(MySensorsMessageSubType.V_HUM, CHANNEL_HUM);
+            put(MySensorsMessageSubType.V_STATUS, CHANNEL_STATUS);
+            put(MySensorsMessageSubType.V_VOLTAGE, CHANNEL_VOLT);
+            put(MySensorsMessageSubType.V_WATT, CHANNEL_WATT);
+            put(MySensorsMessageSubType.V_KWH, CHANNEL_KWH);
+            put(MySensorsMessageSubType.V_PRESSURE, CHANNEL_PRESSURE);
+            put(MySensorsMessageSubType.V_FORECAST, CHANNEL_BARO);
+            put(MySensorsMessageSubType.V_TRIPPED, CHANNEL_TRIPPED);
+            put(MySensorsMessageSubType.V_ARMED, CHANNEL_ARMED);
+            put(MySensorsMessageSubType.V_PERCENTAGE, CHANNEL_DIMMER);
+            put(MySensorsMessageSubType.V_UP, CHANNEL_COVER);
+            put(MySensorsMessageSubType.V_DOWN, CHANNEL_COVER);
+            put(MySensorsMessageSubType.V_STOP, CHANNEL_COVER);
+            put(MySensorsMessageSubType.V_WIND, CHANNEL_WIND);
+            put(MySensorsMessageSubType.V_GUST, CHANNEL_GUST);
+            put(MySensorsMessageSubType.V_RAIN, CHANNEL_RAIN);
+            put(MySensorsMessageSubType.V_RAINRATE, CHANNEL_RAINRATE);
+            put(MySensorsMessageSubType.V_UV, CHANNEL_UV);
+            put(MySensorsMessageSubType.V_WEIGHT, CHANNEL_WEIGHT);
+            put(MySensorsMessageSubType.V_IMPEDANCE, CHANNEL_IMPEDANCE);
+            put(MySensorsMessageSubType.V_DISTANCE, CHANNEL_DISTANCE);
+            put(MySensorsMessageSubType.V_LIGHT_LEVEL, CHANNEL_LIGHT_LEVEL);
+            put(MySensorsMessageSubType.V_CURRENT, CHANNEL_CURRENT);
+            put(MySensorsMessageSubType.V_HVAC_FLOW_STATE, CHANNEL_HVAC_FLOW_STATE);
+            put(MySensorsMessageSubType.V_HVAC_SPEED, CHANNEL_HVAC_SPEED);
+            put(MySensorsMessageSubType.V_HVAC_SETPOINT_COOL, CHANNEL_HVAC_SETPOINT_COOL);
+            put(MySensorsMessageSubType.V_HVAC_SETPOINT_HEAT, CHANNEL_HVAC_SETPOINT_HEAT);
+            put(MySensorsMessageSubType.V_HVAC_FLOW_MODE, CHANNEL_HVAC_FLOW_MODE);
+            put(MySensorsMessageSubType.V_VAR1, CHANNEL_VAR1);
+            put(MySensorsMessageSubType.V_VAR2, CHANNEL_VAR2);
+            put(MySensorsMessageSubType.V_VAR3, CHANNEL_VAR3);
+            put(MySensorsMessageSubType.V_VAR4, CHANNEL_VAR4);
+            put(MySensorsMessageSubType.V_VAR5, CHANNEL_VAR5);
+            put(MySensorsMessageSubType.V_FLOW, CHANNEL_FLOW);
+            put(MySensorsMessageSubType.V_VOLUME, CHANNEL_VOLUME);
+            put(MySensorsMessageSubType.V_LOCK_STATUS, CHANNEL_LOCK_STATUS);
+            put(MySensorsMessageSubType.V_LEVEL, CHANNEL_LEVEL);
+            put(MySensorsMessageSubType.V_RGB, CHANNEL_RGB);
+            put(MySensorsMessageSubType.V_RGBW, CHANNEL_RGBW);
+            put(MySensorsMessageSubType.V_ID, CHANNEL_ID);
+            put(MySensorsMessageSubType.V_UNIT_PREFIX, CHANNEL_UNIT_PREFIX);
+            put(MySensorsMessageSubType.V_TEXT, CHANNEL_TEXT);
+            put(MySensorsMessageSubType.V_CUSTOM, CHANNEL_CUSTOM);
+            put(MySensorsMessageSubType.V_POSITION, CHANNEL_POSITION);
+            put(MySensorsMessageSubType.V_IR_RECORD, CHANNEL_IR_RECORD);
+            put(MySensorsMessageSubType.V_PH, CHANNEL_PH);
+            put(MySensorsMessageSubType.V_ORP, CHANNEL_ORP);
+            put(MySensorsMessageSubType.V_EC, CHANNEL_EC);
+            put(MySensorsMessageSubType.V_VAR, CHANNEL_VAR);
+            put(MySensorsMessageSubType.V_VA, CHANNEL_VA);
+            put(MySensorsMessageSubType.V_POWER_FACTOR, CHANNEL_POWER_FACTOR);
+            put(MySensorsMessageSubType.V_TEXT, CHANNEL_TEXT);
+            put(MySensorsMessageSubType.V_IR_SEND, CHANNEL_IR_SEND);
+            put(MySensorsMessageSubType.V_IR_RECEIVE, CHANNEL_IR_RECEIVE);
         }
     };
 
     /**
      * Inverse of the CHANNEL_MAP, duplicate allowed (see also Converters here below)
      */
-    public final static Map<String, Integer> INVERSE_CHANNEL_MAP = MySensorsUtility.invertMap(CHANNEL_MAP, true);
+    public final static Map<String, MySensorsMessageSubType> INVERSE_CHANNEL_MAP = MySensorsUtility.invertMap(CHANNEL_MAP, true);
 
     /**
      * Converters will be used to map values from OH to/from MySensors Variables
@@ -310,43 +310,43 @@ public class MySensorsBindingConstants {
     /**
      * Used in DiscoveryService to map subtype of a presentation message to thing type
      */
-    public final static Map<Integer, ThingTypeUID> THING_UID_MAP = new HashMap<Integer, ThingTypeUID>() {
+    public final static Map<MySensorsMessageSubType, ThingTypeUID> THING_UID_MAP = new HashMap<MySensorsMessageSubType, ThingTypeUID>() {
 
         /**
          *
          */
         private static final long serialVersionUID = -2042537863671385026L;
         {
-            put(MYSENSORS_SUBTYPE_S_HUM, THING_TYPE_HUMIDITY);
-            put(MYSENSORS_SUBTYPE_S_TEMP, THING_TYPE_TEMPERATURE);
-            put(MYSENSORS_SUBTYPE_S_MULTIMETER, THING_TYPE_MULTIMETER);
-            put(MYSENSORS_SUBTYPE_S_LIGHT, THING_TYPE_LIGHT);
-            put(MYSENSORS_SUBTYPE_S_POWER, THING_TYPE_POWER);
-            put(MYSENSORS_SUBTYPE_S_BARO, THING_TYPE_BARO);
-            put(MYSENSORS_SUBTYPE_S_DOOR, THING_TYPE_DOOR);
-            put(MYSENSORS_SUBTYPE_S_MOTION, THING_TYPE_MOTION);
-            put(MYSENSORS_SUBTYPE_S_SMOKE, THING_TYPE_SMOKE);
-            put(MYSENSORS_SUBTYPE_S_DIMMER, THING_TYPE_DIMMER);
-            put(MYSENSORS_SUBTYPE_S_COVER, THING_TYPE_COVER);
-            put(MYSENSORS_SUBTYPE_S_WIND, THING_TYPE_WIND);
-            put(MYSENSORS_SUBTYPE_S_RAIN, THING_TYPE_RAIN);
-            put(MYSENSORS_SUBTYPE_S_UV, THING_TYPE_UV);
-            put(MYSENSORS_SUBTYPE_S_WEIGHT, THING_TYPE_WEIGHT);
-            put(MYSENSORS_SUBTYPE_S_DISTANCE, THING_TYPE_DISTANCE);
-            put(MYSENSORS_SUBTYPE_S_LIGHT_LEVEL, THING_TYPE_LIGHT_LEVEL);
-            put(MYSENSORS_SUBTYPE_S_WATER, THING_TYPE_WATER);
-            put(MYSENSORS_SUBTYPE_S_CUSTOM, THING_TYPE_CUSTOM);
-            put(MYSENSORS_SUBTYPE_S_HVAC, THING_TYPE_HVAC);
-            put(MYSENSORS_SUBTYPE_S_LOCK, THING_TYPE_LOCK);
-            put(MYSENSORS_SUBTYPE_S_SOUND, THING_TYPE_SOUND);
-            put(MYSENSORS_SUBTYPE_S_RGB_LIGHT, THING_TYPE_RGB_LIGHT);
-            put(MYSENSORS_SUBTYPE_S_RGBW_LIGHT, THING_TYPE_RGBW_LIGHT);
-            put(MYSENSORS_SUBTYPE_S_WATER_QUALITY, THING_TYPE_WATER_QUALITY);
-            put(MYSENSORS_SUBTYPE_S_INFO, THING_TYPE_TEXT);
-            put(MYSENSORS_SUBTYPE_S_IR, THING_TYPE_IR);
-            put(MYSENSORS_SUBTYPE_S_AIR_QUALITY, THING_TYPE_AIR_QUALITY);
-            put(MYSENSORS_SUBTYPE_S_DUST, THING_TYPE_DUST);
-            put(MYSENSORS_SUBTYPE_S_COLOR_SENSOR, THING_TYPE_COLOR_SENSOR);
+            put(MySensorsMessageSubType.S_HUM, THING_TYPE_HUMIDITY);
+            put(MySensorsMessageSubType.S_TEMP, THING_TYPE_TEMPERATURE);
+            put(MySensorsMessageSubType.S_MULTIMETER, THING_TYPE_MULTIMETER);
+            put(MySensorsMessageSubType.S_BINARY, THING_TYPE_BINARY);
+            put(MySensorsMessageSubType.S_POWER, THING_TYPE_POWER);
+            put(MySensorsMessageSubType.S_BARO, THING_TYPE_BARO);
+            put(MySensorsMessageSubType.S_DOOR, THING_TYPE_DOOR);
+            put(MySensorsMessageSubType.S_MOTION, THING_TYPE_MOTION);
+            put(MySensorsMessageSubType.S_SMOKE, THING_TYPE_SMOKE);
+            put(MySensorsMessageSubType.S_DIMMER, THING_TYPE_DIMMER);
+            put(MySensorsMessageSubType.S_COVER, THING_TYPE_COVER);
+            put(MySensorsMessageSubType.S_WIND, THING_TYPE_WIND);
+            put(MySensorsMessageSubType.S_RAIN, THING_TYPE_RAIN);
+            put(MySensorsMessageSubType.S_UV, THING_TYPE_UV);
+            put(MySensorsMessageSubType.S_WEIGHT, THING_TYPE_WEIGHT);
+            put(MySensorsMessageSubType.S_DISTANCE, THING_TYPE_DISTANCE);
+            put(MySensorsMessageSubType.S_LIGHT_LEVEL, THING_TYPE_LIGHT_LEVEL);
+            put(MySensorsMessageSubType.S_WATER, THING_TYPE_WATER);
+            put(MySensorsMessageSubType.S_CUSTOM, THING_TYPE_CUSTOM);
+            put(MySensorsMessageSubType.S_HVAC, THING_TYPE_HVAC);
+            put(MySensorsMessageSubType.S_LOCK, THING_TYPE_LOCK);
+            put(MySensorsMessageSubType.S_SOUND, THING_TYPE_SOUND);
+            put(MySensorsMessageSubType.S_RGB_LIGHT, THING_TYPE_RGB_LIGHT);
+            put(MySensorsMessageSubType.S_RGBW_LIGHT, THING_TYPE_RGBW_LIGHT);
+            put(MySensorsMessageSubType.S_WATER_QUALITY, THING_TYPE_WATER_QUALITY);
+            put(MySensorsMessageSubType.S_INFO, THING_TYPE_TEXT);
+            put(MySensorsMessageSubType.S_IR, THING_TYPE_IR);
+            put(MySensorsMessageSubType.S_AIR_QUALITY, THING_TYPE_AIR_QUALITY);
+            put(MySensorsMessageSubType.S_DUST, THING_TYPE_DUST);
+            put(MySensorsMessageSubType.S_COLOR_SENSOR, THING_TYPE_COLOR_SENSOR);
         }
 
     };
@@ -354,12 +354,12 @@ public class MySensorsBindingConstants {
     /**
      * Inverse of the THING_UID_MAP, helps on building child for every thing type
      */
-    public final static Map<ThingTypeUID, Integer> INVERSE_THING_UID_MAP = MySensorsUtility.invertMap(THING_UID_MAP,
+    public final static Map<ThingTypeUID, MySensorsMessageSubType> INVERSE_THING_UID_MAP = MySensorsUtility.invertMap(THING_UID_MAP,
             true);
 
     /** Supported Things without bridge */
     public final static Set<ThingTypeUID> SUPPORTED_THING_TYPES_UIDS = ImmutableSet.of(THING_TYPE_HUMIDITY,
-            THING_TYPE_TEMPERATURE, THING_TYPE_LIGHT, THING_TYPE_MULTIMETER, THING_TYPE_POWER, THING_TYPE_BARO,
+            THING_TYPE_TEMPERATURE, THING_TYPE_BINARY, THING_TYPE_MULTIMETER, THING_TYPE_POWER, THING_TYPE_BARO,
             THING_TYPE_DOOR, THING_TYPE_MOTION, THING_TYPE_SMOKE, THING_TYPE_DIMMER, THING_TYPE_COVER, THING_TYPE_WIND,
             THING_TYPE_RAIN, THING_TYPE_UV, THING_TYPE_WEIGHT, THING_TYPE_DISTANCE, THING_TYPE_LIGHT_LEVEL,
             THING_TYPE_HVAC, THING_TYPE_WATER, THING_TYPE_CUSTOM, THING_TYPE_LOCK, THING_TYPE_SOUND,
@@ -371,7 +371,7 @@ public class MySensorsBindingConstants {
 
     /** Supported devices (things + brdiges) */
     public final static Collection<ThingTypeUID> SUPPORTED_DEVICE_TYPES_UIDS = Lists.newArrayList(THING_TYPE_HUMIDITY,
-            THING_TYPE_TEMPERATURE, THING_TYPE_LIGHT, THING_TYPE_MULTIMETER, THING_TYPE_POWER, THING_TYPE_BARO,
+            THING_TYPE_TEMPERATURE, THING_TYPE_BINARY, THING_TYPE_MULTIMETER, THING_TYPE_POWER, THING_TYPE_BARO,
             THING_TYPE_DOOR, THING_TYPE_MOTION, THING_TYPE_SMOKE, THING_TYPE_DIMMER, THING_TYPE_COVER, THING_TYPE_WIND,
             THING_TYPE_RAIN, THING_TYPE_UV, THING_TYPE_WEIGHT, THING_TYPE_DISTANCE, THING_TYPE_LIGHT_LEVEL,
             THING_TYPE_HVAC, THING_TYPE_WATER, THING_TYPE_CUSTOM, THING_TYPE_LOCK, THING_TYPE_SOUND,

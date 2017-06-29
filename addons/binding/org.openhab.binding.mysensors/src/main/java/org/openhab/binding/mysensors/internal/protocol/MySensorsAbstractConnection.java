@@ -31,6 +31,7 @@ import org.openhab.binding.mysensors.internal.exception.NoAckException;
 import org.openhab.binding.mysensors.internal.gateway.MySensorsGatewayConfig;
 import org.openhab.binding.mysensors.internal.gateway.MySensorsNetworkSanityChecker;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
+import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageDirection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -344,7 +345,7 @@ public abstract class MySensorsAbstractConnection implements Runnable {
                     MySensorsMessage msg = MySensorsMessage.parse(line);
 
                     if (!msg.isDebugMessage()) {
-                        msg.setDirection(MySensorsMessage.MYSENSORS_MSG_DIRECTION_INCOMING);
+                        msg.setDirection(MySensorsMessageDirection.INCOMING);
 
                         // Have we get a I_HEARBEAT_RESPONSE
                         if (msg.isHeartbeatResponseMessage()) {
@@ -357,7 +358,7 @@ public abstract class MySensorsAbstractConnection implements Runnable {
                         }
 
                         // Is this an ACK message?
-                        if (msg.getAck() == 1) {
+                        if (msg.isAck()) {
                             handleAckReceived(msg);
                         }
 
@@ -501,7 +502,7 @@ public abstract class MySensorsAbstractConnection implements Runnable {
                                  * if we request an ACK we will wait for it and keep the message in the queue (at the
                                  * end) otherwise we remove the message from the queue
                                  */
-                                if (msg.getAck() == 1) {
+                                if (msg.isAck()) {
                                     if (!checkForMessageAcknowledgement(msg)) {
                                         msg.setRetries(msg.getRetries() + 1);
                                         if (!(msg.getRetries() > MYSENSORS_NUMBER_OF_RETRIES)) {

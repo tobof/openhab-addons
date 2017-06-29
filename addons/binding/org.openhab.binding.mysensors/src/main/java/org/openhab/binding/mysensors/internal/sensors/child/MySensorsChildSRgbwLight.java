@@ -9,7 +9,7 @@
 package org.openhab.binding.mysensors.internal.sensors.child;
 
 import org.openhab.binding.mysensors.internal.exception.NoContentException;
-import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
+import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageSubType;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
 import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariableVRgbw;
 import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariableVWatt;
@@ -26,7 +26,7 @@ public class MySensorsChildSRgbwLight extends MySensorsChild {
 
     public MySensorsChildSRgbwLight(int childId) {
         super(childId);
-        setPresentationCode(MySensorsMessage.MYSENSORS_SUBTYPE_S_RGBW_LIGHT);
+        setPresentationCode(MySensorsMessageSubType.S_RGBW_LIGHT);
         try {
             addVariable(new MySensorsVariableVRgbw());
             addVariable(new MySensorsVariableVWatt());

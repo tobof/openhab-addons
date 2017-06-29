@@ -8,7 +8,7 @@
  */
 package org.openhab.binding.mysensors.internal.sensors.variable;
 
-import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
+import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageSubType;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsVariable;
 
 /**
@@ -22,7 +22,7 @@ import org.openhab.binding.mysensors.internal.sensors.MySensorsVariable;
 public class MySensorsVariableVVar3 extends MySensorsVariable {
 
     public MySensorsVariableVVar3() {
-        super(MySensorsMessage.MYSENSORS_SUBTYPE_V_VAR3);
+        super(MySensorsMessageSubType.V_VAR3);
     }
 
 }

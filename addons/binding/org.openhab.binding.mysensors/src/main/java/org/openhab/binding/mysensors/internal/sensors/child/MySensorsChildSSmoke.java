@@ -9,7 +9,7 @@
 package org.openhab.binding.mysensors.internal.sensors.child;
 
 import org.openhab.binding.mysensors.internal.exception.NoContentException;
-import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
+import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageSubType;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
 import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariableVArmed;
 import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariableVTripped;
@@ -26,7 +26,7 @@ public class MySensorsChildSSmoke extends MySensorsChild {
 
     public MySensorsChildSSmoke(int childId) {
         super(childId);
-        setPresentationCode(MySensorsMessage.MYSENSORS_SUBTYPE_S_SMOKE);
+        setPresentationCode(MySensorsMessageSubType.S_SMOKE);
         try {
             addVariable(new MySensorsVariableVTripped());
             addVariable(new MySensorsVariableVArmed());

@@ -9,7 +9,7 @@
 package org.openhab.binding.mysensors.internal.sensors.child;
 
 import org.openhab.binding.mysensors.internal.exception.NoContentException;
-import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
+import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageSubType;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
 import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariableVHvacFlowState;
 import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariableVHvacSetpointHeat;
@@ -28,7 +28,7 @@ public class MySensorsChildSHeater extends MySensorsChild {
 
     public MySensorsChildSHeater(int childId) {
         super(childId);
-        setPresentationCode(MySensorsMessage.MYSENSORS_SUBTYPE_S_HEATER);
+        setPresentationCode(MySensorsMessageSubType.S_HEATER);
         try {
             addVariable(new MySensorsVariableVHvacSetpointHeat());
             addVariable(new MySensorsVariableVHvacFlowState());

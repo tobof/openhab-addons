@@ -9,7 +9,7 @@
 package org.openhab.binding.mysensors.internal.sensors.child;
 
 import org.openhab.binding.mysensors.internal.exception.NoContentException;
-import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
+import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageSubType;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
 import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariableVHum;
 
@@ -25,7 +25,7 @@ public class MySensorsChildSHum extends MySensorsChild {
 
     public MySensorsChildSHum(int childId) {
         super(childId);
-        setPresentationCode(MySensorsMessage.MYSENSORS_SUBTYPE_S_HUM);
+        setPresentationCode(MySensorsMessageSubType.S_HUM);
         try {
             addVariable(new MySensorsVariableVHum());
         } catch (NoContentException e) {

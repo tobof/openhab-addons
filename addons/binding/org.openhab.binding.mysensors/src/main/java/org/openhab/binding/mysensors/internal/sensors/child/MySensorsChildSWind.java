@@ -9,7 +9,7 @@
 package org.openhab.binding.mysensors.internal.sensors.child;
 
 import org.openhab.binding.mysensors.internal.exception.NoContentException;
-import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
+import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageSubType;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
 import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariableVDirection;
 import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariableVGust;
@@ -27,7 +27,7 @@ public class MySensorsChildSWind extends MySensorsChild {
 
     public MySensorsChildSWind(int childId) {
         super(childId);
-        setPresentationCode(MySensorsMessage.MYSENSORS_SUBTYPE_S_WIND);
+        setPresentationCode(MySensorsMessageSubType.S_WIND);
         try {
             addVariable(new MySensorsVariableVWind());
             addVariable(new MySensorsVariableVGust());

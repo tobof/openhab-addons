@@ -12,6 +12,7 @@ import java.util.Date;
 
 import org.openhab.binding.mysensors.internal.exception.RevertVariableStateException;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
+import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageSubType;
 
 /**
  * Variables (states) of a MySensors child.
@@ -22,7 +23,7 @@ import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
  */
 public abstract class MySensorsVariable {
 
-    private final int type;
+    private final MySensorsMessageSubType type;
 
     private String value;
 
@@ -32,7 +33,7 @@ public abstract class MySensorsVariable {
 
     private Date oldLastUpdate;
 
-    public MySensorsVariable(int type) {
+    public MySensorsVariable(MySensorsMessageSubType type) {
         this.type = type;
     }
 
@@ -51,7 +52,7 @@ public abstract class MySensorsVariable {
         setValue(message.getMsg());
     }
 
-    public synchronized int getType() {
+    public synchronized MySensorsMessageSubType getType() {
         return type;
     }
 
@@ -83,7 +84,7 @@ public abstract class MySensorsVariable {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + type;
+        result = prime * result + type.getId();
         result = prime * result + ((value == null) ? 0 : value.hashCode());
         return result;
     }

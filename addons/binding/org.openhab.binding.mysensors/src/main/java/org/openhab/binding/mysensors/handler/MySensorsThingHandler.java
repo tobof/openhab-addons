@@ -35,6 +35,9 @@ import org.openhab.binding.mysensors.internal.event.MySensorsNodeUpdateEventType
 import org.openhab.binding.mysensors.internal.gateway.MySensorsGateway;
 import org.openhab.binding.mysensors.internal.protocol.MySensorsAbstractConnection;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
+import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageAck;
+import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageSubType;
+import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageType;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsChildConfig;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsNode;
@@ -141,7 +144,7 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
             if (adapter != null) {
                 logger.trace("Adapter {} found for type {}", adapter.getClass().getSimpleName(), channelUID.getId());
 
-                Integer type = adapter.typeFromChannelCommand(channelUID.getId(), command);
+                MySensorsMessageSubType type = adapter.typeFromChannelCommand(channelUID.getId(), command);
 
                 if (type != null) {
                     logger.trace("Type for channel: {}, command: {} of thing {} is: {}", thing.getUID(), command,
@@ -151,11 +154,11 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
 
                     if (var != null) {
 
-                        int subType = var.getType();
+                        MySensorsMessageSubType subType = var.getType();
 
                         // Create the real message to send
                         MySensorsMessage newMsg = new MySensorsMessage(configuration.nodeId, configuration.childId,
-                                MySensorsMessage.MYSENSORS_MSG_TYPE_SET, intRequestAck, configuration.revertState, configuration.smartSleep);
+                                MySensorsMessageType.SET, MySensorsMessageAck.getById(intRequestAck), configuration.revertState, configuration.smartSleep);
 
                         newMsg.setSubType(subType);
                         newMsg.setMsg(adapter.fromCommand(command));
@@ -322,7 +325,7 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
         try {
             Integer nodeId = t.getConfiguration().as(MySensorsSensorConfiguration.class).nodeId;
             Integer childId = t.getConfiguration().as(MySensorsSensorConfiguration.class).childId;
-            Integer presentation = INVERSE_THING_UID_MAP.get(t.getThingTypeUID());
+            MySensorsMessageSubType presentation = INVERSE_THING_UID_MAP.get(t.getThingTypeUID());
 
             if (presentation != null) {
                 logger.trace("Building sensors from thing: {}, node: {}, child: {}, presentation: {}", t.getUID(),

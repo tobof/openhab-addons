@@ -9,7 +9,7 @@
 package org.openhab.binding.mysensors.internal.sensors.child;
 
 import org.openhab.binding.mysensors.internal.exception.NoContentException;
-import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
+import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageSubType;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
 import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariableVEc;
 import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariableVOrp;
@@ -29,7 +29,7 @@ public class MySensorsChildSWaterQuality extends MySensorsChild {
 
     public MySensorsChildSWaterQuality(int childId) {
         super(childId);
-        setPresentationCode(MySensorsMessage.MYSENSORS_SUBTYPE_S_WATER_QUALITY);
+        setPresentationCode(MySensorsMessageSubType.S_WATER_QUALITY);
         try {
             addVariable(new MySensorsVariableVTemp());
             addVariable(new MySensorsVariableVPh());

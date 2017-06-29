@@ -9,7 +9,7 @@
 package org.openhab.binding.mysensors.internal.sensors.child;
 
 import org.openhab.binding.mysensors.internal.exception.NoContentException;
-import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
+import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageSubType;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
 import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariableVPercentage;
 import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariableVStatus;
@@ -27,7 +27,7 @@ public class MySensorsChildSDimmer extends MySensorsChild {
 
     public MySensorsChildSDimmer(int childId) {
         super(childId);
-        setPresentationCode(MySensorsMessage.MYSENSORS_SUBTYPE_S_DIMMER);
+        setPresentationCode(MySensorsMessageSubType.S_DIMMER);
         try {
             addVariable(new MySensorsVariableVStatus());
             addVariable(new MySensorsVariableVPercentage());

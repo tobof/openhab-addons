@@ -9,7 +9,7 @@
 package org.openhab.binding.mysensors.internal.sensors.child;
 
 import org.openhab.binding.mysensors.internal.exception.NoContentException;
-import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
+import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageSubType;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
 import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariableVForecast;
 import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariableVPressure;
@@ -26,7 +26,7 @@ public class MySensorsChildSBaro extends MySensorsChild {
 
     public MySensorsChildSBaro(int childId) {
         super(childId);
-        setPresentationCode(MySensorsMessage.MYSENSORS_SUBTYPE_S_BARO);
+        setPresentationCode(MySensorsMessageSubType.S_BARO);
         try {
             addVariable(new MySensorsVariableVPressure());
             addVariable(new MySensorsVariableVForecast());
