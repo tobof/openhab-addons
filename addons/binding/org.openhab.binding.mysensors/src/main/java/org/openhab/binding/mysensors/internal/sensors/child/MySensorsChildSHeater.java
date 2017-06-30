@@ -15,6 +15,8 @@ import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariable
 import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariableVHvacSetpointHeat;
 import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariableVStatus;
 import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariableVTemp;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * MySensors Child definition according to MySensors serial API
@@ -26,6 +28,8 @@ import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariable
  */
 public class MySensorsChildSHeater extends MySensorsChild {
 
+    private Logger logger = LoggerFactory.getLogger(getClass());
+    
     public MySensorsChildSHeater(int childId) {
         super(childId);
         setPresentationCode(MySensorsMessageSubType.S_HEATER);

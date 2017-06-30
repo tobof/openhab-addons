@@ -13,6 +13,8 @@ import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageS
 import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
 import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariableVImpedance;
 import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariableVWeight;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * MySensors Child definition according to MySensors serial API
@@ -24,6 +26,8 @@ import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariable
  */
 public class MySensorsChildSWeight extends MySensorsChild {
 
+    private Logger logger = LoggerFactory.getLogger(getClass());
+    
     public MySensorsChildSWeight(int childId) {
         super(childId);
         setPresentationCode(MySensorsMessageSubType.S_WEIGHT);

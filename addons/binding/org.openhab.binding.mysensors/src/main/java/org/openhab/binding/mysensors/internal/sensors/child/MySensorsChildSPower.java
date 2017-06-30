@@ -16,6 +16,8 @@ import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariable
 import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariableVVa;
 import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariableVVar;
 import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariableVWatt;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * MySensors Child definition according to MySensors serial API
@@ -27,6 +29,8 @@ import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariable
  */
 public class MySensorsChildSPower extends MySensorsChild {
 
+    private Logger logger = LoggerFactory.getLogger(getClass());
+    
     public MySensorsChildSPower(int childId) {
         super(childId);
         setPresentationCode(MySensorsMessageSubType.S_POWER);

@@ -41,7 +41,7 @@ public class MySensorsNode {
 
     private boolean reachable = true;
 
-    private Map<Integer, MySensorsChild> chidldMap = null;
+    private Map<Integer, MySensorsChild> childMap;
 
     private Date lastUpdate = null;
 
@@ -52,7 +52,7 @@ public class MySensorsNode {
             throw new IllegalArgumentException("Invalid node id supplied: " + nodeId);
         }
         this.nodeId = nodeId;
-        this.chidldMap = new HashMap<Integer, MySensorsChild>();
+        this.childMap = new HashMap<Integer, MySensorsChild>();
         this.nodeConfig = Optional.empty();
         this.lastUpdate = new Date(0);
     }
@@ -67,13 +67,13 @@ public class MySensorsNode {
         }
 
         this.nodeId = nodeId;
-        this.chidldMap = new HashMap<Integer, MySensorsChild>();
+        this.childMap = new HashMap<Integer, MySensorsChild>();
         this.nodeConfig = Optional.of(config);
         this.lastUpdate = new Date(0);
     }
 
     public Map<Integer, MySensorsChild> getChildMap() {
-        return chidldMap;
+        return childMap;
     }
 
     /**
@@ -95,8 +95,8 @@ public class MySensorsNode {
             throw new IllegalArgumentException("Null child could't be add");
         }
 
-        synchronized (chidldMap) {
-            chidldMap.put(child.getChildId(), child);
+        synchronized (childMap) {
+            childMap.put(child.getChildId(), child);
         }
     }
 
@@ -107,7 +107,7 @@ public class MySensorsNode {
      * @return MySensorsChild for the given childId
      */
     public MySensorsChild getChild(int childId) {
-        return chidldMap.get(childId);
+        return childMap.get(childId);
     }
 
     /**
@@ -208,10 +208,10 @@ public class MySensorsNode {
             nodeConfig.get().merge(node.nodeConfig.get());
         }
 
-        synchronized (chidldMap) {
-            for (Integer i : node.chidldMap.keySet()) {
-                MySensorsChild child = node.chidldMap.get(i);
-                chidldMap.merge(i, child, (child1, child2) -> {
+        synchronized (childMap) {
+            for (Integer i : node.childMap.keySet()) {
+                MySensorsChild child = node.childMap.get(i);
+                childMap.merge(i, child, (child1, child2) -> {
                     child1.merge(child2);
                     return child1;
                 });
@@ -224,9 +224,9 @@ public class MySensorsNode {
      * Generate message from a state. This method doesn't update variable itself.
      * No check will be performed on value of state parameter
      *
-     * @param childId
-     * @param subType
-     * @param state
+     * @param childId id of the child the message is generated for.
+     * @param subType subtype (humidity, temperature ...) the message is of.
+     * @param state the new state that is send to the mysensors network.
      *
      * @return a non-null message ready to be sent if childId/type are available on this node
      *
@@ -239,7 +239,7 @@ public class MySensorsNode {
             throw new NotInitializedException("State is null");
         }
 
-        synchronized (chidldMap) {
+        synchronized (childMap) {
             MySensorsChild child = getChild(childId);
             MySensorsChildConfig childConfig = (child.getChildConfig().isPresent()) ? child.getChildConfig().get()
                     : new MySensorsChildConfig();
@@ -255,8 +255,6 @@ public class MySensorsNode {
                     msg.setSubType(subType);
                     msg.setAck(childConfig.getRequestAck());
                     msg.setMsg(state);
-
-                    // Optional
                     msg.setRevert(childConfig.getRevertState());
                     msg.setSmartSleep(childConfig.getSmartSleep());
                 }
@@ -278,7 +276,7 @@ public class MySensorsNode {
     }
 
     /**
-     * Check if a node has a valid node ID
+     * Check if a node has a valid node ID and node is not null
      *
      * @param node to test
      *
@@ -292,7 +290,7 @@ public class MySensorsNode {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((chidldMap == null) ? 0 : chidldMap.hashCode());
+        result = prime * result + ((childMap == null) ? 0 : childMap.hashCode());
         result = prime * result + nodeId;
         return result;
     }
@@ -312,11 +310,11 @@ public class MySensorsNode {
         if (batteryPercent != other.batteryPercent) {
             return false;
         }
-        if (chidldMap == null) {
-            if (other.chidldMap != null) {
+        if (childMap == null) {
+            if (other.childMap != null) {
                 return false;
             }
-        } else if (!chidldMap.equals(other.chidldMap)) {
+        } else if (!childMap.equals(other.childMap)) {
             return false;
         }
         if (lastUpdate == null) {
@@ -337,7 +335,7 @@ public class MySensorsNode {
 
     @Override
     public String toString() {
-        return "MySensorsNode [nodeId=" + nodeId + ", childNumber=" + chidldMap.size() + ", chidldList=" + chidldMap
+        return "MySensorsNode [nodeId=" + nodeId + ", childNumber=" + childMap.size() + ", chidldList=" + childMap
                 + "]";
     }
 

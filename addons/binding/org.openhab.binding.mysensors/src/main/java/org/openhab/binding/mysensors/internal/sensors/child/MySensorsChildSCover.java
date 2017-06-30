@@ -15,6 +15,8 @@ import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariable
 import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariableVPercentage;
 import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariableVStop;
 import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariableVUp;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * MySensors Child definition according to MySensors serial API
@@ -26,6 +28,8 @@ import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariable
  */
 public class MySensorsChildSCover extends MySensorsChild {
 
+    private Logger logger = LoggerFactory.getLogger(getClass());
+    
     public MySensorsChildSCover(int childId) {
         super(childId);
         setPresentationCode(MySensorsMessageSubType.S_COVER);

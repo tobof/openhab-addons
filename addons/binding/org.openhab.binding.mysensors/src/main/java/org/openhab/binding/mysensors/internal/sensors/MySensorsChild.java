@@ -8,8 +8,6 @@
  */
 package org.openhab.binding.mysensors.internal.sensors;
 
-import static org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage.*;
-
 import java.lang.reflect.Constructor;
 import java.util.Date;
 import java.util.HashMap;
@@ -46,8 +44,8 @@ import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChildSMotio
 import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChildSMultimeter;
 import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChildSPower;
 import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChildSRain;
-import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChildSRgbwLight;
 import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChildSRgbLight;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChildSRgbwLight;
 import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChildSSceneController;
 import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChildSSmoke;
 import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChildSSound;
@@ -81,16 +79,13 @@ public abstract class MySensorsChild implements Mergeable {
     public static final int MYSENSORS_CHILD_ID_RESERVED_0 = 0;
     public static final int MYSENSORS_CHILD_ID_RESERVED_255 = 255;
 
-    protected Logger logger = LoggerFactory.getLogger(getClass());
+    private Logger logger = LoggerFactory.getLogger(getClass());
 
     /**
      * Used to build child from presentation code
      */
     public final static Map<MySensorsMessageSubType, Class<? extends MySensorsChild>> PRESENTATION_TO_CHILD_CLASS = new HashMap<MySensorsMessageSubType, Class<? extends MySensorsChild>>() {
 
-        /**
-         *
-         */
         private static final long serialVersionUID = -3479184996747993491L;
 
         {
@@ -282,7 +277,7 @@ public abstract class MySensorsChild implements Mergeable {
             addVariable(new MySensorsVariableVVar4());
             addVariable(new MySensorsVariableVVar5());
         } catch (NoContentException e) {
-            logger.error("Variable has no content: {}", e.toString());
+            logger.error("Variable has no content: {}", e);
         }
     }
 

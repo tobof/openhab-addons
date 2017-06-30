@@ -14,6 +14,8 @@ import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
 import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariableVPercentage;
 import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariableVStatus;
 import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariableVWatt;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * MySensors Child definition according to MySensors serial API
@@ -24,6 +26,8 @@ import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariable
  *
  */
 public class MySensorsChildSDimmer extends MySensorsChild {
+    
+    private Logger logger = LoggerFactory.getLogger(getClass());
 
     public MySensorsChildSDimmer(int childId) {
         super(childId);

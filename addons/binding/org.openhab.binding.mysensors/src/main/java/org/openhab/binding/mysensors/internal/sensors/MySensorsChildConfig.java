@@ -26,9 +26,6 @@ public class MySensorsChildConfig implements Mergeable {
     private int expectUpdateTimeout;
 
     public MySensorsChildConfig() {
-        requestAck = false;
-        revertState = false;
-        smartSleep = false;
         expectUpdateTimeout = -1;
     }
 

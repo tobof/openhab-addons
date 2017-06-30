@@ -13,6 +13,8 @@ import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageS
 import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
 import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariableVRgb;
 import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariableVWatt;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * MySensors Child definition according to MySensors serial API
@@ -24,6 +26,8 @@ import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariable
  */
 public class MySensorsChildSRgbLight extends MySensorsChild {
 
+    private Logger logger = LoggerFactory.getLogger(getClass());
+    
     public MySensorsChildSRgbLight(int childId) {
         super(childId);
         setPresentationCode(MySensorsMessageSubType.S_RGB_LIGHT);

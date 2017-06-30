@@ -16,6 +16,8 @@ import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariable
 import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariableVPh;
 import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariableVStatus;
 import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariableVTemp;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * MySensors Child definition according to MySensors serial API
@@ -27,6 +29,8 @@ import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariable
  */
 public class MySensorsChildSWaterQuality extends MySensorsChild {
 
+    private Logger logger = LoggerFactory.getLogger(getClass());
+    
     public MySensorsChildSWaterQuality(int childId) {
         super(childId);
         setPresentationCode(MySensorsMessageSubType.S_WATER_QUALITY);
