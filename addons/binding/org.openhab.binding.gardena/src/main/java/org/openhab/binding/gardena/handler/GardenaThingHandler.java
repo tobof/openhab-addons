@@ -59,14 +59,7 @@ public class GardenaThingHandler extends BaseThingHandler {
     @Override
     public void initialize() {
         try {
-            GardenaSmart gardena = getGardenaSmart();
-
-            String deviceId = getConfig().as(GardenaDeviceConfig.class).deviceId;
-            if (deviceId == null) {
-                deviceId = UidUtils.getGardenaDeviceId(getThing());
-            }
-            Device device = gardena.getDevice(deviceId);
-
+            Device device = getDevice();
             updateProperties(device);
             updateStatus(device);
         } catch (GardenaException ex) {
@@ -99,7 +92,7 @@ public class GardenaThingHandler extends BaseThingHandler {
         try {
             updateChannel(channelUID);
         } catch (Exception ex) {
-            logger.error(ex.getMessage(), ex);
+            logger.error("{}", ex.getMessage(), ex);
         }
     }
 
@@ -112,7 +105,7 @@ public class GardenaThingHandler extends BaseThingHandler {
     }
 
     /**
-     * Converts a Gardena property value to a openHab state.
+     * Converts a Gardena property value to a openHAB state.
      */
     private State convertToState(Device device, ChannelUID channelUID) throws GardenaException {
         String abilityName = channelUID.getGroupId();
@@ -186,7 +179,7 @@ public class GardenaThingHandler extends BaseThingHandler {
         } catch (AccountHandlerNotAvailableException | GardenaDeviceNotFoundException ex) {
             // ignore
         } catch (Exception ex) {
-            logger.error(ex.getMessage(), ex);
+            logger.error("{}", ex.getMessage(), ex);
         }
     }
 
