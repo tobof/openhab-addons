@@ -34,10 +34,10 @@ echo "255;255;3;0;3" > $serialPort #Sensor --> gateway
 #echo "172;3;0;0;3;1.4.1" > $serialPort
 
 # Request I_TIME
-echo "172;255;3;0;1;0" > $serialPort # What time is it?
+#echo "172;255;3;0;1;0" > $serialPort # What time is it?
 
 # I_VERSION
-echo "255;255;3;0;2;2.2.0" > $serialPort # What time is it?
+#echo "255;255;3;0;2;2.2.0" > $serialPort # What time is it?
 
 #echo "172;255;3;0;6;0" > $serialPort ############################### is metric?
 
@@ -146,11 +146,11 @@ echo "172;4;1;0;15;1" > $serialPort
 
 #### Represent LIGHT_LEVEL
 #echo "172;14;0;0;16;1.4.1" > $serialPort
-#echo "101;2;0;0;16;2.1.0" > $serialPort
+echo "101;2;0;0;16;2.1.0" > $serialPort
 
 # Set LIGHT_LEVEL
-#echo "101;2;1;0;23;1543.98" > $serialPort
-#echo "101;2;1;0;37;246" > $serialPort
+echo "101;2;1;0;23;1543.98" > $serialPort
+echo "101;2;1;0;37;246" > $serialPort
 
 # Set watt status
 #echo "172;7;1;0;17;0815" > $serialPort
