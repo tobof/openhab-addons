@@ -1212,6 +1212,7 @@
 		<description>Thermostat</description>
 
 		<channels>
+			<channel id="status" typeId="status-channel" />
 			<channel id="temp" typeId="temp-channel" />
 			<channel id="hvac-flow-state" typeId="hvac-flow-state-channel" />
 			<channel id="hvac-flow-mode" typeId="hvac-flow-mode-channel" />
