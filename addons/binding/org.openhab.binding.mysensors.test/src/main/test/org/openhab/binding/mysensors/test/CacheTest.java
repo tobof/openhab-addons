@@ -12,7 +12,6 @@ import java.util.ArrayList;
 
 import org.eclipse.smarthome.config.core.ConfigConstants;
 import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openhab.binding.mysensors.factory.MySensorsCacheFactory;
 
@@ -26,12 +25,7 @@ import com.google.gson.reflect.TypeToken;
  */
 public class CacheTest {
 
-    private static MySensorsCacheFactory c = null;
-
-    @BeforeClass
-    public static void init() {
-        c = new MySensorsCacheFactory(ConfigConstants.getUserDataFolder());
-    }
+    private static MySensorsCacheFactory c = new MySensorsCacheFactory(ConfigConstants.getUserDataFolder());;
 
     @Test
     public void writeGivenIdsCache() {
