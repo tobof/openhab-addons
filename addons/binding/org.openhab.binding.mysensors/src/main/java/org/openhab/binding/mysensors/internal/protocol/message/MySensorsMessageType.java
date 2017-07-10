@@ -39,16 +39,16 @@ public enum MySensorsMessageType {
         return id;
     }
     
-    private static final Map<Integer, MySensorsMessageType> byId = new HashMap<Integer, MySensorsMessageType>();
+    private static final Map<Integer, MySensorsMessageType> ID = new HashMap<Integer, MySensorsMessageType>();
     static {
         for (MySensorsMessageType e : MySensorsMessageType.values()) {
-            if (byId.put(e.getId(), e) != null) {
+            if (ID.put(e.getId(), e) != null) {
                 throw new IllegalArgumentException("duplicate id: " + e.getId());
             }
         }
     }
 
     public static MySensorsMessageType getById(int id) {
-        return byId.get(id);
+        return ID.get(id);
     }
 }

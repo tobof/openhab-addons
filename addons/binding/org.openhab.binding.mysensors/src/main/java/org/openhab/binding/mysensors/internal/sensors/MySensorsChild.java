@@ -84,7 +84,7 @@ public abstract class MySensorsChild implements Mergeable {
     /**
      * Used to build child from presentation code
      */
-    public final static Map<MySensorsMessageSubType, Class<? extends MySensorsChild>> PRESENTATION_TO_CHILD_CLASS = new HashMap<MySensorsMessageSubType, Class<? extends MySensorsChild>>() {
+    public static final Map<MySensorsMessageSubType, Class<? extends MySensorsChild>> PRESENTATION_TO_CHILD_CLASS = new HashMap<MySensorsMessageSubType, Class<? extends MySensorsChild>>() {
 
         private static final long serialVersionUID = -3479184996747993491L;
 
@@ -185,7 +185,7 @@ public abstract class MySensorsChild implements Mergeable {
 
         synchronized (variableMap) {
             if (variableMap.containsKey(var.getType())) {
-                logger.warn("Overwrite variable: " + var.getType());
+                logger.warn("Overwrite variable: {}", var.getType());
             }
 
             variableMap.put(var.getType(), var);

@@ -8,15 +8,10 @@
  */
 package org.openhab.binding.mysensors.internal.protocol.serial;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Enumeration;
-
-import org.apache.commons.lang.StringUtils;
 import org.openhab.binding.mysensors.internal.event.MySensorsEventRegister;
 import org.openhab.binding.mysensors.internal.gateway.MySensorsGatewayConfig;
 import org.openhab.binding.mysensors.internal.protocol.MySensorsAbstractConnection;
-import gnu.io.CommPortIdentifier;
+
 import gnu.io.NRSerialPort;
 
 /**

@@ -31,7 +31,7 @@ public interface MySensorsGatewayEventListener extends EventListener {
      * Triggered when gateway reserve (and send) an ID for a new network device.
      * A new ,empty, device is created before this method is triggered
      */
-    default public void nodeIdReservationDone(Integer reservedId) throws Exception {
+    public default void nodeIdReservationDone(Integer reservedId) throws Exception {
     }
 
     /**
@@ -39,7 +39,7 @@ public interface MySensorsGatewayEventListener extends EventListener {
      * A new ,empty, device is created before this method is triggered. Only if presentation message received, and so a
      * description for a child is available, @child is not null.
      */
-    default public void newNodeDiscovered(MySensorsNode node, MySensorsChild child) throws Exception {
+    public default void newNodeDiscovered(MySensorsNode node, MySensorsChild child) throws Exception {
     }
 
     /**
@@ -50,7 +50,7 @@ public interface MySensorsGatewayEventListener extends EventListener {
      * -BATTERY indicate that a battery update message was received for a node ( @child and @variable are null in this
      * case)
      */
-    default public void sensorUpdateEvent(MySensorsNode node, MySensorsChild child, MySensorsVariable var,
+    public default void sensorUpdateEvent(MySensorsNode node, MySensorsChild child, MySensorsVariable var,
             MySensorsNodeUpdateEventType updateType) throws Exception {
     }
 
@@ -59,20 +59,20 @@ public interface MySensorsGatewayEventListener extends EventListener {
      * Reachability changes when connection go down or NetworkSanityChecker tells us the
      * device is not responding
      */
-    default public void nodeReachStatusChanged(MySensorsNode node, boolean reach) throws Exception {
+    public default void nodeReachStatusChanged(MySensorsNode node, boolean reach) throws Exception {
     }
 
     /**
      * Procedure to notify new message from MySensorsNetwork.
      * Internally, MySensorsGateway, handle this event and update channel state if message is sent to a known node.
      */
-    default public void messageReceived(MySensorsMessage message) throws Exception {
+    public default void messageReceived(MySensorsMessage message) throws Exception {
     }
 
     /**
      * Triggered when connection update its status
      */
-    default public void connectionStatusUpdate(MySensorsAbstractConnection connection, boolean connected)
+    public default void connectionStatusUpdate(MySensorsAbstractConnection connection, boolean connected)
             throws Exception {
     }
 
@@ -80,6 +80,6 @@ public interface MySensorsGatewayEventListener extends EventListener {
      * Triggered when one message, that request ack, hasn't received any confirmation.
      * Internally, MySensorsGateway, handle this event and restore channel state.
      */
-    default public void ackNotReceived(MySensorsMessage msg) throws Exception {
+    public default void ackNotReceived(MySensorsMessage msg) throws Exception {
     }
 }

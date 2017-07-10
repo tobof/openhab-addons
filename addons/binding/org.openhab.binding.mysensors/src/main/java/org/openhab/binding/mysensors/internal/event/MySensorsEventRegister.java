@@ -9,7 +9,6 @@
 package org.openhab.binding.mysensors.internal.event;
 
 import java.util.List;
-import java.util.function.Consumer;
 
 import org.openhab.binding.mysensors.internal.protocol.MySensorsAbstractConnection;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;

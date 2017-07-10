@@ -52,7 +52,7 @@ public abstract class MySensorsAbstractConnection implements Runnable {
     public static final int[] MYSENSORS_RETRY_TIMES_IN_MILLISECONDS = { 0, 100, 500, 1000, 2000 };
 
     // Wait time Arduino reset
-    public final static int RESET_TIME_IN_MILLISECONDS = 3000;
+    public static final int RESET_TIME_IN_MILLISECONDS = 3000;
 
     // How long should a Smartsleep message be left in the queue?
     public static final int MYSENSORS_SMARTSLEEP_TIMEOUT_IN_MILLISECONDS = 60 * 60* 6; // 6 hours

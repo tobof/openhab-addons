@@ -70,7 +70,7 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
     public void initialize() {
         configuration = getConfigAs(MySensorsSensorConfiguration.class);
 
-        logger.debug(configuration.toString());
+        logger.debug("Configuration: {}", configuration.toString());
 
         myGateway = getBridgeHandler().getMySensorsGateway();
         addIntoGateway(getThing(), configuration);

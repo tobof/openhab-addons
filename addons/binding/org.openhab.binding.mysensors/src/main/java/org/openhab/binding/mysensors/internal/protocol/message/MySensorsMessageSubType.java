@@ -154,24 +154,24 @@ public enum MySensorsMessageSubType {
         return id;
     }
     
-    private static final Map<Integer, MySensorsMessageSubType> presentationMessageById = new HashMap<Integer, MySensorsMessageSubType>();
-    private static final Map<Integer, MySensorsMessageSubType> setReqMessageById = new HashMap<Integer, MySensorsMessageSubType>();
-    private static final Map<Integer, MySensorsMessageSubType> internalMessageById = new HashMap<Integer, MySensorsMessageSubType>();
+    private static final Map<Integer, MySensorsMessageSubType> PRESENTATION_MESSAGE_BY_ID = new HashMap<Integer, MySensorsMessageSubType>();
+    private static final Map<Integer, MySensorsMessageSubType> SET_REQ_MESSAGE_BY_ID = new HashMap<Integer, MySensorsMessageSubType>();
+    private static final Map<Integer, MySensorsMessageSubType> INTERNAL_MESSAGE_BY_ID = new HashMap<Integer, MySensorsMessageSubType>();
     
     
     
     static {
         for (MySensorsMessageSubType e : MySensorsMessageSubType.values()) {
             if (e.subType == MySensorsMessageSubTypes.V) {
-                if (setReqMessageById.put(e.getId(), e) != null) {
+                if (SET_REQ_MESSAGE_BY_ID.put(e.getId(), e) != null) {
                     throw new IllegalArgumentException("duplicate id: " + e.getId());
                 }
             } else if (e.subType == MySensorsMessageSubTypes.S) {
-                if (presentationMessageById.put(e.getId(), e) != null) {
+                if (PRESENTATION_MESSAGE_BY_ID.put(e.getId(), e) != null) {
                     throw new IllegalArgumentException("duplicate id: " + e.getId());
                 }
             } else if (e.subType == MySensorsMessageSubTypes.I){
-                if (internalMessageById.put(e.getId(), e) != null) {
+                if (INTERNAL_MESSAGE_BY_ID.put(e.getId(), e) != null) {
                     throw new IllegalArgumentException("duplicate id: " + e.getId());
                 }
             }
@@ -179,15 +179,16 @@ public enum MySensorsMessageSubType {
     }
 
     public static MySensorsMessageSubType getSetReqById(int id) {
-        return setReqMessageById.get(id);
+        return SET_REQ_MESSAGE_BY_ID.get(id);
     }
     
     public static MySensorsMessageSubType getPresentationById(int id) {
-        return presentationMessageById.get(id);
+        return PRESENTATION_MESSAGE_BY_ID.get(id);
     }
     
     public static MySensorsMessageSubType getInternalById(int id) {
-        return internalMessageById.get(id);
+        return INTERNAL_MESSAGE_BY_ID.get(id);
     }
 
 }
+

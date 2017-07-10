@@ -29,7 +29,7 @@ public interface MySensorsTypeConverter {
      *
      * @return the state from a variable
      */
-    default public State stateFromChannel(MySensorsVariable value) {
+    public default State stateFromChannel(MySensorsVariable value) {
         return fromString(value.getValue());
     }
 
@@ -49,7 +49,7 @@ public interface MySensorsTypeConverter {
      *
      * @return the payload string
      */
-    default public String fromCommand(Command command) {
+    public default String fromCommand(Command command) {
         return command.toString();
     }
 

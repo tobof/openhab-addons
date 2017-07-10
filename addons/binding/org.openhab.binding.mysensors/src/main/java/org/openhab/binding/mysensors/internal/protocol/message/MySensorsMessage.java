@@ -12,8 +12,6 @@ import java.text.ParseException;
 
 import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsNode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Used to store the content of a MySensors message.
@@ -27,8 +25,6 @@ public class MySensorsMessage {
     public static final MySensorsMessage I_VERSION_MESSAGE = new MySensorsMessage(
             MySensorsNode.MYSENSORS_NODE_ID_RESERVED_GATEWAY_0, MySensorsChild.MYSENSORS_CHILD_ID_RESERVED_0,
             MySensorsMessageType.INTERNAL, MySensorsMessageAck.FALSE, false, MySensorsMessageSubType.I_VERSION, "");
-
-    private Logger logger = LoggerFactory.getLogger(MySensorsMessage.class);
 
     private int nodeId;
     private int childId;

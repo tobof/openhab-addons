@@ -32,17 +32,17 @@ public enum MySensorsMessageAck {
         return id;
     }
     
-    private static final Map<Integer, MySensorsMessageAck> byId = new HashMap<Integer, MySensorsMessageAck>();
+    private static final Map<Integer, MySensorsMessageAck> ID = new HashMap<Integer, MySensorsMessageAck>();
     static {
         for (MySensorsMessageAck e : MySensorsMessageAck.values()) {
-            if (byId.put(e.getId(), e) != null) {
+            if (ID.put(e.getId(), e) != null) {
                 throw new IllegalArgumentException("duplicate id: " + e.getId());
             }
         }
     }
 
     public static MySensorsMessageAck getById(int id) {
-        return byId.get(id);
+        return ID.get(id);
     }
 
 }
