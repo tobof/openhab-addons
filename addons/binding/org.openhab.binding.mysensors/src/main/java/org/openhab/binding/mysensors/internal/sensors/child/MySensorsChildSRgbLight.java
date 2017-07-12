@@ -12,6 +12,7 @@ import org.openhab.binding.mysensors.internal.exception.NoContentException;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageSubType;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
 import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariableVRgb;
+import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariableVStatus;
 import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariableVWatt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +35,7 @@ public class MySensorsChildSRgbLight extends MySensorsChild {
         try {
             addVariable(new MySensorsVariableVRgb());
             addVariable(new MySensorsVariableVWatt());
+            addVariable(new MySensorsVariableVStatus());
         } catch (NoContentException e) {
             logger.debug("No content to add: {}", e.toString());
         }

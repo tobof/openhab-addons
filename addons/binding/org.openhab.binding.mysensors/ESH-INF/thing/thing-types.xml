@@ -1540,6 +1540,7 @@
 
 		<channels>
 			<channel id="status" typeId="status-channel" />
+			<channel id="rgb" typeId="rgb-channel" />
 			<channel id="var1" typeId="var1-channel" />
 			<channel id="var2" typeId="var2-channel" />
 			<channel id="var3" typeId="var3-channel" />
@@ -1606,6 +1607,7 @@
 
 		<channels>
 			<channel id="status" typeId="status-channel" />
+			<channel id="rgbw" typeId="rgbw-channel" />
 			<channel id="var1" typeId="var1-channel" />
 			<channel id="var2" typeId="var2-channel" />
 			<channel id="var3" typeId="var3-channel" />
@@ -2383,9 +2385,15 @@
 		<category>Variable</category>
 	</channel-type>
 	<channel-type id="rgb-channel">
-		<item-type>String</item-type>
-		<label>Text</label>
+		<item-type>Color</item-type>
+		<label>Color</label>
 		<description>MySensors RGB Channel</description>
 		<category>Variable</category>
 	</channel-type>
+	<channel-type id="rgbw-channel">
+        <item-type>Color</item-type>
+        <label>Color</label>
+        <description>MySensors RGBW Channel</description>
+        <category>Variable</category>
+    </channel-type>
 </thing:thing-descriptions>

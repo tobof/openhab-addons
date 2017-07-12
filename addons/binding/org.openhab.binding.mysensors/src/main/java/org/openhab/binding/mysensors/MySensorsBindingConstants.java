@@ -18,6 +18,8 @@ import org.openhab.binding.mysensors.converter.MySensorsDecimalTypeConverter;
 import org.openhab.binding.mysensors.converter.MySensorsOnOffTypeConverter;
 import org.openhab.binding.mysensors.converter.MySensorsOpenCloseTypeConverter;
 import org.openhab.binding.mysensors.converter.MySensorsPercentTypeConverter;
+import org.openhab.binding.mysensors.converter.MySensorsRGBTypeConverter;
+import org.openhab.binding.mysensors.converter.MySensorsRGBWTypeConverter;
 import org.openhab.binding.mysensors.converter.MySensorsStringTypeConverter;
 import org.openhab.binding.mysensors.converter.MySensorsTypeConverter;
 import org.openhab.binding.mysensors.converter.MySensorsUpDownTypeConverter;
@@ -233,6 +235,8 @@ public class MySensorsBindingConstants {
     public static final MySensorsOpenCloseTypeConverter OPENCLOSE_TYPE_CONVERTER = new MySensorsOpenCloseTypeConverter();
     public static final MySensorsUpDownTypeConverter UPDOWN_TYPE_CONVERTER = new MySensorsUpDownTypeConverter();
     public static final MySensorsStringTypeConverter STRING_TYPE_CONVERTER = new MySensorsStringTypeConverter();
+    public static final MySensorsRGBTypeConverter RGB_TYPE_CONVERTER = new MySensorsRGBTypeConverter();
+    public static final MySensorsRGBWTypeConverter RGBW_TYPE_CONVERTER = new MySensorsRGBWTypeConverter();
 
     /**
      * Mappings between ChannelUID and class that represents the type of the channel
@@ -282,8 +286,8 @@ public class MySensorsBindingConstants {
             put(CHANNEL_VOLUME, DECIMAL_TYPE_CONVERTER);
             put(CHANNEL_LOCK_STATUS, ONOFF_TYPE_CONVERTER);
             put(CHANNEL_LEVEL, DECIMAL_TYPE_CONVERTER);
-            put(CHANNEL_RGB, STRING_TYPE_CONVERTER);
-            put(CHANNEL_RGBW, STRING_TYPE_CONVERTER);
+            put(CHANNEL_RGB, RGB_TYPE_CONVERTER);
+            put(CHANNEL_RGBW, RGBW_TYPE_CONVERTER);
             put(CHANNEL_ID, DECIMAL_TYPE_CONVERTER);
             put(CHANNEL_UNIT_PREFIX, DECIMAL_TYPE_CONVERTER);
             put(CHANNEL_TEXT, STRING_TYPE_CONVERTER);
