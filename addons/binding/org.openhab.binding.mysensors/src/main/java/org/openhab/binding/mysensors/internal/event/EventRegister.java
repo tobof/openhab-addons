@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
  */
 public class EventRegister<T extends EventListener> implements Register<T> {
 
-    private Logger logger = LoggerFactory.getLogger(getClass());
+    private Logger logger = LoggerFactory.getLogger(EventRegister.class);
 
     private List<T> registeredEventListener;
 

@@ -16,18 +16,19 @@ import org.eclipse.smarthome.core.types.State;
  * Used to convert a String from an incoming MySensors message to an OnOffType
  * 
  * @author Andrea Cioni
+ * @author Tim Oberföll
  *
  */
 public class MySensorsOnOffTypeConverter implements MySensorsTypeConverter {
 
     @Override
-    public State fromString(String s) {
-        if ("0".equals(s)) {
+    public State fromString(String string) {
+        if ("0".equals(string)) {
             return OnOffType.OFF;
-        } else if ("1".equals(s)) {
+        } else if ("1".equals(string)) {
             return OnOffType.ON;
         } else {
-            throw new IllegalArgumentException("String: " + s + ", could not be used as OnOff state");
+            throw new IllegalArgumentException("String: " + string + ", could not be used as OnOff state");
         }
     }
 
@@ -38,12 +39,10 @@ public class MySensorsOnOffTypeConverter implements MySensorsTypeConverter {
                 return "0";
             } else if (value == OnOffType.ON) {
                 return "1";
-            } else {
-                throw new IllegalArgumentException("Passed command is not On/Off");
             }
-        } else {
-            throw new IllegalArgumentException("Passed command: " + value + " is not an OnOff command");
         }
+        throw new IllegalArgumentException("Passed command: " + value + " is not an OnOff command");
+      
     }
 
 }

@@ -29,9 +29,8 @@ public class MySensorsUtility {
      * @param hasDuplicate if true only one value (randomly) will be used as key in map that contains same value for
      *            different keys.
      * @return the new inverted map
-     * @throws NullPointerException if map is null
      */
-    public static <V, K> Map<V, K> invertMap(Map<K, V> map, boolean hasDuplicate) throws NullPointerException {
+    public static <V, K> Map<V, K> invertMap(Map<K, V> map, boolean hasDuplicate) {
         if (!hasDuplicate) {
             return map.entrySet().stream().collect(Collectors.toMap(Entry::getValue, c -> c.getKey()));
         } else {
@@ -45,9 +44,8 @@ public class MySensorsUtility {
      * @param map1
      * @param map2
      * @return the new map that contains the entry of map1 and map2
-     * @throws NullPointerException
      */
-    public static <K, V> Map<K, V> joinMap(Map<K, V> map1, Map<K, V> map2) throws NullPointerException {
+    public static <K, V> Map<K, V> joinMap(Map<K, V> map1, Map<K, V> map2) {
         HashMap<K, V> joinMap = new HashMap<K, V>();
         joinMap.putAll(map1);
         joinMap.putAll(map2);
@@ -61,10 +59,9 @@ public class MySensorsUtility {
      * @param map2 the map that will be merged into map1
      *
      * @throws NullPointerException
-     * @throws MergeException if allowOverwrite is true and a duplicate is found for a key
      */
     public static <K, V> void mergeMap(Map<K, V> map1, Map<K, V> map2, boolean allowOverwrite)
-            throws MergeException, NullPointerException {
+            throws MergeException {
         if (!allowOverwrite) {
             map1.keySet().forEach((a) -> {
                 if (map2.containsKey(a)) {
@@ -77,7 +74,7 @@ public class MySensorsUtility {
 
     }
 
-    public static <K, V> boolean containsSameKey(Map<K, V> map1, Map<K, V> map2) throws NullPointerException {
+    public static <K, V> boolean containsSameKey(Map<K, V> map1, Map<K, V> map2) {
         return map1.keySet().equals(map2.keySet());
     }
 }

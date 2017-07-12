@@ -30,39 +30,39 @@
 				</description>
 				<default>100</default>
 			</parameter>
-			<parameter name="skipStartupCheck" type="boolean" required="false">
-				<label>Skip startup connection check</label>
-				<description>Allow the user to bypass the I_VERSION check on startup</description>
-				<default>false</default>
+			<parameter name="startupCheckEnabled" type="boolean" required="false">
+				<label>Enables the startup check</label>
+				<description>The software version is requested from the gateway at startup to ensure its up and running</description>
+				<default>true</default>
 			</parameter>
 			<parameter name="imperial" type="boolean" required="false">
 				<label>Imperial/Metric selection</label>
 				<description>Metric answer with imperial instead of metric</description>
 				<default>false</default>
 			</parameter>
-			<parameter name="enableNetworkSanCheck" type="boolean" required="false">
+			<parameter name="networkSanCheckEnabled" type="boolean" required="false">
 				<label>Disable network sanity check</label>
-				<description>Network sanity check periodically unsure that gateway is up and running</description>
+				<description>Network sanity check periodically ensure that gateway is up and running</description>
 				<default>false</default>
 			</parameter>
-			<parameter name="sanityCheckerInterval" type="integer" required="false">
+			<parameter name="networkSanCheckInterval" type="integer" required="false">
 				<label>Interval to launch network sanity check</label>
-				<description>Network sanity check periodically unsure that gateway is up and running</description>
+				<description>Network sanity check periodically ensure that gateway is up and running</description>
 				<default>3</default>
 			</parameter>
-			<parameter name="sanCheckConnectionFailAttempts" type="integer" required="false">
+			<parameter name="networkSanCheckConnectionFailAttempts" type="integer" required="false">
 				<label>Attempts before disconnecting the bridge</label>
-				<description>When gateway not respond, you could configure how many retry, sanity check, will do</description>
+				<description>Number of retries to establish a connection to the gateway</description>
 				<default>3</default>
 			</parameter>
-			<parameter name="sanCheckSendHeartbeat" type="boolean" required="false">
-				<label>Send heartbeat to all nodes when network sanity checker run</label>
-				<description>When network sanity checker run, send heartbeat to all nodes</description>
+			<parameter name="networkSanCheckSendHeartbeat" type="boolean" required="false">
+				<label>Send heartbeat to all nodes when network sanity checker is running</label>
+				<description>When network sanity checker is running, send heartbeat to all nodes</description>
 				<default>false</default>
 			</parameter>
-			<parameter name="sanCheckSendHeartbeatFailAttempts" type="integer" required="false">
+			<parameter name="networkSanCheckSendHeartbeatFailAttempts" type="integer" required="false">
 				<label>Attempts before disconnecting nodes</label>
-				<description>When nodes not respond to heartbeat, you could configure how many retry, sanity check, will do before
+				<description>When nodes do not respond to heartbeat, you could configure how many retries the sanity check will do before
 					disconnecting them
 				</description>
 				<default>10</default>
@@ -99,41 +99,39 @@
 				</description>
 				<default>100</default>
 			</parameter>
-			<parameter name="skipStartupCheck" type="boolean" required="false">
-				<label>Skip startup connection check</label>
-				<description>Allow the user to bypass the I_VERSION check on startup</description>
-				<default>false</default>
+			<parameter name="startupCheckEnabled" type="boolean" required="false">
+				<label>Enables the startup check</label>
+				<description>The software version is requested from the gateway at startup to ensure its up and running</description>
+				<default>true</default>
 			</parameter>
 			<parameter name="imperial" type="boolean" required="false">
 				<label>Imperial/Metric selection</label>
 				<description>Metric answer with imperial instead of metric</description>
 				<default>false</default>
 			</parameter>
-			<parameter name="enableNetworkSanCheck" type="boolean" required="false">
+			<parameter name="networkSanCheckEnabled" type="boolean" required="false">
 				<label>Disable network sanity check</label>
-				<description>Network sanity check periodically unsure that gateway is up and running</description>
+				<description>Network sanity check periodically ensure that gateway is up and running</description>
 				<default>false</default>
 			</parameter>
-			<parameter name="sanityCheckerInterval" type="integer" required="false">
+			<parameter name="networkSanCheckInterval" type="integer" required="false">
 				<label>Interval to launch network sanity check</label>
-				<description>Network sanity check periodically unsure that gateway is up and running</description>
+				<description>Network sanity check periodically ensure that gateway is up and running</description>
 				<default>3</default>
 			</parameter>
-			<parameter name="sanCheckConnectionFailAttempts" type="integer" required="false">
+			<parameter name="networkSanCheckConnectionFailAttempts" type="integer" required="false">
 				<label>Attempts before disconnecting the bridge</label>
-				<description>When gateway not respond, you could configure how many retry, sanity check, will do before
-					disconnecting it
-				</description>
+				<description>Number of retries to establish a connection to the gateway</description>
 				<default>3</default>
 			</parameter>
-			<parameter name="sanCheckSendHeartbeat" type="boolean" required="false">
-				<label>Send heartbeat to all nodes when network sanity checker run</label>
-				<description>When network sanity checker run, send heartbeat to all nodes</description>
+			<parameter name="networkSanCheckSendHeartbeat" type="boolean" required="false">
+				<label>Send heartbeat to all nodes when network sanity checker is running</label>
+				<description>When network sanity checker is running, send heartbeat to all nodes</description>
 				<default>false</default>
 			</parameter>
-			<parameter name="sanCheckSendHeartbeatFailAttempts" type="integer" required="false">
+			<parameter name="networkSanCheckSendHeartbeatFailAttempts" type="integer" required="false">
 				<label>Attempts before disconnecting nodes</label>
-				<description>When nodes not respond to heartbeat, you could configure how many retry, sanity check, will do before
+				<description>When nodes do not respond to heartbeat, you could configure how many retries the sanity check will do before
 					disconnecting them
 				</description>
 				<default>10</default>
@@ -164,13 +162,13 @@
 		</channels>
 
 		<config-description>
-			<parameter name="nodeId" type="text" required="true">
+			<parameter name="nodeId" type="integer" required="true">
 				<context>NodeId</context>
 				<label>NodeId</label>
 				<description>The ID of the node in the MySensors network
 				</description>
 			</parameter>
-			<parameter name="childId" type="text" required="true">
+			<parameter name="childId" type="integer" required="true">
 				<context>ChildId</context>
 				<label>ChildId</label>
 				<description>The ID of the child of a node in the MySensors network
@@ -189,7 +187,7 @@
 			</parameter>
 			<parameter name="requestHeartbeatResponse" type="boolean" required="false">
 				<label>Request Heartbeat Response</label>
-				<description>If no heartbeat received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL thing with
+				<description>If no heartbeat is received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL things with
 					same node ID will be set OFFLINE.</description>
 				<default>false</default>
 			</parameter>
@@ -229,12 +227,12 @@
 		</channels>
 
 		<config-description>
-			<parameter name="nodeId" type="text" required="true">
+			<parameter name="nodeId" type="integer" required="true">
 				<label>NodeId</label>
 				<description>The ID of the node in the MySensors network
 				</description>
 			</parameter>
-			<parameter name="childId" type="text" required="true">
+			<parameter name="childId" type="integer" required="true">
 				<label>ChildId</label>
 				<description>The ID of the child of a node in the MySensors network
 				</description>
@@ -293,12 +291,12 @@
 		</channels>
 
 		<config-description>
-			<parameter name="nodeId" type="text" required="true">
+			<parameter name="nodeId" type="integer" required="true">
 				<label>NodeId</label>
 				<description>The ID of the node in the MySensors network
 				</description>
 			</parameter>
-			<parameter name="childId" type="text" required="true">
+			<parameter name="childId" type="integer" required="true">
 				<label>ChildId</label>
 				<description>The ID of the child of a node in the MySensors network
 				</description>
@@ -354,12 +352,12 @@
 		</channels>
 
 		<config-description>
-			<parameter name="nodeId" type="text" required="true">
+			<parameter name="nodeId" type="integer" required="true">
 				<label>NodeId</label>
 				<description>The ID of the node in the MySensors network
 				</description>
 			</parameter>
-			<parameter name="childId" type="text" required="true">
+			<parameter name="childId" type="integer" required="true">
 				<label>ChildId</label>
 				<description>The ID of the child of a node in the MySensors network
 				</description>
@@ -411,17 +409,20 @@
 		<channels>
 			<channel id="watt" typeId="watt-channel" />
 			<channel id="kwh" typeId="kwh-channel" />
+			<channel id="var" typeId="var-channel" />
+			<channel id="va" typeId="va-channel" />
+			<channel id="power-factor" typeId="power-factor-channel" />
 			<channel id="battery" typeId="battery-channel" />
 			<channel id="lastupdate" typeId="lastupdate-channel" />
 		</channels>
 
 		<config-description>
-			<parameter name="nodeId" type="text" required="true">
+			<parameter name="nodeId" type="integer" required="true">
 				<label>NodeId</label>
 				<description>The ID of the node in the MySensors network
 				</description>
 			</parameter>
-			<parameter name="childId" type="text" required="true">
+			<parameter name="childId" type="integer" required="true">
 				<label>ChildId-watt</label>
 				<description>The ID of the first child, displaying watt, of a node in the MySensors network
 				</description>
@@ -478,12 +479,12 @@
 		</channels>
 
 		<config-description>
-			<parameter name="nodeId" type="text" required="true">
+			<parameter name="nodeId" type="integer" required="true">
 				<label>NodeId</label>
 				<description>The ID of the node in the MySensors network
 				</description>
 			</parameter>
-			<parameter name="childId" type="text" required="true">
+			<parameter name="childId" type="integer" required="true">
 				<label>ChildId</label>
 				<description>The ID of the child of a node in the MySensors network
 				</description>
@@ -540,12 +541,12 @@
 		</channels>
 
 		<config-description>
-			<parameter name="nodeId" type="text" required="true">
+			<parameter name="nodeId" type="integer" required="true">
 				<label>NodeId</label>
 				<description>The ID of the node in the MySensors network
 				</description>
 			</parameter>
-			<parameter name="childId" type="text" required="true">
+			<parameter name="childId" type="integer" required="true">
 				<label>ChildId</label>
 				<description>The ID of the child of a node in the MySensors network
 				</description>
@@ -602,12 +603,12 @@
 		</channels>
 
 		<config-description>
-			<parameter name="nodeId" type="text" required="true">
+			<parameter name="nodeId" type="integer" required="true">
 				<label>NodeId</label>
 				<description>The ID of the node in the MySensors network
 				</description>
 			</parameter>
-			<parameter name="childId" type="text" required="true">
+			<parameter name="childId" type="integer" required="true">
 				<label>ChildId</label>
 				<description>The ID of the child of a node in the MySensors network
 				</description>
@@ -663,12 +664,12 @@
 		</channels>
 
 		<config-description>
-			<parameter name="nodeId" type="text" required="true">
+			<parameter name="nodeId" type="integer" required="true">
 				<label>NodeId</label>
 				<description>The ID of the node in the MySensors network
 				</description>
 			</parameter>
-			<parameter name="childId" type="text" required="true">
+			<parameter name="childId" type="integer" required="true">
 				<label>ChildId</label>
 				<description>The ID of the child of a node in the MySensors network
 				</description>
@@ -718,7 +719,7 @@
 		<description>Dimmer</description>
 
 		<channels>
-			<channel id="dimmer" typeId="dimmer-channel" />
+			<channel id="percentage" typeId="percentage-channel" />
 			<channel id="status" typeId="status-channel" />
 			<channel id="watt" typeId="watt-channel" />
 			<channel id="battery" typeId="battery-channel" />
@@ -726,12 +727,12 @@
 		</channels>
 
 		<config-description>
-			<parameter name="nodeId" type="text" required="true">
+			<parameter name="nodeId" type="integer" required="true">
 				<label>NodeId</label>
 				<description>The ID of the node in the MySensors network
 				</description>
 			</parameter>
-			<parameter name="childId" type="text" required="true">
+			<parameter name="childId" type="integer" required="true">
 				<label>ChildId</label>
 				<description>The ID of the child of a node in the MySensors network
 				</description>
@@ -787,12 +788,12 @@
 		</channels>
 
 		<config-description>
-			<parameter name="nodeId" type="text" required="true">
+			<parameter name="nodeId" type="integer" required="true">
 				<label>NodeId</label>
 				<description>The ID of the node in the MySensors network
 				</description>
 			</parameter>
-			<parameter name="childId" type="text" required="true">
+			<parameter name="childId" type="integer" required="true">
 				<label>ChildId</label>
 				<description>The ID of the child of a node in the MySensors network
 				</description>
@@ -810,7 +811,7 @@
 			</parameter>
 			<parameter name="requestHeartbeatResponse" type="boolean" required="false">
 				<label>Request Heartbeat Response</label>
-				<description>If no heartbeat received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL thing with
+				<description>If no heartbeat is received and no attempts are left (see: sanCheckSendHeartbeatFailAttempts) ALL things with
 					same node ID will be set OFFLINE.</description>
 				<default>false</default>
 			</parameter>
@@ -849,12 +850,12 @@
 		</channels>
 
 		<config-description>
-			<parameter name="nodeId" type="text" required="true">
+			<parameter name="nodeId" type="integer" required="true">
 				<label>NodeId</label>
 				<description>The ID of the node in the MySensors network
 				</description>
 			</parameter>
-			<parameter name="childId" type="text" required="true">
+			<parameter name="childId" type="integer" required="true">
 				<label>ChildId</label>
 				<description>The ID of the child of a node in the MySensors network
 				</description>
@@ -911,12 +912,12 @@
 		</channels>
 
 		<config-description>
-			<parameter name="nodeId" type="text" required="true">
+			<parameter name="nodeId" type="integer" required="true">
 				<label>NodeId</label>
 				<description>The ID of the node in the MySensors network
 				</description>
 			</parameter>
-			<parameter name="childId" type="text" required="true">
+			<parameter name="childId" type="integer" required="true">
 				<label>ChildId</label>
 				<description>The ID of the child of a node in the MySensors network
 				</description>
@@ -934,7 +935,7 @@
 			</parameter>
 			<parameter name="requestHeartbeatResponse" type="boolean" required="false">
 				<label>Request Heartbeat Response</label>
-				<description>If no heartbeat received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL thing with
+				<description>If no heartbeat is received and no attempts are left (see: sanCheckSendHeartbeatFailAttempts) ALL things with
 					same node ID will be set OFFLINE.</description>
 				<default>false</default>
 			</parameter>
@@ -972,12 +973,12 @@
 		</channels>
 
 		<config-description>
-			<parameter name="nodeId" type="text" required="true">
+			<parameter name="nodeId" type="integer" required="true">
 				<label>NodeId</label>
 				<description>The ID of the node in the MySensors network
 				</description>
 			</parameter>
-			<parameter name="childId" type="text" required="true">
+			<parameter name="childId" type="integer" required="true">
 				<label>ChildId</label>
 				<description>The ID of the child of a node in the MySensors network
 				</description>
@@ -995,7 +996,7 @@
 			</parameter>
 			<parameter name="requestHeartbeatResponse" type="boolean" required="false">
 				<label>Request Heartbeat Response</label>
-				<description>If no heartbeat received and no attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL thing with
+				<description>If no heartbeat is received and no are attempts left (see: sanCheckSendHeartbeatFailAttempts) ALL things with
 					same node ID will be set OFFLINE.</description>
 				<default>false</default>
 			</parameter>
@@ -1034,12 +1035,12 @@
 		</channels>
 
 		<config-description>
-			<parameter name="nodeId" type="text" required="true">
+			<parameter name="nodeId" type="integer" required="true">
 				<label>NodeId</label>
 				<description>The ID of the node in the MySensors network
 				</description>
 			</parameter>
-			<parameter name="childId" type="text" required="true">
+			<parameter name="childId" type="integer" required="true">
 				<label>ChildId</label>
 				<description>The ID of the child of a node in the MySensors network
 				</description>
@@ -1095,12 +1096,12 @@
 		</channels>
 
 		<config-description>
-			<parameter name="nodeId" type="text" required="true">
+			<parameter name="nodeId" type="integer" required="true">
 				<label>NodeId</label>
 				<description>The ID of the node in the MySensors network
 				</description>
 			</parameter>
-			<parameter name="childId" type="text" required="true">
+			<parameter name="childId" type="integer" required="true">
 				<label>ChildId</label>
 				<description>The ID of the child of a node in the MySensors network
 				</description>
@@ -1151,17 +1152,18 @@
 
 		<channels>
 			<channel id="light-level" typeId="light-level-channel" />
+			<channel id="level" typeId="level-channel" />
 			<channel id="battery" typeId="battery-channel" />
 			<channel id="lastupdate" typeId="lastupdate-channel" />
 		</channels>
 
 		<config-description>
-			<parameter name="nodeId" type="text" required="true">
+			<parameter name="nodeId" type="integer" required="true">
 				<label>NodeId</label>
 				<description>The ID of the node in the MySensors network
 				</description>
 			</parameter>
-			<parameter name="childId" type="text" required="true">
+			<parameter name="childId" type="integer" required="true">
 				<label>ChildId</label>
 				<description>The ID of the child of a node in the MySensors network
 				</description>
@@ -1211,6 +1213,7 @@
 		<description>Thermostat</description>
 
 		<channels>
+			<channel id="status" typeId="status-channel" />
 			<channel id="temp" typeId="temp-channel" />
 			<channel id="hvac-flow-state" typeId="hvac-flow-state-channel" />
 			<channel id="hvac-flow-mode" typeId="hvac-flow-mode-channel" />
@@ -1227,12 +1230,12 @@
 		</channels>
 
 		<config-description>
-			<parameter name="nodeId" type="text" required="true">
+			<parameter name="nodeId" type="integer" required="true">
 				<label>NodeId</label>
 				<description>The ID of the node in the MySensors network
 				</description>
 			</parameter>
-			<parameter name="childId" type="text" required="true">
+			<parameter name="childId" type="integer" required="true">
 				<label>ChildId</label>
 				<description>The ID of the child of a node in the MySensors network
 				</description>
@@ -1290,12 +1293,12 @@
 		</channels>
 
 		<config-description>
-			<parameter name="nodeId" type="text" required="true">
+			<parameter name="nodeId" type="integer" required="true">
 				<label>NodeId</label>
 				<description>The ID of the node in the MySensors network
 				</description>
 			</parameter>
-			<parameter name="childId" type="text" required="true">
+			<parameter name="childId" type="integer" required="true">
 				<label>ChildId</label>
 				<description>The ID of the child of a node in the MySensors network
 				</description>
@@ -1354,12 +1357,12 @@
 		</channels>
 
 		<config-description>
-			<parameter name="nodeId" type="text" required="true">
+			<parameter name="nodeId" type="integer" required="true">
 				<label>NodeId</label>
 				<description>The ID of the node in the MySensors network
 				</description>
 			</parameter>
-			<parameter name="childId" type="text" required="true">
+			<parameter name="childId" type="integer" required="true">
 				<label>ChildId</label>
 				<description>The ID of the child of a node in the MySensors network
 				</description>
@@ -1415,13 +1418,13 @@
 		</channels>
 
 		<config-description>
-			<parameter name="nodeId" type="text" required="true">
+			<parameter name="nodeId" type="integer" required="true">
 				<context>NodeId</context>
 				<label>NodeId</label>
 				<description>The ID of the node in the MySensors network
 				</description>
 			</parameter>
-			<parameter name="childId" type="text" required="true">
+			<parameter name="childId" type="integer" required="true">
 				<context>ChildId</context>
 				<label>ChildId</label>
 				<description>The ID of the child of a node in the MySensors network
@@ -1480,13 +1483,13 @@
 		</channels>
 
 		<config-description>
-			<parameter name="nodeId" type="text" required="true">
+			<parameter name="nodeId" type="integer" required="true">
 				<context>NodeId</context>
 				<label>NodeId</label>
 				<description>The ID of the node in the MySensors network
 				</description>
 			</parameter>
-			<parameter name="childId" type="text" required="true">
+			<parameter name="childId" type="integer" required="true">
 				<context>ChildId</context>
 				<label>ChildId</label>
 				<description>The ID of the child of a node in the MySensors network
@@ -1538,6 +1541,7 @@
 
 		<channels>
 			<channel id="status" typeId="status-channel" />
+			<channel id="rgb" typeId="rgb-channel" />
 			<channel id="var1" typeId="var1-channel" />
 			<channel id="var2" typeId="var2-channel" />
 			<channel id="var3" typeId="var3-channel" />
@@ -1546,13 +1550,13 @@
 		</channels>
 
 		<config-description>
-			<parameter name="nodeId" type="text" required="true">
+			<parameter name="nodeId" type="integer" required="true">
 				<context>NodeId</context>
 				<label>NodeId</label>
 				<description>The ID of the node in the MySensors network
 				</description>
 			</parameter>
-			<parameter name="childId" type="text" required="true">
+			<parameter name="childId" type="integer" required="true">
 				<context>ChildId</context>
 				<label>ChildId</label>
 				<description>The ID of the child of a node in the MySensors network
@@ -1604,6 +1608,7 @@
 
 		<channels>
 			<channel id="status" typeId="status-channel" />
+			<channel id="rgbw" typeId="rgbw-channel" />
 			<channel id="var1" typeId="var1-channel" />
 			<channel id="var2" typeId="var2-channel" />
 			<channel id="var3" typeId="var3-channel" />
@@ -1613,13 +1618,13 @@
 		</channels>
 
 		<config-description>
-			<parameter name="nodeId" type="text" required="true">
+			<parameter name="nodeId" type="integer" required="true">
 				<context>NodeId</context>
 				<label>NodeId</label>
 				<description>The ID of the node in the MySensors network
 				</description>
 			</parameter>
-			<parameter name="childId" type="text" required="true">
+			<parameter name="childId" type="integer" required="true">
 				<context>ChildId</context>
 				<label>ChildId</label>
 				<description>The ID of the child of a node in the MySensors network
@@ -1679,13 +1684,13 @@
 		</channels>
 
 		<config-description>
-			<parameter name="nodeId" type="text" required="true">
+			<parameter name="nodeId" type="integer" required="true">
 				<context>NodeId</context>
 				<label>NodeId</label>
 				<description>The ID of the node in the MySensors network
 				</description>
 			</parameter>
-			<parameter name="childId" type="text" required="true">
+			<parameter name="childId" type="integer" required="true">
 				<context>ChildId</context>
 				<label>ChildId</label>
 				<description>The ID of the child of a node in the MySensors network
@@ -1740,14 +1745,14 @@
 		</channels>
 
 		<config-description>
-			<parameter name="nodeId" type="text" required="true">
+			<parameter name="nodeId" type="integer" required="true">
 				<context>NodeId</context>
 				<label>NodeId</label>
 				<description>The ID of the node in the MySensors network
 				</description>
 				<default>999</default>
 			</parameter>
-			<parameter name="childId" type="text" required="true">
+			<parameter name="childId" type="integer" required="true">
 				<context>ChildId</context>
 				<label>ChildId</label>
 				<description>The ID of the child of a node in the MySensors network
@@ -1804,14 +1809,14 @@
 		</channels>
 
 		<config-description>
-			<parameter name="nodeId" type="text" required="true">
+			<parameter name="nodeId" type="integer" required="true">
 				<context>NodeId</context>
 				<label>NodeId</label>
 				<description>The ID of the node in the MySensors network
 				</description>
 				<default>999</default>
 			</parameter>
-			<parameter name="childId" type="text" required="true">
+			<parameter name="childId" type="integer" required="true">
 				<context>ChildId</context>
 				<label>ChildId</label>
 				<description>The ID of the child of a node in the MySensors network
@@ -1869,14 +1874,14 @@
 		</channels>
 
 		<config-description>
-			<parameter name="nodeId" type="text" required="true">
+			<parameter name="nodeId" type="integer" required="true">
 				<context>NodeId</context>
 				<label>NodeId</label>
 				<description>The ID of the node in the MySensors network
 				</description>
 				<default>999</default>
 			</parameter>
-			<parameter name="childId" type="text" required="true">
+			<parameter name="childId" type="integer" required="true">
 				<context>ChildId</context>
 				<label>ChildId</label>
 				<description>The ID of the child of a node in the MySensors network
@@ -1934,12 +1939,12 @@
 		</channels>
 
 		<config-description>
-			<parameter name="nodeId" type="text" required="true">
+			<parameter name="nodeId" type="integer" required="true">
 				<label>NodeId</label>
 				<description>The ID of the node in the MySensors network
 				</description>
 			</parameter>
-			<parameter name="childId" type="text" required="true">
+			<parameter name="childId" type="integer" required="true">
 				<label>ChildId</label>
 				<description>The ID of the child of a node in the MySensors network
 				</description>
@@ -1995,12 +2000,12 @@
 		</channels>
 
 		<config-description>
-			<parameter name="nodeId" type="text" required="true">
+			<parameter name="nodeId" type="integer" required="true">
 				<label>NodeId</label>
 				<description>The ID of the node in the MySensors network
 				</description>
 			</parameter>
-			<parameter name="childId" type="text" required="true">
+			<parameter name="childId" type="integer" required="true">
 				<label>ChildId</label>
 				<description>The ID of the child of a node in the MySensors network
 				</description>
@@ -2056,12 +2061,12 @@
 		</channels>
 
 		<config-description>
-			<parameter name="nodeId" type="text" required="true">
+			<parameter name="nodeId" type="integer" required="true">
 				<label>NodeId</label>
 				<description>The ID of the node in the MySensors network
 				</description>
 			</parameter>
-			<parameter name="childId" type="text" required="true">
+			<parameter name="childId" type="integer" required="true">
 				<label>ChildId</label>
 				<description>The ID of the child of a node in the MySensors network
 				</description>
@@ -2147,10 +2152,31 @@
 	</channel-type>
 	<channel-type id="kwh-channel">
 		<item-type>Number</item-type>
-		<label>KWH</label>
-		<description>MySensors KWH Channel</description>
+		<label>kWh</label>
+		<description>MySensors kWh Channel</description>
 		<category>Energy</category>
-		<state pattern="%.2f KWH" readOnly="true"></state>
+		<state pattern="%.2f kWh" readOnly="true"></state>
+	</channel-type>
+	<channel-type id="power-factor-channel">
+		<item-type>Number</item-type>
+		<label>Power Factor</label>
+		<description>MySensors Power Factor Channel</description>
+		<category>Energy</category>
+		<state pattern="%.2f" readOnly="true"></state>
+	</channel-type>
+	<channel-type id="va-channel">
+		<item-type>Number</item-type>
+		<label>VA</label>
+		<description>MySensors VA Channel</description>
+		<category>Energy</category>
+		<state pattern="%.2f VA" readOnly="true"></state>
+	</channel-type>
+	<channel-type id="var-channel">
+		<item-type>Number</item-type>
+		<label>var</label>
+		<description>MySensors var Channel</description>
+		<category>Energy</category>
+		<state pattern="%.2f var" readOnly="true"></state>
 	</channel-type>
 	<channel-type id="pressure-channel">
 		<item-type>Number</item-type>
@@ -2175,11 +2201,10 @@
 		<label>Armed Status</label>
 		<description>Armed Status</description>
 	</channel-type>
-	<channel-type id="dimmer-channel">
+	<channel-type id="percentage-channel">
 		<item-type>Dimmer</item-type>
-		<label>Dimmer</label>
-		<description>Dimmer</description>
-		<category>LightVolume</category>
+		<label>Percentage</label>
+		<description>Percentage</description>
 		<state min="0" max="100" pattern="%d %%" />
 	</channel-type>
 	<channel-type id="cover-channel">
@@ -2381,9 +2406,15 @@
 		<category>Variable</category>
 	</channel-type>
 	<channel-type id="rgb-channel">
-		<item-type>String</item-type>
-		<label>Text</label>
+		<item-type>Color</item-type>
+		<label>Color</label>
 		<description>MySensors RGB Channel</description>
 		<category>Variable</category>
 	</channel-type>
+	<channel-type id="rgbw-channel">
+        <item-type>Color</item-type>
+        <label>Color</label>
+        <description>MySensors RGBW Channel</description>
+        <category>Variable</category>
+    </channel-type>
 </thing:thing-descriptions>

@@ -9,6 +9,8 @@
 package org.openhab.binding.mysensors.test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,7 +34,7 @@ public class MySensorsUtilityTest {
         m2.put(6, new Object());
         m2.put(7, new Object());
 
-        assertEquals(false, MySensorsUtility.containsSameKey(m1, m2));
+        assertFalse(MySensorsUtility.containsSameKey(m1, m2));
 
         m1.clear();
         m2.clear();
@@ -45,7 +47,7 @@ public class MySensorsUtilityTest {
         m2.put(232, new Object());
         m2.put(569, new Object());
 
-        assertEquals(true, MySensorsUtility.containsSameKey(m1, m2));
+        assertTrue(MySensorsUtility.containsSameKey(m1, m2));
 
         m1.clear();
         m2.clear();
@@ -58,7 +60,7 @@ public class MySensorsUtilityTest {
         m2.put(1, new Object());
         m2.put(569, new Object());
 
-        assertEquals(true, MySensorsUtility.containsSameKey(m1, m2));
+        assertTrue(MySensorsUtility.containsSameKey(m1, m2));
     }
 
     @Test

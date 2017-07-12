@@ -36,6 +36,9 @@ serialPort=$1
 # Request I_TIME
 #echo "172;255;3;0;1;0" > $serialPort # What time is it?
 
+# I_VERSION
+#echo "255;255;3;0;2;2.2.0" > $serialPort # What time is it?
+
 #echo "172;255;3;0;6;0" > $serialPort ############################### is metric?
 
 # Set Humidty status
@@ -82,22 +85,25 @@ echo "172;4;1;0;15;1" > $serialPort
 #echo "172;6;1;0;16;1" > $serialPort
 
 #### Represent Dimmer
-#echo "172;7;0;0;4;1.4.1" > $serialPort
+echo "172;7;0;0;4;1.4.1" > $serialPort
 
 # Set dimmer status
-#echo "172;7;1;0;3;49" > $serialPort
+echo "172;7;1;0;3;49" > $serialPort
 
 # Set dimmer status
 #echo "172;7;1;0;2;1" > $serialPort
 
 #### Represent Cover
-#echo "172;8;0;0;5;1.4.1" > $serialPort
+echo "172;8;0;0;5;1.4.1" > $serialPort
 
 # Set cover status UP(29) == 1, DOWN(30) == 1
 #echo "172;8;1;0;29;1" > $serialPort
 
 # Set cover status
 #echo "172;8;1;0;30;1" > $serialPort
+
+# Set cover status percentage
+echo "172;8;1;0;3;81" > $serialPort
 
 
 #### Represent wind
@@ -158,11 +164,15 @@ echo "172;4;1;0;15;1" > $serialPort
 
 
 # Representation of a S_POWER Sensor
-#echo "3;1;0;0;13;1.4.1" > $serialPort
+echo "3;1;0;0;13;1.4.1" > $serialPort
 
 # S_POWER Sensor
-#echo "3;1;1;0;17;2810" > $serialPort # the current power consumption (Watt)
-#echo "3;1;1;0;18;106.2550" > $serialPort # the overall power usage since sensor boot (KWH)
+echo "3;1;1;0;17;2810.14" > $serialPort # the current power consumption (Watt)
+echo "3;1;1;0;18;106.2550" > $serialPort # the overall power usage since sensor boot (KWH)
+echo "3;1;1;0;54;4.8" > $serialPort # var
+echo "3;1;1;0;55;2809.78" > $serialPort # VA
+echo "3;1;1;0;56;-0.69" > $serialPort # Power Factor
+
 
 # Representation of a S_BARO
 #echo "6;3;0;0;8;1.4.1" > $serialPort
@@ -193,7 +203,7 @@ echo "172;4;1;0;15;1" > $serialPort
 
 # INTERNAL
 # batteryLevel
-#echo "101;255;3;0;0;94" > $serialPort
+#echo "173;255;3;0;0;91" > $serialPort
 
 # I_HEARTBEAT_RESPONSE
 #echo "172;3;3;0;22;1" > $serialPort
@@ -201,8 +211,17 @@ echo "172;4;1;0;15;1" > $serialPort
 # Representation of a S_COLOR_SENSOR
 #echo "1;0;0;0;28;2.1.0" > $serialPort
 
+# Represent RGBW
+#echo "198;0;0;0;27;2.1.1" > $serialPort
+ 
+# Set RGBW
+#echo "198;0;1;0;41;4a30a610" > $serialPort
+
+# Represent RGB
+#echo "199;0;0;0;26;2.1.1" > $serialPort
+
 # set rgb
-#echo "1;0;1;0;40;ff00ff" > $serialPort
+#echo "199;0;1;0;40;ff00ff" > $serialPort
 
 # Representation of a S_DUST
 #echo "1;1;0;0;24;2.1.0" > $serialPort
