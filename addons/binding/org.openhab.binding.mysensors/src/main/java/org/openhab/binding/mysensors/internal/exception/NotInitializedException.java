@@ -17,14 +17,7 @@ package org.openhab.binding.mysensors.internal.exception;
 public class NotInitializedException extends Exception {
     private static final long serialVersionUID = -1441354134423131361L;
 
-    private String message;
-
     public NotInitializedException(String message) {
-        this.message = message;
-    }
-
-    @Override
-    public String getMessage() {
-        return message;
+        super(message);
     }
 }

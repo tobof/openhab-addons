@@ -20,7 +20,7 @@ import org.eclipse.smarthome.core.types.State;
 public class MySensorsPercentTypeConverter implements MySensorsTypeConverter {
 
     @Override
-    public State fromString(String s) {
-        return new PercentType(s);
+    public State fromString(String string) {
+        return new PercentType(string);
     }
 }

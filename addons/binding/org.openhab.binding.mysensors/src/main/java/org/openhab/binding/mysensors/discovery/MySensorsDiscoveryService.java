@@ -73,7 +73,7 @@ public class MySensorsDiscoveryService extends AbstractDiscoveryService implemen
      */
     public void newDevicePresented(MySensorsNode node, MySensorsChild child) {
         /*
-         * If a message was received from a not known node, which issn't a
+         * If a message was received from a not known node, which is not a
          * presentation message, we don't do anything!
          */
         if (child != null) {
@@ -87,8 +87,8 @@ public class MySensorsDiscoveryService extends AbstractDiscoveryService implemen
                         thingUid.getId().toLowerCase() + "_" + node.getNodeId() + "_" + child.getChildId());
 
                 Map<String, Object> properties = new HashMap<>(2);
-                properties.put(PARAMETER_NODEID, "" + node.getNodeId());
-                properties.put(PARAMETER_CHILDID, "" + child.getChildId());
+                properties.put(PARAMETER_NODEID, node.getNodeId());
+                properties.put(PARAMETER_CHILDID, child.getChildId());
                 DiscoveryResult result = DiscoveryResultBuilder.create(uid).withProperties(properties)
                         .withLabel("MySensors Device (" + node.getNodeId() + ";" + child.getChildId() + ")")
                         .withBridge(bridgeHandler.getThing().getUID()).build();

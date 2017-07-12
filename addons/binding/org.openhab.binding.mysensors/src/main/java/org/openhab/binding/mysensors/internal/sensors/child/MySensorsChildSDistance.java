@@ -9,10 +9,12 @@
 package org.openhab.binding.mysensors.internal.sensors.child;
 
 import org.openhab.binding.mysensors.internal.exception.NoContentException;
-import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
+import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageSubType;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
 import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariableVDistance;
 import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariableVUnitPrefix;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * MySensors Child definition according to MySensors serial API
@@ -23,10 +25,12 @@ import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariable
  *
  */
 public class MySensorsChildSDistance extends MySensorsChild {
+    
+    private Logger logger = LoggerFactory.getLogger(getClass());
 
     public MySensorsChildSDistance(int childId) {
         super(childId);
-        setPresentationCode(MySensorsMessage.MYSENSORS_SUBTYPE_S_DISTANCE);
+        setPresentationCode(MySensorsMessageSubType.S_DISTANCE);
         try {
             addVariable(new MySensorsVariableVDistance());
             addVariable(new MySensorsVariableVUnitPrefix());

@@ -20,6 +20,9 @@ import org.openhab.binding.mysensors.internal.event.MySensorsEventRegister;
 import org.openhab.binding.mysensors.internal.event.MySensorsGatewayEventListener;
 import org.openhab.binding.mysensors.internal.protocol.MySensorsAbstractConnection;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
+import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageAck;
+import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageSubType;
+import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageType;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsNode;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsNodeConfig;
@@ -48,13 +51,13 @@ public class MySensorsNetworkSanityChecker implements MySensorsGatewayEventListe
     private final boolean sendHeartbeat;
     private final int maxAttemptsBeforeDisconnectingNodes;
 
-    private ScheduledExecutorService scheduler = null;
-    private ScheduledFuture<?> futureSanityChk = null;
+    private ScheduledExecutorService scheduler;
+    private ScheduledFuture<?> futureSanityChk;
 
-    private Integer iVersionMessageMissing = 0;
-    private boolean iVersionMessageArrived = false;
+    private Integer missedIVersionMessages = 0;
+    private boolean iVersionMessageArrived;
 
-    private Map<Integer, Integer> missingHearbeatsMap = null;
+    private Map<Integer, Integer> missingHearbeatsMap;
 
     public MySensorsNetworkSanityChecker(MySensorsGateway myGateway, MySensorsEventRegister myEventRegister,
             MySensorsAbstractConnection myCon) {
@@ -193,8 +196,8 @@ public class MySensorsNetworkSanityChecker implements MySensorsGatewayEventListe
             for (Integer nodeId : myGateway.getGivenIds()) {
                 if (nodeId != null) {
                     MySensorsMessage msg = new MySensorsMessage(nodeId, MySensorsChild.MYSENSORS_CHILD_ID_RESERVED_255,
-                            MySensorsMessage.MYSENSORS_MSG_TYPE_INTERNAL, 0, false,
-                            MySensorsMessage.MYSENSORS_SUBTYPE_I_HEARTBEAT_REQUEST, "");
+                            MySensorsMessageType.INTERNAL, MySensorsMessageAck.FALSE, false,
+                            MySensorsMessageSubType.I_HEARTBEAT_REQUEST, "");
                     myGateway.sendMessage(msg);
 
                 }
@@ -215,24 +218,24 @@ public class MySensorsNetworkSanityChecker implements MySensorsGatewayEventListe
 
         Thread.sleep(SEND_DELAY);
 
-        synchronized (iVersionMessageMissing) {
+        synchronized (missedIVersionMessages) {
 
             if (!iVersionMessageArrived) {
                 logger.warn("I_VERSION message response is not arrived. Remained attempts before disconnection {}",
-                        maxAttemptsBeforeDisconnecting - iVersionMessageMissing);
+                        maxAttemptsBeforeDisconnecting - missedIVersionMessages);
 
-                if ((maxAttemptsBeforeDisconnecting - iVersionMessageMissing) <= 0) {
+                if ((maxAttemptsBeforeDisconnecting - missedIVersionMessages) <= 0) {
                     logger.error("Retry period expired, gateway is down. Disconneting bridge...");
 
                     myCon.requestDisconnection(true);
                     ret = false;
 
                 } else {
-                    iVersionMessageMissing++;
+                    missedIVersionMessages++;
                 }
             } else {
                 logger.debug("Network sanity check: PASSED");
-                iVersionMessageMissing = 0;
+                missedIVersionMessages = 0;
             }
 
             iVersionMessageArrived = false;
@@ -242,16 +245,16 @@ public class MySensorsNetworkSanityChecker implements MySensorsGatewayEventListe
     }
 
     private void reset() {
-        synchronized (iVersionMessageMissing) {
+        synchronized (missedIVersionMessages) {
             iVersionMessageArrived = false;
-            iVersionMessageMissing = 0;
+            missedIVersionMessages = 0;
             missingHearbeatsMap = new HashMap<>();
         }
     }
 
     @Override
     public void messageReceived(MySensorsMessage message) throws Exception {
-        synchronized (iVersionMessageMissing) {
+        synchronized (missedIVersionMessages) {
             if (!iVersionMessageArrived) {
                 if (message.isIVersionMessage()) {
                     iVersionMessageArrived = true;

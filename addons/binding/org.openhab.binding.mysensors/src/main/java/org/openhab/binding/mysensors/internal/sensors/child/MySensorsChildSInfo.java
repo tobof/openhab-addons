@@ -9,9 +9,11 @@
 package org.openhab.binding.mysensors.internal.sensors.child;
 
 import org.openhab.binding.mysensors.internal.exception.NoContentException;
-import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
+import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageSubType;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
 import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariableVText;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * MySensors Child definition according to MySensors serial API
@@ -23,9 +25,11 @@ import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariable
  */
 public class MySensorsChildSInfo extends MySensorsChild {
 
+    private Logger logger = LoggerFactory.getLogger(getClass());
+    
     public MySensorsChildSInfo(int childId) {
         super(childId);
-        setPresentationCode(MySensorsMessage.MYSENSORS_SUBTYPE_S_INFO);
+        setPresentationCode(MySensorsMessageSubType.S_INFO);
         try {
             addVariable(new MySensorsVariableVText());
         } catch (NoContentException e) {

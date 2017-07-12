@@ -9,10 +9,12 @@
 package org.openhab.binding.mysensors.internal.sensors.child;
 
 import org.openhab.binding.mysensors.internal.exception.NoContentException;
-import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
+import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageSubType;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
 import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariableVArmed;
 import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariableVTripped;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * MySensors Child definition according to MySensors serial API
@@ -24,9 +26,11 @@ import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariable
  */
 public class MySensorsChildSSmoke extends MySensorsChild {
 
+    private Logger logger = LoggerFactory.getLogger(getClass());
+    
     public MySensorsChildSSmoke(int childId) {
         super(childId);
-        setPresentationCode(MySensorsMessage.MYSENSORS_SUBTYPE_S_SMOKE);
+        setPresentationCode(MySensorsMessageSubType.S_SMOKE);
         try {
             addVariable(new MySensorsVariableVTripped());
             addVariable(new MySensorsVariableVArmed());
