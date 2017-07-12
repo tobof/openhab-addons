@@ -36,6 +36,9 @@ serialPort=$1
 # Request I_TIME
 #echo "172;255;3;0;1;0" > $serialPort # What time is it?
 
+# I_VERSION
+#echo "255;255;3;0;2;2.2.0" > $serialPort # What time is it?
+
 #echo "172;255;3;0;6;0" > $serialPort ############################### is metric?
 
 # Set Humidty status
@@ -193,7 +196,7 @@ echo "172;4;1;0;15;1" > $serialPort
 
 # INTERNAL
 # batteryLevel
-#echo "101;255;3;0;0;94" > $serialPort
+#echo "173;255;3;0;0;91" > $serialPort
 
 # I_HEARTBEAT_RESPONSE
 #echo "172;3;3;0;22;1" > $serialPort
@@ -201,8 +204,17 @@ echo "172;4;1;0;15;1" > $serialPort
 # Representation of a S_COLOR_SENSOR
 #echo "1;0;0;0;28;2.1.0" > $serialPort
 
+# Represent RGBW
+echo "198;0;0;0;27;2.1.1" > $serialPort
+ 
+# Set RGBW
+echo "198;0;1;0;41;4a30a610" > $serialPort
+
+# Represent RGB
+echo "199;0;0;0;26;2.1.1" > $serialPort
+
 # set rgb
-#echo "1;0;1;0;40;ff00ff" > $serialPort
+echo "199;0;1;0;40;ff00ff" > $serialPort
 
 # Representation of a S_DUST
 #echo "1;1;0;0;24;2.1.0" > $serialPort

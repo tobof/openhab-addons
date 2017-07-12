@@ -8,8 +8,6 @@
  */
 package org.openhab.binding.mysensors.internal.sensors;
 
-import static org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage.*;
-
 import java.lang.reflect.Constructor;
 import java.util.Date;
 import java.util.HashMap;
@@ -19,6 +17,7 @@ import java.util.Optional;
 import org.openhab.binding.mysensors.internal.Mergeable;
 import org.openhab.binding.mysensors.internal.exception.MergeException;
 import org.openhab.binding.mysensors.internal.exception.NoContentException;
+import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageSubType;
 import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChildSAirQuality;
 import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChildSArduinoNode;
 import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChildSArduinoRepeaterNode;
@@ -45,8 +44,8 @@ import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChildSMotio
 import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChildSMultimeter;
 import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChildSPower;
 import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChildSRain;
-import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChildSRgbwLight;
 import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChildSRgbLight;
+import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChildSRgbwLight;
 import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChildSSceneController;
 import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChildSSmoke;
 import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChildSSound;
@@ -80,60 +79,56 @@ public abstract class MySensorsChild implements Mergeable {
     public static final int MYSENSORS_CHILD_ID_RESERVED_0 = 0;
     public static final int MYSENSORS_CHILD_ID_RESERVED_255 = 255;
 
-    protected Logger logger = LoggerFactory.getLogger(getClass());
+    private Logger logger = LoggerFactory.getLogger(getClass());
 
     /**
      * Used to build child from presentation code
      */
-    public final static Map<Integer, Class<? extends MySensorsChild>> PRESENTATION_TO_CHILD_CLASS = new HashMap<Integer, Class<? extends MySensorsChild>>() {
+    public static final Map<MySensorsMessageSubType, Class<? extends MySensorsChild>> PRESENTATION_TO_CHILD_CLASS = new HashMap<MySensorsMessageSubType, Class<? extends MySensorsChild>>() {
 
-        /**
-         *
-         */
         private static final long serialVersionUID = -3479184996747993491L;
 
         {
-            put(MYSENSORS_SUBTYPE_S_DOOR, MySensorsChildSDoor.class);
-            put(MYSENSORS_SUBTYPE_S_MOTION, MySensorsChildSMotion.class);
-            put(MYSENSORS_SUBTYPE_S_SMOKE, MySensorsChildSSmoke.class);
-            put(MYSENSORS_SUBTYPE_S_LIGHT, MySensorsChildSBinary.class); // BINARY=LIGHT
-            put(MYSENSORS_SUBTYPE_S_BINARY, MySensorsChildSBinary.class);
-            put(MYSENSORS_SUBTYPE_S_DIMMER, MySensorsChildSDimmer.class);
-            put(MYSENSORS_SUBTYPE_S_COVER, MySensorsChildSCover.class);
-            put(MYSENSORS_SUBTYPE_S_TEMP, MySensorsChildSTemp.class);
-            put(MYSENSORS_SUBTYPE_S_HUM, MySensorsChildSHum.class);
-            put(MYSENSORS_SUBTYPE_S_BARO, MySensorsChildSBaro.class);
-            put(MYSENSORS_SUBTYPE_S_WIND, MySensorsChildSWind.class);
-            put(MYSENSORS_SUBTYPE_S_RAIN, MySensorsChildSRain.class);
-            put(MYSENSORS_SUBTYPE_S_UV, MySensorsChildSUv.class);
-            put(MYSENSORS_SUBTYPE_S_WEIGHT, MySensorsChildSWeight.class);
-            put(MYSENSORS_SUBTYPE_S_POWER, MySensorsChildSPower.class);
-            put(MYSENSORS_SUBTYPE_S_HEATER, MySensorsChildSHeater.class);
-            put(MYSENSORS_SUBTYPE_S_DISTANCE, MySensorsChildSDistance.class);
-            put(MYSENSORS_SUBTYPE_S_LIGHT_LEVEL, MySensorsChildSLightLevel.class);
-            put(MYSENSORS_SUBTYPE_S_LOCK, MySensorsChildSLock.class);
-            put(MYSENSORS_SUBTYPE_S_IR, MySensorsChildSIr.class);
-            put(MYSENSORS_SUBTYPE_S_WATER, MySensorsChildSWater.class);
-            put(MYSENSORS_SUBTYPE_S_AIR_QUALITY, MySensorsChildSAirQuality.class);
-            put(MYSENSORS_SUBTYPE_S_CUSTOM, MySensorsChildSCustom.class);
-            put(MYSENSORS_SUBTYPE_S_RGB_LIGHT, MySensorsChildSRgbLight.class);
-            put(MYSENSORS_SUBTYPE_S_RGBW_LIGHT, MySensorsChildSRgbwLight.class);
-            put(MYSENSORS_SUBTYPE_S_HVAC, MySensorsChildSHvac.class);
-            put(MYSENSORS_SUBTYPE_S_MULTIMETER, MySensorsChildSMultimeter.class);
-            put(MYSENSORS_SUBTYPE_S_SPRINKLER, MySensorsChildSSprinkler.class);
-            put(MYSENSORS_SUBTYPE_S_WATER_LEAK, MySensorsChildSWaterLeak.class);
-            put(MYSENSORS_SUBTYPE_S_SOUND, MySensorsChildSSound.class);
-            put(MYSENSORS_SUBTYPE_S_VIBRATION, MySensorsChildSVibration.class);
-            put(MYSENSORS_SUBTYPE_S_MOISTURE, MySensorsChildSMoisture.class);
-            put(MYSENSORS_SUBTYPE_S_INFO, MySensorsChildSInfo.class);
-            put(MYSENSORS_SUBTYPE_S_GAS, MySensorsChildSGas.class);
-            put(MYSENSORS_SUBTYPE_S_GPS, MySensorsChildSGps.class);
-            put(MYSENSORS_SUBTYPE_S_WATER_QUALITY, MySensorsChildSWaterQuality.class);
-            put(MYSENSORS_SUBTYPE_S_SCENE_CONTROLLER, MySensorsChildSSceneController.class);
-            put(MYSENSORS_SUBTYPE_S_DUST, MySensorsChildSDust.class);
-            put(MYSENSORS_SUBTYPE_S_COLOR_SENSOR, MySensorsChildSColorSensor.class);
-            put(MYSENSORS_SUBTYPE_S_ARDUINO_REPEATER_NODE, MySensorsChildSArduinoRepeaterNode.class);
-            put(MYSENSORS_SUBTYPE_S_ARDUINO_NODE, MySensorsChildSArduinoNode.class);
+            put(MySensorsMessageSubType.S_DOOR, MySensorsChildSDoor.class);
+            put(MySensorsMessageSubType.S_MOTION, MySensorsChildSMotion.class);
+            put(MySensorsMessageSubType.S_SMOKE, MySensorsChildSSmoke.class);
+            put(MySensorsMessageSubType.S_BINARY, MySensorsChildSBinary.class);
+            put(MySensorsMessageSubType.S_DIMMER, MySensorsChildSDimmer.class);
+            put(MySensorsMessageSubType.S_COVER, MySensorsChildSCover.class);
+            put(MySensorsMessageSubType.S_TEMP, MySensorsChildSTemp.class);
+            put(MySensorsMessageSubType.S_HUM, MySensorsChildSHum.class);
+            put(MySensorsMessageSubType.S_BARO, MySensorsChildSBaro.class);
+            put(MySensorsMessageSubType.S_WIND, MySensorsChildSWind.class);
+            put(MySensorsMessageSubType.S_RAIN, MySensorsChildSRain.class);
+            put(MySensorsMessageSubType.S_UV, MySensorsChildSUv.class);
+            put(MySensorsMessageSubType.S_WEIGHT, MySensorsChildSWeight.class);
+            put(MySensorsMessageSubType.S_POWER, MySensorsChildSPower.class);
+            put(MySensorsMessageSubType.S_HEATER, MySensorsChildSHeater.class);
+            put(MySensorsMessageSubType.S_DISTANCE, MySensorsChildSDistance.class);
+            put(MySensorsMessageSubType.S_LIGHT_LEVEL, MySensorsChildSLightLevel.class);
+            put(MySensorsMessageSubType.S_LOCK, MySensorsChildSLock.class);
+            put(MySensorsMessageSubType.S_IR, MySensorsChildSIr.class);
+            put(MySensorsMessageSubType.S_WATER, MySensorsChildSWater.class);
+            put(MySensorsMessageSubType.S_AIR_QUALITY, MySensorsChildSAirQuality.class);
+            put(MySensorsMessageSubType.S_CUSTOM, MySensorsChildSCustom.class);
+            put(MySensorsMessageSubType.S_RGB_LIGHT, MySensorsChildSRgbLight.class);
+            put(MySensorsMessageSubType.S_RGBW_LIGHT, MySensorsChildSRgbwLight.class);
+            put(MySensorsMessageSubType.S_HVAC, MySensorsChildSHvac.class);
+            put(MySensorsMessageSubType.S_MULTIMETER, MySensorsChildSMultimeter.class);
+            put(MySensorsMessageSubType.S_SPRINKLER, MySensorsChildSSprinkler.class);
+            put(MySensorsMessageSubType.S_WATER_LEAK, MySensorsChildSWaterLeak.class);
+            put(MySensorsMessageSubType.S_SOUND, MySensorsChildSSound.class);
+            put(MySensorsMessageSubType.S_VIBRATION, MySensorsChildSVibration.class);
+            put(MySensorsMessageSubType.S_MOISTURE, MySensorsChildSMoisture.class);
+            put(MySensorsMessageSubType.S_INFO, MySensorsChildSInfo.class);
+            put(MySensorsMessageSubType.S_GAS, MySensorsChildSGas.class);
+            put(MySensorsMessageSubType.S_GPS, MySensorsChildSGps.class);
+            put(MySensorsMessageSubType.S_WATER_QUALITY, MySensorsChildSWaterQuality.class);
+            put(MySensorsMessageSubType.S_SCENE_CONTROLLER, MySensorsChildSSceneController.class);
+            put(MySensorsMessageSubType.S_DUST, MySensorsChildSDust.class);
+            put(MySensorsMessageSubType.S_COLOR_SENSOR, MySensorsChildSColorSensor.class);
+            put(MySensorsMessageSubType.S_ARDUINO_REPEATER_NODE, MySensorsChildSArduinoRepeaterNode.class);
+            put(MySensorsMessageSubType.S_ARDUINO_NODE, MySensorsChildSArduinoNode.class);
         }
 
     };
@@ -142,18 +137,18 @@ public abstract class MySensorsChild implements Mergeable {
 
     private Optional<MySensorsChildConfig> childConfig;
 
-    private Map<Integer, MySensorsVariable> variableMap = null;
+    private Map<MySensorsMessageSubType, MySensorsVariable> variableMap = null;
 
     private Date lastUpdate = null;
 
-    private int presentationCode;
+    private MySensorsMessageSubType presentationCode;
 
     public MySensorsChild(int childId) {
         if (!isValidChildId(childId)) {
             throw new IllegalArgumentException("Invalid child id supplied: " + childId);
         }
         this.childId = childId;
-        variableMap = new HashMap<Integer, MySensorsVariable>();
+        variableMap = new HashMap<MySensorsMessageSubType, MySensorsVariable>();
         lastUpdate = new Date(0);
         childConfig = Optional.empty();
         addCommonVariables();
@@ -169,7 +164,7 @@ public abstract class MySensorsChild implements Mergeable {
         }
 
         this.childId = childId;
-        variableMap = new HashMap<Integer, MySensorsVariable>();
+        variableMap = new HashMap<MySensorsMessageSubType, MySensorsVariable>();
         lastUpdate = new Date(0);
         childConfig = Optional.of(config);
         addCommonVariables();
@@ -190,7 +185,7 @@ public abstract class MySensorsChild implements Mergeable {
 
         synchronized (variableMap) {
             if (variableMap.containsKey(var.getType())) {
-                logger.warn("Overwrite variable: " + var.getType());
+                logger.warn("Overwrite variable: {}", var.getType());
             }
 
             variableMap.put(var.getType(), var);
@@ -201,12 +196,12 @@ public abstract class MySensorsChild implements Mergeable {
     /**
      * Get MySensorsVariable of this child
      *
-     * @param type the integer of the subtype
+     * @param subType the integer of the subtype
      * @return one MySensorsVariable if present, otherwise null
      */
-    public MySensorsVariable getVariable(int type) {
+    public MySensorsVariable getVariable(MySensorsMessageSubType subType) {
         synchronized (variableMap) {
-            return variableMap.get(type);
+            return variableMap.get(subType);
         }
     }
 
@@ -241,11 +236,11 @@ public abstract class MySensorsChild implements Mergeable {
         }
     }
 
-    public int getPresentationCode() {
+    public MySensorsMessageSubType getPresentationCode() {
         return presentationCode;
     }
 
-    public void setPresentationCode(int presentationCode) {
+    public void setPresentationCode(MySensorsMessageSubType presentationCode) {
         this.presentationCode = presentationCode;
     }
 
@@ -282,7 +277,7 @@ public abstract class MySensorsChild implements Mergeable {
             addVariable(new MySensorsVariableVVar4());
             addVariable(new MySensorsVariableVVar5());
         } catch (NoContentException e) {
-            logger.error("Variable has no content: {}", e.toString());
+            logger.error("Variable has no content: {}", e);
         }
     }
 
@@ -304,7 +299,7 @@ public abstract class MySensorsChild implements Mergeable {
      *
      * @return an instance of a child
      */
-    public static MySensorsChild fromPresentation(int presentationCode, int childId) {
+    public static MySensorsChild fromPresentation(MySensorsMessageSubType presentationCode, int childId) {
         MySensorsChild ret;
 
         if (PRESENTATION_TO_CHILD_CLASS.containsKey(presentationCode)) {
@@ -330,7 +325,7 @@ public abstract class MySensorsChild implements Mergeable {
         final int prime = 31;
         int result = 1;
         result = prime * result + childId;
-        result = prime * result + presentationCode;
+        result = prime * result + presentationCode.getId();
         result = prime * result + ((variableMap == null) ? 0 : variableMap.hashCode());
         return result;
     }
