@@ -192,6 +192,11 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
             ret.setGatewayType(MySensorsGatewayType.IP);
             ret.setIpAddress(conf.ipAddress);
             ret.setTcpPort(conf.tcpPort);
+        } else if (bridgeuid.equals(THING_TYPE_BRIDGE_MQTT)) {
+            ret.setGatewayType(MySensorsGatewayType.MQTT);
+            ret.setTopicSubscribe(conf.topicSubscribe);
+            ret.setTopicPublish(conf.topicPublish);
+            ret.setBrokerName(conf.brokerName);
         } else {
             throw new IllegalArgumentException("BridgeUID is unkonown: " + bridgeuid);
         }

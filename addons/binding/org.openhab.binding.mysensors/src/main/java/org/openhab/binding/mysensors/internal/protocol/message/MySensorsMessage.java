@@ -569,7 +569,38 @@ public class MySensorsMessage {
                 }
                 return mysensorsmessage;
             } else {
-                throw new ParseException("Message lenght is not > 4", 0);
+                throw new ParseException("Message length is not > 4", 0);
+            }
+
+        } catch (Exception e) {
+            throw new ParseException(e.getClass() + " : " + e.getMessage(), 0);
+        }
+    }
+
+    /**
+     * @param line Input is a String containing the message received from the MySensors network
+     * @return Returns the content of the message as a MySensorsMessage
+     *
+     * @throws ParseException
+     */
+    public static MySensorsMessage parseMQTT(String topic, String payload) throws ParseException {
+        try {
+            String[] splitTopic = topic.split("/");
+            if (splitTopic.length == 5) {
+
+                MySensorsMessage mysensorsmessage = new MySensorsMessage();
+
+                int nodeId = Integer.parseInt(splitTopic[MYSENSORS_MSG_PART_NODE]);
+
+                mysensorsmessage.setNodeId(nodeId);
+                mysensorsmessage.setChildId(Integer.parseInt(splitTopic[MYSENSORS_MSG_PART_CHILD]));
+                mysensorsmessage.setMsgType(Integer.parseInt(splitTopic[MYSENSORS_MSG_PART_TYPE]));
+                mysensorsmessage.setAck(Integer.parseInt(splitTopic[MYSENSORS_MSG_PART_ACK]));
+                mysensorsmessage.setSubType(Integer.parseInt(splitTopic[MYSENSORS_MSG_PART_SUBTYPE]));
+                mysensorsmessage.setMsg(payload);
+                return mysensorsmessage;
+            } else {
+                throw new ParseException("Message length is not 5", 0);
             }
 
         } catch (Exception e) {
@@ -593,6 +624,23 @@ public class MySensorsMessage {
         apiString += msg.getMsg() + "\n";
 
         return apiString;
+    }
+
+    /**
+     * Converts a MySensorsMessage object to a MQTT topic String.
+     *
+     * @param msg the MySensorsMessage that should be converted.
+     * @return the MySensorsMessage as a MQTT topic String.
+     */
+    public static String generateMQTTString(MySensorsMessage msg) {
+        String mqttString = "";
+        mqttString += msg.getNodeId() + "/";
+        mqttString += msg.getChildId() + "/";
+        mqttString += msg.getMsgType() + "/";
+        mqttString += msg.getAck() + "/";
+        mqttString += msg.getSubType();
+
+        return mqttString;
     }
 
     @Override

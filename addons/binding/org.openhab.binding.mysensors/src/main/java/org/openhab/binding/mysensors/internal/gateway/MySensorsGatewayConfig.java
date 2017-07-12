@@ -85,6 +85,21 @@ public class MySensorsGatewayConfig {
      */
     private Integer tcpPort;
 
+    /**
+     * MQTT broker name
+     */
+    private String brokerName;
+
+    /**
+     * MQTT topic to subscribe to
+     */
+    private String topicSubscribe;
+
+    /**
+     * MQTT topic to publish to
+     */
+    private String topicPublish;
+
     public MySensorsGatewayType getGatewayType() {
         return gatewayType;
     }
@@ -115,6 +130,30 @@ public class MySensorsGatewayConfig {
 
     public void setTcpPort(Integer tcpPort) {
         this.tcpPort = tcpPort;
+    }
+
+    public String getBrokerName() {
+        return brokerName;
+    }
+
+    public void setBrokerName(String brokername) {
+        this.brokerName = brokername;
+    }
+
+    public String getTopicSubscribe() {
+        return topicSubscribe;
+    }
+
+    public void setTopicSubscribe(String topicSubscribe) {
+        this.topicSubscribe = topicSubscribe;
+    }
+
+    public String getTopicPublish() {
+        return topicPublish;
+    }
+
+    public void setTopicPublish(String topicPublish) {
+        this.topicPublish = topicPublish;
     }
 
     public Integer getSendDelay() {
@@ -197,6 +236,7 @@ public class MySensorsGatewayConfig {
                 + ", sanCheckConnectionFailAttempts=" + sanCheckConnectionFailAttempts + ", sanCheckSendHeartbeat="
                 + sanCheckSendHeartbeat + ", sanCheckSendHeartbeatFailAttempts=" + sanCheckSendHeartbeatFailAttempts
                 + ", serialPort=" + serialPort + ", baudRate=" + baudRate + ", ipAddress=" + ipAddress + ", tcpPort="
-                + tcpPort + "]";
+                + tcpPort + ", brokerName=" + brokerName + ", topicSubsribe=" + topicSubscribe + ", topicPublish="
+                + topicPublish + "]";
     }
 }

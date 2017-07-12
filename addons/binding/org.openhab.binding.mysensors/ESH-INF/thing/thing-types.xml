@@ -145,12 +145,76 @@
 
 	</bridge-type>
 
+    <bridge-type id="bridge-mqtt">
+        <label>MySensors MQTT Gateway</label>
+        <description>MySensors Gateway connected via MQTT
+        </description>
+        <config-description>
+            <parameter name="brokerName" type="text" required="true">
+                <label>Broker Name</label>
+                <description>name of the MQTT broker as defined in the mqtt.cfg file
+                </description>
+            </parameter>
+            <parameter name="topicSubscribe" type="text" required="true">
+                <label>Subscription Topic</label>
+                <description>MQTT topic to subscribe to
+                </description>
+            </parameter>
+            <parameter name="topicPublish" type="text" required="true">
+                <label>Publish Topic</label>
+                <description>MQTT topic to publish to
+                </description>
+            </parameter>
+            <parameter name="skipStartupCheck" type="boolean" required="false">
+                <label>Skip startup connection check</label>
+                <description>Allow the user to bypass the I_VERSION check on startup</description>
+                <default>false</default>
+            </parameter>
+            <parameter name="imperial" type="boolean" required="false">
+                <label>Imperial/Metric selection</label>
+                <description>Metric answer with imperial instead of metric</description>
+                <default>false</default>
+            </parameter>
+            <parameter name="enableNetworkSanCheck" type="boolean" required="false">
+                <label>Disable network sanity check</label>
+                <description>Network sanity check periodically unsure that gateway is up and running</description>
+                <default>false</default>
+            </parameter>
+            <parameter name="sanityCheckerInterval" type="integer" required="false">
+                <label>Interval to launch network sanity check</label>
+                <description>Network sanity check periodically unsure that gateway is up and running</description>
+                <default>3</default>
+            </parameter>
+            <parameter name="sanCheckConnectionFailAttempts" type="integer" required="false">
+                <label>Attempts before disconnecting the bridge</label>
+                <description>When gateway not respond, you could configure how many retry, sanity check, will do before
+                    disconnecting it
+                </description>
+                <default>3</default>
+            </parameter>
+            <parameter name="sanCheckSendHeartbeat" type="boolean" required="false">
+                <label>Send heartbeat to all nodes when network sanity checker run</label>
+                <description>When network sanity checker run, send heartbeat to all nodes</description>
+                <default>false</default>
+            </parameter>
+            <parameter name="sanCheckSendHeartbeatFailAttempts" type="integer" required="false">
+                <label>Attempts before disconnecting nodes</label>
+                <description>When nodes not respond to heartbeat, you could configure how many retry, sanity check, will do before
+                    disconnecting them
+                </description>
+                <default>10</default>
+            </parameter>
+        </config-description>
+
+    </bridge-type>
+
 	<!-- SENSORS -->
 
 	<thing-type id="humidity">
 		<supported-bridge-type-refs>
 			<bridge-type-ref id="bridge-ser" />
 			<bridge-type-ref id="bridge-eth" />
+			<bridge-type-ref id="bridge-mqtt" />
 		</supported-bridge-type-refs>
 
 		<label>Humidity Sensor</label>
@@ -209,13 +273,13 @@
 				<default>false</default>
 			</parameter>
 		</config-description>
-
 	</thing-type>
 
 	<thing-type id="temperature">
 		<supported-bridge-type-refs>
 			<bridge-type-ref id="bridge-ser" />
 			<bridge-type-ref id="bridge-eth" />
+			<bridge-type-ref id="bridge-mqtt" />
 		</supported-bridge-type-refs>
 
 		<label>Temperature Sensor</label>
@@ -279,6 +343,7 @@
 		<supported-bridge-type-refs>
 			<bridge-type-ref id="bridge-ser" />
 			<bridge-type-ref id="bridge-eth" />
+			<bridge-type-ref id="bridge-mqtt" />
 		</supported-bridge-type-refs>
 
 		<label>Multimeter Sensor</label>
@@ -342,6 +407,7 @@
 		<supported-bridge-type-refs>
 			<bridge-type-ref id="bridge-ser" />
 			<bridge-type-ref id="bridge-eth" />
+			<bridge-type-ref id="bridge-mqtt" />
 		</supported-bridge-type-refs>
 
 		<label>Light</label>
@@ -403,6 +469,7 @@
 		<supported-bridge-type-refs>
 			<bridge-type-ref id="bridge-ser" />
 			<bridge-type-ref id="bridge-eth" />
+			<bridge-type-ref id="bridge-mqtt" />
 		</supported-bridge-type-refs>
 
 		<label>Power</label>
@@ -465,6 +532,7 @@
 		<supported-bridge-type-refs>
 			<bridge-type-ref id="bridge-ser" />
 			<bridge-type-ref id="bridge-eth" />
+			<bridge-type-ref id="bridge-mqtt" />
 		</supported-bridge-type-refs>
 
 		<label>Barometer</label>
@@ -527,6 +595,7 @@
 		<supported-bridge-type-refs>
 			<bridge-type-ref id="bridge-ser" />
 			<bridge-type-ref id="bridge-eth" />
+			<bridge-type-ref id="bridge-mqtt" />
 		</supported-bridge-type-refs>
 
 		<label>Door</label>
@@ -589,6 +658,7 @@
 		<supported-bridge-type-refs>
 			<bridge-type-ref id="bridge-ser" />
 			<bridge-type-ref id="bridge-eth" />
+			<bridge-type-ref id="bridge-mqtt" />
 		</supported-bridge-type-refs>
 
 		<label>Motion</label>
@@ -651,6 +721,7 @@
 		<supported-bridge-type-refs>
 			<bridge-type-ref id="bridge-ser" />
 			<bridge-type-ref id="bridge-eth" />
+			<bridge-type-ref id="bridge-mqtt" />
 		</supported-bridge-type-refs>
 
 		<label>Smoke</label>
@@ -712,6 +783,7 @@
 		<supported-bridge-type-refs>
 			<bridge-type-ref id="bridge-ser" />
 			<bridge-type-ref id="bridge-eth" />
+			<bridge-type-ref id="bridge-mqtt" />
 		</supported-bridge-type-refs>
 
 		<label>Dimmer</label>
@@ -775,6 +847,7 @@
 		<supported-bridge-type-refs>
 			<bridge-type-ref id="bridge-ser" />
 			<bridge-type-ref id="bridge-eth" />
+			<bridge-type-ref id="bridge-mqtt" />
 		</supported-bridge-type-refs>
 
 		<label>RollerShutter</label>
@@ -836,6 +909,7 @@
 		<supported-bridge-type-refs>
 			<bridge-type-ref id="bridge-ser" />
 			<bridge-type-ref id="bridge-eth" />
+			<bridge-type-ref id="bridge-mqtt" />
 		</supported-bridge-type-refs>
 
 		<label>Wind</label>
@@ -898,6 +972,7 @@
 		<supported-bridge-type-refs>
 			<bridge-type-ref id="bridge-ser" />
 			<bridge-type-ref id="bridge-eth" />
+			<bridge-type-ref id="bridge-mqtt" />
 		</supported-bridge-type-refs>
 
 		<label>Rain</label>
@@ -960,6 +1035,7 @@
 		<supported-bridge-type-refs>
 			<bridge-type-ref id="bridge-ser" />
 			<bridge-type-ref id="bridge-eth" />
+			<bridge-type-ref id="bridge-mqtt" />
 		</supported-bridge-type-refs>
 
 		<label>UV</label>
@@ -1021,6 +1097,7 @@
 		<supported-bridge-type-refs>
 			<bridge-type-ref id="bridge-ser" />
 			<bridge-type-ref id="bridge-eth" />
+			<bridge-type-ref id="bridge-mqtt" />
 		</supported-bridge-type-refs>
 
 		<label>Weight</label>
@@ -1083,6 +1160,7 @@
 		<supported-bridge-type-refs>
 			<bridge-type-ref id="bridge-ser" />
 			<bridge-type-ref id="bridge-eth" />
+			<bridge-type-ref id="bridge-mqtt" />
 		</supported-bridge-type-refs>
 
 		<label>Distance</label>
@@ -1144,6 +1222,7 @@
 		<supported-bridge-type-refs>
 			<bridge-type-ref id="bridge-ser" />
 			<bridge-type-ref id="bridge-eth" />
+			<bridge-type-ref id="bridge-mqtt" />
 		</supported-bridge-type-refs>
 
 		<label>Light level</label>
@@ -1205,6 +1284,7 @@
 		<supported-bridge-type-refs>
 			<bridge-type-ref id="bridge-ser" />
 			<bridge-type-ref id="bridge-eth" />
+			<bridge-type-ref id="bridge-mqtt" />
 		</supported-bridge-type-refs>
 
 		<label>Thermostat</label>
@@ -1276,6 +1356,7 @@
 		<supported-bridge-type-refs>
 			<bridge-type-ref id="bridge-ser" />
 			<bridge-type-ref id="bridge-eth" />
+			<bridge-type-ref id="bridge-mqtt" />
 		</supported-bridge-type-refs>
 
 		<label>WaterMeter</label>
@@ -1339,6 +1420,7 @@
 		<supported-bridge-type-refs>
 			<bridge-type-ref id="bridge-ser" />
 			<bridge-type-ref id="bridge-eth" />
+			<bridge-type-ref id="bridge-mqtt" />
 		</supported-bridge-type-refs>
 
 		<label>CustomSensor</label>
@@ -1403,6 +1485,7 @@
 		<supported-bridge-type-refs>
 			<bridge-type-ref id="bridge-ser" />
 			<bridge-type-ref id="bridge-eth" />
+			<bridge-type-ref id="bridge-mqtt" />
 		</supported-bridge-type-refs>
 
 		<label>Lock Sensor</label>
@@ -1466,6 +1549,7 @@
 		<supported-bridge-type-refs>
 			<bridge-type-ref id="bridge-ser" />
 			<bridge-type-ref id="bridge-eth" />
+			<bridge-type-ref id="bridge-mqtt" />
 		</supported-bridge-type-refs>
 
 		<label>Level Sensor</label>
@@ -1531,6 +1615,7 @@
 		<supported-bridge-type-refs>
 			<bridge-type-ref id="bridge-ser" />
 			<bridge-type-ref id="bridge-eth" />
+			<bridge-type-ref id="bridge-mqtt" />
 		</supported-bridge-type-refs>
 
 		<label>RGB Light Sensor</label>
@@ -1597,6 +1682,7 @@
 		<supported-bridge-type-refs>
 			<bridge-type-ref id="bridge-ser" />
 			<bridge-type-ref id="bridge-eth" />
+			<bridge-type-ref id="bridge-mqtt" />
 		</supported-bridge-type-refs>
 
 		<label>RGBW Light Sensor</label>
@@ -1664,6 +1750,7 @@
 		<supported-bridge-type-refs>
 			<bridge-type-ref id="bridge-ser" />
 			<bridge-type-ref id="bridge-eth" />
+			<bridge-type-ref id="bridge-mqtt" />
 		</supported-bridge-type-refs>
 
 		<label>PH Meter Sensor</label>
@@ -1725,10 +1812,12 @@
 			</parameter>
 		</config-description>
 	</thing-type>
+
 	<thing-type id="mysensorsMessage">
 		<supported-bridge-type-refs>
 			<bridge-type-ref id="bridge-ser" />
 			<bridge-type-ref id="bridge-eth" />
+			<bridge-type-ref id="bridge-mqtt" />
 		</supported-bridge-type-refs>
 
 		<label>MySensors Message</label>
@@ -1793,6 +1882,7 @@
 		<supported-bridge-type-refs>
 			<bridge-type-ref id="bridge-ser" />
 			<bridge-type-ref id="bridge-eth" />
+			<bridge-type-ref id="bridge-mqtt" />
 		</supported-bridge-type-refs>
 
 		<label>Text</label>
@@ -1857,6 +1947,7 @@
 		<supported-bridge-type-refs>
 			<bridge-type-ref id="bridge-ser" />
 			<bridge-type-ref id="bridge-eth" />
+			<bridge-type-ref id="bridge-mqtt" />
 		</supported-bridge-type-refs>
 
 		<label>IR Receive</label>
@@ -1922,6 +2013,7 @@
 		<supported-bridge-type-refs>
 			<bridge-type-ref id="bridge-ser" />
 			<bridge-type-ref id="bridge-eth" />
+			<bridge-type-ref id="bridge-mqtt" />
 		</supported-bridge-type-refs>
 
 		<label>Air Quality Meter</label>
@@ -1983,6 +2075,7 @@
 		<supported-bridge-type-refs>
 			<bridge-type-ref id="bridge-ser" />
 			<bridge-type-ref id="bridge-eth" />
+			<bridge-type-ref id="bridge-mqtt" />
 		</supported-bridge-type-refs>
 
 		<label>Dust Meter</label>
@@ -2044,6 +2137,7 @@
 		<supported-bridge-type-refs>
 			<bridge-type-ref id="bridge-ser" />
 			<bridge-type-ref id="bridge-eth" />
+			<bridge-type-ref id="bridge-mqtt" />
 		</supported-bridge-type-refs>
 
 		<label>Color Sensor</label>

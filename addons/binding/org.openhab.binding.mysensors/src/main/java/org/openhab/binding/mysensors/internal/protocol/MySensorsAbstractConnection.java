@@ -597,7 +597,7 @@ public abstract class MySensorsAbstractConnection implements Runnable {
          * Confirm acknowledge for a message from the outbound message queue.
          *
          * @param msg The message that should be acknowledged from the queue.
-         * @throws NoAckException 
+         * @throws NoAckException
          */
         private void confirmAcknowledgeMessage(MySensorsMessage msg) throws NoAckException {
             if (msg == null) {
@@ -727,6 +727,7 @@ public abstract class MySensorsAbstractConnection implements Runnable {
         /**
          * Debug print of the smart sleep queue content to logs
          */
+        @SuppressWarnings("unused")
         private void printSmartSleepQueue() {
             synchronized (smartSleepMessageQueue) {
                 Iterator<MySensorsMessage> iterator = smartSleepMessageQueue.iterator();
