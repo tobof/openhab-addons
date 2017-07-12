@@ -30,15 +30,15 @@ import com.google.gson.stream.JsonWriter;
 public class MySensorsCacheFactory {
     private Logger logger = LoggerFactory.getLogger(getClass());
 
-    private static final String CACHE_BASE_PATH = "./mysensors/cache";
+    private String CACHE_BASE_PATH;
     private static final String CACHE_FILE_SUFFIX = ".cached";
 
     public static final String GIVEN_IDS_CACHE_FILE = "given_ids";
 
-    private Gson gson = null;
+    private final Gson gson = new Gson();
 
-    public MySensorsCacheFactory() {
-        gson = new Gson();
+    public MySensorsCacheFactory(String userDataFolder) {
+        CACHE_BASE_PATH = userDataFolder + "/mysensors/cache";
         initializeCacheDir();
     }
 

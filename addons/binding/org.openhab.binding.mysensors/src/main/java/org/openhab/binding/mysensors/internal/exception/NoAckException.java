@@ -18,14 +18,7 @@ package org.openhab.binding.mysensors.internal.exception;
 public class NoAckException extends Exception {
     private static final long serialVersionUID = -4446354274423342464L;
 
-    private String message;
-
     public NoAckException(String message) {
-        this.message = message;
-    }
-
-    @Override
-    public String getMessage() {
-        return message;
+        super(message);
     }
 }

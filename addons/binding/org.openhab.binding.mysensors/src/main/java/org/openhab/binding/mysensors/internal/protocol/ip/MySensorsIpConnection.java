@@ -11,6 +11,8 @@ package org.openhab.binding.mysensors.internal.protocol.ip;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
+
+import org.apache.commons.lang.StringUtils;
 import org.openhab.binding.mysensors.internal.event.MySensorsEventRegister;
 import org.openhab.binding.mysensors.internal.gateway.MySensorsGatewayConfig;
 import org.openhab.binding.mysensors.internal.protocol.MySensorsAbstractConnection;
@@ -39,9 +41,7 @@ public class MySensorsIpConnection extends MySensorsAbstractConnection {
 
         boolean ret = false;
 
-        if (myGatewayConfig.getIpAddress() == null || myGatewayConfig.getIpAddress().isEmpty()) {
-            logger.error("IP must be not null/empty");
-        } else {
+        if (StringUtils.isNotEmpty(myGatewayConfig.getIpAddress())) {
             try {
                 sock = new Socket(myGatewayConfig.getIpAddress(), myGatewayConfig.getTcpPort());
                 mysConReader = new MySensorsReader(sock.getInputStream());
@@ -54,6 +54,9 @@ public class MySensorsIpConnection extends MySensorsAbstractConnection {
             } catch (IOException e) {
                 logger.error("Error while trying to connect InputStreamReader", e);
             }
+
+        } else {
+            logger.error("IP must be not null/empty");
         }
 
         return ret;

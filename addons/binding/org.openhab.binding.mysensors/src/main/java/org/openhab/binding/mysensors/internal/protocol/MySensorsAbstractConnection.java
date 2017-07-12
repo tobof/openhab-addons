@@ -31,6 +31,7 @@ import org.openhab.binding.mysensors.internal.exception.NoAckException;
 import org.openhab.binding.mysensors.internal.gateway.MySensorsGatewayConfig;
 import org.openhab.binding.mysensors.internal.gateway.MySensorsNetworkSanityChecker;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
+import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageDirection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,20 +49,23 @@ public abstract class MySensorsAbstractConnection implements Runnable {
 
     // How often and at which times should the binding retry to send a message if requestAck is true?
     public static final int MYSENSORS_NUMBER_OF_RETRIES = 5;
-    public static final int[] MYSENSORS_RETRY_TIMES = { 0, 100, 500, 1000, 2000 };
+    public static final int[] MYSENSORS_RETRY_TIMES_IN_MILLISECONDS = { 0, 100, 500, 1000, 2000 };
 
     // Wait time Arduino reset
-    public final static int RESET_TIME = 3000;
+    public static final int RESET_TIME_IN_MILLISECONDS = 3000;
 
     // How long should a Smartsleep message be left in the queue?
-    public static final int MYSENSORS_SMARTSLEEP_TIMEOUT = 216000; // 6 hours
+    public static final int MYSENSORS_SMARTSLEEP_TIMEOUT_IN_MILLISECONDS = 60 * 60* 6; // 6 hours
+    
+    // Maximum number of attempts to request for an iVersion Message from the gateway
+    public static final int MAX_ATTEMPTS_IVERSION_REQUEST = 5;
 
     protected Logger logger = LoggerFactory.getLogger(getClass());
 
     // Connector will check for connection status every CONNECTOR_INTERVAL_CHECK seconds
     public static final int CONNECTOR_INTERVAL_CHECK = 10;
 
-    // Flag setted to true while connection is up
+    // Flag set to true while connection is up
     private boolean connected = false;
 
     // Flag to be set (through available method below)
@@ -71,9 +75,6 @@ public abstract class MySensorsAbstractConnection implements Runnable {
 
     // I_VERSION response flag
     private boolean iVersionResponse = false;
-
-    // Check connection on startup flag
-    private boolean skipStartupCheck = false;
 
     // Reader and writer thread
     protected MySensorsWriter mysConWriter = null;
@@ -107,9 +108,6 @@ public abstract class MySensorsAbstractConnection implements Runnable {
      * Initialization of the BridgeConnection
      */
     public void initialize() {
-        logger.debug("Set skip check on startup to: {}", myGatewayConfig.getSkipStartupCheck());
-        skipStartupCheck = myGatewayConfig.getSkipStartupCheck();
-
         // Launch connection watchdog
         logger.debug("Enabling connection watchdog");
         futureWatchdog = watchdogExecutor.scheduleWithFixedDelay(this, 0, CONNECTOR_INTERVAL_CHECK, TimeUnit.SECONDS);
@@ -151,6 +149,7 @@ public abstract class MySensorsAbstractConnection implements Runnable {
     private boolean connect() {
         connected = establishConnection();
         myEventRegister.notifyBridgeStatusUpdate(this, isConnected());
+        errorCount = 0;
         return connected;
     }
 
@@ -209,11 +208,11 @@ public abstract class MySensorsAbstractConnection implements Runnable {
         reader.startReader();
         writer.startWriter();
 
-        if (!skipStartupCheck) {
+        if (myGatewayConfig.getStartupCheck()) {
             try {
                 int i = 0;
                 synchronized (this) {
-                    while (!iVersionResponse && i < 5) {
+                    while (!iVersionResponse && i < MAX_ATTEMPTS_IVERSION_REQUEST) {
                         sendMessage(MySensorsMessage.I_VERSION_MESSAGE);
                         waitingObj = this;
                         waitingObj.wait(1000);
@@ -230,7 +229,7 @@ public abstract class MySensorsAbstractConnection implements Runnable {
 
         if (!iVersionResponse) {
             logger.error(
-                    "Cannot start reading/writing thread, probably sync message (I_VERSION) not received. Try set skipStartupCheck to true");
+                    "Cannot start reading/writing thread, probably sync message (I_VERSION) not received. Try set startupCheckEnabled to false");
         }
 
         return iVersionResponse;
@@ -261,6 +260,11 @@ public abstract class MySensorsAbstractConnection implements Runnable {
         return connected;
     }
 
+    /**
+     * If the gateway is removed or the binding is stopped the connection to the gateway will be disposed
+     * 
+     * @return true if the connection should be disposed.
+     */
     public boolean requestingDisconnection() {
         return requestDisconnection;
     }
@@ -280,7 +284,6 @@ public abstract class MySensorsAbstractConnection implements Runnable {
             if (errorCount < ERROR_COUNT_REQ_DISCONNECT) {
                 errorCount++;
             } else {
-                errorCount = 0;
                 requestDisconnection(true);
             }
         }
@@ -297,12 +300,12 @@ public abstract class MySensorsAbstractConnection implements Runnable {
         private Logger logger = LoggerFactory.getLogger(MySensorsReader.class);
 
         private ExecutorService executor = Executors.newSingleThreadExecutor();
-        private Future<?> future = null;
+        private Future<?> future;
 
-        private InputStream inStream = null;
-        private BufferedReader reads = null;
+        private InputStream inStream;
+        private BufferedReader reads;
 
-        private boolean stopReader = false;
+        private boolean stopReader;
 
         public MySensorsReader(InputStream inStream) {
             this.inStream = inStream;
@@ -338,12 +341,11 @@ public abstract class MySensorsAbstractConnection implements Runnable {
                         break;
                     }
 
-                    logger.debug(line);
+                    logger.debug("Message from gateway received: {}", line);
                     MySensorsMessage msg = MySensorsMessage.parse(line);
 
-                    // Debug message are useless, just print it
                     if (!msg.isDebugMessage()) {
-                        msg.setDirection(MySensorsMessage.MYSENSORS_MSG_DIRECTION_INCOMING);
+                        msg.setDirection(MySensorsMessageDirection.INCOMING);
 
                         // Have we get a I_HEARBEAT_RESPONSE
                         if (msg.isHeartbeatResponseMessage()) {
@@ -356,7 +358,7 @@ public abstract class MySensorsAbstractConnection implements Runnable {
                         }
 
                         // Is this an ACK message?
-                        if (msg.getAck() == 1) {
+                        if (msg.isAck()) {
                             handleAckReceived(msg);
                         }
 
@@ -426,7 +428,7 @@ public abstract class MySensorsAbstractConnection implements Runnable {
             try {
                 mysConWriter.confirmAcknowledgeMessage(msg);
             } catch (NoAckException e) {
-                logger.warn("Invalid ACK message received: {}", e.toString());
+                logger.warn("Invalid ACK message received: {}", e);
             }
         }
 
@@ -500,12 +502,12 @@ public abstract class MySensorsAbstractConnection implements Runnable {
                                  * if we request an ACK we will wait for it and keep the message in the queue (at the
                                  * end) otherwise we remove the message from the queue
                                  */
-                                if (msg.getAck() == 1) {
-                                    if (!checkMessageAcknowledge(msg)) {
+                                if (msg.isAck()) {
+                                    if (!checkForMessageAcknowledgement(msg)) {
                                         msg.setRetries(msg.getRetries() + 1);
                                         if (!(msg.getRetries() > MYSENSORS_NUMBER_OF_RETRIES)) {
                                             msg.setNextSend(System.currentTimeMillis()
-                                                    + MYSENSORS_RETRY_TIMES[msg.getRetries() - 1]);
+                                                    + MYSENSORS_RETRY_TIMES_IN_MILLISECONDS[msg.getRetries() - 1]);
                                             addMySensorsOutboundMessage(msg);
                                         } else {
                                             logger.warn("NO ACK for message: {}",
@@ -617,22 +619,25 @@ public abstract class MySensorsAbstractConnection implements Runnable {
          *
          * @return true if message is confirmed
          */
-        private boolean checkMessageAcknowledge(MySensorsMessage msg) {
-            boolean ret = false;
+        private boolean checkForMessageAcknowledgement(MySensorsMessage msg) {
+            boolean acknowledgementReceived = false;
             synchronized (acknowledgeMessages) {
                 Iterator<MySensorsMessage> iterator = acknowledgeMessages.iterator();
                 while (iterator.hasNext()) {
                     MySensorsMessage ackM = iterator.next();
-                    if (ackM.getNodeId() == msg.getNodeId() && ackM.getChildId() == msg.getChildId()
-                            && ackM.getMsgType() == msg.getMsgType() && ackM.getSubType() == msg.getSubType()
-                            && ackM.getAck() == msg.getAck() && ackM.getMsg().equals(msg.getMsg())) {
+                    if (    ackM.getNodeId() == msg.getNodeId() && 
+                            ackM.getChildId() == msg.getChildId() && 
+                            ackM.getMsgType() == msg.getMsgType() && 
+                            ackM.getSubType() == msg.getSubType() && 
+                            ackM.getAck() == msg.getAck() && 
+                            ackM.getMsg().equals(msg.getMsg())) {
                         iterator.remove();
-                        ret = (msg.getRetries() != 0); // First time we only clear old ack, if present
+                        acknowledgementReceived = true;
                     }
                 }
             }
 
-            return ret;
+            return acknowledgementReceived;
         }
 
         /**
@@ -645,7 +650,7 @@ public abstract class MySensorsAbstractConnection implements Runnable {
             try {
                 outboundMessageQueue.put(msg);
             } catch (InterruptedException e) {
-                logger.error("Interrupted message while ruuning");
+                logger.error("Interrupted message while running");
             }
 
         }
@@ -710,15 +715,12 @@ public abstract class MySensorsAbstractConnection implements Runnable {
         private void checkPendingSmartSleepMessage(int nodeId) {
             synchronized (smartSleepMessageQueue) {
                 Iterator<MySensorsMessage> iterator = smartSleepMessageQueue.iterator();
-                if (iterator != null) {
-
-                    while (iterator.hasNext()) {
-                        MySensorsMessage msgInQueue = iterator.next();
-                        if (msgInQueue.getNodeId() == nodeId) {
-                            iterator.remove();
-                            addMySensorsOutboundMessage(msgInQueue);
-                            logger.debug("Message for nodeId: {} in queue needs to be send immediately!", nodeId);
-                        }
+                while (iterator.hasNext()) {
+                    MySensorsMessage msgInQueue = iterator.next();
+                    if (msgInQueue.getNodeId() == nodeId) {
+                        iterator.remove();
+                        addMySensorsOutboundMessage(msgInQueue);
+                        logger.debug("Message for nodeId: {} in queue needs to be send immediately!", nodeId);
                     }
                 }
             }
