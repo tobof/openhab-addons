@@ -10,7 +10,7 @@ package org.openhab.binding.mysensors.internal.gateway;
 
 /**
  * Holds the configuration and parameters of the MySensors gateway.
- * 
+ *
  * @author Tim Oberföll
  * @author Andrea Cioni
  *
@@ -85,6 +85,21 @@ public class MySensorsGatewayConfig {
      */
     private Integer tcpPort;
 
+    /**
+     * MQTT broker name
+     */
+    private String brokerName;
+
+    /**
+     * MQTT topic to subscribe to
+     */
+    private String topicSubscribe;
+
+    /**
+     * MQTT topic to publish to
+     */
+    private String topicPublish;
+
     public MySensorsGatewayType getGatewayType() {
         return gatewayType;
     }
@@ -115,6 +130,30 @@ public class MySensorsGatewayConfig {
 
     public void setTcpPort(Integer tcpPort) {
         this.tcpPort = tcpPort;
+    }
+
+    public String getBrokerName() {
+        return brokerName;
+    }
+
+    public void setBrokerName(String brokername) {
+        this.brokerName = brokername;
+    }
+
+    public String getTopicSubscribe() {
+        return topicSubscribe;
+    }
+
+    public void setTopicSubscribe(String topicSubscribe) {
+        this.topicSubscribe = topicSubscribe;
+    }
+
+    public String getTopicPublish() {
+        return topicPublish;
+    }
+
+    public void setTopicPublish(String topicPublish) {
+        this.topicPublish = topicPublish;
     }
 
     public Integer getSendDelay() {
@@ -194,9 +233,10 @@ public class MySensorsGatewayConfig {
         return "MySensorsGatewayConfig [gatewayType=" + gatewayType + ", sendDelay=" + sendDelay + ", imperial="
                 + imperial + ", skipStartupCheck=" + startupCheckEnabled + ", enableNetworkSanCheck="
                 + networkSanCheckEnabled + ", sanityCheckerInterval=" + networkSanCheckInterval
-                + ", sanCheckConnectionFailAttempts=" + networkSanCheckConnectionFailAttempts + ", sanCheckSendHeartbeat="
-                + networkSanCheckSendHeartbeat + ", sanCheckSendHeartbeatFailAttempts=" + networkSanCheckSendHeartbeatFailAttempts
-                + ", serialPort=" + serialPort + ", baudRate=" + baudRate + ", ipAddress=" + ipAddress + ", tcpPort="
-                + tcpPort + "]";
+                + ", sanCheckConnectionFailAttempts=" + networkSanCheckConnectionFailAttempts
+                + ", sanCheckSendHeartbeat=" + networkSanCheckSendHeartbeat + ", sanCheckSendHeartbeatFailAttempts="
+                + networkSanCheckSendHeartbeatFailAttempts + ", serialPort=" + serialPort + ", baudRate=" + baudRate
+                + ", ipAddress=" + ipAddress + ", tcpPort=" + tcpPort + ", brokerName=" + brokerName
+                + ", topicSubsribe=" + topicSubscribe + ", topicPublish=" + topicPublish + "]";
     }
 }

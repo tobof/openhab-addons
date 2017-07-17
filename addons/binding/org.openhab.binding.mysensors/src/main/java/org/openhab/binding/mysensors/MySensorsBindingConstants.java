@@ -92,6 +92,7 @@ public class MySensorsBindingConstants {
     // List of bridges
     public static final ThingTypeUID THING_TYPE_BRIDGE_SER = new ThingTypeUID(BINDING_ID, "bridge-ser");
     public static final ThingTypeUID THING_TYPE_BRIDGE_ETH = new ThingTypeUID(BINDING_ID, "bridge-eth");
+    public final static ThingTypeUID THING_TYPE_BRIDGE_MQTT = new ThingTypeUID(BINDING_ID, "bridge-mqtt");
 
     // List of all Channel ids
     public static final String CHANNEL_HUM = "hum";
@@ -224,7 +225,8 @@ public class MySensorsBindingConstants {
     /**
      * Inverse of the CHANNEL_MAP, duplicate allowed (see also Converters here below)
      */
-    public static final Map<String, MySensorsMessageSubType> INVERSE_CHANNEL_MAP = MySensorsUtility.invertMap(CHANNEL_MAP, true);
+    public static final Map<String, MySensorsMessageSubType> INVERSE_CHANNEL_MAP = MySensorsUtility
+            .invertMap(CHANNEL_MAP, true);
 
     /**
      * Converters will be used to map values from OH to/from MySensors Variables
@@ -357,8 +359,8 @@ public class MySensorsBindingConstants {
     /**
      * Inverse of the THING_UID_MAP, helps on building child for every thing type
      */
-    public static final Map<ThingTypeUID, MySensorsMessageSubType> INVERSE_THING_UID_MAP = MySensorsUtility.invertMap(THING_UID_MAP,
-            true);
+    public static final Map<ThingTypeUID, MySensorsMessageSubType> INVERSE_THING_UID_MAP = MySensorsUtility
+            .invertMap(THING_UID_MAP, true);
 
     /** Supported Things without bridge */
     public static final Set<ThingTypeUID> SUPPORTED_THING_TYPES_UIDS = ImmutableSet.of(THING_TYPE_HUMIDITY,
@@ -370,9 +372,9 @@ public class MySensorsBindingConstants {
             THING_TYPE_TEXT, THING_TYPE_IR, THING_TYPE_AIR_QUALITY, THING_TYPE_DUST, THING_TYPE_COLOR_SENSOR);
     /** Supported bridges */
     public static final Set<ThingTypeUID> SUPPORTED_BRIDGE_THING_TYPES_UIDS = ImmutableSet.of(THING_TYPE_BRIDGE_SER,
-            THING_TYPE_BRIDGE_ETH);
+            THING_TYPE_BRIDGE_ETH, THING_TYPE_BRIDGE_MQTT);
 
-    /** Supported devices (things + brdiges) */
+    /** Supported devices (things + bridges) */
     public static final Collection<ThingTypeUID> SUPPORTED_DEVICE_TYPES_UIDS = Lists.newArrayList(THING_TYPE_HUMIDITY,
             THING_TYPE_TEMPERATURE, THING_TYPE_BINARY, THING_TYPE_MULTIMETER, THING_TYPE_POWER, THING_TYPE_BARO,
             THING_TYPE_DOOR, THING_TYPE_MOTION, THING_TYPE_SMOKE, THING_TYPE_DIMMER, THING_TYPE_COVER, THING_TYPE_WIND,
@@ -380,5 +382,5 @@ public class MySensorsBindingConstants {
             THING_TYPE_HVAC, THING_TYPE_WATER, THING_TYPE_CUSTOM, THING_TYPE_LOCK, THING_TYPE_SOUND,
             THING_TYPE_RGB_LIGHT, THING_TYPE_RGBW_LIGHT, THING_TYPE_WATER_QUALITY, THING_TYPE_MYSENSORS_MESSAGE,
             THING_TYPE_TEXT, THING_TYPE_IR, THING_TYPE_AIR_QUALITY, THING_TYPE_DUST, THING_TYPE_COLOR_SENSOR,
-            THING_TYPE_BRIDGE_SER, THING_TYPE_BRIDGE_ETH);
+            THING_TYPE_BRIDGE_SER, THING_TYPE_BRIDGE_ETH, THING_TYPE_BRIDGE_MQTT);
 }

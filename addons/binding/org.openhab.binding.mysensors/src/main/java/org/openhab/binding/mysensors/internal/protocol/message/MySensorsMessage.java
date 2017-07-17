@@ -339,6 +339,50 @@ public class MySensorsMessage {
     }
 
     /**
+     * @param line Input is a String containing the message received from the MySensors network
+     * @return Returns the content of the message as a MySensorsMessage
+     *
+     * @throws ParseException
+     */
+    public static MySensorsMessage parseMQTT(String topic, String payload) throws ParseException {
+        try {
+            String[] splitTopic = topic.split("/");
+            if (splitTopic.length == 5) {
+
+                MySensorsMessage mysensorsmessage = new MySensorsMessage();
+
+                int nodeId = Integer.parseInt(splitTopic[MySensorsMessagePart.NODE.getId()]);
+
+                mysensorsmessage.setNodeId(nodeId);
+                mysensorsmessage.setChildId(Integer.parseInt(splitTopic[MySensorsMessagePart.CHILD.getId()]));
+
+                int msgTypeId = Integer.parseInt(splitTopic[MySensorsMessagePart.TYPE.getId()]);
+                mysensorsmessage.setMsgType(MySensorsMessageType.getById(msgTypeId));
+
+                int ackId = Integer.parseInt(splitTopic[MySensorsMessagePart.ACK.getId()]);
+                mysensorsmessage.setAck(MySensorsMessageAck.getById(ackId));
+
+                int subTypeId = Integer.parseInt(splitTopic[MySensorsMessagePart.SUBTYPE.getId()]);
+                if (mysensorsmessage.getMsgType() == MySensorsMessageType.INTERNAL) {
+                    mysensorsmessage.setSubType(MySensorsMessageSubType.getInternalById(subTypeId));
+                } else if (mysensorsmessage.getMsgType() == MySensorsMessageType.PRESENTATION) {
+                    mysensorsmessage.setSubType(MySensorsMessageSubType.getPresentationById(subTypeId));
+                } else {
+                    mysensorsmessage.setSubType(MySensorsMessageSubType.getSetReqById(subTypeId));
+                }
+
+                mysensorsmessage.setMsg(payload);
+                return mysensorsmessage;
+            } else {
+                throw new ParseException("Message length is not 5", 0);
+            }
+
+        } catch (Exception e) {
+            throw new ParseException(e.getClass() + " : " + e.getMessage(), 0);
+        }
+    }
+
+    /**
      * Converts a MySensorsMessage object to a String.
      *
      * @param msg the MySensorsMessage that should be converted.
@@ -354,6 +398,23 @@ public class MySensorsMessage {
         apiString += msg.getMsg() + "\n";
 
         return apiString;
+    }
+
+    /**
+     * Converts a MySensorsMessage object to a MQTT topic String.
+     *
+     * @param msg the MySensorsMessage that should be converted.
+     * @return the MySensorsMessage as a MQTT topic String.
+     */
+    public static String generateMQTTString(MySensorsMessage msg) {
+        String mqttString = "";
+        mqttString += msg.getNodeId() + "/";
+        mqttString += msg.getChildId() + "/";
+        mqttString += msg.getMsgType().getId() + "/";
+        mqttString += msg.getAck().getId() + "/";
+        mqttString += msg.getSubType().getId();
+
+        return mqttString;
     }
 
     @Override
