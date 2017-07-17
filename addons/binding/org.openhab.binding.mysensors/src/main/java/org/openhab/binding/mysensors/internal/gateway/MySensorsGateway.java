@@ -27,6 +27,7 @@ import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageA
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageDirection;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageSubType;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageType;
+import org.openhab.binding.mysensors.internal.protocol.mqtt.MySensorsMqttConnection;
 import org.openhab.binding.mysensors.internal.protocol.serial.MySensorsSerialConnection;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsNode;
@@ -93,6 +94,9 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
                 case IP:
                     myCon = new MySensorsIpConnection(myConf, myEventRegister);
                     return true;
+                case MQTT:
+                    myCon = new MySensorsMqttConnection(myConf, myEventRegister);
+                    return true;
             }
         } else {
             logger.error("Invalid configuration supplied: {}", myConf);
@@ -109,7 +113,7 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
         myCon.initialize();
 
         myEventRegister.addEventListener(this);
-        
+
         if (myConf.getEnableNetworkSanCheck()) {
             myNetSanCheck = new MySensorsNetworkSanityChecker(this, myEventRegister, myCon);
         }
@@ -144,7 +148,7 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
             return nodeMap.get(nodeId);
         }
     }
-    
+
     public void removeNode(int nodeId) {
         synchronized (nodeMap) {
             nodeMap.remove(nodeId);
@@ -241,13 +245,13 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
      * @throws MergeException if mergeIfExist is true and nodes has common child/children
      */
     public void addNode(MySensorsNode node, boolean mergeIfExist) throws MergeException {
-      synchronized (nodeMap) {
+        synchronized (nodeMap) {
             MySensorsNode exist = null;
             if (mergeIfExist && ((exist = getNode(node.getNodeId())) != null)) {
                 logger.debug("Merging child map: {} with: {}", exist.getChildMap(), node.getChildMap());
 
                 exist.merge(node);
-      
+
                 logger.trace("Merging result is: {}", exist.getChildMap());
             } else {
                 logger.debug("Adding device {}", node.toString());
@@ -453,16 +457,17 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
             if (msg.getDirection() == MySensorsMessageDirection.INCOMING) {
                 updateReachable(msg);
                 updateLastUpdateFromMessage(msg);
-                
-                if(msg.getMsgType() == MySensorsMessageType.INTERNAL)
+
+                if (msg.getMsgType() == MySensorsMessageType.INTERNAL) {
                     return handleInternalMessage(msg);
-                else if(msg.getMsgType() == MySensorsMessageType.SET ||
-                        msg.getMsgType() == MySensorsMessageType.REQ)
+                } else if (msg.getMsgType() == MySensorsMessageType.SET
+                        || msg.getMsgType() == MySensorsMessageType.REQ) {
                     return handleSetReqMessage(msg, true);
-                else if(msg.getMsgType() == MySensorsMessageType.PRESENTATION)
+                } else if (msg.getMsgType() == MySensorsMessageType.PRESENTATION) {
                     return handlePresentationMessage(msg);
-                else
+                } else {
                     return isNewDevice(msg);
+                }
             } else {
                 logger.warn("Cannot handle this message, direction MYSENSORS_MSG_DIRECTION_OUTGOING");
             }
@@ -500,7 +505,7 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
             logger.debug("Node {} not present, send new node discovered event", msg.getNodeId());
 
             node = new MySensorsNode(msg.getNodeId());
-            
+
             addNode(node);
             myEventRegister.notifyNewNodeDiscovered(node, null);
             return true;
@@ -551,7 +556,7 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
                 logger.debug("Child {} found in node {}", msg.getChildId(), msg.getNodeId());
 
                 MySensorsVariable variable = child.getVariable(msg.getSubType());
-                
+
                 if (variable != null) {
 
                     if (msg.isSetMessage()) {
@@ -600,8 +605,7 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
         if (node != null) {
             if (msg.getSubType() == MySensorsMessageSubType.I_BATTERY_LEVEL) {
                 node.setBatteryPercent(Integer.parseInt(msg.getMsg()));
-                logger.debug("Battery percent for node {} update to: {}%", node.getNodeId(),
-                        node.getBatteryPercent());
+                logger.debug("Battery percent for node {} update to: {}%", node.getNodeId(), node.getBatteryPercent());
                 myEventRegister.notifyNodeUpdateEvent(node, null, null, MySensorsNodeUpdateEventType.BATTERY);
                 return true;
             }
@@ -665,9 +669,8 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
         logger.info("I_TIME request received from {}, answering...", msg.getNodeId());
 
         String time = Long.toString(System.currentTimeMillis() / 1000);
-        MySensorsMessage newMsg = new MySensorsMessage(msg.getNodeId(), msg.getChildId(),
-                MySensorsMessageType.INTERNAL, MySensorsMessageAck.FALSE, false, MySensorsMessageSubType.I_TIME,
-                time);
+        MySensorsMessage newMsg = new MySensorsMessage(msg.getNodeId(), msg.getChildId(), MySensorsMessageType.INTERNAL,
+                MySensorsMessageAck.FALSE, false, MySensorsMessageSubType.I_TIME, time);
         myCon.sendMessage(newMsg);
 
     }
@@ -683,9 +686,8 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
 
         logger.debug("I_CONFIG request received from {}, answering: (is imperial?){}", iConfig, imperial);
 
-        MySensorsMessage newMsg = new MySensorsMessage(msg.getNodeId(), msg.getChildId(),
-                MySensorsMessageType.INTERNAL, MySensorsMessageAck.FALSE, false, MySensorsMessageSubType.I_CONFIG,
-                iConfig);
+        MySensorsMessage newMsg = new MySensorsMessage(msg.getNodeId(), msg.getChildId(), MySensorsMessageType.INTERNAL,
+                MySensorsMessageAck.FALSE, false, MySensorsMessageSubType.I_CONFIG, iConfig);
         myCon.sendMessage(newMsg);
 
     }
@@ -696,7 +698,6 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
     private void answerIDRequest() {
         logger.info("ID Request received");
 
-        
         try {
             int newId = reserveId();
             logger.info("New Node in the MySensors network has requested an ID. ID is: {}", newId);

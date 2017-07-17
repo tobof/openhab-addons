@@ -62,7 +62,7 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
 
     // Discovery service
     private MySensorsDiscoveryService discoveryService;
-    
+
     private MySensorsCacheFactory cacheFactory;
 
     public MySensorsBridgeHandler(Bridge bridge) {
@@ -193,6 +193,11 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
             gatewayConfig.setGatewayType(MySensorsGatewayType.IP);
             gatewayConfig.setIpAddress(conf.ipAddress);
             gatewayConfig.setTcpPort(conf.tcpPort);
+        } else if (bridgeuid.equals(THING_TYPE_BRIDGE_MQTT)) {
+            gatewayConfig.setGatewayType(MySensorsGatewayType.MQTT);
+            gatewayConfig.setTopicSubscribe(conf.topicSubscribe);
+            gatewayConfig.setTopicPublish(conf.topicPublish);
+            gatewayConfig.setBrokerName(conf.brokerName);
         } else {
             throw new IllegalArgumentException("BridgeUID is unknown: " + bridgeuid);
         }
