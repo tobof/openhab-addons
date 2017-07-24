@@ -45,6 +45,19 @@ Bridge mysensors:bridge-eth:gateway [ ipAddress="127.0.0.1", tcpPort=5003, sendD
   }
 ```
 
+#### Common parameters for all gateway types
+
+| Parameter | Value | Description |
+| --------- | ----- | ----------- |
+| `sendDelay` | **Milliseconds** | The delay between messages send to the gateway |
+| `startupCheckEnabled` | **boolean** |  The software version is requested from the gateway at startup to ensure it's up and running |
+| `imperial` | **boolean** | Metric answer with imperial instead of metric |
+| `networkSanCheckEnabled` | **boolean** | Network sanity check periodically ensure that gateway is up and running |
+| `networkSanCheckInterval` | **Minutes** | Network sanity check periodically ensure that gateway is up and running |
+| `networkSanCheckConnectionFailAttempts` | **Number** | Number of retries to establish a connection to the gateway |
+| `networkSanCheckSendHeartbeat` | **boolean** | If network sanity checker is running, send heartbeat to all nodes |
+| `networkSanCheckSendHeartbeatFailAttempts` | **Number** | If nodes do not respond to heartbeat, you could configure how many retries the sanity check will do before disconnecting them  |
+
 ### Skip startup check
 
 In some cases you need to skip the startup check for I_VERSION. The binding asks the gateway for its version and if no answer is given the connection to the thing will fail.

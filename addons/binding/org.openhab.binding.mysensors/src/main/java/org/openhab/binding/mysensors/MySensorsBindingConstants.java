@@ -157,11 +157,8 @@ public class MySensorsBindingConstants {
      * Mapping MySensors message type/subtypes to channels.
      */
     public static final Map<MySensorsMessageSubType, String> CHANNEL_MAP = new HashMap<MySensorsMessageSubType, String>() {
-        /**
-         *
-         */
+        
         private static final long serialVersionUID = -7970323220036599380L;
-
         {
             put(MySensorsMessageSubType.V_TEMP, CHANNEL_TEMP);
             put(MySensorsMessageSubType.V_HUM, CHANNEL_HUM);
@@ -243,9 +240,6 @@ public class MySensorsBindingConstants {
      */
     public static final Map<String, MySensorsTypeConverter> TYPE_MAP = new HashMap<String, MySensorsTypeConverter>() {
 
-        /**
-         *
-         */
         private static final long serialVersionUID = 6273187523631143905L;
         {
             put(CHANNEL_TEMP, DECIMAL_TYPE_CONVERTER);
@@ -315,9 +309,6 @@ public class MySensorsBindingConstants {
      */
     public static final Map<MySensorsMessageSubType, ThingTypeUID> THING_UID_MAP = new HashMap<MySensorsMessageSubType, ThingTypeUID>() {
 
-        /**
-         *
-         */
         private static final long serialVersionUID = -2042537863671385026L;
         {
             put(MySensorsMessageSubType.S_HUM, THING_TYPE_HUMIDITY);

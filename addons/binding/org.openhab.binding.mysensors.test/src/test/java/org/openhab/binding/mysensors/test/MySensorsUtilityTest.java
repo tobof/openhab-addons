@@ -19,6 +19,13 @@ import org.junit.Test;
 import org.openhab.binding.mysensors.internal.MySensorsUtility;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsNode;
 
+/**
+ * Test functions for the Utility class
+ * 
+ * @author Tim Oberföll
+ * @author Andrea Cioni
+ *
+ */
 public class MySensorsUtilityTest {
 
     @Test

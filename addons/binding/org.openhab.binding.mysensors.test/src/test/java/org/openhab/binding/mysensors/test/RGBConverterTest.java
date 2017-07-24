@@ -15,7 +15,7 @@ import org.junit.Test;
 import org.openhab.binding.mysensors.converter.MySensorsRGBTypeConverter;
 
 /**
- * Test case for the RGB converter
+ * Test case for the RGB converter.
  *
  * @author Tim Oberföll
  *

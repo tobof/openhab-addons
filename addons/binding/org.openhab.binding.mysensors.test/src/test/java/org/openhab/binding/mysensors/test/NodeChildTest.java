@@ -12,6 +12,13 @@ import org.junit.Test;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsNode;
 import org.openhab.binding.mysensors.internal.sensors.child.MySensorsChildSCustom;
 
+/**
+ * Tests for MySensors nodes and child classes.
+ * Check if given id is valid according to MySensors specification.
+ * 
+ * @author Andrea Cioni
+ *
+ */
 public class NodeChildTest {
 
     @Test(expected = IllegalArgumentException.class)
@@ -21,12 +28,7 @@ public class NodeChildTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testWrongChildId() {
-        new MySensorsChildSCustom(255);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testWrongNodeId0() {
-        new MySensorsNode(0);
+        new MySensorsChildSCustom(256);
     }
 
     @Test(expected = IllegalArgumentException.class)

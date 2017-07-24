@@ -32,7 +32,7 @@
 			</parameter>
 			<parameter name="startupCheckEnabled" type="boolean" required="false">
 				<label>Enables the startup check</label>
-				<description>The software version is requested from the gateway at startup to ensure its up and running</description>
+				<description>The software version is requested from the gateway at startup to ensure it's up and running</description>
 				<default>true</default>
 			</parameter>
 			<parameter name="imperial" type="boolean" required="false">
@@ -57,12 +57,12 @@
 			</parameter>
 			<parameter name="networkSanCheckSendHeartbeat" type="boolean" required="false">
 				<label>Send heartbeat to all nodes when network sanity checker is running</label>
-				<description>When network sanity checker is running, send heartbeat to all nodes</description>
+				<description>If network sanity checker is running, send heartbeat to all nodes</description>
 				<default>false</default>
 			</parameter>
 			<parameter name="networkSanCheckSendHeartbeatFailAttempts" type="integer" required="false">
 				<label>Attempts before disconnecting nodes</label>
-				<description>When nodes do not respond to heartbeat, you could configure how many retries the sanity check will do before
+				<description>If nodes do not respond to heartbeat, you could configure how many retries the sanity check will do before
 					disconnecting them
 				</description>
 				<default>10</default>
@@ -83,6 +83,7 @@
 				<label>IP Address</label>
 				<description>The IP Address the MySensors Gateway uses
 				</description>
+				<context>network-address</context>
 			</parameter>
 			<parameter name="tcpPort" type="integer" required="true" min="1" max="65535">
 				<label>TCP Port</label>
@@ -101,7 +102,7 @@
 			</parameter>
 			<parameter name="startupCheckEnabled" type="boolean" required="false">
 				<label>Enables the startup check</label>
-				<description>The software version is requested from the gateway at startup to ensure its up and running</description>
+				<description>The software version is requested from the gateway at startup to ensure it's up and running</description>
 				<default>true</default>
 			</parameter>
 			<parameter name="imperial" type="boolean" required="false">
@@ -126,12 +127,12 @@
 			</parameter>
 			<parameter name="networkSanCheckSendHeartbeat" type="boolean" required="false">
 				<label>Send heartbeat to all nodes when network sanity checker is running</label>
-				<description>When network sanity checker is running, send heartbeat to all nodes</description>
+				<description>If network sanity checker is running, send heartbeat to all nodes</description>
 				<default>false</default>
 			</parameter>
 			<parameter name="networkSanCheckSendHeartbeatFailAttempts" type="integer" required="false">
 				<label>Attempts before disconnecting nodes</label>
-				<description>When nodes do not respond to heartbeat, you could configure how many retries the sanity check will do before
+				<description>If nodes do not respond to heartbeat, you could configure how many retries the sanity check will do before
 					disconnecting them
 				</description>
 				<default>10</default>

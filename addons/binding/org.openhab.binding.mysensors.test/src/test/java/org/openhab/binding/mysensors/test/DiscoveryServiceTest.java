@@ -15,6 +15,13 @@ import org.eclipse.smarthome.core.thing.ThingTypeUID;
 import org.junit.Test;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageSubType;
 
+/**
+ * Check the naming of the entries of the ThingUidMap from DiscoveryService
+ * 
+ * @author Tim Oberföll
+ * @author Andrea Cioni
+ *
+ */
 public class DiscoveryServiceTest {
 
     @Test
