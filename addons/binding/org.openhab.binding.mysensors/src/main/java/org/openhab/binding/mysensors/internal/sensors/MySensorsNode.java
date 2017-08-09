@@ -243,22 +243,22 @@ public class MySensorsNode {
             MySensorsChild child = getChild(childId);
             MySensorsChildConfig childConfig = (child.getChildConfig().isPresent()) ? child.getChildConfig().get()
                     : new MySensorsChildConfig();
-            if (child != null) {
-                MySensorsVariable var = child.getVariable(subType);
-                if (var != null) {
-                    msg = new MySensorsMessage();
+            
+            MySensorsVariable var = child.getVariable(subType);
+            if (var != null) {
+                msg = new MySensorsMessage();
 
-                    // MySensors
-                    msg.setNodeId(nodeId);
-                    msg.setChildId(childId);
-                    msg.setMsgType(MySensorsMessageType.SET);
-                    msg.setSubType(subType);
-                    msg.setAck(childConfig.getRequestAck());
-                    msg.setMsg(state);
-                    msg.setRevert(childConfig.getRevertState());
-                    msg.setSmartSleep(childConfig.getSmartSleep());
-                }
+                // MySensors
+                msg.setNodeId(nodeId);
+                msg.setChildId(childId);
+                msg.setMsgType(MySensorsMessageType.SET);
+                msg.setSubType(subType);
+                msg.setAck(childConfig.getRequestAck());
+                msg.setMsg(state);
+                msg.setRevert(childConfig.getRevertState());
+                msg.setSmartSleep(childConfig.getSmartSleep());
             }
+        
         }
 
         return msg;

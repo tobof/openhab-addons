@@ -342,8 +342,8 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
                         nodeId, childId, presentation);
 
                 MySensorsChild child = MySensorsChild.fromPresentation(presentation, childId);
-                child.setChildConfig(generateChildConfig(configuration));
                 if (child != null) {
+                	child.setChildConfig(generateChildConfig(configuration));
                     node = new MySensorsNode(nodeId);
                     node.setNodeConfig(generateNodeConfig(configuration));
                     node.addChild(child);
