@@ -156,7 +156,8 @@ public class MySensorsNetworkSanityChecker implements MySensorsGatewayEventListe
                             }
                         } else {
                             logger.warn(
-                                    "Check expected update can't be performed on node {} if request heartbeat is active.");
+                                    "Check expected update can't be performed on node {} if request heartbeat is active.",
+                                    nodeId);
                         }
                     }
                 }
