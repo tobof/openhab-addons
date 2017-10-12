@@ -60,7 +60,7 @@
 				<description>If network sanity checker is running, send heartbeat to all nodes</description>
 				<default>false</default>
 			</parameter>
-			<parameter name="networkSanCheckSendHeartbeatFailAttempts" type="integer" required="false">
+			<parameter name="networkSanCheckSendHeartbeatFailAttempts" type="integer" required="false" min="1">
 				<label>Attempts before disconnecting nodes</label>
 				<description>If nodes do not respond to heartbeat, you could configure how many retries the sanity check will do before
 					disconnecting them
@@ -130,7 +130,7 @@
 				<description>If network sanity checker is running, send heartbeat to all nodes</description>
 				<default>false</default>
 			</parameter>
-			<parameter name="networkSanCheckSendHeartbeatFailAttempts" type="integer" required="false">
+			<parameter name="networkSanCheckSendHeartbeatFailAttempts" type="integer" required="false" min="1">
 				<label>Attempts before disconnecting nodes</label>
 				<description>If nodes do not respond to heartbeat, you could configure how many retries the sanity check will do before
 					disconnecting them
