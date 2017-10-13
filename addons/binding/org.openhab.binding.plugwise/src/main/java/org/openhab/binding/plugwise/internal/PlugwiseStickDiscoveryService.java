@@ -24,6 +24,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.eclipse.smarthome.config.discovery.AbstractDiscoveryService;
 import org.eclipse.smarthome.config.discovery.DiscoveryResult;
 import org.eclipse.smarthome.config.discovery.DiscoveryResultBuilder;
+import org.eclipse.smarthome.config.discovery.DiscoveryService;
 import org.eclipse.smarthome.config.discovery.DiscoveryServiceCallback;
 import org.eclipse.smarthome.config.discovery.ExtendedDiscoveryService;
 import org.eclipse.smarthome.core.thing.ThingTypeUID;
@@ -37,6 +38,10 @@ import org.openhab.binding.plugwise.internal.protocol.Message;
 import org.openhab.binding.plugwise.internal.protocol.NetworkStatusRequestMessage;
 import org.openhab.binding.plugwise.internal.protocol.NetworkStatusResponseMessage;
 import org.openhab.binding.plugwise.internal.protocol.field.MACAddress;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Modified;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,6 +54,7 @@ import gnu.io.CommPortIdentifier;
  *
  * @author Wouter Born - Initial contribution
  */
+@Component(immediate = true, service = DiscoveryService.class, configurationPid = "discovery.plugwise")
 public class PlugwiseStickDiscoveryService extends AbstractDiscoveryService
         implements ExtendedDiscoveryService, PlugwiseMessageListener {
 
@@ -80,6 +86,7 @@ public class PlugwiseStickDiscoveryService extends AbstractDiscoveryService
         discovering = false;
     }
 
+    @Activate
     public void activate() {
         super.activate(new HashMap<>());
         communicationHandler.addMessageListener(this);
@@ -93,9 +100,11 @@ public class PlugwiseStickDiscoveryService extends AbstractDiscoveryService
                 .withProperty(PlugwiseBindingConstants.CONFIG_PROPERTY_MAC_ADDRESS, mac)
                 .withProperty(PlugwiseBindingConstants.CONFIG_PROPERTY_SERIAL_PORT,
                         communicationHandler.getConfiguration().getSerialPort())
-                .withProperties(new HashMap<>(properties)).withRepresentationProperty(mac).build();
+                .withProperties(new HashMap<>(properties))
+                .withRepresentationProperty(PlugwiseBindingConstants.PROPERTY_MAC_ADDRESS).build();
     }
 
+    @Deactivate
     @Override
     protected void deactivate() {
         super.deactivate();
@@ -214,6 +223,12 @@ public class PlugwiseStickDiscoveryService extends AbstractDiscoveryService
         return false;
     }
 
+    @Modified
+    @Override
+    protected void modified(Map<String, Object> configProperties) {
+        super.modified(configProperties);
+    }
+
     private void sendMessage(Message message) {
         try {
             communicationHandler.sendMessage(message, PlugwiseMessagePriority.UPDATE_AND_DISCOVERY);
@@ -246,7 +261,8 @@ public class PlugwiseStickDiscoveryService extends AbstractDiscoveryService
         };
 
         if (discoveryJob == null || discoveryJob.isCancelled()) {
-            discoveryJob = scheduler.scheduleAtFixedRate(discoveryRunnable, 15, DISCOVERY_INTERVAL, TimeUnit.SECONDS);
+            discoveryJob = scheduler.scheduleWithFixedDelay(discoveryRunnable, 15, DISCOVERY_INTERVAL,
+                    TimeUnit.SECONDS);
         }
     }
 

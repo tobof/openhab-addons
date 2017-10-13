@@ -30,9 +30,9 @@ import org.eclipse.smarthome.core.types.Command;
 import org.eclipse.smarthome.core.types.RefreshType;
 import org.eclipse.smarthome.core.types.State;
 import org.eclipse.smarthome.core.types.UnDefType;
-import org.openhab.binding.systeminfo.model.DeviceNotFoundException;
-import org.openhab.binding.systeminfo.model.OshiSysteminfo;
-import org.openhab.binding.systeminfo.model.SysteminfoInterface;
+import org.openhab.binding.systeminfo.internal.model.DeviceNotFoundException;
+import org.openhab.binding.systeminfo.internal.model.OshiSysteminfo;
+import org.openhab.binding.systeminfo.internal.model.SysteminfoInterface;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -211,7 +211,7 @@ public class SysteminfoHandler extends BaseThingHandler {
 
     private void scheduleUpdates() {
         logger.debug("Schedule high priority tasks at fixed rate {} s.", refreshIntervalHighPriority);
-        highPriorityTasks = scheduler.scheduleAtFixedRate(new Runnable() {
+        highPriorityTasks = scheduler.scheduleWithFixedDelay(new Runnable() {
             @Override
             public void run() {
                 publishData(highPriorityChannels);
@@ -219,7 +219,7 @@ public class SysteminfoHandler extends BaseThingHandler {
         }, WAIT_TIME_CHANNEL_ITEM_LINK_INIT, refreshIntervalHighPriority.intValue(), TimeUnit.SECONDS);
 
         logger.debug("Schedule medium priority tasks at fixed rate {} s.", refreshIntervalMediumPriority);
-        mediumPriorityTasks = scheduler.scheduleAtFixedRate(new Runnable() {
+        mediumPriorityTasks = scheduler.scheduleWithFixedDelay(new Runnable() {
             @Override
             public void run() {
                 systeminfo.updateStaticObjects();

@@ -18,6 +18,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.smarthome.core.library.types.DecimalType;
 import org.eclipse.smarthome.core.library.types.IncreaseDecreaseType;
 import org.eclipse.smarthome.core.library.types.NextPreviousType;
@@ -27,8 +28,6 @@ import org.eclipse.smarthome.core.library.types.PlayPauseType;
 import org.eclipse.smarthome.core.library.types.RawType;
 import org.eclipse.smarthome.core.library.types.RewindFastforwardType;
 import org.eclipse.smarthome.core.library.types.StringType;
-import org.eclipse.smarthome.core.net.HttpServiceUtil;
-import org.eclipse.smarthome.core.net.NetUtil;
 import org.eclipse.smarthome.core.thing.ChannelUID;
 import org.eclipse.smarthome.core.thing.Thing;
 import org.eclipse.smarthome.core.thing.ThingStatus;
@@ -40,7 +39,7 @@ import org.eclipse.smarthome.core.types.Command;
 import org.eclipse.smarthome.core.types.RefreshType;
 import org.eclipse.smarthome.core.types.State;
 import org.openhab.binding.squeezebox.SqueezeBoxBindingConstants;
-import org.openhab.binding.squeezebox.config.SqueezeBoxPlayerConfig;
+import org.openhab.binding.squeezebox.internal.config.SqueezeBoxPlayerConfig;
 import org.openhab.binding.squeezebox.internal.utils.HttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -104,13 +103,16 @@ public class SqueezeBoxPlayerHandler extends BaseThingHandler implements Squeeze
      */
     private int notificationSoundVolume = -1;
 
+    private String callbackUrl;
+
     /**
      * Creates SqueezeBox Player Handler
      *
      * @param thing
      */
-    public SqueezeBoxPlayerHandler(Thing thing) {
+    public SqueezeBoxPlayerHandler(@NonNull Thing thing, String callbackUrl) {
         super(thing);
+        this.callbackUrl = callbackUrl;
     }
 
     @Override
@@ -522,7 +524,7 @@ public class SqueezeBoxPlayerHandler extends BaseThingHandler implements Squeeze
             }
         };
 
-        timeCounterJob = scheduler.scheduleAtFixedRate(runnable, 0, 1, TimeUnit.SECONDS);
+        timeCounterJob = scheduler.scheduleWithFixedDelay(runnable, 0, 1, TimeUnit.SECONDS);
     }
 
     private boolean isMe(String mac) {
@@ -799,22 +801,10 @@ public class SqueezeBoxPlayerHandler extends BaseThingHandler implements Squeeze
     }
 
     /*
-     * Return the IP and port of the OH2 web server (assumes the primary ipv4 interface
-     * is where the web server is listening)
+     * Return the IP and port of the OH2 web server
      */
     public String getHostAndPort() {
-        final String ipAddress = NetUtil.getLocalIpv4HostAddress();
-        if (ipAddress == null) {
-            logger.warn("No network interface could be found");
-            return null;
-        }
-        // Get the HTTP (non-SSL) port
-        final int port = HttpServiceUtil.getHttpServicePort(bundleContext);
-        if (port == -1) {
-            logger.warn("Cannot find port of the http service");
-            return null;
-        }
-        return new String("http://" + ipAddress + ":" + port);
+        return callbackUrl;
     }
 
     /**

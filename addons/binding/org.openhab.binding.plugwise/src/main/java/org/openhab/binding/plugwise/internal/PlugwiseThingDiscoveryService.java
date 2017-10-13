@@ -128,7 +128,8 @@ public class PlugwiseThingDiscoveryService extends AbstractDiscoveryService
         return DiscoveryResultBuilder.create(thingUID).withBridge(stickHandler.getThing().getUID())
                 .withLabel("Plugwise " + node.deviceType.toString())
                 .withProperty(PlugwiseBindingConstants.CONFIG_PROPERTY_MAC_ADDRESS, mac)
-                .withProperties(new HashMap<>(node.properties)).withRepresentationProperty(mac).build();
+                .withProperties(new HashMap<>(node.properties))
+                .withRepresentationProperty(PlugwiseBindingConstants.PROPERTY_MAC_ADDRESS).build();
     }
 
     @Override
@@ -295,7 +296,7 @@ public class PlugwiseThingDiscoveryService extends AbstractDiscoveryService
         };
 
         if (discoveryJob == null || discoveryJob.isCancelled()) {
-            discoveryJob = scheduler.scheduleAtFixedRate(discoveryRunnable, 0, DISCOVERY_INTERVAL, TimeUnit.SECONDS);
+            discoveryJob = scheduler.scheduleWithFixedDelay(discoveryRunnable, 0, DISCOVERY_INTERVAL, TimeUnit.SECONDS);
         }
     }
 
@@ -341,7 +342,8 @@ public class PlugwiseThingDiscoveryService extends AbstractDiscoveryService
         };
 
         if (watchJob == null || watchJob.isCancelled()) {
-            watchJob = scheduler.scheduleAtFixedRate(watchRunnable, WATCH_INTERVAL, WATCH_INTERVAL, TimeUnit.SECONDS);
+            watchJob = scheduler.scheduleWithFixedDelay(watchRunnable, WATCH_INTERVAL, WATCH_INTERVAL,
+                    TimeUnit.SECONDS);
         }
     }
 

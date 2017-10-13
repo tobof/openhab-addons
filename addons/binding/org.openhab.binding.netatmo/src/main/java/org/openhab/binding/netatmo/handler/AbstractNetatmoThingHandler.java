@@ -24,8 +24,8 @@ import org.eclipse.smarthome.core.types.Command;
 import org.eclipse.smarthome.core.types.RefreshType;
 import org.eclipse.smarthome.core.types.State;
 import org.eclipse.smarthome.core.types.UnDefType;
-import org.openhab.binding.netatmo.config.NetatmoThingConfiguration;
 import org.openhab.binding.netatmo.internal.ChannelTypeUtils;
+import org.openhab.binding.netatmo.internal.config.NetatmoThingConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -159,11 +159,15 @@ abstract class AbstractNetatmoThingHandler<X extends NetatmoThingConfiguration> 
         }
     }
 
+    public void refreshAllChannels() {
+        logger.debug("Refreshing Channels");
+        updateChannels(configuration.getEquipmentId());
+    }
+
     @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
         if (command == RefreshType.REFRESH) {
-            logger.debug("Refreshing {}", channelUID);
-            updateChannels(configuration.getEquipmentId());
+            refreshAllChannels();
         }
     }
 

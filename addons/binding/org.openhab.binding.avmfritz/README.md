@@ -19,11 +19,11 @@ This [DECT repeater](https://avm.de/produkte/fritzdect/fritzdect-repeater-100/) 
 
 ### FRITZ!Powerline 546E
 
-This [powerline adapter](http://avm.de/produkte/fritzpowerline/fritzpowerline-546e/) can be used via the bridge or in standalone mode. It supports switching the outlet and current power and energy consumption readings. This device does not contain a temperature sensor.
+This [powerline adapter](http://avm.de/produkte/fritzpowerline/fritzpowerline-546e/) can be used via the bridge or in stand-alone mode. It supports switching the outlet and current power and energy consumption readings. This device does not contain a temperature sensor.
 
-### FRITZ!DECT 300 / Comet DECT
+### FRITZ!DECT 301 / FRITZ!DECT 300 / Comet DECT
 
-These two devices [FRITZ!DECT 300](https://avm.de/produkte/fritzdect/fritzdect-300/) and [Comet DECT](https://www.eurotronic.org/produkte/comet-dect.html) ( [EUROtronic Technology GmbH](https://www.eurotronic.org) ) are used to regulate radiators via DECT protocol. The FRITZ!Box can handle up to twelve heating thermostats. The binding provides channels for reading and setting the temperature. Additionally you can check the eco temperature, the comfort temperature and the battery level of the device. The FRITZ!Box has to run at least on firmware FRITZ!OS 6.35.
+These devices [FRITZ!DECT 301](https://avm.de/produkte/fritzdect/fritzdect-301/), [FRITZ!DECT 300](https://avm.de/produkte/fritzdect/fritzdect-300/) and [Comet DECT](https://www.eurotronic.org/produkte/comet-dect.html) ( [EUROtronic Technology GmbH](https://www.eurotronic.org) ) are used to regulate radiators via DECT protocol. The FRITZ!Box can handle up to twelve heating thermostats. The binding provides channels for reading and setting the temperature. Additionally you can check the eco temperature, the comfort temperature and the battery level of the device. The FRITZ!Box has to run at least on firmware FRITZ!OS 6.35.
 
 ## Discovery
 
@@ -66,6 +66,7 @@ If correct credentials are set in the bridge configuration, connected AHA device
 |-----------------|-----------|--------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------|
 | mode            | String    | States the mode of the device (MANUAL/AUTOMATIC)                                                       | FRITZ!DECT 210, FRITZ!DECT 200, FRITZ!Powerline 546E, FRITZ!DECT 300, Comet DECT    |
 | locked          | Contact   | Device is locked for switching over external sources (OPEN/CLOSE)                                      | FRITZ!DECT 210, FRITZ!DECT 200, FRITZ!Powerline 546E, FRITZ!DECT 300, Comet DECT    |
+| device_locked   | Contact   | Device is locked for switching manually (OPEN/CLOSE) - FRITZ!OS 6.90                                   | FRITZ!DECT 210, FRITZ!DECT 200, FRITZ!Powerline 546E, FRITZ!DECT 300, Comet DECT    |
 | temperature     | Number    | Actual measured temperature (in °C)                                                                    | FRITZ!DECT 210, FRITZ!DECT 200, FRITZ!DECT Repeater 100, FRITZ!DECT 300, Comet DECT |
 | energy          | Number    | Accumulated energy consumption (in kWh)                                                                | FRITZ!DECT 210, FRITZ!DECT 200, FRITZ!Powerline 546E                                |
 | power           | Number    | Current power consumption (in W)                                                                       | FRITZ!DECT 210, FRITZ!DECT 200, FRITZ!Powerline 546E                                |
