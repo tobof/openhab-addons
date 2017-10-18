@@ -88,6 +88,14 @@ public class MySensorsBindingConstants {
     public static final ThingTypeUID THING_TYPE_AIR_QUALITY = new ThingTypeUID(BINDING_ID, "airQuality");
     public static final ThingTypeUID THING_TYPE_DUST = new ThingTypeUID(BINDING_ID, "dust");
     public static final ThingTypeUID THING_TYPE_COLOR_SENSOR = new ThingTypeUID(BINDING_ID, "colorSensor");
+    public static final ThingTypeUID THING_TYPE_MOISTURE = new ThingTypeUID(BINDING_ID, "moisture");
+    public static final ThingTypeUID THING_TYPE_SPRINKLER = new ThingTypeUID(BINDING_ID, "sprinkler");
+    public static final ThingTypeUID THING_TYPE_HEATER = new ThingTypeUID(BINDING_ID, "heater");
+    public static final ThingTypeUID THING_TYPE_VIBRATION = new ThingTypeUID(BINDING_ID, "vibration");
+    public static final ThingTypeUID THING_TYPE_WATER_LEAK = new ThingTypeUID(BINDING_ID, "waterLeak");
+    public static final ThingTypeUID THING_TYPE_GAS = new ThingTypeUID(BINDING_ID, "gas");
+    public static final ThingTypeUID THING_TYPE_GPS = new ThingTypeUID(BINDING_ID, "gps");
+    public static final ThingTypeUID THING_TYPE_SCENE_CONTROLLER = new ThingTypeUID(BINDING_ID, "scene");
 
     // List of bridges
     public static final ThingTypeUID THING_TYPE_BRIDGE_SER = new ThingTypeUID(BINDING_ID, "bridge-ser");
@@ -148,6 +156,8 @@ public class MySensorsBindingConstants {
     public static final String CHANNEL_POWER_FACTOR = "power-factor";
     public static final String CHANNEL_IR_SEND = "irSend";
     public static final String CHANNEL_IR_RECEIVE = "irReceive";
+    public static final String CHANNEL_SCENE_ON = "scene-on";
+    public static final String CHANNEL_SCENE_OFF = "scene-off";
 
     // Extra channel names for non-standard MySensors channels
     public static final String CHANNEL_MYSENSORS_MESSAGE = "mySensorsMessage";
@@ -215,6 +225,8 @@ public class MySensorsBindingConstants {
             put(MySensorsMessageSubType.V_TEXT, CHANNEL_TEXT);
             put(MySensorsMessageSubType.V_IR_SEND, CHANNEL_IR_SEND);
             put(MySensorsMessageSubType.V_IR_RECEIVE, CHANNEL_IR_RECEIVE);
+            put(MySensorsMessageSubType.V_SCENE_ON, CHANNEL_SCENE_ON);
+            put(MySensorsMessageSubType.V_SCENE_OFF, CHANNEL_SCENE_OFF);
         }
     };
 
@@ -297,6 +309,8 @@ public class MySensorsBindingConstants {
             put(CHANNEL_TEXT, STRING_TYPE_CONVERTER);
             put(CHANNEL_IR_SEND, STRING_TYPE_CONVERTER);
             put(CHANNEL_IR_RECEIVE, STRING_TYPE_CONVERTER);
+            put(CHANNEL_SCENE_ON, DECIMAL_TYPE_CONVERTER);
+            put(CHANNEL_SCENE_OFF, DECIMAL_TYPE_CONVERTER);
 
             // Internal
             put(CHANNEL_VERSION, STRING_TYPE_CONVERTER);
@@ -341,6 +355,14 @@ public class MySensorsBindingConstants {
             put(MySensorsMessageSubType.S_AIR_QUALITY, THING_TYPE_AIR_QUALITY);
             put(MySensorsMessageSubType.S_DUST, THING_TYPE_DUST);
             put(MySensorsMessageSubType.S_COLOR_SENSOR, THING_TYPE_COLOR_SENSOR);
+            put(MySensorsMessageSubType.S_MOISTURE, THING_TYPE_MOISTURE);
+            put(MySensorsMessageSubType.S_SPRINKLER, THING_TYPE_SPRINKLER);
+            put(MySensorsMessageSubType.S_HEATER, THING_TYPE_HEATER);
+            put(MySensorsMessageSubType.S_VIBRATION, THING_TYPE_VIBRATION);
+            put(MySensorsMessageSubType.S_WATER_LEAK, THING_TYPE_WATER_LEAK);
+            put(MySensorsMessageSubType.S_GAS, THING_TYPE_GAS);
+            put(MySensorsMessageSubType.S_GPS, THING_TYPE_GPS);
+            put(MySensorsMessageSubType.S_SCENE_CONTROLLER, THING_TYPE_SCENE_CONTROLLER);
         }
 
     };
@@ -358,12 +380,14 @@ public class MySensorsBindingConstants {
             THING_TYPE_RAIN, THING_TYPE_UV, THING_TYPE_WEIGHT, THING_TYPE_DISTANCE, THING_TYPE_LIGHT_LEVEL,
             THING_TYPE_HVAC, THING_TYPE_WATER, THING_TYPE_CUSTOM, THING_TYPE_LOCK, THING_TYPE_SOUND,
             THING_TYPE_RGB_LIGHT, THING_TYPE_RGBW_LIGHT, THING_TYPE_WATER_QUALITY, THING_TYPE_MYSENSORS_MESSAGE,
-            THING_TYPE_TEXT, THING_TYPE_IR, THING_TYPE_AIR_QUALITY, THING_TYPE_DUST, THING_TYPE_COLOR_SENSOR);
+            THING_TYPE_TEXT, THING_TYPE_IR, THING_TYPE_AIR_QUALITY, THING_TYPE_DUST, THING_TYPE_COLOR_SENSOR,
+            THING_TYPE_MOISTURE, THING_TYPE_SPRINKLER, THING_TYPE_HEATER, THING_TYPE_VIBRATION, THING_TYPE_WATER_LEAK,
+            THING_TYPE_GAS, THING_TYPE_GPS, THING_TYPE_SCENE_CONTROLLER);
     /** Supported bridges */
     public static final Set<ThingTypeUID> SUPPORTED_BRIDGE_THING_TYPES_UIDS = ImmutableSet.of(THING_TYPE_BRIDGE_SER,
             THING_TYPE_BRIDGE_ETH);
 
-    /** Supported devices (things + brdiges) */
+    /** Supported devices (things + bridges) */
     public static final Collection<ThingTypeUID> SUPPORTED_DEVICE_TYPES_UIDS = Lists.newArrayList(THING_TYPE_HUMIDITY,
             THING_TYPE_TEMPERATURE, THING_TYPE_BINARY, THING_TYPE_MULTIMETER, THING_TYPE_POWER, THING_TYPE_BARO,
             THING_TYPE_DOOR, THING_TYPE_MOTION, THING_TYPE_SMOKE, THING_TYPE_DIMMER, THING_TYPE_COVER, THING_TYPE_WIND,
@@ -371,5 +395,7 @@ public class MySensorsBindingConstants {
             THING_TYPE_HVAC, THING_TYPE_WATER, THING_TYPE_CUSTOM, THING_TYPE_LOCK, THING_TYPE_SOUND,
             THING_TYPE_RGB_LIGHT, THING_TYPE_RGBW_LIGHT, THING_TYPE_WATER_QUALITY, THING_TYPE_MYSENSORS_MESSAGE,
             THING_TYPE_TEXT, THING_TYPE_IR, THING_TYPE_AIR_QUALITY, THING_TYPE_DUST, THING_TYPE_COLOR_SENSOR,
+            THING_TYPE_MOISTURE,THING_TYPE_SPRINKLER, THING_TYPE_HEATER, THING_TYPE_VIBRATION, THING_TYPE_WATER_LEAK,
+            THING_TYPE_GAS, THING_TYPE_GPS, THING_TYPE_SCENE_CONTROLLER, 
             THING_TYPE_BRIDGE_SER, THING_TYPE_BRIDGE_ETH);
 }
