@@ -14,9 +14,13 @@
 
 		<channels>
 			<channel id="hum" typeId="hum-channel" />
+			<channel id="var1" typeId="var1-channel" />
+			<channel id="var2" typeId="var2-channel" />
+			<channel id="var3" typeId="var3-channel" />
+			<channel id="var4" typeId="var4-channel" />
+			<channel id="var5" typeId="var5-channel" />
 			<channel id="battery" typeId="battery-channel" />
 			<channel id="lastupdate" typeId="lastupdate-channel" />
-			<channel id="custom" typeId="var1-channel" />
 		</channels>
 
 		<config-description>
