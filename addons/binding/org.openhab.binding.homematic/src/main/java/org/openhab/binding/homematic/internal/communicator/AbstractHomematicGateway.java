@@ -47,6 +47,7 @@ import org.openhab.binding.homematic.internal.communicator.virtual.HmwIoModuleVi
 import org.openhab.binding.homematic.internal.communicator.virtual.InstallModeDurationVirtualDatapoint;
 import org.openhab.binding.homematic.internal.communicator.virtual.InstallModeVirtualDatapoint;
 import org.openhab.binding.homematic.internal.communicator.virtual.OnTimeAutomaticVirtualDatapointHandler;
+import org.openhab.binding.homematic.internal.communicator.virtual.PressVirtualDatapointHandler;
 import org.openhab.binding.homematic.internal.communicator.virtual.ReloadAllFromGatewayVirtualDatapointHandler;
 import org.openhab.binding.homematic.internal.communicator.virtual.ReloadFromGatewayVirtualDatapointHandler;
 import org.openhab.binding.homematic.internal.communicator.virtual.ReloadRssiVirtualDatapointHandler;
@@ -118,6 +119,7 @@ public abstract class AbstractHomematicGateway implements RpcEventListener, Home
         virtualDatapointHandlers.add(new SignalStrengthVirtualDatapointHandler());
         virtualDatapointHandlers.add(new DisplayTextVirtualDatapoint());
         virtualDatapointHandlers.add(new HmwIoModuleVirtualDatapointHandler());
+        virtualDatapointHandlers.add(new PressVirtualDatapointHandler());
     }
 
     public AbstractHomematicGateway(String id, HomematicConfig config, HomematicGatewayAdapter gatewayAdapter) {
@@ -598,25 +600,25 @@ public abstract class AbstractHomematicGateway implements RpcEventListener, Home
                 if (connectionTrackerThread != null && dpInfo.isPong() && id.equals(newValue)) {
                     connectionTrackerThread.pongReceived();
                 }
+                if (initialized) {
+                    final HmDatapoint dp = getDatapoint(dpInfo);
+                    HmDatapointConfig config = gatewayAdapter.getDatapointConfig(dp);
+                    receiveDelayedExecutor.start(dpInfo, config.getReceiveDelay(), () -> {
+                        dp.setValue(newValue);
 
-                final HmDatapoint dp = getDatapoint(dpInfo);
-                HmDatapointConfig config = gatewayAdapter.getDatapointConfig(dp);
-                receiveDelayedExecutor.start(dpInfo, config.getReceiveDelay(), () -> {
-                    dp.setValue(newValue);
-
-                    gatewayAdapter.onStateUpdated(dp);
-                    if (dp.isPressDatapoint() && MiscUtils.isTrueValue(dp.getValue())) {
-                        disableDatapoint(dp, DEFAULT_DISABLE_DELAY);
-                    }
-                    for (VirtualDatapointHandler vdph : virtualDatapointHandlers) {
-                        if (vdph.canHandleEvent(dp)) {
-                            vdph.handleEvent(this, dp);
-                            gatewayAdapter.onStateUpdated(vdph.getVirtualDatapoint(dp.getChannel()));
+                        gatewayAdapter.onStateUpdated(dp);
+                        if (dp.isPressDatapoint() && MiscUtils.isTrueValue(dp.getValue())) {
+                            disableDatapoint(dp, DEFAULT_DISABLE_DELAY);
                         }
-                    }
+                        for (VirtualDatapointHandler vdph : virtualDatapointHandlers) {
+                            if (vdph.canHandleEvent(dp)) {
+                                vdph.handleEvent(this, dp);
+                                gatewayAdapter.onStateUpdated(vdph.getVirtualDatapoint(dp.getChannel()));
+                            }
+                        }
 
-                });
-
+                    });
+                }
             } catch (HomematicClientException | IOException ex) {
                 // ignore
             }
@@ -759,7 +761,14 @@ public abstract class AbstractHomematicGateway implements RpcEventListener, Home
                 }
 
                 pong = false;
-                getRpcClient(getDefaultInterface()).ping(getDefaultInterface(), id);
+                if (config.getGatewayInfo().isCCU1()) {
+                    // the CCU1 does not support the ping command, we need a workaround
+                    getRpcClient(getDefaultInterface()).listBidcosInterfaces(getDefaultInterface());
+                    // if there is no exception, connection is valid
+                    connectionConfirmed();
+                } else {
+                    getRpcClient(getDefaultInterface()).ping(getDefaultInterface(), id);
+                }
                 ping = true;
             } catch (IOException ex) {
                 try {
@@ -772,6 +781,10 @@ public abstract class AbstractHomematicGateway implements RpcEventListener, Home
 
         public void pongReceived() {
             pong = true;
+            connectionConfirmed();
+        }
+
+        private void connectionConfirmed() {
             if (connectionLost) {
                 connectionLost = false;
                 logger.info("Connection resumed on gateway '{}'", id);
