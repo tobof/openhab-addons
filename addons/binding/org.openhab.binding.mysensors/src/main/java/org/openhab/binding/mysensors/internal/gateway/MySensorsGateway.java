@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.smarthome.io.transport.mqtt.MqttService;
 import org.openhab.binding.mysensors.internal.event.MySensorsEventRegister;
 import org.openhab.binding.mysensors.internal.event.MySensorsGatewayEventListener;
 import org.openhab.binding.mysensors.internal.event.MySensorsNodeUpdateEventType;
@@ -27,6 +28,7 @@ import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageA
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageDirection;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageSubType;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageType;
+import org.openhab.binding.mysensors.internal.protocol.mqtt.MySensorsMqttConnection;
 import org.openhab.binding.mysensors.internal.protocol.serial.MySensorsSerialConnection;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsNode;
@@ -54,10 +56,6 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
 
     private MySensorsGatewayConfig myConf;
 
-    public void setMyConf(MySensorsGatewayConfig myConf) {
-        this.myConf = myConf;
-    }
-
     private MySensorsNetworkSanityChecker myNetSanCheck;
 
     public MySensorsGateway() {
@@ -68,6 +66,10 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
     public MySensorsGateway(Map<Integer, MySensorsNode> nodeMap) {
         this.nodeMap = nodeMap;
         this.myEventRegister = new MySensorsEventRegister();
+    }
+    
+    public void setMyConf(MySensorsGatewayConfig myConf) {
+        this.myConf = myConf;
     }
 
     /**
@@ -93,6 +95,9 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
                 case IP:
                     myCon = new MySensorsIpConnection(myConf, myEventRegister);
                     return true;
+                case MQTT:
+                	myCon = new MySensorsMqttConnection(myConf, myEventRegister);
+                	return true;
             }
         } else {
             logger.error("Invalid configuration supplied: {}", myConf);

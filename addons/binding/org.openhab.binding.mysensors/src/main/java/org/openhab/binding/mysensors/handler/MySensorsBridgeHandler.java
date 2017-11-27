@@ -8,7 +8,9 @@
  */
 package org.openhab.binding.mysensors.handler;
 
-import static org.openhab.binding.mysensors.MySensorsBindingConstants.*;
+import static org.openhab.binding.mysensors.MySensorsBindingConstants.THING_TYPE_BRIDGE_ETH;
+import static org.openhab.binding.mysensors.MySensorsBindingConstants.THING_TYPE_BRIDGE_MQTT;
+import static org.openhab.binding.mysensors.MySensorsBindingConstants.THING_TYPE_BRIDGE_SER;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,6 +26,7 @@ import org.eclipse.smarthome.core.thing.ThingStatus;
 import org.eclipse.smarthome.core.thing.ThingTypeUID;
 import org.eclipse.smarthome.core.thing.binding.BaseBridgeHandler;
 import org.eclipse.smarthome.core.types.Command;
+import org.eclipse.smarthome.io.transport.mqtt.MqttService;
 import org.openhab.binding.mysensors.config.MySensorsBridgeConfiguration;
 import org.openhab.binding.mysensors.discovery.MySensorsDiscoveryService;
 import org.openhab.binding.mysensors.factory.MySensorsCacheFactory;
@@ -64,16 +67,17 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
     private MySensorsDiscoveryService discoveryService;
     
     private MySensorsCacheFactory cacheFactory;
+    
 
     public MySensorsBridgeHandler(Bridge bridge) {
         super(bridge);
         cacheFactory = new MySensorsCacheFactory(ConfigConstants.getUserDataFolder());
     }
-
+    
     @Override
     public void initialize() {
         logger.debug("Initialization of the MySensors bridge");
-
+        
         myBridgeConfiguration = getConfigAs(MySensorsBridgeConfiguration.class);
 
         myGateway = new MySensorsGateway(loadCacheFile());
@@ -193,6 +197,11 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
             gatewayConfig.setGatewayType(MySensorsGatewayType.IP);
             gatewayConfig.setIpAddress(conf.ipAddress);
             gatewayConfig.setTcpPort(conf.tcpPort);
+        } else if (bridgeuid.equals(THING_TYPE_BRIDGE_MQTT)) {
+        	gatewayConfig.setGatewayType(MySensorsGatewayType.MQTT);
+        	gatewayConfig.setBrokerName(conf.brokerName);
+        	gatewayConfig.setTopicPublish(conf.topicPublish);
+        	gatewayConfig.setTopicSubscribe(conf.topicSubscribe);
         } else {
             throw new IllegalArgumentException("BridgeUID is unknown: " + bridgeuid);
         }

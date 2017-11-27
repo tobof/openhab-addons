@@ -100,6 +100,7 @@ public class MySensorsBindingConstants {
     // List of bridges
     public static final ThingTypeUID THING_TYPE_BRIDGE_SER = new ThingTypeUID(BINDING_ID, "bridge-ser");
     public static final ThingTypeUID THING_TYPE_BRIDGE_ETH = new ThingTypeUID(BINDING_ID, "bridge-eth");
+    public static final ThingTypeUID THING_TYPE_BRIDGE_MQTT = new ThingTypeUID(BINDING_ID, "bridge-mqtt");
 
     // List of all Channel ids
     public static final String CHANNEL_HUM = "hum";
@@ -385,7 +386,7 @@ public class MySensorsBindingConstants {
             THING_TYPE_GAS, THING_TYPE_GPS, THING_TYPE_SCENE_CONTROLLER);
     /** Supported bridges */
     public static final Set<ThingTypeUID> SUPPORTED_BRIDGE_THING_TYPES_UIDS = ImmutableSet.of(THING_TYPE_BRIDGE_SER,
-            THING_TYPE_BRIDGE_ETH);
+            THING_TYPE_BRIDGE_ETH, THING_TYPE_BRIDGE_MQTT);
 
     /** Supported devices (things + bridges) */
     public static final Collection<ThingTypeUID> SUPPORTED_DEVICE_TYPES_UIDS = Lists.newArrayList(THING_TYPE_HUMIDITY,
@@ -397,5 +398,5 @@ public class MySensorsBindingConstants {
             THING_TYPE_TEXT, THING_TYPE_IR, THING_TYPE_AIR_QUALITY, THING_TYPE_DUST, THING_TYPE_COLOR_SENSOR,
             THING_TYPE_MOISTURE,THING_TYPE_SPRINKLER, THING_TYPE_HEATER, THING_TYPE_VIBRATION, THING_TYPE_WATER_LEAK,
             THING_TYPE_GAS, THING_TYPE_GPS, THING_TYPE_SCENE_CONTROLLER, 
-            THING_TYPE_BRIDGE_SER, THING_TYPE_BRIDGE_ETH);
+            THING_TYPE_BRIDGE_SER, THING_TYPE_BRIDGE_ETH, THING_TYPE_BRIDGE_MQTT);
 }

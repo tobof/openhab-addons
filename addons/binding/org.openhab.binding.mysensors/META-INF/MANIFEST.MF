@@ -23,6 +23,7 @@ Import-Package:
  org.eclipse.smarthome.core.thing.binding.builder,
  org.eclipse.smarthome.core.thing.type,
  org.eclipse.smarthome.core.types,
+ org.eclipse.smarthome.io.transport.mqtt,
  org.openhab.binding.mysensors,
  org.openhab.binding.mysensors.handler,
  org.osgi.framework,
