@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
  * Implementation for static access to the (central) MqttService
  * 
  * @author Tim Oberföll
+ * @author Sean McGuire
  *
  */
 public class MySensorsMqttService {
@@ -25,6 +26,11 @@ public class MySensorsMqttService {
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 	
 	
+	/**
+	 * Get the static instance of MqttService which holds all broker connections
+	 * 
+	 * @return static instance of the MqttService
+	 */
 	public static MqttService getMqttService() {
 		return mqttService;
 	}
@@ -33,11 +39,21 @@ public class MySensorsMqttService {
 		
 	}
 	
+	/**
+	 * Sets the MqttService instance. Method is called by OSGI XML service
+	 * 
+	 * @param mqttService MqttService that should be set
+	 */
 	public void setMqttService(MqttService mqttService) {
     	this.mqttService = mqttService;
     }
 
-    public void unsetMqttService(MqttService service) {
+    /**
+     * Unsets the MqttService instance. Method is called by OSGI XML service.
+     * 
+     * @param service MqttService that should be unset
+     */
+	public void unsetMqttService(MqttService service) {
         mqttService = null;
     }
 	

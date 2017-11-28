@@ -32,6 +32,7 @@ import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
  * Implements the MQTT connection to a gateway of the MySensors network.
  *
  * @author Tim Oberföll
+ * @author Sean McGuire
  *
  */
 
@@ -53,6 +54,9 @@ public class MySensorsMqttConnection extends MySensorsAbstractConnection
 		myMqttSub = new MySensorsMqttSubscriber(myGatewayConfig.getTopicSubscribe());
 	}
     
+	/**
+	 * Establishes a link to the broker connection
+	 */
 	@Override
 	protected boolean establishConnection() {
 		
@@ -107,6 +111,9 @@ public class MySensorsMqttConnection extends MySensorsAbstractConnection
         return connectionEstablished;
 	}
 
+	/**
+	 * Removes the consumer from the broker connection
+	 */
 	@Override
 	protected void stopConnection() {
 		in = null;
@@ -117,6 +124,9 @@ public class MySensorsMqttConnection extends MySensorsAbstractConnection
 	/**
      * Receives messages from MQTT transport, translates them and passes them on to
      * the MySensors abstract connection
+     * 
+     * @author Sean McGuire
+     * @author Tim Oberföll
      */
     public class MySensorsMqttSubscriber implements MqttMessageSubscriber {
     	
@@ -152,12 +162,20 @@ public class MySensorsMqttConnection extends MySensorsAbstractConnection
             }
         }
 
-		@Override
+		/**
+		 * Get the topic that should be listened to
+		 */
+        @Override
 		public String getTopic() {
 			return topicSubscribe;
 		}
 		
-		public void setTopic(String topicSubscribe) {
+		/**
+		 * Set the topic that should be listen to
+		 * 
+		 * @param topicSubscribe topic that should be listened to
+		 */
+        public void setTopic(String topicSubscribe) {
 			if (topicSubscribe.substring(topicSubscribe.length() - 1) != "/") {
                 topicSubscribe += "/";
             }
@@ -165,6 +183,12 @@ public class MySensorsMqttConnection extends MySensorsAbstractConnection
 		}
     }
     
+    /**
+     * 
+     * @author Sean McGuire
+     * @author Tim Oberföll
+     *
+     */
     protected class MySensorsMqttWriter extends MySensorsWriter {
 
         MqttBrokerConnection conn = MySensorsMqttService.getMqttService().getBrokerConnection(myGatewayConfig.getBrokerName());
@@ -210,22 +234,35 @@ public class MySensorsMqttConnection extends MySensorsAbstractConnection
 			logger.debug("Connected to MQTT broker!");
         } else {
             if (error == null) {
-                logger.error("Offline - Reason unknown");
+                logger.error("MQTT connection offline - Reason unknown");
             } else {
-                error.printStackTrace();
+                logger.error("MQTT connection offline - {}", error);
             }
         }
 		
 	}
 	
+	/**
+	 * 
+	 * Callback for published MQTT messages
+	 * 
+	 * @author Tim Oberföll
+	 *
+	 */
 	public class MySensorsMqttPublishCallback implements MqttPublishCallback {
 
+		/**
+		 * Callback for successful publishment
+		 */
 		@Override
 		public void onSuccess(MqttPublishResult result) {
 			// TODO Auto-generated method stub
 			
 		}
-
+		
+		/**
+		 * Callback for successful publishment
+		 */
 		@Override
 		public void onFailure(MqttPublishResult result, Throwable error) {
 			// TODO Auto-generated method stub
