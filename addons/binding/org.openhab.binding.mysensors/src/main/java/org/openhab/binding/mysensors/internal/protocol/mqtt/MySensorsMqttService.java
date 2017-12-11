@@ -36,7 +36,6 @@ public class MySensorsMqttService {
 	}
 	
 	public void initialize() {
-		
 	}
 	
 	/**

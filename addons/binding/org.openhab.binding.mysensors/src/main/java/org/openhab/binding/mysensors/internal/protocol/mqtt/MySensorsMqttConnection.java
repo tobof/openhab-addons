@@ -10,7 +10,6 @@ package org.openhab.binding.mysensors.internal.protocol.mqtt;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.text.ParseException;
@@ -80,7 +79,6 @@ public class MySensorsMqttConnection extends MySensorsAbstractConnection
 			
 			@Override
 			public void write(int b) throws IOException {
-				// TODO Auto-generated method stub
 				
 			}
 		});
@@ -100,12 +98,11 @@ public class MySensorsMqttConnection extends MySensorsAbstractConnection
         
         try {
 			connection.addConsumer(myMqttSub);
-			logger.debug(myMqttSub.getTopic());
+			logger.debug("Adding consumer for topic: {}", myMqttSub.getTopic());
 		} catch (MqttException e) {
 			logger.error("Error while attaching the MQTT subscriber/consumer to the MQTT connection! {}", e.toString());
 		}
 		
-        
         connectionEstablished = startReaderWriterThread(mysConReader, mysConWriter);
         
         return connectionEstablished;
@@ -219,13 +216,11 @@ public class MySensorsMqttConnection extends MySensorsAbstractConnection
 	@Override
 	public void brokerAdded(MqttBrokerConnection broker) {
 		logger.debug("Broker added");
-		
 	}
 
 	@Override
 	public void brokerRemoved(MqttBrokerConnection broker) {
 		logger.debug("Broker removed");
-		
 	}
 
 	@Override
@@ -239,12 +234,12 @@ public class MySensorsMqttConnection extends MySensorsAbstractConnection
                 logger.error("MQTT connection offline - {}", error);
             }
         }
-		
 	}
 	
 	/**
 	 * 
 	 * Callback for published MQTT messages
+	 * We're not using the callbacks yet.
 	 * 
 	 * @author Tim Oberföll
 	 *
@@ -261,7 +256,7 @@ public class MySensorsMqttConnection extends MySensorsAbstractConnection
 		}
 		
 		/**
-		 * Callback for successful publishment
+		 * Callback for failed publishment
 		 */
 		@Override
 		public void onFailure(MqttPublishResult result, Throwable error) {
