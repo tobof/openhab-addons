@@ -96,8 +96,8 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
                     myCon = new MySensorsIpConnection(myConf, myEventRegister);
                     return true;
                 case MQTT:
-                	myCon = new MySensorsMqttConnection(myConf, myEventRegister);
-                	return true;
+                    myCon = new MySensorsMqttConnection(myConf, myEventRegister);
+                    return true;
             }
         } else {
             logger.error("Invalid configuration supplied: {}", myConf);

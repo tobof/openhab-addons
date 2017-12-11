@@ -205,47 +205,47 @@ public class MySensorsGatewayConfig {
     }
     
     public String getBrokerName() {
-		return brokerName;
-	}
+        return brokerName;
+    }
 
-	public void setBrokerName(String brokerName) {
-		this.brokerName = brokerName;
-	}
+    public void setBrokerName(String brokerName) {
+        this.brokerName = brokerName;
+    }
 
-	public String getTopicSubscribe() {
-		return topicSubscribe;
-	}
+    public String getTopicSubscribe() {
+        return topicSubscribe;
+    }
 
-	public void setTopicSubscribe(String topicSubscribe) {
-		this.topicSubscribe = topicSubscribe;
-	}
+    public void setTopicSubscribe(String topicSubscribe) {
+        this.topicSubscribe = topicSubscribe;
+    }
 
-	public String getTopicPublish() {
-		return topicPublish;
-	}
+    public String getTopicPublish() {
+        return topicPublish;
+    }
 
-	public void setTopicPublish(String topicPublish) {
-		this.topicPublish = topicPublish;
-	}
+    public void setTopicPublish(String topicPublish) {
+        this.topicPublish = topicPublish;
+    }
 
-	@Override
+    @Override
     public String toString() {
         return "MySensorsGatewayConfig [gatewayType=" + gatewayType 
-        								+ ", sendDelay=" + sendDelay
-        								+ ", imperial=" + imperial 
-        								+ ", skipStartupCheck=" + startupCheckEnabled 
-        								+ ", enableNetworkSanCheck=" + networkSanCheckEnabled 
-        								+ ", sanityCheckerInterval=" + networkSanCheckInterval
-        								+ ", sanCheckConnectionFailAttempts=" + networkSanCheckConnectionFailAttempts 
-        								+ ", sanCheckSendHeartbeat=" + networkSanCheckSendHeartbeat 
-        								+ ", sanCheckSendHeartbeatFailAttempts=" + networkSanCheckSendHeartbeatFailAttempts
-        								+ ", serialPort=" + serialPort 
-        								+ ", baudRate=" + baudRate 
-        								+ ", ipAddress=" + ipAddress 
-        								+ ", tcpPort=" + tcpPort 
-        								+ ", brokerName=" + brokerName
-        								+ ", topicSubscribe=" + topicSubscribe
-        								+ ", topicPublish=" + topicPublish
-        								+ "]";
+                                        + ", sendDelay=" + sendDelay
+                                        + ", imperial=" + imperial 
+                                        + ", skipStartupCheck=" + startupCheckEnabled 
+                                        + ", enableNetworkSanCheck=" + networkSanCheckEnabled 
+                                        + ", sanityCheckerInterval=" + networkSanCheckInterval
+                                        + ", sanCheckConnectionFailAttempts=" + networkSanCheckConnectionFailAttempts 
+                                        + ", sanCheckSendHeartbeat=" + networkSanCheckSendHeartbeat 
+                                        + ", sanCheckSendHeartbeatFailAttempts=" + networkSanCheckSendHeartbeatFailAttempts
+                                        + ", serialPort=" + serialPort 
+                                        + ", baudRate=" + baudRate 
+                                        + ", ipAddress=" + ipAddress 
+                                        + ", tcpPort=" + tcpPort 
+                                        + ", brokerName=" + brokerName
+                                        + ", topicSubscribe=" + topicSubscribe
+                                        + ", topicPublish=" + topicPublish
+                                        + "]";
     }
 }

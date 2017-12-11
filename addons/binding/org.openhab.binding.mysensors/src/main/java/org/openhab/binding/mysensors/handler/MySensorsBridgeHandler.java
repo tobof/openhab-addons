@@ -26,7 +26,6 @@ import org.eclipse.smarthome.core.thing.ThingStatus;
 import org.eclipse.smarthome.core.thing.ThingTypeUID;
 import org.eclipse.smarthome.core.thing.binding.BaseBridgeHandler;
 import org.eclipse.smarthome.core.types.Command;
-import org.eclipse.smarthome.io.transport.mqtt.MqttService;
 import org.openhab.binding.mysensors.config.MySensorsBridgeConfiguration;
 import org.openhab.binding.mysensors.discovery.MySensorsDiscoveryService;
 import org.openhab.binding.mysensors.factory.MySensorsCacheFactory;
@@ -93,7 +92,6 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
         } else {
             logger.error("Failed to initialize MySensors bridge");
         }
-
     }
 
     @Override
@@ -112,7 +110,6 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
 
     @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
-
     }
 
     /**
@@ -162,7 +159,6 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
     }
 
     private void updateCacheFile() {
-
         List<Integer> givenIds = myGateway.getGivenIds();
 
         cacheFactory.writeCache(MySensorsCacheFactory.GIVEN_IDS_CACHE_FILE, givenIds.toArray(new Integer[] {}),
@@ -198,10 +194,10 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
             gatewayConfig.setIpAddress(conf.ipAddress);
             gatewayConfig.setTcpPort(conf.tcpPort);
         } else if (bridgeuid.equals(THING_TYPE_BRIDGE_MQTT)) {
-        	gatewayConfig.setGatewayType(MySensorsGatewayType.MQTT);
-        	gatewayConfig.setBrokerName(conf.brokerName);
-        	gatewayConfig.setTopicPublish(conf.topicPublish);
-        	gatewayConfig.setTopicSubscribe(conf.topicSubscribe);
+            gatewayConfig.setGatewayType(MySensorsGatewayType.MQTT);
+            gatewayConfig.setBrokerName(conf.brokerName);
+            gatewayConfig.setTopicPublish(conf.topicPublish);
+            gatewayConfig.setTopicSubscribe(conf.topicSubscribe);
         } else {
             throw new IllegalArgumentException("BridgeUID is unknown: " + bridgeuid);
         }

@@ -69,7 +69,6 @@ public class MySensorsCacheFactory {
      * Read the cache file.
      */
     private synchronized <T> T jsonFromFile(String fileName, T def, Type clasz) {
-
         T ret = def;
 
         try {
@@ -134,6 +133,5 @@ public class MySensorsCacheFactory {
         } else {
             logger.warn("Cache {} not exist", cacheId);
         }
-
     }
 }

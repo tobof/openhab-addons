@@ -147,7 +147,7 @@ public abstract class MySensorsAbstractConnection implements Runnable {
      * @return true, if connection established correctly
      */
     private boolean connect() {
-    	connected = establishConnection();
+        connected = establishConnection();
         myEventRegister.notifyBridgeStatusUpdate(this, isConnected());
         errorCount = 0;
         return connected;

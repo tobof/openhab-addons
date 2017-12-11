@@ -20,31 +20,30 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class MySensorsMqttService {
-	
-	private static MqttService mqttService;
-	
-	protected Logger logger = LoggerFactory.getLogger(getClass());
-	
-	
-	/**
-	 * Get the static instance of MqttService which holds all broker connections
-	 * 
-	 * @return static instance of the MqttService
-	 */
-	public static MqttService getMqttService() {
-		return mqttService;
-	}
-	
-	public void initialize() {
-	}
-	
-	/**
-	 * Sets the MqttService instance. Method is called by OSGI XML service
-	 * 
-	 * @param mqttService MqttService that should be set
-	 */
-	public void setMqttService(MqttService mqttService) {
-    	this.mqttService = mqttService;
+    
+    private static MqttService mqttService;
+    protected Logger logger = LoggerFactory.getLogger(getClass());
+
+
+    /**
+     * Get the static instance of MqttService which holds all broker connections
+     * 
+     * @return static instance of the MqttService
+     */
+    public static MqttService getMqttService() {
+        return mqttService;
+    }
+    
+    public void initialize() {
+    }
+    
+    /**
+     * Sets the MqttService instance. Method is called by OSGI XML service
+     * 
+     * @param mqttService MqttService that should be set
+     */
+    public void setMqttService(MqttService mqttService) {
+        this.mqttService = mqttService;
     }
 
     /**
@@ -52,8 +51,8 @@ public class MySensorsMqttService {
      * 
      * @param service MqttService that should be unset
      */
-	public void unsetMqttService(MqttService service) {
+    public void unsetMqttService(MqttService service) {
         mqttService = null;
     }
-	
+    
 }

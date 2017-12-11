@@ -19,7 +19,6 @@ import org.eclipse.smarthome.core.thing.Thing;
 import org.eclipse.smarthome.core.thing.ThingTypeUID;
 import org.eclipse.smarthome.core.thing.binding.BaseThingHandlerFactory;
 import org.eclipse.smarthome.core.thing.binding.ThingHandler;
-import org.eclipse.smarthome.io.transport.mqtt.MqttService;
 import org.openhab.binding.mysensors.handler.MySensorsBridgeHandler;
 import org.openhab.binding.mysensors.handler.MySensorsThingHandler;
 import org.slf4j.Logger;
@@ -50,9 +49,9 @@ public class MySensorsHandlerFactory extends BaseThingHandlerFactory {
         if (SUPPORTED_THING_TYPES_UIDS.contains(thingTypeUID)) {
             handler = new MySensorsThingHandler(thing);
         } else if (thingTypeUID.equals(THING_TYPE_BRIDGE_SER) 
-        			|| thingTypeUID.equals(THING_TYPE_BRIDGE_ETH)
-        			|| thingTypeUID.equals(THING_TYPE_BRIDGE_MQTT)) {
-        	handler = new MySensorsBridgeHandler((Bridge) thing);
+                || thingTypeUID.equals(THING_TYPE_BRIDGE_ETH)
+                || thingTypeUID.equals(THING_TYPE_BRIDGE_MQTT)) {
+            handler = new MySensorsBridgeHandler((Bridge) thing);
         } else {
             logger.error("Thing {} cannot be configured, is this thing supported by the binding?", thingTypeUID);
         }
