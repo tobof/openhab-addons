@@ -14,7 +14,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.smarthome.io.transport.mqtt.MqttService;
 import org.openhab.binding.mysensors.internal.event.MySensorsEventRegister;
 import org.openhab.binding.mysensors.internal.event.MySensorsGatewayEventListener;
 import org.openhab.binding.mysensors.internal.event.MySensorsNodeUpdateEventType;
@@ -110,7 +109,6 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
      * Startup the gateway
      */
     public void startup() {
-
         myCon.initialize();
 
         myEventRegister.addEventListener(this);
@@ -124,7 +122,6 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
      * Shutdown the gateway
      */
     public void shutdown() {
-
         if (myNetSanCheck != null) {
             myNetSanCheck.stop();
         }
@@ -218,7 +215,6 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
         }
 
         return msg;
-
     }
 
     /**
@@ -326,7 +322,6 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
      */
     public void addEventListener(MySensorsGatewayEventListener listener) {
         myEventRegister.addEventListener(listener);
-
     }
 
     /**
@@ -337,7 +332,6 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
      */
     public void removeEventListener(MySensorsGatewayEventListener listener) {
         myEventRegister.removeEventListener(listener);
-
     }
 
     /**
@@ -358,7 +352,6 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
      * @param message to send
      */
     public void sendMessage(MySensorsMessage message) {
-
         if (message == null) {
             throw new IllegalArgumentException("Null message could not be sent over the network");
         }
@@ -403,7 +396,6 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
                             logger.error("Could not revert variable {}, no previous value is present",
                                     variable.getClass().getSimpleName());
                         }
-
                     } else {
                         logger.warn("Variable {} not present", msg.getSubType());
                     }
@@ -454,7 +446,6 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
      */
     private boolean handleIncomingMessage(MySensorsMessage msg) throws Exception {
         if (MySensorsNode.isValidNodeId(msg.getNodeId()) && MySensorsChild.isValidChildId(msg.getChildId())) {
-
             if (msg.getDirection() == MySensorsMessageDirection.INCOMING) {
                 updateReachable(msg);
                 updateLastUpdateFromMessage(msg);
@@ -495,7 +486,6 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
             node.setReachable(true);
             myEventRegister.notifyNodeReachEvent(node, true);
         }
-
     }
 
     private boolean isNewDevice(MySensorsMessage msg) {
@@ -510,7 +500,6 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
             myEventRegister.notifyNewNodeDiscovered(node, null);
             return true;
         }
-
         return false;
     }
 
@@ -524,7 +513,6 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
         logger.debug("Presentation Message received");
 
         if (child == null) {
-
             if (node == null) {
                 node = new MySensorsNode(msg.getNodeId());
                 insertNode = true;
@@ -558,7 +546,6 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
                 MySensorsVariable variable = child.getVariable(msg.getSubType());
                 
                 if (variable != null) {
-
                     if (msg.isSetMessage()) {
                         if (node.isReachable()) {
                             logger.trace("Variable {}({}) found in child, pre-update value: {}",
@@ -585,7 +572,6 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
                             logger.warn("Request received, but variable state is not yet defined");
                         }
                     }
-
                     return true;
                 } else {
                     logger.warn("Variable {} not present", msg.getSubType());
@@ -593,11 +579,8 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
             } else {
                 logger.debug("Child {} not present in node {}", msg.getChildId(), msg.getNodeId());
             }
-
         }
-
         return false;
-
     }
 
     private boolean handleInternalMessage(MySensorsMessage msg) {
@@ -610,11 +593,8 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
                 myEventRegister.notifyNodeUpdateEvent(node, null, null, MySensorsNodeUpdateEventType.BATTERY);
                 return true;
             }
-
         }
-
         return false;
-
     }
 
     private void updateLastUpdateFromMessage(MySensorsMessage msg) {
@@ -625,9 +605,7 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
             MySensorsNode node = getNode(msg.getNodeId());
 
             if (node != null) {
-
                 node.setLastUpdate(now);
-
                 MySensorsChild child = getChild(msg.getNodeId(), msg.getChildId());
 
                 if (child != null) {
@@ -644,7 +622,6 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
     }
 
     private void handleSpecialMessageEvent(MySensorsMessage msg) {
-
         // Is this an I_CONFIG message?
         if (msg.isIConfigMessage()) {
             answerIConfigMessage(msg);
@@ -674,7 +651,6 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
                 MySensorsMessageType.INTERNAL, MySensorsMessageAck.FALSE, false, MySensorsMessageSubType.I_TIME,
                 time);
         myCon.sendMessage(newMsg);
-
     }
 
     /**
@@ -692,7 +668,6 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
                 MySensorsMessageType.INTERNAL, MySensorsMessageAck.FALSE, false, MySensorsMessageSubType.I_CONFIG,
                 iConfig);
         myCon.sendMessage(newMsg);
-
     }
 
     /**
@@ -701,7 +676,6 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
     private void answerIDRequest() {
         logger.info("ID Request received");
 
-        
         try {
             int newId = reserveId();
             logger.info("New Node in the MySensors network has requested an ID. ID is: {}", newId);
@@ -713,5 +687,4 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
             logger.error("No more IDs available for this node, you could try cleaning cache file");
         }
     }
-
 }

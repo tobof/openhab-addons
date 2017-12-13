@@ -39,7 +39,6 @@ public class MySensorsMessage {
     private MySensorsMessageDirection direction = MySensorsMessageDirection.OUTGOING;
 
     public MySensorsMessage() {
-
     }
 
     public MySensorsMessage(int nodeId, int childId, MySensorsMessageType msgType, MySensorsMessageAck ack,
@@ -298,7 +297,6 @@ public class MySensorsMessage {
         try {
             String[] splitMessage = line.split(";");
             if (splitMessage.length > 4) {
-
                 MySensorsMessage mysensorsmessage = new MySensorsMessage();
 
                 int nodeId = Integer.parseInt(splitMessage[MySensorsMessagePart.NODE.getId()]);
@@ -331,7 +329,6 @@ public class MySensorsMessage {
             } else {
                 throw new ParseException("Message length is not > 4", 0);
             }
-
         } catch (Exception e) {
             throw new ParseException(e.getClass() + " : " + e.getMessage(), 0);
         }
@@ -347,7 +344,6 @@ public class MySensorsMessage {
         try {
             String[] splitTopic = topic.split("/");
             if (splitTopic.length == 5) {
-
                 MySensorsMessage mysensorsmessage = new MySensorsMessage();
 
                 int nodeId = Integer.parseInt(splitTopic[MySensorsMessagePart.NODE.getId()]);
@@ -375,7 +371,6 @@ public class MySensorsMessage {
             } else {
                 throw new ParseException("Message length is not 5", 0);
             }
-
         } catch (Exception e) {
             throw new ParseException(e.getClass() + " : " + e.getMessage(), 0);
         }
@@ -487,7 +482,6 @@ public class MySensorsMessage {
      * @return the hash code
      */
     public int customHashCode(MySensorsMessagePart... messageParts) {
-
         final int prime = 101;
 
         int result = 1;
@@ -507,16 +501,12 @@ public class MySensorsMessage {
             } else {
                 throw new IllegalArgumentException("Messsage part must be in [0,5] interval");
             }
-
         }
-
         return result;
-
     }
 
     @Override
     public String toString() {
         return "MySensorsMessage [" + generateAPIString(this) + "]";
     }
-
 }

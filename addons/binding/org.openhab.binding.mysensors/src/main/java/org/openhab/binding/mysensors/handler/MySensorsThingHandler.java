@@ -93,7 +93,6 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
                 getThing().getUID().toString());
         if (bridgeStatusInfo.getStatus() == ThingStatus.ONLINE
                 || bridgeStatusInfo.getStatus() == ThingStatus.OFFLINE) {
-
             if (bridgeStatusInfo.getStatus() == ThingStatus.ONLINE) {
                 registerListeners();
             } else {
@@ -154,7 +153,6 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
                     MySensorsVariable var = myGateway.getVariable(configuration.nodeId, configuration.childId, type);
 
                     if (var != null) {
-
                         MySensorsMessageSubType subType = var.getType();
 
                         // Create the real message to send
@@ -165,7 +163,6 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
                         newMsg.setMsg(adapter.fromCommand(command));
 
                         myGateway.sendMessage(newMsg);
-
                     } else {
                         logger.warn("Variable not found, cannot handle command for thing {} of type {}", thing.getUID(),
                                 channelUID.getId());
@@ -174,18 +171,15 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
                     logger.error("Could not get type of variable for channel: {}, command: {} of thing {}",
                             thing.getUID(), command, thing.getUID());
                 }
-
             } else {
                 logger.error("Type adapter not found for {}", channelUID.getId());
             }
-
         }
     }
 
     @Override
     public void messageReceived(MySensorsMessage message) throws Exception {
         handleIncomingMessageEvent(message);
-
     }
 
     @Override
@@ -206,7 +200,6 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
                 }
                 break;
         }
-
     }
 
     @Override
@@ -227,7 +220,6 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
                 updateStatus(ThingStatus.ONLINE);
             }
         }
-
     }
 
     /**
@@ -277,7 +269,6 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
         if(myGateway.getNode(configuration.nodeId).getChild(configuration.childId).getPresentationCode() == MySensorsMessageSubType.S_COVER)
             updateState(CHANNEL_COVER, newState);
         updateState(channelName, newState);
-
     }
 
     private void handleBatteryUpdateEvent(MySensorsNode node) {
@@ -309,7 +300,6 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
         if (configuration.nodeId == MYSENSORS_NODE_ID_ALL_KNOWING && configuration.childId == MYSENSORS_CHILD_ID_ALL_KNOWING) {
             updateState(CHANNEL_MYSENSORS_MESSAGE,
                     new StringType(MySensorsMessage.generateAPIString(msg).replaceAll("(\\r|\\n)", "")));
-
         }
     }
 
@@ -352,13 +342,11 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
                 logger.error("Error on building sensors from thing: {}, node: {}, child: {}, presentation: {}",
                         t.getUID(), nodeId, childId, presentation);
             }
-
         } catch (Exception e) {
             logger.error("Failing on create node/child for thing {}", thing.getUID(), e);
         }
 
         return node;
-
     }
 
     private MySensorsChildConfig generateChildConfig(MySensorsSensorConfiguration configuration) {

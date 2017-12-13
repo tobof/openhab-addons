@@ -92,7 +92,6 @@ public class MySensorsSerialConnection extends MySensorsAbstractConnection {
             }
             serialConnection = null;
         }
-
     }
     
     /**
@@ -103,7 +102,6 @@ public class MySensorsSerialConnection extends MySensorsAbstractConnection {
      * @param devName is the device used as COM/UART port
      */
     private void updateSerialProperties(String devName) {
-
         //
         // first go through the port identifiers to find any that are not in
         // "gnu.io.rxtx.SerialPorts"
@@ -158,5 +156,4 @@ public class MySensorsSerialConnection extends MySensorsAbstractConnection {
         return "MySensorsSerialConnection [serialPort=" + myGatewayConfig.getSerialPort() + ", baudRate="
                 + myGatewayConfig.getBaudRate() + "]";
     }
-
 }

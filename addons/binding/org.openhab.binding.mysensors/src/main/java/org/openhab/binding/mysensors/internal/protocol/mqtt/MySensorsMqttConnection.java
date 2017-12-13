@@ -57,7 +57,6 @@ public class MySensorsMqttConnection extends MySensorsAbstractConnection
      */
     @Override
     protected boolean establishConnection() {
-        
         boolean connectionEstablished = false;
         
         if(MySensorsMqttService.getMqttService() == null) {
@@ -78,7 +77,6 @@ public class MySensorsMqttConnection extends MySensorsAbstractConnection
 
             @Override
             public void write(int b) throws IOException {
-                
             }
         });
         
@@ -125,7 +123,6 @@ public class MySensorsMqttConnection extends MySensorsAbstractConnection
      * @author Tim Oberföll
      */
     public class MySensorsMqttSubscriber implements MqttMessageSubscriber {
-
         private String topicSubscribe;
         
         public MySensorsMqttSubscriber(String topicSubscribe) {
@@ -137,7 +134,6 @@ public class MySensorsMqttConnection extends MySensorsAbstractConnection
             String payloadString = new String(payload);
             logger.debug("MQTT message received. Topic: {}, Message: {}", topic, payloadString);
             if (topic.indexOf(myGatewayConfig.getTopicSubscribe()) == 0) {
-
                 String messageTopicPart = topic.replace(myGatewayConfig.getTopicSubscribe() + "/", "");
                 logger.debug("Message topic part: {}", messageTopicPart);
                 MySensorsMessage incomingMessage = new MySensorsMessage();
@@ -146,12 +142,10 @@ public class MySensorsMqttConnection extends MySensorsAbstractConnection
                     logger.debug("Converted MQTT message to MySensors Serial format. Sending on to bridge: {}",
                             MySensorsMessage.generateAPIString(incomingMessage).trim());
                     try {
-                        
                         out.write(MySensorsMessage.generateAPIString(incomingMessage).getBytes());
                     } catch (IOException ioe) {
                         ioe.toString();
                     }
-
                 } catch (ParseException pe) {
                     logger.debug("Unable to send message to bridge: {}", pe.toString());
                 }
@@ -186,7 +180,6 @@ public class MySensorsMqttConnection extends MySensorsAbstractConnection
      *
      */
     protected class MySensorsMqttWriter extends MySensorsWriter {
-
         MqttBrokerConnection conn = MySensorsMqttService.getMqttService().getBrokerConnection(myGatewayConfig.getBrokerName());
         
         public MySensorsMqttWriter(OutputStream outStream) {
@@ -195,7 +188,6 @@ public class MySensorsMqttConnection extends MySensorsAbstractConnection
 
         @Override
         protected void sendMessage(String msg) {
-
             logger.debug("Sending MQTT Message: Topic: {}, Message: {}", myGatewayConfig.getTopicPublish(), msg.trim());
             
             try {
@@ -207,7 +199,6 @@ public class MySensorsMqttConnection extends MySensorsAbstractConnection
             } catch (MqttException e) {
                 logger.error("Error sending MQTT message to broker: {}.", myGatewayConfig.getBrokerName(), e);
             }
-            
         }
     }
 
