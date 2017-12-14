@@ -15,7 +15,6 @@ import java.io.PipedOutputStream;
 import java.text.ParseException;
 
 import org.eclipse.smarthome.io.transport.mqtt.MqttBrokerConnection;
-import org.eclipse.smarthome.io.transport.mqtt.MqttBrokersObserver;
 import org.eclipse.smarthome.io.transport.mqtt.MqttConnectionObserver;
 import org.eclipse.smarthome.io.transport.mqtt.MqttConnectionState;
 import org.eclipse.smarthome.io.transport.mqtt.MqttException;
@@ -36,7 +35,7 @@ import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
  */
 
 public class MySensorsMqttConnection extends MySensorsAbstractConnection
-    implements MqttConnectionObserver, MqttBrokersObserver {
+    implements MqttConnectionObserver {
     
     private MqttBrokerConnection mqttBrokerConn;
     private MySensorsMqttSubscriber myMqttSub;
@@ -79,8 +78,6 @@ public class MySensorsMqttConnection extends MySensorsAbstractConnection
             public void write(int b) throws IOException {
             }
         });
-        
-        MySensorsMqttService.getMqttService().addBrokersListener(this);
         
         connection = MySensorsMqttService.getMqttService().getBrokerConnection(myGatewayConfig.getBrokerName());
         if (connection == null) {
@@ -200,16 +197,6 @@ public class MySensorsMqttConnection extends MySensorsAbstractConnection
                 logger.error("Error sending MQTT message to broker: {}.", myGatewayConfig.getBrokerName(), e);
             }
         }
-    }
-
-    @Override
-    public void brokerAdded(MqttBrokerConnection broker) {
-        logger.debug("Broker added");
-    }
-
-    @Override
-    public void brokerRemoved(MqttBrokerConnection broker) {
-        logger.debug("Broker removed");
     }
 
     @Override

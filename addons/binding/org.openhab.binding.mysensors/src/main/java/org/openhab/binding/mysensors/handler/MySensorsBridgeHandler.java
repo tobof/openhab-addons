@@ -14,12 +14,10 @@ import static org.openhab.binding.mysensors.MySensorsBindingConstants.THING_TYPE
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
 import org.eclipse.smarthome.config.core.ConfigConstants;
-import org.eclipse.smarthome.config.discovery.DiscoveryService;
 import org.eclipse.smarthome.core.thing.Bridge;
 import org.eclipse.smarthome.core.thing.ChannelUID;
 import org.eclipse.smarthome.core.thing.ThingStatus;
@@ -36,7 +34,6 @@ import org.openhab.binding.mysensors.internal.gateway.MySensorsGatewayType;
 import org.openhab.binding.mysensors.internal.protocol.MySensorsAbstractConnection;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsNode;
-import org.osgi.framework.ServiceRegistration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,12 +55,6 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
 
     // Configuration from thing file
     private MySensorsBridgeConfiguration myBridgeConfiguration;
-
-    // Service discovery registration
-    private ServiceRegistration<?> discoveryServiceRegistration;
-
-    // Discovery service
-    private MySensorsDiscoveryService discoveryService;
     
     private MySensorsCacheFactory cacheFactory;
     
@@ -85,8 +76,9 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
             myGateway.startup();
 
             myGateway.addEventListener(this);
-
-            registerDeviceDiscoveryService();
+            
+            MySensorsDiscoveryService.getInstance().setBridgeHandler(this);
+            MySensorsDiscoveryService.getInstance().activate();
 
             logger.debug("Initialization of the MySensors bridge DONE!");
         } else {
@@ -98,7 +90,7 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
     public void dispose() {
         logger.debug("Disposing of the MySensors bridge");
 
-        unregisterDeviceDiscoveryService();
+        MySensorsDiscoveryService.getInstance().abortScan();
 
         if (myGateway != null) {
             myGateway.removeEventListener(this);
@@ -212,27 +204,5 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
         gatewayConfig.setSanCheckSendHeartbeatFailAttempts(conf.networkSanCheckSendHeartbeatFailAttempts);
 
         return gatewayConfig;
-    }
-
-    private void registerDeviceDiscoveryService() {
-        if (bundleContext != null) {
-            logger.trace("Registering MySensorsDiscoveryService for bridge '{}'", getThing().getUID().getId());
-            discoveryService = new MySensorsDiscoveryService(this);
-            discoveryServiceRegistration = bundleContext.registerService(DiscoveryService.class.getName(),
-                    discoveryService, new Hashtable<String, Object>());
-            discoveryService.activate();
-        }
-    }
-
-    private void unregisterDeviceDiscoveryService() {
-        if (discoveryServiceRegistration != null && discoveryService != null) {
-            logger.trace("Unregistering MySensorsDiscoveryService for bridge '{}'", getThing().getUID().getId());
-
-            discoveryService.deactivate();
-
-            discoveryServiceRegistration.unregister();
-            discoveryServiceRegistration = null;
-            discoveryService = null;
-        }
     }
 }

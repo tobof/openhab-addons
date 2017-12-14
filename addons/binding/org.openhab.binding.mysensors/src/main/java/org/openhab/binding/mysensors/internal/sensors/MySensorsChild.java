@@ -175,7 +175,7 @@ public abstract class MySensorsChild implements Mergeable {
      *
      * @param var the non-null variable to add to this child
      *
-     * @throws NullPointerException if var is null
+     * @throws NoContentException if var is null
      */
     public void addVariable(MySensorsVariable var) throws NoContentException {
         if (var == null) {

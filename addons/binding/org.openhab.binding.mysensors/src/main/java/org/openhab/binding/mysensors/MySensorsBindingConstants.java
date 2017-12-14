@@ -47,6 +47,9 @@ public class MySensorsBindingConstants {
     public static final String PARAMETER_SENDDELAY = "sendDelay";
     public static final String PARAMETER_BAUDRATE = "baudRate";
     public static final String PARAMETER_REQUESTACK = "requestack";
+    public static final String PARAMETER_TOPICSUBSCRIBE = "topicSubscribe";
+    public static final String PARAMETER_TOPICPUBLISH = "topicPublish";
+    public static final String PARAMETER_BROKERNAME = "brokerName";
 
     /**
      * All knowing thing. A node with nodeId 999 and childId 999 receives all messages

@@ -58,4 +58,5 @@ public class MySensorsHandlerFactory extends BaseThingHandlerFactory {
 
         return handler;
     }
+    
 }
