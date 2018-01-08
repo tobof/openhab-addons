@@ -175,21 +175,17 @@ public abstract class MySensorsChild implements Mergeable {
      *
      * @param var the non-null variable to add to this child
      *
-     * @throws NullPointerException if var is null
+     * @throws NoContentException if var is null
      */
     public void addVariable(MySensorsVariable var) throws NoContentException {
-
         if (var == null) {
             throw new NoContentException("Cannot add a null variable");
         }
-
         synchronized (variableMap) {
             if (variableMap.containsKey(var.getType())) {
                 logger.warn("Overwrite variable: {}", var.getType());
             }
-
             variableMap.put(var.getType(), var);
-
         }
     }
 
@@ -266,7 +262,6 @@ public abstract class MySensorsChild implements Mergeable {
         } else if (child.childConfig.isPresent() && childConfig.isPresent()) {
             childConfig.get().merge(child.childConfig.get());
         }
-
     }
 
     private void addCommonVariables() {

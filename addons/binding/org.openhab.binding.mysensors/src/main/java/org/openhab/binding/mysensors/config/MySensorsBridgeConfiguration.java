@@ -20,6 +20,9 @@ public class MySensorsBridgeConfiguration {
     public Integer tcpPort; // tcp port the gateway is running at
     public Integer sendDelay; // delay at which messages are send from the internal queue to the MySensors network
     public Integer baudRate; // baud rate used to connect the serial port
+    public String brokerName; // Name of the MQTT broker
+    public String topicSubscribe; // Name of the MQTT topic to subscribe to
+    public String topicPublish; // Name of the MQTT topic to publish to
     public Boolean imperial; // should nodes send imperial or metric values?
     public Boolean startupCheckEnabled; // should the startup check of the bridge at boot skipped?
     public Boolean networkSanCheckEnabled; // network sanity check enabled?
@@ -34,7 +37,10 @@ public class MySensorsBridgeConfiguration {
                 + ", ipAddress=" + ipAddress 
                 + ", tcpPort=" + tcpPort 
                 + ", sendDelay=" + sendDelay 
-                + ", baudRate=" + baudRate 
+                + ", baudRate=" + baudRate
+                + ", brokerName=" + brokerName
+                + ", topicSubscribe=" + topicSubscribe
+                + ", topicPublish=" + topicPublish
                 + ", imperial=" + imperial
                 + ", startupCheckEnabled=" + startupCheckEnabled 
                 + ", networSanCheckEnabled=" + networkSanCheckEnabled

@@ -45,6 +45,13 @@ Bridge mysensors:bridge-eth:gateway [ ipAddress="127.0.0.1", tcpPort=5003, sendD
   }
 ```
 
+MQTTGateway:
+ 
+```
+Bridge mysensors:bridge-mqtt:gateway [ brokerName="mosquitto", topicPublish="mygateway1-in", topicSubscribe="mygateway1-out", startupCheckEnabled=false ] {
+}
+```
+
 #### Common parameters for all gateway types
 
 | Parameter | Value | Description |
@@ -71,6 +78,7 @@ A reason could be if you see a message like this:
 In this case the hardware OH2 is running on takes a bit too long to startup (due to the lack of CPU power).
 
 To skip the startup check add an option **startupCheckEnabled=false** to the gateway/thing:
+
 ```
 Bridge mysensors:bridge-eth:gateway [ ipAddress="127.0.0.1", tcpPort=5003, sendDelay=200, startupCheckEnabled=false ] {
      /** define things connected to that bridge here */
@@ -170,16 +178,19 @@ If a message is NOT acknowledged by a node the binding retries to send the messa
 If the binding should not try to revert to the old status if no ACK was received use the option **revertState=false**.
 
 ## Enable smart sleep for a node
+
 In the MySensors network smart sleep may be used for nodes that are mostly sleeping. As a controller is not able to send a command to a sleeping node the node may activate smart sleep. If smart sleep is enabled a I_HEARTBEAT_RESPONSE message is send to the controller. The node will wait a short time (default 500 ms) if a message is received from the controller.
 
 If smart sleep is enabled in the binding and a message is send by an item (button activated / light on, text send ...) the message is stored in a separate queue. If a I_HEARTBEAT_RESPONSE message is received from the node the queued message is send immediately.
 
 Configuration in *.things:
+
 ```
 light workLight01 [ nodeId=104, childId=2, smartSleep=true ]
 ```
 
 The log output should look like:
+
 ```
 20:36:41.093 [INFO ] [smarthome.event.ItemCommandEvent    ] - Item 'workLight01' received command OFF
 20:36:41.095 [INFO ] [marthome.event.ItemStateChangedEvent] - workLight01 changed from ON to OFF
@@ -194,6 +205,7 @@ The log output should look like:
 The sanity check tries to ensure if the connection to the MySensors bridge is still alive. It sends an I_VERSION message to the gateway and expects an answer. If no answer from the MySensors gateway is received the binding will try to reconnect to the gateway to establish a connection. The default is **enableNetworkSanCheck=false**, the sanity check is disabled. 
 
 To enable the sanity check insert:
+
 ```
 Bridge mysensors:bridge-ser:gateway [ serialPort="/dev/pts/6", sendDelay=200, enableNetworkSanCheck=true ] {
 ...    
@@ -203,6 +215,7 @@ Bridge mysensors:bridge-ser:gateway [ serialPort="/dev/pts/6", sendDelay=200, en
 # Examples
 
 Definition in **.things**:
+
 ```
 // SensebenderMicro
 humidity bathHum01 [ nodeId=101, childId=0 ]
@@ -230,6 +243,7 @@ irReceive       ir_test_receive     [ nodeId=111, childId=111 ]
 ```
 
 Definition in **.items**:
+
 ```
 // SensebenderMicro
 Number bathTemp01 "Temp. Bad [%.1f °C]" <temperature> (gTemp,gHumAndTemp,gBath) { channel="mysensors:temperature:MySGW:bathTemp01:temp" }
@@ -260,6 +274,7 @@ String ir_test_receive "ir test receive"    { channel="mysensors:irReceive:gatew
 ```
 
 Definition in **.sitemap**:
+
 ```
 // Text
 Switch item=v_text_test mappings=["text to send"="SEND"] // Send something to the MySensors network
@@ -282,16 +297,19 @@ It is possible to create a thing that receives *ALL* MySensors Messages (not the
 This special thing has a fixed node Id of 999 and child Id of 999 which are not used by the MySensors network itself.
 
 Create a thing in *.things:
+
 ```
 mySensorsMessage mySMsg01   [ nodeId=999, childId=999 ]
 ```
 
 Create an item in *.items:
+
 ```
 String mySMsg01  "MySensorsMessage"   { channel="mysensors:mySensorsMessage:gateway:mySMsg01:mySensorsMessage" }
 ```
 
 Now you are good to go! If you receive a message it may look like this:
+
 ```
 2016-09-19 20:32:37.190 [DEBUG] [o.b.m.protocol.MySensorsReader:62   ] - 172;0;1;0;1;87
 2016-09-19 20:32:37.212 [INFO ] [smarthome.event.ItemStateEvent:43   ] - hum01 updated to 87
@@ -306,6 +324,7 @@ In a rule you may now do what you want with the string.
 Sending a message via a rule is also possible.
 
 In this example I have a switch light01 to trigger the sending.
+
 ```
 rule "Send a message to the MySensorsMessage"
     when
