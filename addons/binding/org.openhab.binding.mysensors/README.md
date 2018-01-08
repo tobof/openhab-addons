@@ -48,7 +48,7 @@ Bridge mysensors:bridge-eth:gateway [ ipAddress="127.0.0.1", tcpPort=5003, sendD
 MQTTGateway:
  
 ```
-Bridge mysensors:bridge-mqtt:gateway [ brokerName="mosquitto", topicPublish="mygateway1-in", topicSubscribe="mygateway1-out", startupCheckEnabled=true ] {
+Bridge mysensors:bridge-mqtt:gateway [ brokerName="mosquitto", topicPublish="mygateway1-in", topicSubscribe="mygateway1-out", startupCheckEnabled=false ] {
 }
 ```
 
