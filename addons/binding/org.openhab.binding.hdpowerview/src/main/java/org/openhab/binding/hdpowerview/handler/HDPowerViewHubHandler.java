@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2017 by the respective copyright holders.
+ * Copyright (c) 2010-2018 by the respective copyright holders.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -151,7 +151,7 @@ public class HDPowerViewHubHandler extends BaseBridgeHandler {
         Shades shades = webTargets.getShades();
         updateStatus(ThingStatus.ONLINE);
         if (shades != null) {
-            Map<Integer, Thing> things = getThingsByShadeId();
+            Map<String, Thing> things = getThingsByShadeId();
             logger.debug("Found {} shades", things.size());
             for (Shade shade : shades.shadeData) {
                 Thing thing = things.get(shade.id);
@@ -206,11 +206,11 @@ public class HDPowerViewHubHandler extends BaseBridgeHandler {
         }
     }
 
-    private Map<Integer, Thing> getThingsByShadeId() {
-        Map<Integer, Thing> ret = new HashMap<>();
+    private Map<String, Thing> getThingsByShadeId() {
+        Map<String, Thing> ret = new HashMap<>();
         for (Thing thing : getThing().getThings()) {
             if (thing.getThingTypeUID().equals(HDPowerViewBindingConstants.THING_TYPE_SHADE)) {
-                Integer id = thing.getConfiguration().as(HDPowerViewShadeConfiguration.class).id;
+                String id = thing.getConfiguration().as(HDPowerViewShadeConfiguration.class).id;
                 ret.put(id, thing);
             }
         }
