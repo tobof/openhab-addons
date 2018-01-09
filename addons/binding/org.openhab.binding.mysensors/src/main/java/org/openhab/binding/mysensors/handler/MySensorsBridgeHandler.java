@@ -189,6 +189,7 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
             gatewayConfig.setGatewayType(MySensorsGatewayType.SERIAL);
             gatewayConfig.setBaudRate(conf.baudRate);
             gatewayConfig.setSerialPort(conf.serialPort);
+            gatewayConfig.setHardReset(conf.hardReset);
         } else if (bridgeuid.equals(THING_TYPE_BRIDGE_ETH)) {
             gatewayConfig.setGatewayType(MySensorsGatewayType.IP);
             gatewayConfig.setIpAddress(conf.ipAddress);

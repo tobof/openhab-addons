@@ -36,6 +36,8 @@ Bridge mysensors:bridge-ser:gateway [ serialPort="/dev/pts/2", sendDelay=200, ba
   }
 ```
 
+If the gateway gets stuck on a regular basis you may try `hardReset=true`. This will try to reset the attached gateway with the DTR line on a disconnect or reconnect. This only makes sense together with the network sanity checker.
+
   
 EthernetGateway:
 

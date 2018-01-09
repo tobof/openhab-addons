@@ -73,6 +73,11 @@ public class MySensorsGatewayConfig {
      * Baud rate used to connect the serial port
      */
     private Integer baudRate;
+    
+    /**
+    * try hard reset of serial port using DTR
+    */
+    private boolean hardReset;
 
     // Ip
     /**
@@ -226,6 +231,14 @@ public class MySensorsGatewayConfig {
 
     public void setTopicPublish(String topicPublish) {
         this.topicPublish = topicPublish;
+    }
+    
+    public boolean isHardReset() {
+        return hardReset;
+    }
+
+    public void setHardReset(boolean hardReset) {
+        this.hardReset = hardReset;
     }
 
     @Override

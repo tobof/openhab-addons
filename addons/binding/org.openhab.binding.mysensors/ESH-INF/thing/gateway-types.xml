@@ -21,6 +21,12 @@
 				</description>
 				<default>115200</default>
 			</parameter>
+			<parameter name="hardReset" type="boolean" required="false">
+				<label>Hard Reset</label>
+				<description>Try to hard reset an attached gateway with DTR on disconnect and reconnect
+				</description>
+				<default>false</default>
+			</parameter>
 
 			<!-- COMMON PARAMS STARTS HERE -->
 
