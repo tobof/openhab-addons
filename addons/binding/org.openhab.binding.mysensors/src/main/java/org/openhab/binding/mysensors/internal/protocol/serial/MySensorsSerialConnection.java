@@ -72,7 +72,6 @@ public class MySensorsSerialConnection extends MySensorsAbstractConnection imple
             mysConWriter = new MySensorsWriter(serialConnection.getOutputStream());
 
             return startReaderWriterThread(mysConReader, mysConWriter);
-        
         } catch (NoSuchPortException e) {
             logger.error("No such port: {}", myGatewayConfig.getSerialPort(), e);
         } catch (PortInUseException e) {
@@ -113,7 +112,6 @@ public class MySensorsSerialConnection extends MySensorsAbstractConnection imple
             }
             serialConnection = null;
         }
-
     }
     
     @Override
@@ -151,5 +149,4 @@ public class MySensorsSerialConnection extends MySensorsAbstractConnection imple
         return "MySensorsSerialConnection [serialPort=" + myGatewayConfig.getSerialPort() + ", baudRate="
                 + myGatewayConfig.getBaudRate() + "]";
     }
-
 }
