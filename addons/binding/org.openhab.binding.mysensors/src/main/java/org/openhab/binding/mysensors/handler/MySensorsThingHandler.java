@@ -17,7 +17,6 @@ import java.util.Map;
 import org.eclipse.smarthome.core.library.types.DateTimeType;
 import org.eclipse.smarthome.core.library.types.DecimalType;
 import org.eclipse.smarthome.core.library.types.HSBType;
-import org.eclipse.smarthome.core.library.types.PercentType;
 import org.eclipse.smarthome.core.library.types.StringType;
 import org.eclipse.smarthome.core.thing.Bridge;
 import org.eclipse.smarthome.core.thing.ChannelUID;
@@ -154,7 +153,7 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
 
             // RGBW only
             // if the config is set to use pure white instead of mixed white use special converter
-            } else if(channelUID.getId().equals(CHANNEL_RGBW) && getBridgeHandler().getBridgeConfiguration().usePureWhiteLightInRGBW) {
+            } else if(channelUID.getId().equals(CHANNEL_RGBW) && configuration.usePureWhiteLightInRGBW) {
                 adapter = new MySensorsRGBWPureTypeConverter();
             } else {
                 adapter = loadAdapterForChannelType(channelUID.getId());
