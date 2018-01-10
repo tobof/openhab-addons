@@ -16,6 +16,8 @@ import java.util.Map;
 
 import org.eclipse.smarthome.core.library.types.DateTimeType;
 import org.eclipse.smarthome.core.library.types.DecimalType;
+import org.eclipse.smarthome.core.library.types.HSBType;
+import org.eclipse.smarthome.core.library.types.PercentType;
 import org.eclipse.smarthome.core.library.types.StringType;
 import org.eclipse.smarthome.core.thing.Bridge;
 import org.eclipse.smarthome.core.thing.ChannelUID;
@@ -43,6 +45,7 @@ import org.openhab.binding.mysensors.internal.sensors.MySensorsChildConfig;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsNode;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsNodeConfig;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsVariable;
+import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariableVPercentage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -139,7 +142,18 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
                 }
             }
         } else {
-            MySensorsTypeConverter adapter = loadAdapterForChannelType(channelUID.getId());
+            MySensorsTypeConverter adapter;
+            
+            // RGB && RGBW only:
+            // if the brightness (Percentage) is changed it must be send via V_PERCENTAGE 
+            // and another converter must be used
+            boolean rgbPercentageValue = false;
+            if((channelUID.getId().equals(CHANNEL_RGB) || channelUID.getId().equals(CHANNEL_RGBW)) && !(command instanceof HSBType)) {
+                adapter = loadAdapterForChannelType(CHANNEL_PERCENTAGE);
+                rgbPercentageValue = true;
+            } else {
+                adapter = loadAdapterForChannelType(channelUID.getId());
+            }
 
             if (adapter != null) {
                 logger.trace("Adapter {} found for type {}", adapter.getClass().getSimpleName(), channelUID.getId());
@@ -153,7 +167,13 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
                     MySensorsVariable var = myGateway.getVariable(configuration.nodeId, configuration.childId, type);
 
                     if (var != null) {
-                        MySensorsMessageSubType subType = var.getType();
+                        MySensorsMessageSubType subType;
+                        if(rgbPercentageValue) {
+                            subType = MySensorsMessageSubType.V_PERCENTAGE;
+                        } else {
+                            subType = var.getType();
+                        }
+                        
 
                         // Create the real message to send
                         MySensorsMessage newMsg = new MySensorsMessage(configuration.nodeId, configuration.childId,
