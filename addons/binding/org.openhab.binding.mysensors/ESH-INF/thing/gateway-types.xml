@@ -47,7 +47,7 @@
 				<default>false</default>
 			</parameter>
 			<parameter name="networkSanCheckEnabled" type="boolean" required="false">
-				<label>Disable network sanity check</label>
+				<label>Enables network sanity check</label>
 				<description>Network sanity check periodically ensure that gateway is up and running</description>
 				<default>false</default>
 			</parameter>
@@ -115,7 +115,7 @@
 				<default>false</default>
 			</parameter>
 			<parameter name="networkSanCheckEnabled" type="boolean" required="false">
-				<label>Disable network sanity check</label>
+				<label>Enables network sanity check</label>
 				<description>Network sanity check periodically ensure that gateway is up and running</description>
 				<default>false</default>
 			</parameter>
@@ -190,7 +190,7 @@
 				<default>false</default>
 			</parameter>
 			<parameter name="networkSanCheckEnabled" type="boolean" required="false">
-				<label>Disable network sanity check</label>
+				<label>Enables network sanity check</label>
 				<description>Network sanity check periodically ensure that gateway is up and running</description>
 				<default>false</default>
 			</parameter>
