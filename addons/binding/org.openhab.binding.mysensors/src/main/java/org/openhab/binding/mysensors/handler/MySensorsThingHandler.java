@@ -31,6 +31,7 @@ import org.eclipse.smarthome.core.types.RefreshType;
 import org.eclipse.smarthome.core.types.State;
 import org.openhab.binding.mysensors.MySensorsBindingConstants;
 import org.openhab.binding.mysensors.config.MySensorsSensorConfiguration;
+import org.openhab.binding.mysensors.converter.MySensorsRGBWPureTypeConverter;
 import org.openhab.binding.mysensors.converter.MySensorsTypeConverter;
 import org.openhab.binding.mysensors.internal.event.MySensorsGatewayEventListener;
 import org.openhab.binding.mysensors.internal.event.MySensorsNodeUpdateEventType;
@@ -45,7 +46,6 @@ import org.openhab.binding.mysensors.internal.sensors.MySensorsChildConfig;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsNode;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsNodeConfig;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsVariable;
-import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariableVPercentage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -151,6 +151,11 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
             if((channelUID.getId().equals(CHANNEL_RGB) || channelUID.getId().equals(CHANNEL_RGBW)) && !(command instanceof HSBType)) {
                 adapter = loadAdapterForChannelType(CHANNEL_PERCENTAGE);
                 rgbPercentageValue = true;
+
+            // RGBW only
+            // if the config is set to use pure white instead of mixed white use special converter
+            } else if(channelUID.getId().equals(CHANNEL_RGBW) && getBridgeHandler().getBridgeConfiguration().usePureWhiteLightInRGBW) {
+                adapter = new MySensorsRGBWPureTypeConverter();
             } else {
                 adapter = loadAdapterForChannelType(channelUID.getId());
             }

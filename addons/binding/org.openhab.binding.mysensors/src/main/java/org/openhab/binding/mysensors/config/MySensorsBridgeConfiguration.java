@@ -31,6 +31,7 @@ public class MySensorsBridgeConfiguration {
     public Integer networkSanCheckConnectionFailAttempts; // connection will wait this number of attempts before disconnecting
     public boolean networkSanCheckSendHeartbeat; // network sanity checker will also send heartbeats to all known nodes
     public Integer networkSanCheckSendHeartbeatFailAttempts; // disconnect nodes that fail to answer to heartbeat request
+    public boolean usePureWhiteLightInRGBW; // if a pure white rgbw value is selected in openhab the binding will only switch on the white led not the rgb part
 
     @Override
     public String toString() {
@@ -49,7 +50,8 @@ public class MySensorsBridgeConfiguration {
                 + ", networkSanCheckInterval=" + networkSanCheckInterval 
                 + ", networkSanCheckConnectionFailAttempts=" + networkSanCheckConnectionFailAttempts 
                 + ", networkSanCheckSendHeartbeat=" + networkSanCheckSendHeartbeat
-                + ", networkSanCheckSendHeartbeatFailAttempts=" + networkSanCheckSendHeartbeatFailAttempts 
+                + ", networkSanCheckSendHeartbeatFailAttempts=" + networkSanCheckSendHeartbeatFailAttempts
+                + ", usePureWhiteLightInRGBW=" + usePureWhiteLightInRGBW
                 + "]";
     }
 
