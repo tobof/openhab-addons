@@ -563,14 +563,15 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
                         }
                     } else {
                         String value = variable.getValue();
-                        if (value != null) {
-                            logger.debug("Request received!");
-                            msg.setMsgType(MySensorsMessageType.SET);
-                            msg.setMsg(value);
-                            myCon.sendMessage(msg);
+                        logger.debug("Request received!");
+                        msg.setMsgType(MySensorsMessageType.SET);
+                        if(value != null) {
+                        msg.setMsg(value);
                         } else {
-                            logger.warn("Request received, but variable state is not yet defined");
+                            msg.setMsg("0");
                         }
+                        myCon.sendMessage(msg);
+                        
                     }
                     return true;
                 } else {

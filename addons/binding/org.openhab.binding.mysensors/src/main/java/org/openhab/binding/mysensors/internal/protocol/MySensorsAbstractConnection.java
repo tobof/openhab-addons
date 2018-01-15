@@ -507,7 +507,6 @@ public abstract class MySensorsAbstractConnection implements Runnable {
                                 }
                                 String output = MySensorsMessage.generateAPIString(msg);
                                 logger.debug("Sending to MySensors: {}", output.trim());
-
                                 sendMessage(output);
                             } else {
                                 addMySensorsOutboundMessage(msg);

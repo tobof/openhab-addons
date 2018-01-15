@@ -278,7 +278,7 @@
 		<description>MySensors Water Electric Condictivity Channel</description>
 		<state readOnly="false"></state>
 	</channel-type>
-	<channel-type id="mysensorsMessage-channel">
+	<channel-type id="mySensorsMessage-channel">
 		<item-type>String</item-type>
 		<label>MySensors Message</label>
 		<description>MySensors Message Channel</description>
