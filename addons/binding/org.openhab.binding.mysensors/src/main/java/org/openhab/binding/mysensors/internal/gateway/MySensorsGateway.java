@@ -571,7 +571,6 @@ public class MySensorsGateway implements MySensorsGatewayEventListener {
                             msg.setMsg("0");
                         }
                         myCon.sendMessage(msg);
-                        
                     }
                     return true;
                 } else {

@@ -8,7 +8,19 @@
  */
 package org.openhab.binding.mysensors.handler;
 
-import static org.openhab.binding.mysensors.MySensorsBindingConstants.*;
+import static org.openhab.binding.mysensors.MySensorsBindingConstants.CHANNEL_BATTERY;
+import static org.openhab.binding.mysensors.MySensorsBindingConstants.CHANNEL_COVER;
+import static org.openhab.binding.mysensors.MySensorsBindingConstants.CHANNEL_LAST_UPDATE;
+import static org.openhab.binding.mysensors.MySensorsBindingConstants.CHANNEL_MAP;
+import static org.openhab.binding.mysensors.MySensorsBindingConstants.CHANNEL_MYSENSORS_MESSAGE;
+import static org.openhab.binding.mysensors.MySensorsBindingConstants.CHANNEL_PERCENTAGE;
+import static org.openhab.binding.mysensors.MySensorsBindingConstants.CHANNEL_RGB;
+import static org.openhab.binding.mysensors.MySensorsBindingConstants.CHANNEL_RGBW;
+import static org.openhab.binding.mysensors.MySensorsBindingConstants.CHANNEL_STATUS;
+import static org.openhab.binding.mysensors.MySensorsBindingConstants.INVERSE_THING_UID_MAP;
+import static org.openhab.binding.mysensors.MySensorsBindingConstants.MYSENSORS_CHILD_ID_ALL_KNOWING;
+import static org.openhab.binding.mysensors.MySensorsBindingConstants.MYSENSORS_NODE_ID_ALL_KNOWING;
+import static org.openhab.binding.mysensors.MySensorsBindingConstants.TYPE_MAP;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -18,7 +30,6 @@ import org.eclipse.smarthome.core.library.types.DateTimeType;
 import org.eclipse.smarthome.core.library.types.DecimalType;
 import org.eclipse.smarthome.core.library.types.HSBType;
 import org.eclipse.smarthome.core.library.types.OnOffType;
-import org.eclipse.smarthome.core.library.types.PercentType;
 import org.eclipse.smarthome.core.library.types.StringType;
 import org.eclipse.smarthome.core.thing.Bridge;
 import org.eclipse.smarthome.core.thing.ChannelUID;
@@ -46,7 +57,6 @@ import org.openhab.binding.mysensors.internal.sensors.MySensorsChildConfig;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsNode;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsNodeConfig;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsVariable;
-import org.openhab.binding.mysensors.internal.sensors.variable.MySensorsVariableVPercentage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
