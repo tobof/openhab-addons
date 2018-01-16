@@ -17,6 +17,7 @@ import java.util.Map;
 import org.eclipse.smarthome.core.library.types.DateTimeType;
 import org.eclipse.smarthome.core.library.types.DecimalType;
 import org.eclipse.smarthome.core.library.types.HSBType;
+import org.eclipse.smarthome.core.library.types.OnOffType;
 import org.eclipse.smarthome.core.library.types.PercentType;
 import org.eclipse.smarthome.core.library.types.StringType;
 import org.eclipse.smarthome.core.thing.Bridge;
@@ -148,12 +149,18 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
             // if the brightness (Percentage) is changed it must be send via V_PERCENTAGE 
             // and another converter must be used
             boolean rgbPercentageValue = false;
-            if((channelUID.getId().equals(CHANNEL_RGB) || channelUID.getId().equals(CHANNEL_RGBW)) && !(command instanceof HSBType)) {
+            boolean rgbOnOffValue = false;
+            if ((channelUID.getId().equals(CHANNEL_RGB) || channelUID.getId().equals(CHANNEL_RGBW)) && (command instanceof OnOffType)) {
+                adapter = loadAdapterForChannelType(CHANNEL_STATUS);
+                rgbOnOffValue = true;
+            } else if((channelUID.getId().equals(CHANNEL_RGB) || channelUID.getId().equals(CHANNEL_RGBW)) && !(command instanceof HSBType)) {
                 adapter = loadAdapterForChannelType(CHANNEL_PERCENTAGE);
                 rgbPercentageValue = true;
             } else {
                 adapter = loadAdapterForChannelType(channelUID.getId());
             }
+            
+            logger.debug("Adapter: {} loaded", adapter.getClass());
 
             if (adapter != null) {
                 logger.trace("Adapter {} found for type {}", adapter.getClass().getSimpleName(), channelUID.getId());
@@ -170,6 +177,8 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
                         MySensorsMessageSubType subType;
                         if(rgbPercentageValue) {
                             subType = MySensorsMessageSubType.V_PERCENTAGE;
+                        } else if(rgbOnOffValue) {
+                            subType = MySensorsMessageSubType.V_STATUS;
                         } else {
                             subType = var.getType();
                         }
