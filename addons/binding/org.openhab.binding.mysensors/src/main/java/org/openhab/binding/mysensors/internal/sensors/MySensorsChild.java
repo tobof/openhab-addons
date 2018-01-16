@@ -182,9 +182,6 @@ public abstract class MySensorsChild implements Mergeable {
             throw new NoContentException("Cannot add a null variable");
         }
         synchronized (variableMap) {
-            if (variableMap.containsKey(var.getType())) {
-                logger.warn("Overwrite variable: {}", var.getType());
-            }
             variableMap.put(var.getType(), var);
         }
     }
