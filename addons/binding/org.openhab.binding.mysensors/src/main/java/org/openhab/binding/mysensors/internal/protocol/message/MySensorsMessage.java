@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2017 by the respective copyright holders.
+ * Copyright (c) 2010-2018 by the respective copyright holders.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -236,9 +236,8 @@ public class MySensorsMessage {
      * @return true, if the received message is a I_ID_REQUEST message.
      */
     public boolean isIdRequestMessage() {
-        return (nodeId == MySensorsNode.MYSENSORS_NODE_ID_RESERVED_255)
-                && (msgType == MySensorsMessageType.INTERNAL) && (ack == MySensorsMessageAck.FALSE)
-                && (subType == MySensorsMessageSubType.I_ID_REQUEST);
+        return (nodeId == MySensorsNode.MYSENSORS_NODE_ID_RESERVED_255) && (msgType == MySensorsMessageType.INTERNAL)
+                && (ack == MySensorsMessageAck.FALSE) && (subType == MySensorsMessageSubType.I_ID_REQUEST);
     }
 
     /**
@@ -333,7 +332,7 @@ public class MySensorsMessage {
             throw new ParseException(e.getClass() + " : " + e.getMessage(), 0);
         }
     }
-    
+
     /**
      * @param line Input is a String containing the message received from the MySensors network
      * @return Returns the content of the message as a MySensorsMessage
@@ -393,7 +392,7 @@ public class MySensorsMessage {
 
         return apiString;
     }
-    
+
     /**
      * Converts a MySensorsMessage object to a MQTT topic String.
      *
