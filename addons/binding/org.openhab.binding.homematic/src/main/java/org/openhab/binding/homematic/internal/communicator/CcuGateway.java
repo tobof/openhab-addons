@@ -37,6 +37,8 @@ import org.openhab.binding.homematic.internal.model.HmResult;
 import org.openhab.binding.homematic.internal.model.TclScript;
 import org.openhab.binding.homematic.internal.model.TclScriptDataList;
 import org.openhab.binding.homematic.internal.model.TclScriptList;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,11 +54,11 @@ public class CcuGateway extends AbstractHomematicGateway {
     private final Logger logger = LoggerFactory.getLogger(CcuGateway.class);
 
     private Map<String, String> tclregaScripts;
-    private HttpClient httpClient;
     private XStream xStream = new XStream(new StaxDriver());
 
-    protected CcuGateway(String id, HomematicConfig config, HomematicGatewayAdapter gatewayAdapter) {
-        super(id, config, gatewayAdapter);
+    protected CcuGateway(String id, HomematicConfig config, HomematicGatewayAdapter gatewayAdapter,
+            HttpClient httpClient) {
+        super(id, config, gatewayAdapter, httpClient);
 
         xStream.setClassLoader(CcuGateway.class.getClassLoader());
         xStream.autodetectAnnotations(true);
@@ -70,28 +72,12 @@ public class CcuGateway extends AbstractHomematicGateway {
         super.startClients();
 
         tclregaScripts = loadTclRegaScripts();
-
-        httpClient = new HttpClient();
-        httpClient.setConnectTimeout(config.getTimeout() * 1000L);
-        try {
-            httpClient.start();
-        } catch (Exception ex) {
-            throw new IOException(ex.getMessage(), ex);
-        }
     }
 
     @Override
     protected void stopClients() {
         super.stopClients();
         tclregaScripts = null;
-        if (httpClient != null) {
-            try {
-                httpClient.stop();
-            } catch (Exception e) {
-                // ignore
-            }
-            httpClient = null;
-        }
     }
 
     @Override
@@ -122,7 +108,7 @@ public class CcuGateway extends AbstractHomematicGateway {
                     channel.getDevice().getAddress(), channel.getNumber(), paramsetType);
 
             Collection<String> dpNames = new ArrayList<String>();
-            for (HmDatapoint dp : channel.getDatapoints().values()) {
+            for (HmDatapoint dp : channel.getDatapoints()) {
                 if (!dp.isVirtual() && dp.isReadable() && dp.getParamsetType() == HmParamsetType.VALUES) {
                     dpNames.add(dp.getName());
                 }
@@ -233,8 +219,8 @@ public class CcuGateway extends AbstractHomematicGateway {
      * Load predefined scripts from an XML file.
      */
     private Map<String, String> loadTclRegaScripts() throws IOException {
-        InputStream stream = Thread.currentThread().getContextClassLoader()
-                .getResourceAsStream("homematic/tclrega-scripts.xml");
+        Bundle bundle = FrameworkUtil.getBundle(getClass());
+        InputStream stream = bundle.getResource("homematic/tclrega-scripts.xml").openStream();
         TclScriptList scriptList = (TclScriptList) xStream.fromXML(stream);
 
         Map<String, String> result = new HashMap<String, String>();

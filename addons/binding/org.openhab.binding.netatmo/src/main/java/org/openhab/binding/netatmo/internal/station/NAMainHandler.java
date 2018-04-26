@@ -13,10 +13,8 @@ import static org.openhab.binding.netatmo.internal.ChannelTypeUtils.*;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.smarthome.core.library.types.DecimalType;
 import org.eclipse.smarthome.core.thing.Thing;
 import org.eclipse.smarthome.core.types.State;
-import org.eclipse.smarthome.core.types.UnDefType;
 import org.openhab.binding.netatmo.handler.NetatmoDeviceHandler;
 import org.openhab.binding.netatmo.internal.WeatherUtils;
 
@@ -98,11 +96,9 @@ public class NAMainHandler extends NetatmoDeviceHandler<NAMain> {
                             dashboardData.getHumidity());
                     return toDecimalType(WeatherUtils.getDewPointDep(dashboardData.getTemperature(), dewPoint));
                 case CHANNEL_WIND_UNIT:
-                    return userAdministrative != null ? new DecimalType(userAdministrative.getWindunit())
-                            : UnDefType.UNDEF;
+                    return toDecimalType(userAdministrative.getWindunit());
                 case CHANNEL_PRESSURE_UNIT:
-                    return userAdministrative != null ? new DecimalType(userAdministrative.getPressureunit())
-                            : UnDefType.UNDEF;
+                    return toDecimalType(userAdministrative.getPressureunit());
             }
         }
         return super.getNAThingProperty(channelId);

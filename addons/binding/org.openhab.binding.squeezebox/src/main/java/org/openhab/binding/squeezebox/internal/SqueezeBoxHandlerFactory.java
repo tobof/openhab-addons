@@ -36,7 +36,6 @@ import org.openhab.binding.squeezebox.handler.SqueezeBoxServerHandler;
 import org.openhab.binding.squeezebox.internal.discovery.SqueezeBoxPlayerDiscoveryParticipant;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +47,7 @@ import org.slf4j.LoggerFactory;
  * @author Dan Cunningham - Initial contribution
  * @author Mark Hilbush - Cancel request player job when handler removed
  */
-@Component(service = ThingHandlerFactory.class, immediate = true, configurationPid = "binding.squeezebox", configurationPolicy = ConfigurationPolicy.OPTIONAL)
+@Component(service = ThingHandlerFactory.class, immediate = true, configurationPid = "binding.squeezebox")
 public class SqueezeBoxHandlerFactory extends BaseThingHandlerFactory {
 
     private Logger logger = LoggerFactory.getLogger(SqueezeBoxHandlerFactory.class);
@@ -64,6 +63,8 @@ public class SqueezeBoxHandlerFactory extends BaseThingHandlerFactory {
     private NetworkAddressService networkAddressService;
 
     private Map<String, ServiceRegistration<AudioSink>> audioSinkRegistrations = new ConcurrentHashMap<>();
+
+    private SqueezeBoxStateDescriptionOptionsProvider stateDescriptionProvider;
 
     @Override
     public boolean supportsThingType(ThingTypeUID thingTypeUID) {
@@ -83,7 +84,8 @@ public class SqueezeBoxHandlerFactory extends BaseThingHandlerFactory {
 
         if (thingTypeUID.equals(SQUEEZEBOXPLAYER_THING_TYPE)) {
             logger.trace("creating handler for player thing {}", thing);
-            SqueezeBoxPlayerHandler playerHandler = new SqueezeBoxPlayerHandler(thing, createCallbackUrl());
+            SqueezeBoxPlayerHandler playerHandler = new SqueezeBoxPlayerHandler(thing, createCallbackUrl(),
+                    stateDescriptionProvider);
 
             // Register the player as an audio sink
             logger.trace("Registering an audio sink for player thing {}", thing.getUID());
@@ -197,5 +199,14 @@ public class SqueezeBoxHandlerFactory extends BaseThingHandlerFactory {
 
     protected void unsetNetworkAddressService(NetworkAddressService networkAddressService) {
         this.networkAddressService = null;
+    }
+
+    @Reference
+    protected void setDynamicStateDescriptionProvider(SqueezeBoxStateDescriptionOptionsProvider provider) {
+        this.stateDescriptionProvider = provider;
+    }
+
+    protected void unsetDynamicStateDescriptionProvider(SqueezeBoxStateDescriptionOptionsProvider provider) {
+        this.stateDescriptionProvider = null;
     }
 }
