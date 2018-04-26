@@ -86,8 +86,7 @@ public class MySensorsMqttConnection extends MySensorsAbstractConnection impleme
 
         connection.addConnectionObserver(this);
 
-        connectionStateChanged(
-                connection.isConnected() ? MqttConnectionState.CONNECTED : MqttConnectionState.DISCONNECTED, null);
+        connectionStateChanged(connection.connectionState(), null);
 
         try {
             connection.addConsumer(myMqttSub);
