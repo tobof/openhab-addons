@@ -1,0 +1,64 @@
+/**
+ * Copyright (c) 2010-2019 Contributors to the openHAB project
+ *
+ * See the NOTICE file(s) distributed with this work for additional
+ * information.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ */
+package org.openhab.binding.mysensors.factory;
+
+import static org.openhab.binding.mysensors.MySensorsBindingConstants.*;
+
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.smarthome.core.thing.Bridge;
+import org.eclipse.smarthome.core.thing.Thing;
+import org.eclipse.smarthome.core.thing.ThingTypeUID;
+import org.eclipse.smarthome.core.thing.binding.ThingHandlerFactory;
+import org.eclipse.smarthome.core.thing.binding.BaseThingHandlerFactory;
+import org.eclipse.smarthome.core.thing.binding.ThingHandler;
+import org.openhab.binding.mysensors.handler.MySensorsBridgeHandler;
+import org.openhab.binding.mysensors.handler.MySensorsThingHandler;
+import org.osgi.service.component.annotations.Component;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * The {@link MySensorsHandlerFactory} is responsible for creating things and thing
+ * handlers.
+ *
+ * @author Tim Oberföll
+ */
+@Component(service = { ThingHandlerFactory.class })
+public class MySensorsHandlerFactory extends BaseThingHandlerFactory {
+
+    private Logger logger = LoggerFactory.getLogger(getClass());
+
+    @Override
+    public boolean supportsThingType(ThingTypeUID thingTypeUID) {
+        logger.debug("bibop");
+        return SUPPORTED_DEVICE_TYPES_UIDS.contains(thingTypeUID);
+    }
+
+    @Override
+    protected ThingHandler createHandler(Thing thing) {
+        logger.trace("Creating handler for thing: {}", thing.getUID());
+        ThingTypeUID thingTypeUID = thing.getThingTypeUID();
+        ThingHandler handler = null;
+
+        if (SUPPORTED_THING_TYPES_UIDS.contains(thingTypeUID)) {
+            handler = new MySensorsThingHandler(thing);
+        } else if (thingTypeUID.equals(THING_TYPE_BRIDGE_SER) || thingTypeUID.equals(THING_TYPE_BRIDGE_ETH)) {
+            handler = new MySensorsBridgeHandler((Bridge) thing);
+        } else {
+            logger.error("Thing {} cannot be configured, is this thing supported by the binding?", thingTypeUID);
+        }
+
+        return handler;
+    }
+
+}
