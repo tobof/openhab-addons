@@ -16,12 +16,10 @@ import static org.openhab.binding.mysensors.MySensorsBindingConstants.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
 import org.eclipse.smarthome.config.core.ConfigConstants;
-import org.eclipse.smarthome.config.discovery.DiscoveryService;
 import org.eclipse.smarthome.core.thing.Bridge;
 import org.eclipse.smarthome.core.thing.ChannelUID;
 import org.eclipse.smarthome.core.thing.ThingStatus;
@@ -86,8 +84,6 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
             myGateway.startup();
 
             myGateway.addEventListener(this);
-
-            registerDeviceDiscoveryService();
 
             logger.debug("Initialization of the MySensors bridge DONE!");
         } else {
@@ -209,16 +205,6 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
         gatewayConfig.setSanCheckSendHeartbeatFailAttempts(conf.networkSanCheckSendHeartbeatFailAttempts);
 
         return gatewayConfig;
-    }
-
-    private void registerDeviceDiscoveryService() {
-        if (bundleContext != null) {
-            logger.trace("Registering MySensorsDiscoveryService for bridge '{}'", getThing().getUID().getId());
-            discoveryService = new MySensorsDiscoveryService(this);
-            discoveryServiceRegistration = bundleContext.registerService(DiscoveryService.class.getName(),
-                    discoveryService, new Hashtable<String, Object>());
-            discoveryService.activate();
-        }
     }
 
     private void unregisterDeviceDiscoveryService() {
