@@ -15,7 +15,7 @@ package org.openhab.binding.mysensors.internal.protocol.message;
 /**
  * A MySensors Message consists of 6 parts splitted by semicolon
  *
- * @author Tim Oberföll
+ * @author Tim Oberföll - Initial contribution
  *
  */
 public enum MySensorsMessagePart {

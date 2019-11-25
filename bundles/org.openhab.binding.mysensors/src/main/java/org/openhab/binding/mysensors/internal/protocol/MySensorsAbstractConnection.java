@@ -42,8 +42,8 @@ import org.slf4j.LoggerFactory;
 /**
  * Connection of the bridge (via TCP/IP or serial) to the MySensors network.
  *
- * @author Tim Oberföll
- * @author Andrea Cioni
+ * @author Tim Oberföll - Initial contribution
+ * @author Andrea Cioni - Redesign
  *
  */
 public abstract class MySensorsAbstractConnection implements Runnable {
@@ -690,34 +690,16 @@ public abstract class MySensorsAbstractConnection implements Runnable {
         private void checkPendingSmartSleepMessage(int nodeId) {
             synchronized (smartSleepMessageQueue) {
                 Iterator<MySensorsMessage> iterator = smartSleepMessageQueue.iterator();
+                int i = 0;
                 while (iterator.hasNext()) {
                     MySensorsMessage msgInQueue = iterator.next();
+                    logger.debug("Msg: {}, nodeId: {}, childId: {}, nextSend: {}.", i++, msgInQueue.getNodeId(),
+                            msgInQueue.getChildId(), msgInQueue.getNextSend());
                     if (msgInQueue.getNodeId() == nodeId) {
                         iterator.remove();
                         addMySensorsOutboundMessage(msgInQueue);
                         logger.debug("Message for nodeId: {} in queue needs to be send immediately!", nodeId);
                     }
-                }
-            }
-        }
-
-        /**
-         * Debug print of the smart sleep queue content to logs
-         */
-        private void printSmartSleepQueue() {
-            synchronized (smartSleepMessageQueue) {
-                Iterator<MySensorsMessage> iterator = smartSleepMessageQueue.iterator();
-                if (iterator != null) {
-                    logger.debug("####### START SmartSleep queue #####");
-                    int i = 1;
-                    while (iterator.hasNext()) {
-                        MySensorsMessage msgInQueue = iterator.next();
-
-                        logger.debug("Msg: {}, nodeId: {}, childId: {}, nextSend: {}.", i, msgInQueue.getNodeId(),
-                                msgInQueue.getChildId(), msgInQueue.getNextSend());
-                        i++;
-                    }
-                    logger.debug("####### END SmartSleep queue #####");
                 }
             }
         }

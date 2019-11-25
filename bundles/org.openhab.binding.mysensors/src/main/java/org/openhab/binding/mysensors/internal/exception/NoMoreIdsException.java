@@ -15,7 +15,7 @@ package org.openhab.binding.mysensors.internal.exception;
 /**
  * Exception occurs if no more ids are available.
  *
- * @author Andrea Cioni
+ * @author Andrea Cioni - Initial contribution
  *
  */
 public class NoMoreIdsException extends Exception {

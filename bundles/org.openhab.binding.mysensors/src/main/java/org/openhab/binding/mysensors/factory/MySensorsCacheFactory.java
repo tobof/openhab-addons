@@ -28,7 +28,7 @@ import com.google.gson.stream.JsonWriter;
 /**
  * Cache may be used to store information across restart of MySensors connection.
  *
- * @author Andrea Cioni
+ * @author Andrea Cioni - Initial contribution
  *
  */
 public class MySensorsCacheFactory {

@@ -25,8 +25,8 @@ import org.openhab.binding.mysensors.internal.sensors.MySensorsVariable;
  * Default (Java8) added to allow the class that will implement this interface, to choose
  * only the method in which is interested (not best practice, but help code reading).
  *
- * @author Tim Oberföll
- * @author Andrea Cioni
+ * @author Tim Oberföll - Initial contribution
+ * @author Andrea Cioni - Redesign
  *
  */
 public interface MySensorsGatewayEventListener extends EventListener {

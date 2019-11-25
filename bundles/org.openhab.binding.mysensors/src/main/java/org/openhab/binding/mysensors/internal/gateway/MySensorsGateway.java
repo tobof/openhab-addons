@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
  * -ID handling for the MySensors network: Requests for IDs get answered and IDs get stored in a local cache.
  * -Updating sensors variable and status information
  *
- * @author Andrea Cioni
+ * @author Andrea Cioni - Initial contribution
  *
  */
 public class MySensorsGateway implements MySensorsGatewayEventListener {

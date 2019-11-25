@@ -23,7 +23,7 @@ import java.util.Map;
  * internal: for example for battery status
  * stream: for example for firmware updates
  *
- * @author Tim Oberföll
+ * @author Tim Oberföll - Initial contribution
  *
  */
 public enum MySensorsMessageType {

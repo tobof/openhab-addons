@@ -12,13 +12,16 @@
  */
 package org.openhab.binding.mysensors.config;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+
 /**
  * Parameters used for node / thing configuration.
  *
- * @author Tim Oberföll
- * @author Andrea Cioni
+ * @author Tim Oberföll - Initial contribution
+ * @author Andrea Cioni - Redesign of the binding
  *
  */
+@NonNullByDefault
 public class MySensorsSensorConfiguration {
     /**
      * Node ID in the MySensors network

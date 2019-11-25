@@ -15,7 +15,7 @@ package org.openhab.binding.mysensors.internal.exception;
 /**
  * Exception occurs if the state of a thing is not yet initialized.
  *
- * @author Tim Oberföll
+ * @author Tim Oberföll - Initial contribution
  *
  */
 public class NotInitializedException extends Exception {

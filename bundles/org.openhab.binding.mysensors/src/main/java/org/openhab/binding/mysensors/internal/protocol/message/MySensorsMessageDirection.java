@@ -17,7 +17,7 @@ package org.openhab.binding.mysensors.internal.protocol.message;
  * Incoming == from the gateway to the binding
  * Outgoing == from the binding to the gateway
  *
- * @author Tim Oberföll
+ * @author Tim Oberföll - Initial contribution
  *
  */
 public enum MySensorsMessageDirection {

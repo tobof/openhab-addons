@@ -57,7 +57,7 @@ import org.slf4j.LoggerFactory;
  * The {@link MySensorsThingHandler} is responsible for handling commands, which are
  * sent to one of the channels and messages received via the MySensors network.
  *
- * @author Tim Oberföll
+ * @author Tim Oberföll - Initial contribution
  */
 public class MySensorsThingHandler extends BaseThingHandler implements MySensorsGatewayEventListener {
 
@@ -118,12 +118,6 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
     }
 
     @Override
-    public void handleUpdate(ChannelUID channelUID, State newState) {
-        logger.trace("New state {} received for channel uid {}", newState, channelUID);
-        super.handleUpdate(channelUID, newState);
-    }
-
-    @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
         logger.trace("Command {} received for channel uid {}", command, channelUID);
 
@@ -172,46 +166,42 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
 
             logger.debug("Adapter: {} loaded", adapter.getClass());
 
-            if (adapter != null) {
-                logger.trace("Adapter {} found for type {}", adapter.getClass().getSimpleName(), channelUID.getId());
+            logger.trace("Adapter {} found for type {}", adapter.getClass().getSimpleName(), channelUID.getId());
 
-                MySensorsMessageSubType type = adapter.typeFromChannelCommand(channelUID.getId(), command);
+            MySensorsMessageSubType type = adapter.typeFromChannelCommand(channelUID.getId(), command);
 
-                if (type != null) {
-                    logger.trace("Type for channel: {}, command: {} of thing {} is: {}", thing.getUID(), command,
-                            thing.getUID(), type);
+            if (type != null) {
+                logger.trace("Type for channel: {}, command: {} of thing {} is: {}", thing.getUID(), command,
+                        thing.getUID(), type);
 
-                    MySensorsVariable var = myGateway.getVariable(configuration.nodeId, configuration.childId, type);
+                MySensorsVariable var = myGateway.getVariable(configuration.nodeId, configuration.childId, type);
 
-                    if (var != null) {
-                        MySensorsMessageSubType subType;
-                        if (rgbPercentageValue) {
-                            subType = MySensorsMessageSubType.V_PERCENTAGE;
-                        } else if (rgbOnOffValue) {
-                            subType = MySensorsMessageSubType.V_STATUS;
-                        } else {
-                            subType = var.getType();
-                        }
-
-                        // Create the real message to send
-                        MySensorsMessage newMsg = new MySensorsMessage(configuration.nodeId, configuration.childId,
-                                MySensorsMessageType.SET, MySensorsMessageAck.getById(intRequestAck),
-                                configuration.revertState, configuration.smartSleep);
-
-                        newMsg.setSubType(subType);
-                        newMsg.setMsg(adapter.fromCommand(command));
-
-                        myGateway.sendMessage(newMsg);
+                if (var != null) {
+                    MySensorsMessageSubType subType;
+                    if (rgbPercentageValue) {
+                        subType = MySensorsMessageSubType.V_PERCENTAGE;
+                    } else if (rgbOnOffValue) {
+                        subType = MySensorsMessageSubType.V_STATUS;
                     } else {
-                        logger.warn("Variable not found, cannot handle command for thing {} of type {}", thing.getUID(),
-                                channelUID.getId());
+                        subType = var.getType();
                     }
+
+                    // Create the real message to send
+                    MySensorsMessage newMsg = new MySensorsMessage(configuration.nodeId, configuration.childId,
+                            MySensorsMessageType.SET, MySensorsMessageAck.getById(intRequestAck),
+                            configuration.revertState, configuration.smartSleep);
+
+                    newMsg.setSubType(subType);
+                    newMsg.setMsg(adapter.fromCommand(command));
+
+                    myGateway.sendMessage(newMsg);
                 } else {
-                    logger.error("Could not get type of variable for channel: {}, command: {} of thing {}",
-                            thing.getUID(), command, thing.getUID());
+                    logger.warn("Variable not found, cannot handle command for thing {} of type {}", thing.getUID(),
+                            channelUID.getId());
                 }
             } else {
-                logger.error("Type adapter not found for {}", channelUID.getId());
+                logger.error("Could not get type of variable for channel: {}, command: {} of thing {}", thing.getUID(),
+                        command, thing.getUID());
             }
         }
     }
@@ -267,7 +257,8 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
      */
     private void updateLastUpdate(MySensorsNode node, boolean isRevert) {
         // Don't always fire last update channel, do it only after a minute by
-        if (lastUpdate == null || (System.currentTimeMillis() > (lastUpdate.getCalendar().getTimeInMillis() + 60000))
+        if (lastUpdate == null
+                || (System.currentTimeMillis() > (lastUpdate.getZonedDateTime().toInstant().toEpochMilli() + 60000))
                 || configuration.revertState) {
             DateTimeType dt = new DateTimeType(
                     new SimpleDateFormat(DateTimeType.DATE_PATTERN).format(node.getLastUpdate()));
@@ -290,7 +281,10 @@ public class MySensorsThingHandler extends BaseThingHandler implements MySensors
      */
     private synchronized MySensorsBridgeHandler getBridgeHandler() {
         Bridge bridge = getBridge();
-        MySensorsBridgeHandler myBridgeHandler = (MySensorsBridgeHandler) bridge.getHandler();
+        MySensorsBridgeHandler myBridgeHandler = null;
+        if (bridge != null) {
+            myBridgeHandler = (MySensorsBridgeHandler) bridge.getHandler();
+        }
 
         return myBridgeHandler;
     }

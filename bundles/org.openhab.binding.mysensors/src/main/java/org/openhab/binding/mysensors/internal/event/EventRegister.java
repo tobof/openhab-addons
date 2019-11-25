@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Event register generic class
  *
- * @author Andrea Cioni
+ * @author Andrea Cioni - Initial contribution
  *
  * @param <T> the EventListener to register
  */

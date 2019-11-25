@@ -30,7 +30,7 @@ import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageT
  * - is the child reachable?
  * - battery percent (if available)
  *
- * @author Andrea Cioni
+ * @author Andrea Cioni - Initial contribution
  *
  */
 public class MySensorsNode {

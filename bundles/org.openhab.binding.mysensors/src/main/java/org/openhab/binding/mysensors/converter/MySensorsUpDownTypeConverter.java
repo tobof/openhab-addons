@@ -12,6 +12,8 @@
  */
 package org.openhab.binding.mysensors.converter;
 
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.smarthome.core.library.types.PercentType;
 import org.eclipse.smarthome.core.library.types.StopMoveType;
 import org.eclipse.smarthome.core.library.types.UpDownType;
@@ -24,14 +26,15 @@ import org.openhab.binding.mysensors.internal.sensors.MySensorsVariable;
 /**
  * Used to convert a String from an incoming MySensors message to a UpDownType
  *
- * @author Andrea Cioni
- * @author Tim Oberföll
+ * @author Tim Oberföll - Initial contribution
+ * @author Andrea Cioni - Redesign
  *
  */
+@NonNullByDefault
 public class MySensorsUpDownTypeConverter implements MySensorsTypeConverter {
 
     @Override
-    public MySensorsMessageSubType typeFromChannelCommand(String channel, Command command) {
+    public MySensorsMessageSubType typeFromChannelCommand(@NonNull String channel, @NonNull Command command) {
         if (channel.equals(MySensorsBindingConstants.CHANNEL_COVER)) {
             if (command instanceof UpDownType) {
                 if (command == UpDownType.UP) {
@@ -51,7 +54,7 @@ public class MySensorsUpDownTypeConverter implements MySensorsTypeConverter {
     }
 
     @Override
-    public State stateFromChannel(MySensorsVariable value) {
+    public State stateFromChannel(@NonNull MySensorsVariable value) {
         if (value.getType() == MySensorsMessageSubType.V_DOWN) {
             return UpDownType.DOWN;
         } else if (value.getType() == MySensorsMessageSubType.V_UP) {

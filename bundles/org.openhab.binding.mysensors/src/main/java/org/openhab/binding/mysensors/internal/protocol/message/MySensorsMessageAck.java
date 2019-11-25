@@ -19,7 +19,7 @@ import java.util.Map;
  * Every message contains a field with which the sender is able to indicate that it requests an
  * Acknowledgement for the message.
  *
- * @author Tim Oberföll
+ * @author Tim Oberföll - Initial contribution
  *
  */
 public enum MySensorsMessageAck {

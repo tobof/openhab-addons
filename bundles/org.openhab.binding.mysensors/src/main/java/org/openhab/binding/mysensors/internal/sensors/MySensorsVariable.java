@@ -21,8 +21,8 @@ import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageS
 /**
  * Variables (states) of a MySensors child.
  *
- * @author Tim Oberföll
- * @author Andrea Cioni
+ * @author Tim Oberföll - Initial contribution
+ * @author Andrea Cioni - Redesign
  *
  */
 public abstract class MySensorsVariable {

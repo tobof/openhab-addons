@@ -12,16 +12,18 @@
  */
 package org.openhab.binding.mysensors.internal.sensors;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.openhab.binding.mysensors.internal.Mergeable;
 import org.openhab.binding.mysensors.internal.exception.MergeException;
 
 /**
  * Configuration and parameters of a MySensors node.
  *
- * @author Tim Oberföll
- * @author Andrea Cioni
+ * @author Tim Oberföll - Initial contribution
+ * @author Andrea Cioni - Redesign
  *
  */
+@NonNullByDefault
 public class MySensorsNodeConfig implements Mergeable {
 
     private boolean requestHeartbeatResponse;

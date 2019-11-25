@@ -16,7 +16,7 @@ package org.openhab.binding.mysensors.internal.exception;
  * Exception occurs if there is an error in
  * the ack message that was received by the gateway
  *
- * @author Tim Oberföll
+ * @author Tim Oberföll - Initial contribution
  *
  */
 public class NoAckException extends Exception {

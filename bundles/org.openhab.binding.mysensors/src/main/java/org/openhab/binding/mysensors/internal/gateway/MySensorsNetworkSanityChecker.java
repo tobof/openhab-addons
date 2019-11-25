@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Regulary checks the status of the link to the gateway to the MySensors network.
  *
- * @author Andrea Cioni
+ * @author Andrea Cioni - Initial contribution
  *
  */
 public class MySensorsNetworkSanityChecker implements MySensorsGatewayEventListener, Runnable {

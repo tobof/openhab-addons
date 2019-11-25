@@ -31,8 +31,8 @@ import gnu.io.UnsupportedCommOperationException;
 /**
  * Connection to the serial interface where the MySensors Gateway is connected.
  *
- * @author Tim Oberföll
- * @author Andrea Cioni
+ * @author Tim Oberföll - Initial contribution
+ * @author Andrea Cioni - Redesign
  *
  */
 public class MySensorsSerialConnection extends MySensorsAbstractConnection implements SerialPortEventListener {

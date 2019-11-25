@@ -12,6 +12,7 @@
  */
 package org.openhab.binding.mysensors.internal.sensors.variable;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageSubType;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsVariable;
 
@@ -19,10 +20,11 @@ import org.openhab.binding.mysensors.internal.sensors.MySensorsVariable;
  * MySensors variable definition according to MySensors serial API
  * https://www.mysensors.org/download/serial_api_20
  *
- * @author Andrea Cioni
- * @author Tim Oberföll
+ * @author Andrea Cioni - Initial contribution
+ * @author Tim Oberföll - Redesign
  *
  */
+@NonNullByDefault
 public class MySensorsVariableVIrRecord extends MySensorsVariable {
 
     public MySensorsVariableVIrRecord() {

@@ -74,7 +74,7 @@ import org.slf4j.LoggerFactory;
  * Every node may have one ore more children in the MySensors context.
  * Instance of this class could be obtained easy if presentation code is know (use static method fromPresentation).
  *
- * @author Andrea Cioni
+ * @author Andrea Cioni - Initial contribution
  *
  */
 public abstract class MySensorsChild implements Mergeable {

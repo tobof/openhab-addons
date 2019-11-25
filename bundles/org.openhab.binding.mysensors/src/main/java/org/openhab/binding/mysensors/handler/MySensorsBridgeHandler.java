@@ -36,7 +36,6 @@ import org.openhab.binding.mysensors.internal.gateway.MySensorsGatewayType;
 import org.openhab.binding.mysensors.internal.protocol.MySensorsAbstractConnection;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsNode;
-import org.osgi.framework.ServiceRegistration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +45,7 @@ import com.google.gson.reflect.TypeToken;
  * MySensorsBridgeHandler is used to initialize a new bridge (in MySensors: Gateway)
  * The sensors are connected via the gateway/bridge to the controller
  *
- * @author Tim Oberföll
+ * @author Tim Oberföll - Initial contribution
  *
  */
 public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySensorsGatewayEventListener {
@@ -59,13 +58,13 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
     // Configuration from thing file
     private MySensorsBridgeConfiguration myBridgeConfiguration;
 
-    // Service discovery registration
-    private ServiceRegistration<?> discoveryServiceRegistration;
+    private MySensorsCacheFactory cacheFactory;
 
-    // Discovery service
     private MySensorsDiscoveryService discoveryService;
 
-    private MySensorsCacheFactory cacheFactory;
+    public void setDiscoveryService(MySensorsDiscoveryService discoveryService) {
+        this.discoveryService = discoveryService;
+    }
 
     public MySensorsBridgeHandler(Bridge bridge) {
         super(bridge);
@@ -86,6 +85,7 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
             myGateway.addEventListener(this);
 
             logger.debug("Initialization of the MySensors bridge DONE!");
+            discoveryService.activate();
         } else {
             logger.error("Failed to initialize MySensors bridge");
         }
@@ -94,8 +94,6 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
     @Override
     public void dispose() {
         logger.debug("Disposing of the MySensors bridge");
-
-        unregisterDeviceDiscoveryService();
 
         if (myGateway != null) {
             myGateway.removeEventListener(this);
@@ -205,17 +203,5 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
         gatewayConfig.setSanCheckSendHeartbeatFailAttempts(conf.networkSanCheckSendHeartbeatFailAttempts);
 
         return gatewayConfig;
-    }
-
-    private void unregisterDeviceDiscoveryService() {
-        if (discoveryServiceRegistration != null && discoveryService != null) {
-            logger.trace("Unregistering MySensorsDiscoveryService for bridge '{}'", getThing().getUID().getId());
-
-            discoveryService.deactivate();
-
-            discoveryServiceRegistration.unregister();
-            discoveryServiceRegistration = null;
-            discoveryService = null;
-        }
     }
 }

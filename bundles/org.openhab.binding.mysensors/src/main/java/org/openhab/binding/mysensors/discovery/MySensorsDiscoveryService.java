@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
  * Discovery service for MySensors devices. Starts DiscoveryThread to listen for
  * new things / nodes.
  *
- * @author Tim Oberföll
+ * @author Tim Oberföll - Initial contribution
  *
  */
 public class MySensorsDiscoveryService extends AbstractDiscoveryService implements MySensorsGatewayEventListener {
@@ -66,6 +66,16 @@ public class MySensorsDiscoveryService extends AbstractDiscoveryService implemen
     protected void stopScan() {
         logger.debug("Stopping MySensors discovery scan");
         bridgeHandler.getMySensorsGateway().removeEventListener(this);
+    }
+
+    @Override
+    protected void startBackgroundDiscovery() {
+        startScan();
+    }
+
+    @Override
+    protected void stopBackgroundDiscovery() {
+        startScan();
     }
 
     /**

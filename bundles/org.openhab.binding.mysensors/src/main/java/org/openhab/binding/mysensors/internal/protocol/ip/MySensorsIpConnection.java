@@ -24,8 +24,8 @@ import org.openhab.binding.mysensors.internal.protocol.MySensorsAbstractConnecti
 /**
  * Implements the TCP/IP connection to the ethernet gateway of the MySensors network.
  *
- * @author Andrea Cioni
- * @author Tim Oberföll
+ * @author Andrea Cioni - Initial contribution
+ * @author Tim Oberföll - Redesign
  *
  */
 public class MySensorsIpConnection extends MySensorsAbstractConnection {

@@ -20,7 +20,7 @@ import org.openhab.binding.mysensors.internal.sensors.MySensorsNode;
 /**
  * Used to store the content of a MySensors message.
  *
- * @author Tim Oberföll
+ * @author Tim Oberföll - Initial contribution
  *
  */
 public class MySensorsMessage {
@@ -281,7 +281,7 @@ public class MySensorsMessage {
 
     /**
      * Checks if the received message is a PRE_SLEEP_NOTIFICATION for smartsleep messages
-     * 
+     *
      * @return true, if it is a PRE_SLEEP_NOTIFICATION
      */
     public boolean isPreSleepNotification() {

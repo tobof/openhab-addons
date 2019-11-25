@@ -15,7 +15,7 @@ package org.openhab.binding.mysensors.internal.exception;
 /**
  * Exception occurs if there is no content to add, for example in a variable.
  *
- * @author Tim Oberföll
+ * @author Tim Oberföll - Initial contribution
  *
  */
 public class NoContentException extends Exception {

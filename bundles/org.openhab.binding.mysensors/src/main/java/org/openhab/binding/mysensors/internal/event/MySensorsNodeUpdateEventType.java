@@ -18,7 +18,7 @@ package org.openhab.binding.mysensors.internal.event;
  * BATTERY == for battery info (in percent)
  * UPDATE == new value for the node
  *
- * @author Tim Oberföll
+ * @author Tim Oberföll - Initial contribution
  *
  */
 public enum MySensorsNodeUpdateEventType {

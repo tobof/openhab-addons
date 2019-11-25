@@ -22,7 +22,7 @@ import org.openhab.binding.mysensors.internal.exception.MergeException;
 /**
  * Class gives some utility methods that not belong to a specific class
  *
- * @author Andrea Cioni
+ * @author Andrea Cioni - Initial contribution
  *
  */
 public class MySensorsUtility {

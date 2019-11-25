@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * Generic interface for an EventListener register
  *
- * @author Andrea Cioni
+ * @author Andrea Cioni - Initial contribution
  *
  * @param <T> the EventListener to register
  */

@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.smarthome.core.thing.ThingTypeUID;
 import org.openhab.binding.mysensors.converter.MySensorsDecimalTypeConverter;
 import org.openhab.binding.mysensors.converter.MySensorsOnOffTypeConverter;
@@ -35,8 +36,9 @@ import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageS
  * The {@link MySensorsBinding} class defines common constants, which are
  * used across the whole binding.
  *
- * @author Tim Oberföll
+ * @author Tim Oberföll - Initial contribution
  */
+@NonNullByDefault
 public class MySensorsBindingConstants {
 
     public static final String BINDING_ID = "mysensors";
@@ -49,7 +51,7 @@ public class MySensorsBindingConstants {
     public static final String PARAMETER_SENDDELAY = "sendDelay";
     public static final String PARAMETER_BAUDRATE = "baudRate";
     public static final String PARAMETER_REQUESTACK = "requestack";
-    
+
     /**
      * All knowing thing. A node with nodeId 999 and childId 999 receives all messages
      * received from the MySensors bridge/gateway. Useful for debugging and for implementation
@@ -392,12 +394,10 @@ public class MySensorsBindingConstants {
             THING_TYPE_RGB_LIGHT, THING_TYPE_RGBW_LIGHT, THING_TYPE_WATER_QUALITY, THING_TYPE_MYSENSORS_MESSAGE,
             THING_TYPE_TEXT, THING_TYPE_IR, THING_TYPE_AIR_QUALITY, THING_TYPE_DUST, THING_TYPE_COLOR_SENSOR,
             THING_TYPE_MOISTURE, THING_TYPE_SPRINKLER, THING_TYPE_HEATER, THING_TYPE_VIBRATION, THING_TYPE_WATER_LEAK,
-            THING_TYPE_GAS, THING_TYPE_GPS, THING_TYPE_SCENE_CONTROLLER)
-            .collect(Collectors.toSet());
+            THING_TYPE_GAS, THING_TYPE_GPS, THING_TYPE_SCENE_CONTROLLER).collect(Collectors.toSet());
     /** Supported bridges */
-    public static final Set<ThingTypeUID> SUPPORTED_BRIDGE_THING_TYPES_UIDS = Stream.of(THING_TYPE_BRIDGE_SER,
-            THING_TYPE_BRIDGE_ETH)
-            .collect(Collectors.toSet());
+    public static final Set<ThingTypeUID> SUPPORTED_BRIDGE_THING_TYPES_UIDS = Stream
+            .of(THING_TYPE_BRIDGE_SER, THING_TYPE_BRIDGE_ETH).collect(Collectors.toSet());
 
     /** Supported devices (things + bridges) */
     public static final Set<ThingTypeUID> SUPPORTED_DEVICE_TYPES_UIDS = Stream.of(THING_TYPE_HUMIDITY,

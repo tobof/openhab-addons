@@ -19,7 +19,7 @@ package org.openhab.binding.mysensors.internal.protocol.message;
  * V == variable
  * I == internal
  *
- * @author Tim Oberföll
+ * @author Tim Oberföll - Initial contribution
  *
  */
 public enum MySensorsMessageSubTypes {

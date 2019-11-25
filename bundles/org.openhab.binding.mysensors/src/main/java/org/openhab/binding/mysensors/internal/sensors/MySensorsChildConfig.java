@@ -18,8 +18,8 @@ import org.openhab.binding.mysensors.internal.exception.MergeException;
 /**
  * Configuration and parameters of a child from a MySensors node.
  *
- * @author Tim Oberföll
- * @author Andrea Cioni
+ * @author Tim Oberföll - Initial contribution
+ * @author Andrea Cioni - Redesign
  *
  */
 public class MySensorsChildConfig implements Mergeable {

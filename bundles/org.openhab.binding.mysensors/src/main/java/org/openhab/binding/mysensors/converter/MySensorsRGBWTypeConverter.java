@@ -14,6 +14,7 @@ package org.openhab.binding.mysensors.converter;
 
 import java.awt.Color;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.smarthome.core.library.types.HSBType;
 import org.eclipse.smarthome.core.types.Command;
 import org.eclipse.smarthome.core.types.State;
@@ -21,9 +22,10 @@ import org.eclipse.smarthome.core.types.State;
 /**
  * Used to convert a String from an incoming MySensors message to a HSBType
  *
- * @author Tim Oberföll
+ * @author Tim Oberföll - Initial contribution
  *
  */
+@NonNullByDefault
 public class MySensorsRGBWTypeConverter implements MySensorsTypeConverter {
 
     @Override

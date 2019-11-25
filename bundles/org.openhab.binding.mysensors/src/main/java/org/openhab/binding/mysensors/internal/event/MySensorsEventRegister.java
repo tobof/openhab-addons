@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
  * Event register is used to notify registered things about updates
  * and messages received by the gateway.
  *
- * @author Andrea Cioni
+ * @author Andrea Cioni - Initial contribution
  *
  */
 public class MySensorsEventRegister extends EventRegister<MySensorsGatewayEventListener> {

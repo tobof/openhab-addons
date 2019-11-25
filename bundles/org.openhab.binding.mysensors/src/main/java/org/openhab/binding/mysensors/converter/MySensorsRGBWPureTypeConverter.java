@@ -14,6 +14,7 @@ package org.openhab.binding.mysensors.converter;
 
 import java.awt.Color;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.smarthome.core.library.types.HSBType;
 import org.eclipse.smarthome.core.types.Command;
 import org.eclipse.smarthome.core.types.State;
@@ -22,9 +23,11 @@ import org.eclipse.smarthome.core.types.State;
  * Used to convert a String from an incoming MySensors message to a HSBType
  * If the color value exceeds a certain limit a pure white color is generated
  *
- * @author Oliver Hilsky
+ * @author Oliver Hilsky - Initial contribution
+ * @author Tim Oberföll - Redesign
  *
  */
+@NonNullByDefault
 public class MySensorsRGBWPureTypeConverter implements MySensorsTypeConverter {
 
     private static final int WHITE_LIMIT = 245;

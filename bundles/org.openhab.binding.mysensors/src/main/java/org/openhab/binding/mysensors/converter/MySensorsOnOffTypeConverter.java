@@ -12,6 +12,8 @@
  */
 package org.openhab.binding.mysensors.converter;
 
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.smarthome.core.library.types.OnOffType;
 import org.eclipse.smarthome.core.types.Command;
 import org.eclipse.smarthome.core.types.State;
@@ -19,10 +21,11 @@ import org.eclipse.smarthome.core.types.State;
 /**
  * Used to convert a String from an incoming MySensors message to an OnOffType
  *
- * @author Andrea Cioni
- * @author Tim Oberföll
+ * @author Tim Oberföll - Initial contribution
+ * @author Andrea Cioni - Redesign
  *
  */
+@NonNullByDefault
 public class MySensorsOnOffTypeConverter implements MySensorsTypeConverter {
 
     @Override
@@ -37,7 +40,7 @@ public class MySensorsOnOffTypeConverter implements MySensorsTypeConverter {
     }
 
     @Override
-    public String fromCommand(Command value) {
+    public String fromCommand(@NonNull Command value) {
         if (value instanceof OnOffType) {
             if (value == OnOffType.OFF) {
                 return "0";

@@ -15,7 +15,7 @@ package org.openhab.binding.mysensors.internal.exception;
 /**
  * Exception is thrown if an error occures while trying to revert the status of a thing.
  *
- * @author Tim Oberföll
+ * @author Tim Oberföll - Initial contribution
  *
  */
 public class RevertVariableStateException extends Exception {

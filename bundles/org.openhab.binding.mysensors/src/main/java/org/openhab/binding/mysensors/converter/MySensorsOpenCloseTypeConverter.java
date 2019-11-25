@@ -12,6 +12,7 @@
  */
 package org.openhab.binding.mysensors.converter;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.smarthome.core.library.types.OnOffType;
 import org.eclipse.smarthome.core.library.types.OpenClosedType;
 import org.eclipse.smarthome.core.types.Command;
@@ -20,10 +21,11 @@ import org.eclipse.smarthome.core.types.State;
 /**
  * Used to convert a String from an incoming MySensors message to an OpenCloseType
  *
- * @author Andrea Cioni
- * @author Tim Oberföll
+ * @author Tim Oberföll - Initial contribution
+ * @author Andrea Cioni - Redesign
  *
  */
+@NonNullByDefault
 public class MySensorsOpenCloseTypeConverter implements MySensorsTypeConverter {
     @Override
     public State fromString(String string) {

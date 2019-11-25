@@ -12,14 +12,16 @@
  */
 package org.openhab.binding.mysensors.internal;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.openhab.binding.mysensors.internal.exception.MergeException;
 
 /**
  * Indicates that a class could be merged to another one of the same type
  *
- * @author Andrea Cioni
+ * @author Andrea Cioni - Initial contribution
  *
  */
+@NonNullByDefault
 public interface Mergeable {
 
     /**

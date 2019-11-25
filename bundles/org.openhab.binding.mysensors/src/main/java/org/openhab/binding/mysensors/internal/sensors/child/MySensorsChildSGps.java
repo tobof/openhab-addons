@@ -12,6 +12,7 @@
  */
 package org.openhab.binding.mysensors.internal.sensors.child;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.openhab.binding.mysensors.internal.exception.NoContentException;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessageSubType;
 import org.openhab.binding.mysensors.internal.sensors.MySensorsChild;
@@ -28,10 +29,11 @@ import org.slf4j.LoggerFactory;
  * MySensors Child definition according to MySensors serial API
  * https://www.mysensors.org/download/serial_api_20
  *
- * @author Andrea Cioni
- * @author Tim Oberföll
+ * @author Andrea Cioni - Initial contribution
+ * @author Tim Oberföll - Redesign
  *
  */
+@NonNullByDefault
 public class MySensorsChildSGps extends MySensorsChild {
 
     private Logger logger = LoggerFactory.getLogger(getClass());

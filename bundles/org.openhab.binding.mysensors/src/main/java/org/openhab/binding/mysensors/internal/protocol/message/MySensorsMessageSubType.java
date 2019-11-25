@@ -18,7 +18,7 @@ import java.util.Map;
 /**
  * Enum of MessageSubTypes and the corresponding id
  *
- * @author Tim Oberföll
+ * @author Tim Oberföll - Initial contribution
  *
  */
 public enum MySensorsMessageSubType {

@@ -15,7 +15,7 @@ package org.openhab.binding.mysensors.internal.gateway;
 /**
  * Possible gateway types
  *
- * @author Tim Oberföll
+ * @author Tim Oberföll - Initial contribution
  *
  */
 public enum MySensorsGatewayType {

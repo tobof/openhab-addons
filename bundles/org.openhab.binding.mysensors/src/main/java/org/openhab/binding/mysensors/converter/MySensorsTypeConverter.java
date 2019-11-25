@@ -12,6 +12,7 @@
  */
 package org.openhab.binding.mysensors.converter;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.smarthome.core.types.Command;
 import org.eclipse.smarthome.core.types.State;
 import org.openhab.binding.mysensors.MySensorsBindingConstants;
@@ -21,7 +22,7 @@ import org.openhab.binding.mysensors.internal.sensors.MySensorsVariable;
 /**
  * Converter to adapt state of OpenHab to MySensors and vice versa
  *
- * @author Andrea Cioni
+ * @author Andrea Cioni - Initial contribution
  *
  */
 public interface MySensorsTypeConverter {
@@ -32,7 +33,7 @@ public interface MySensorsTypeConverter {
      * @param value non-null that should be converted
      * @return the state from a variable
      */
-    public default State stateFromChannel(MySensorsVariable value) {
+    public default State stateFromChannel(@NonNull MySensorsVariable value) {
         return fromString(value.getValue());
     }
 
@@ -42,7 +43,7 @@ public interface MySensorsTypeConverter {
      * @param string the payload to process
      * @return an equivalent state for OpenHab
      */
-    public State fromString(String string);
+    public State fromString(@NonNull String string);
 
     /**
      * Get a string from an OpenHab command.
@@ -50,7 +51,7 @@ public interface MySensorsTypeConverter {
      * @param command, the command from OpenHab environment
      * @return the payload string
      */
-    public default String fromCommand(Command command) {
+    public default String fromCommand(@NonNull Command command) {
         return command.toString();
     }
 
@@ -62,7 +63,7 @@ public interface MySensorsTypeConverter {
      * @param command the command received
      * @return the variable number
      */
-    default MySensorsMessageSubType typeFromChannelCommand(String channel, Command command) {
+    default MySensorsMessageSubType typeFromChannelCommand(@NonNull String channel, @NonNull Command command) {
         return MySensorsBindingConstants.INVERSE_CHANNEL_MAP.get(channel);
     }
 }
