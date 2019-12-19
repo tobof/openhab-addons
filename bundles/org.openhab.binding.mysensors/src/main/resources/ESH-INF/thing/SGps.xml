@@ -7,6 +7,7 @@
 		<supported-bridge-type-refs>
 			<bridge-type-ref id="bridge-ser" />
 			<bridge-type-ref id="bridge-eth" />
+            <bridge-type-ref id="bridge-mqtt" />
 		</supported-bridge-type-refs>
 
 		<label>GPS</label>

@@ -54,7 +54,8 @@ public class MySensorsHandlerFactory extends BaseThingHandlerFactory {
 
         if (SUPPORTED_THING_TYPES_UIDS.contains(thingTypeUID)) {
             handler = new MySensorsThingHandler(thing);
-        } else if (thingTypeUID.equals(THING_TYPE_BRIDGE_SER) || thingTypeUID.equals(THING_TYPE_BRIDGE_ETH)) {
+        } else if (thingTypeUID.equals(THING_TYPE_BRIDGE_SER) || thingTypeUID.equals(THING_TYPE_BRIDGE_ETH)
+                || thingTypeUID.equals(THING_TYPE_BRIDGE_MQTT)) {
             MySensorsBridgeHandler bridgeHandler = new MySensorsBridgeHandler((Bridge) thing);
             registerDiscoveryService(bridgeHandler);
             handler = bridgeHandler;
