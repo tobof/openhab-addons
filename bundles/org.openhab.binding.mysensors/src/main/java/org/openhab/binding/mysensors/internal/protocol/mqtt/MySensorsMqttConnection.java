@@ -45,8 +45,8 @@ public class MySensorsMqttConnection extends MySensorsAbstractConnection impleme
     private MySensorsMqttSubscriber myMqttSub;
     private MqttBrokerConnection connection;
 
-    private static PipedOutputStream out;
-    private static PipedInputStream in;
+    private PipedOutputStream out;
+    private PipedInputStream in;
 
     private MySensorsMqttPublishCallback myMqttPublishCallback = new MySensorsMqttPublishCallback();
 
