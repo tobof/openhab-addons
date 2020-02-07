@@ -23,10 +23,14 @@ import org.eclipse.smarthome.io.transport.mqtt.MqttBrokerConnection;
 import org.eclipse.smarthome.io.transport.mqtt.MqttConnectionObserver;
 import org.eclipse.smarthome.io.transport.mqtt.MqttConnectionState;
 import org.eclipse.smarthome.io.transport.mqtt.MqttMessageSubscriber;
+import org.eclipse.smarthome.io.transport.mqtt.MqttService;
 import org.openhab.binding.mysensors.internal.event.MySensorsEventRegister;
 import org.openhab.binding.mysensors.internal.gateway.MySensorsGatewayConfig;
 import org.openhab.binding.mysensors.internal.protocol.MySensorsAbstractConnection;
 import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.ServiceReference;
 
 /**
  * Implements the MQTT connection to a gateway of the MySensors network.
@@ -38,12 +42,11 @@ import org.openhab.binding.mysensors.internal.protocol.message.MySensorsMessage;
 
 public class MySensorsMqttConnection extends MySensorsAbstractConnection implements MqttConnectionObserver {
 
-    private MqttBrokerConnection mqttBrokerConn;
     private MySensorsMqttSubscriber myMqttSub;
     private MqttBrokerConnection connection;
 
-    private static PipedOutputStream out;
-    private static PipedInputStream in;
+    private PipedOutputStream out;
+    private PipedInputStream in;
 
     private MySensorsMqttPublishCallback myMqttPublishCallback = new MySensorsMqttPublishCallback();
 
@@ -58,6 +61,19 @@ public class MySensorsMqttConnection extends MySensorsAbstractConnection impleme
     @Override
     protected boolean establishConnection() {
         boolean connectionEstablished = false;
+
+        // ## Start workaround
+        if (MySensorsMqttService.getMqttService() == null) {
+            BundleContext bc = FrameworkUtil.getBundle(getClass()).getBundleContext();
+            final ServiceReference sr = bc.getServiceReference(MqttService.class.getName());
+            if (sr != null) {
+                final MqttService mqtt = (MqttService) bc.getService(sr);
+                if (mqtt != null) {
+                    new MySensorsMqttService().setMqttService(mqtt);
+                }
+            }
+        }
+        // ## End workaround
 
         if (MySensorsMqttService.getMqttService() == null) {
             logger.error("MqttService is null!");
@@ -105,7 +121,7 @@ public class MySensorsMqttConnection extends MySensorsAbstractConnection impleme
     protected void stopConnection() {
         in = null;
         out = null;
-        mqttBrokerConn.unsubscribe(myMqttSub.getTopic(), myMqttSub);
+        connection.unsubscribe(myMqttSub.getTopic(), myMqttSub);
     }
 
     /**
@@ -124,6 +140,11 @@ public class MySensorsMqttConnection extends MySensorsAbstractConnection impleme
 
         @Override
         public void processMessage(String topic, byte[] payload) {
+            if (!isConnected() || out == null) {
+                logger.error("Not connected - Messages can not be processed");
+                return;
+            }
+
             String payloadString = new String(payload);
             logger.debug("MQTT message received. Topic: {}, Message: {}", topic, payloadString);
             if (topic.indexOf(myGatewayConfig.getTopicSubscribe()) == 0) {

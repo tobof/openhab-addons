@@ -75,7 +75,7 @@ public class MySensorsCacheFactory {
         T ret = def;
 
         try {
-            File f = new File(CACHE_BASE_PATH + "/" + GIVEN_IDS_CACHE_FILE + CACHE_FILE_SUFFIX);
+            File f = new File(CACHE_BASE_PATH + "/" + fileName + CACHE_FILE_SUFFIX);// FTi
 
             if (f.exists()) {
                 logger.debug("Cache file: {} exist.", GIVEN_IDS_CACHE_FILE + CACHE_FILE_SUFFIX);
@@ -106,7 +106,7 @@ public class MySensorsCacheFactory {
     private synchronized <T> void jsonToFile(String fileName, T obj, Type clasz) {
         JsonWriter jsonWriter = null;
         try {
-            File f = new File(CACHE_BASE_PATH + "/" + GIVEN_IDS_CACHE_FILE + CACHE_FILE_SUFFIX);
+            File f = new File(CACHE_BASE_PATH + "/" + fileName + CACHE_FILE_SUFFIX);// FTi
 
             jsonWriter = new JsonWriter(new FileWriter(f));
 

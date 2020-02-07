@@ -156,15 +156,19 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
     private void updateCacheFile() {
         List<Integer> givenIds = myGateway.getGivenIds();
 
-        cacheFactory.writeCache(MySensorsCacheFactory.GIVEN_IDS_CACHE_FILE, givenIds.toArray(new Integer[] {}),
-                Integer[].class);
+        String cacheFileName = MySensorsCacheFactory.GIVEN_IDS_CACHE_FILE + "_"
+                + getThing().getUID().toString().replace(':', '_');
+
+        cacheFactory.writeCache(cacheFileName, givenIds.toArray(new Integer[] {}), Integer[].class);
     }
 
     private Map<Integer, MySensorsNode> loadCacheFile() {
         Map<Integer, MySensorsNode> nodes = new HashMap<Integer, MySensorsNode>();
 
-        List<Integer> givenIds = cacheFactory.readCache(MySensorsCacheFactory.GIVEN_IDS_CACHE_FILE,
-                new ArrayList<Integer>(), new TypeToken<ArrayList<Integer>>() {
+        String cacheFileName = MySensorsCacheFactory.GIVEN_IDS_CACHE_FILE + "_"
+                + getThing().getUID().toString().replace(':', '_');
+        List<Integer> givenIds = cacheFactory.readCache(cacheFileName, new ArrayList<Integer>(),
+                new TypeToken<ArrayList<Integer>>() {
                 }.getType());
 
         for (Integer i : givenIds) {
@@ -190,6 +194,7 @@ public class MySensorsBridgeHandler extends BaseBridgeHandler implements MySenso
             gatewayConfig.setIpAddress(conf.ipAddress);
             gatewayConfig.setTcpPort(conf.tcpPort);
         } else if (bridgeuid.equals(THING_TYPE_BRIDGE_MQTT)) {
+            gatewayConfig.setGatewayType(MySensorsGatewayType.MQTT);
             gatewayConfig.setBrokerName(conf.brokerName);
             gatewayConfig.setTopicPublish(conf.topicPublish);
             gatewayConfig.setTopicSubscribe(conf.topicSubscribe);
