@@ -166,6 +166,7 @@ public class MySensorsBindingConstants {
     public static final String CHANNEL_IR_RECEIVE = "irReceive";
     public static final String CHANNEL_SCENE_ON = "scene-on";
     public static final String CHANNEL_SCENE_OFF = "scene-off";
+    public static final String CHANNEL_DIRECTION = "direction";
 
     // Extra channel names for non-standard MySensors channels
     public static final String CHANNEL_MYSENSORS_MESSAGE = "mySensorsMessage";
@@ -236,6 +237,7 @@ public class MySensorsBindingConstants {
             put(MySensorsMessageSubType.V_IR_RECEIVE, CHANNEL_IR_RECEIVE);
             put(MySensorsMessageSubType.V_SCENE_ON, CHANNEL_SCENE_ON);
             put(MySensorsMessageSubType.V_SCENE_OFF, CHANNEL_SCENE_OFF);
+            put(MySensorsMessageSubType.V_DIRECTION, CHANNEL_DIRECTION);
         }
     };
 
@@ -324,6 +326,7 @@ public class MySensorsBindingConstants {
             put(CHANNEL_IR_RECEIVE, STRING_TYPE_CONVERTER);
             put(CHANNEL_SCENE_ON, DECIMAL_TYPE_CONVERTER);
             put(CHANNEL_SCENE_OFF, DECIMAL_TYPE_CONVERTER);
+            put(CHANNEL_DIRECTION, DECIMAL_TYPE_CONVERTER);
 
             // Internal
             put(CHANNEL_VERSION, STRING_TYPE_CONVERTER);

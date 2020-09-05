@@ -16,6 +16,7 @@
 
 		<channels>
 			<channel id="wind" typeId="wind-channel" />
+			<channel id="direction" typeId="direction-channel" />
 			<channel id="gust" typeId="gust-channel" />
 			<channel id="var1" typeId="var1-channel" />
 			<channel id="var2" typeId="var2-channel" />
