@@ -333,4 +333,9 @@
 		<description>MySensors RGBW Channel</description>
 		<category>Variable</category>
 	</channel-type>
+	<channel-type id="direction-channel">
+		<item-type>Number</item-type>
+		<label>Direction</label>
+		<description>Direction</description>
+	</channel-type>
 </thing:thing-descriptions>
